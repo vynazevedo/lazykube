@@ -2,16 +2,15 @@ package config
 
 import (
 	"github.com/TNK-Studio/lazykube/pkg/utils"
-	"github.com/jroimartin/gocui"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v3"
-	"io/ioutil"
 	"os"
 	"path"
 )
 
+const configFileMode = 0o600
+
 var (
-	// Todo: check error
 	HomePath, _      = utils.Home()
 	LazykubeHomePath = path.Join(HomePath, ".lazykube/")
 
@@ -21,8 +20,8 @@ var (
 		GuiConfig: &GuiConfig{
 			Highlight:  true,
 			Cursor:     false,
-			FgColor:    gocui.ColorWhite,
-			SelFgColor: gocui.ColorGreen,
+			FgColor:    ColorWhite,
+			SelFgColor: ColorGreen,
 			Mouse:      true,
 			InputEsc:   true,
 		},
@@ -69,9 +68,8 @@ type Config struct {
 	UserConfig *UserConfig `yaml:"user_config"`
 }
 
-// ReadFrom read config
 func (c *Config) ReadFrom(filePath, fileName string) error {
-	configFile, err := ioutil.ReadFile(path.Join(filePath, fileName))
+	configFile, err := os.ReadFile(path.Join(filePath, fileName))
 	if err != nil {
 		return err
 	}
@@ -84,13 +82,12 @@ func (c *Config) ReadFrom(filePath, fileName string) error {
 	return nil
 }
 
-// SaveTo save config
 func (c *Config) SaveTo(filePath, fileName string) error {
 	bytes, err := yaml.Marshal(c)
 	if err != nil {
 		return err
 	}
-	if err := ioutil.WriteFile(path.Join(filePath, fileName), bytes, 0755); err != nil {
+	if err := os.WriteFile(path.Join(filePath, fileName), bytes, configFileMode); err != nil {
 		return err
 	}
 	return nil
