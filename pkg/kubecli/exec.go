@@ -2,7 +2,7 @@ package kubecli
 
 import (
 	"github.com/spf13/cobra"
-	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/cli-runtime/pkg/genericiooptions"
 	"k8s.io/kubectl/pkg/cmd/exec"
 	cmdutil "k8s.io/kubectl/pkg/cmd/util"
 	"k8s.io/kubectl/pkg/util/i18n"
@@ -10,8 +10,6 @@ import (
 
 	"k8s.io/kubectl/pkg/util/templates"
 )
-
-// Note: Copy code because of argsLenAtDash always "-1"
 
 var (
 	execExample = templates.Examples(i18n.T(`
@@ -44,7 +42,7 @@ const (
 	defaultPodExecTimeout = 60 * time.Second
 )
 
-func NewCmdExec(f cmdutil.Factory, streams genericclioptions.IOStreams) *cobra.Command {
+func NewCmdExec(f cmdutil.Factory, streams genericiooptions.IOStreams) *cobra.Command {
 	options := &exec.ExecOptions{
 		StreamOptions: exec.StreamOptions{
 			IOStreams: streams,
@@ -59,8 +57,6 @@ func NewCmdExec(f cmdutil.Factory, streams genericclioptions.IOStreams) *cobra.C
 		Long:                  "Execute a command in a container.",
 		Example:               execExample,
 		Run: func(cmd *cobra.Command, args []string) {
-			// Note: Copy code because of argsLenAtDash always "-1"
-			// argsLenAtDash := cmd.ArgsLenAtDash()
 			argsLenAtDash := 1
 			cmdutil.CheckErr(options.Complete(f, cmd, args, argsLenAtDash))
 			cmdutil.CheckErr(options.Validate())
@@ -68,16 +64,14 @@ func NewCmdExec(f cmdutil.Factory, streams genericclioptions.IOStreams) *cobra.C
 		},
 	}
 	cmdutil.AddPodRunningTimeoutFlag(cmd, defaultPodExecTimeout)
-	cmdutil.AddJsonFilenameFlag(cmd.Flags(), &options.FilenameOptions.Filenames, "to use to exec into the resource")
-	// TODO support UID
+	cmdutil.AddJsonFilenameFlag(cmd.Flags(), &options.Filenames, "to use to exec into the resource")
 	cmd.Flags().StringVarP(&options.ContainerName, "container", "c", options.ContainerName, "Container name. If omitted, the first container in the pod will be chosen")
 	cmd.Flags().BoolVarP(&options.Stdin, "stdin", "i", options.Stdin, "Pass stdin to the container")
 	cmd.Flags().BoolVarP(&options.TTY, "tty", "t", options.TTY, "Stdin is a TTY")
 	return cmd
 }
 
-// Exec Exec
-func (cli *KubeCLI) Exec(streams genericclioptions.IOStreams, args ...string) *Cmd {
+func (cli *KubeCLI) Exec(streams genericiooptions.IOStreams, args ...string) *Cmd {
 	cmd := NewCmdExec(cli.factory, streams)
 	return NewCmd(cmd, args, streams)
 }
