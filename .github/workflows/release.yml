@@ -1,0 +1,55 @@
+name: Build release
+on:
+  release:
+      types:
+        - published
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v1
+        with:
+          go-version: 1.14
+
+      - uses: actions/checkout@v2.3.4
+
+      - run: go mod download
+
+      - name: Get tag
+        id: tag
+        uses: dawidd6/action-get-tag@v1
+
+      - name: Current tag
+        run: echo ${{steps.tag.outputs.tag}}
+
+      - uses: izumin5210/action-go-crossbuild@v1.0.0
+        with:
+          goxz-version: v0.6.0
+          name: lazykube
+          arch: amd64,386
+          os: darwin,linux,windows
+          package: ./cmd/lazykube
+          ldflags: "-X github.com/TNK-Studio/lazykube/pkg/app.Version=${{steps.tag.outputs.tag}}"
+
+      - uses: izumin5210/action-go-crossbuild@v1.0.0
+        with:
+          goxz-version: v0.6.0
+          name: lazykube
+          arch: arm
+          os: linux
+          package: ./cmd/lazykube
+          ldflags: "-X github.com/TNK-Studio/lazykube/pkg/app.Version=${{steps.tag.outputs.tag}}"
+
+      - uses: softprops/action-gh-release@v1
+        with:
+          files: './dist/*'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: startsWith(github.ref, 'refs/tags/')
+
+      - uses: izumin5210/action-homebrew-tap@v1.0.0
+        with:
+          tap: TNK-Studio/homebrew-tools
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tap-token: ${{ secrets.TAP_GITHUB_TOKEN }}
+        if: startsWith(github.ref, 'refs/tags/')
