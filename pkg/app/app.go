@@ -1,11 +1,12 @@
 package app
 
 import (
+	"context"
 	"fmt"
-	"github.com/Matt-Gleich/release"
 	"github.com/TNK-Studio/lazykube/pkg/config"
 	guilib "github.com/TNK-Studio/lazykube/pkg/gui"
 	"github.com/TNK-Studio/lazykube/pkg/log"
+	"github.com/TNK-Studio/lazykube/pkg/release"
 	"github.com/TNK-Studio/lazykube/pkg/utils"
 	"github.com/gookit/color"
 )
@@ -18,7 +19,6 @@ var (
 	Version = "No Version Provided"
 )
 
-// App lazykube application
 type App struct {
 	version     string
 	ClusterInfo *guilib.View
@@ -32,7 +32,6 @@ type App struct {
 	Gui         *guilib.Gui
 }
 
-// NewApp new lazykube application
 func NewApp() *App {
 	app := &App{
 		version:     Version,
@@ -75,25 +74,24 @@ func (app *App) Version() string {
 }
 
 func (app *App) CheckRelease() (bool, string, error) {
-	isOutdated, version, err := release.Check(app.version, githubRepo)
+	result, err := release.NewChecker().Check(context.Background(), app.version, githubRepo)
 	if err != nil {
-		log.Logger.Error(isOutdated, version, err)
+		log.Logger.Error(err)
+		return false, "", err
 	}
-	return isOutdated, version, err
+	return result.Outdated, result.Latest, nil
 }
 
-// Run run
 func (app *App) Run() {
 	app.Gui.Run()
 }
 
-// Stop stop
 func (app *App) Stop() {
 	app.Gui.Close()
 	isOutdated, version, err := app.CheckRelease()
 	if err == nil && isOutdated {
 		fmt.Printf(
-			"%s 🎉. %s => %s %s/releases/tag/%s\n",
+			"%s. %s => %s %s/releases/tag/%s\n",
 			color.Green.Sprint("A new release of lazykube is available"),
 			color.Yellow.Sprint(app.Version()),
 			color.Green.Sprint(version),
@@ -103,7 +101,6 @@ func (app *App) Stop() {
 	}
 }
 
-// OnRender OnRender
 func (app *App) OnRender(gui *guilib.Gui) error {
 	if config.Conf.UserConfig.CustomResourcePanels != nil {
 		for _, resource := range config.Conf.UserConfig.CustomResourcePanels {
@@ -115,7 +112,6 @@ func (app *App) OnRender(gui *guilib.Gui) error {
 	return nil
 }
 
-// OnRenderOptions OnRenderOptions
 func (app *App) OnRenderOptions(gui *guilib.Gui) error {
 	return gui.RenderString(
 		app.Option.Name,
