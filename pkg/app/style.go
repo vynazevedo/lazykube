@@ -17,7 +17,6 @@ var (
 	functionViews   = []string{clusterInfoViewName, namespaceViewName, serviceViewName, deploymentViewName, podViewName}
 	resizeableViews = []string{namespaceViewName, serviceViewName, deploymentViewName, podViewName}
 
-	// Function cache
 	reactiveHeightCache = map[string]int{}
 	migrateTopCache     = map[string]int{}
 )
@@ -93,11 +92,9 @@ func cacheAbleReactiveHeight(maxHeight int, resizeableViews []string, currentVie
 		resizeView = currentViewName
 	}
 
-	// When cluster info 、navigation or detail panel selected.
 	if !resizeableView(resizeView) {
 		resizeView = previousViewName
 
-		// If previous view is cluster info 、navigation or detail pane.
 		if !resizeableView(resizeView) {
 			resizeView = resizeableViews[0]
 		}
@@ -106,16 +103,9 @@ func cacheAbleReactiveHeight(maxHeight int, resizeableViews []string, currentVie
 	n := len(resizeableViews)
 	height := viewHeights[viewName]
 
-	if maxHeight < heightBoundary() && resizeableView(viewName) {
-		if resizeView == viewName {
-			cacheVal = height + len(resizeableViews)
-		} else {
-			cacheVal = 2
-		}
-	} else {
-		if resizeView == viewName {
-			height += usableSpace(maxHeight) % n
-		}
+	smallScreen := maxHeight < heightBoundary() && resizeableView(viewName)
+	if !smallScreen && resizeView == viewName {
+		height += usableSpace(maxHeight) % n
 	}
 
 	cacheVal = height
@@ -134,36 +124,15 @@ func migrateTopFunc(gui *guilib.Gui, view *guilib.View) int {
 
 func cacheAbleMigrateTopFunc(maxHeight int, resizeableViews []string, currentViewName, viewName string) int {
 	key := fmt.Sprintf("%d,%s,%s,%s", maxHeight, strings.Join(resizeableViews, ","), currentViewName, viewName)
-	cacheVal, ok := migrateTopCache[key]
-	if ok {
+	if cacheVal, ok := migrateTopCache[key]; ok {
 		return cacheVal
 	}
 
-	if maxHeight < heightBoundary() {
-		if currentViewName != "" {
-			if !resizeableView(viewName) {
-				if viewName == resizeableViews[0] {
-					cacheVal = 1
-				}
-			} else {
-				for i, viewName := range functionViews {
-					if currentViewName == viewName {
-						index := i + 1
-						if index < len(functionViews) && functionViews[index] == viewName {
-							cacheVal = 1
-							break
-						}
-					}
-				}
-			}
-		} else {
-			cacheVal = -1
-		}
-	}
-	cacheVal = 1
-	migrateTopCache[key] = cacheVal
-	return cacheVal
+	migrateTopCache[key] = defaultMigrateTop
+	return defaultMigrateTop
 }
+
+const defaultMigrateTop = 1
 
 func heightBoundary() int {
 	usedSpace := clusterInfoViewHeight - optionViewHeight - (len(functionViews) - 1)

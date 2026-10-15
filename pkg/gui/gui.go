@@ -4,17 +4,16 @@ import (
 	"errors"
 	"github.com/TNK-Studio/lazykube/pkg/config"
 	"github.com/TNK-Studio/lazykube/pkg/log"
-	"github.com/jroimartin/gocui"
-	"github.com/nsf/termbox-go"
+	"github.com/jesseduffield/gocui"
 	"sort"
+	"sync/atomic"
+	"time"
 )
 
 type (
-	// Gui Gui
 	Gui struct {
-		views   []*View
-		Actions []*Action
-		// History of focused views name.
+		views              []*View
+		Actions            []*Action
 		previousViews      TowHeadQueue
 		OnSizeChange       func(gui *Gui) error
 		OnRender           func(gui *Gui) error
@@ -26,11 +25,25 @@ type (
 		preWidth           int
 		Config             config.GuiConfig
 		renderTimes        int
+		RefreshInterval    time.Duration
+		refresher          atomic.Pointer[refresher]
 	}
 )
 
-// NewGui NewGui
 func NewGui(config config.GuiConfig, views ...*View) *Gui {
+	return newGui(gocui.NewGuiOpts{OutputMode: gocui.OutputNormal}, config, views...)
+}
+
+func NewHeadlessGui(config config.GuiConfig, width, height int, views ...*View) *Gui {
+	return newGui(gocui.NewGuiOpts{
+		OutputMode: gocui.OutputNormal,
+		Headless:   true,
+		Width:      width,
+		Height:     height,
+	}, config, views...)
+}
+
+func newGui(opts gocui.NewGuiOpts, config config.GuiConfig, views ...*View) *Gui {
 	gui := &Gui{
 		state:              NewStateMap(),
 		previousViews:      NewQueue(),
@@ -38,7 +51,7 @@ func NewGui(config config.GuiConfig, views ...*View) *Gui {
 		Config:             config,
 	}
 	gui.views = make([]*View, 0)
-	g, err := gocui.NewGui(gocui.OutputNormal)
+	g, err := gocui.NewGui(opts)
 
 	if err != nil {
 		log.Logger.Panicf("%+v", err)
@@ -59,7 +72,6 @@ func NewGui(config config.GuiConfig, views ...*View) *Gui {
 	return gui
 }
 
-// ReRenderAll ReRenderAll
 func (gui *Gui) ReRenderAll() {
 	gui.renderTimes++
 	for _, view := range gui.views {
@@ -154,7 +166,6 @@ func (gui *Gui) updateSelectedViewLine(view *View) error {
 	return nil
 }
 
-// SetAlwaysOnTopViews SetAlwaysOnTopViews
 func (gui *Gui) SetAlwaysOnTopViews() {
 	views := gui.views
 	sort.Sort(ViewsZIndexSorter(views))
@@ -167,11 +178,8 @@ func (gui *Gui) SetAlwaysOnTopViews() {
 			continue
 		}
 	}
-
-	return
 }
 
-// SortViewsByZIndex SortViewsByZIndex
 func (gui *Gui) SortViewsByZIndex() {
 	views := gui.views
 	sort.Sort(ViewsZIndexSorter(views))
@@ -184,60 +192,37 @@ func (gui *Gui) SortViewsByZIndex() {
 			continue
 		}
 	}
-
-	return
 }
 
-// Configure Configure
 func (gui *Gui) Configure() {
 	gui.g.Highlight = gui.Config.Highlight
 	gui.g.Cursor = gui.Config.Cursor
-	gui.g.SelFgColor = gui.Config.SelFgColor
-	gui.g.SelBgColor = gui.Config.SelBgColor
-	gui.g.FgColor = gui.Config.FgColor
-	gui.g.BgColor = gui.Config.BgColor
+	gui.g.SelFgColor = gui.Config.SelFgColor.Attribute()
+	gui.g.SelBgColor = gui.Config.SelBgColor.Attribute()
+	gui.g.FgColor = gui.Config.FgColor.Attribute()
+	gui.g.BgColor = gui.Config.BgColor.Attribute()
 	gui.g.Mouse = gui.Config.Mouse
 	gui.g.InputEsc = gui.Config.InputEsc
-
-	inputMode := termbox.InputAlt
-	if gui.g.InputEsc {
-		inputMode = termbox.InputEsc
-	}
-	if gui.g.Mouse {
-		inputMode |= termbox.InputMouse
-	}
-	termbox.SetInputMode(inputMode)
-
-	// Must to set cursor otherwise hide cursor not work.
-	termbox.SetCursor(0, 0)
-	if !gui.g.Cursor {
-		termbox.HideCursor()
-	}
 }
 
-// Size Size
 func (gui *Gui) Size() (int, int) {
 	return gui.g.Size()
 }
 
-// MaxWidth MaxWidth
 func (gui *Gui) MaxWidth() int {
 	maxWidth, _ := gui.g.Size()
 	return maxWidth
 }
 
-// MaxHeight MaxHeight
 func (gui *Gui) MaxHeight() int {
 	_, maxHeight := gui.g.Size()
 	return maxHeight
 }
 
-// GetViews GetViews
 func (gui *Gui) GetViews() []*View {
 	return gui.views
 }
 
-// SetKeybinding SetKeybinding
 func (gui *Gui) SetKeybinding(viewName string, key interface{}, mod gocui.Modifier, handler func(*gocui.Gui, *gocui.View) error) {
 	if err := gui.g.SetKeybinding(
 		viewName,
@@ -249,7 +234,6 @@ func (gui *Gui) SetKeybinding(viewName string, key interface{}, mod gocui.Modifi
 	}
 }
 
-// BindAction BindAction
 func (gui *Gui) BindAction(viewName string, action ActionInterface) {
 	var handler ViewHandler
 	if action.ReRenderAll() {
@@ -284,7 +268,6 @@ func (gui *Gui) BindAction(viewName string, action ActionInterface) {
 	}
 }
 
-// ViewDimensionValidated ViewDimensionValidated
 func (gui *Gui) ViewDimensionValidated(x0, y0, x1, y1 int) bool {
 	if x0 >= x1 || y0 >= y1 {
 		return false
@@ -293,7 +276,6 @@ func (gui *Gui) ViewDimensionValidated(x0, y0, x1, y1 int) bool {
 	return true
 }
 
-// Run Run
 func (gui *Gui) Run() {
 	if gui.Actions != nil {
 		for _, act := range gui.Actions {
@@ -312,17 +294,49 @@ func (gui *Gui) Run() {
 		}
 	}
 
-	if err := gui.g.MainLoop(); err != nil && !errors.Is(err, gocui.ErrQuit) {
+	stopRefresh := gui.startRefreshTicker()
+	defer stopRefresh()
+
+	if err := gui.g.MainLoop(); !errors.Is(err, gocui.ErrQuit) {
 		log.Logger.Panicf("MainLoop - %+v", err)
 	}
 }
 
-// Close Close
+const DefaultRefreshInterval = 250 * time.Millisecond
+
+func (gui *Gui) refreshInterval() time.Duration {
+	if gui.RefreshInterval > 0 {
+		return gui.RefreshInterval
+	}
+	return DefaultRefreshInterval
+}
+
+func (gui *Gui) startRefreshTicker() func() {
+	r := newRefresher(gui.g.Update)
+	gui.refresher.Store(r)
+	r.start(gui.refreshInterval())
+	return func() {
+		r.stop()
+		gui.refresher.Store(nil)
+	}
+}
+
+func (gui *Gui) pauseRefresh() {
+	if r := gui.refresher.Load(); r != nil {
+		r.pause()
+	}
+}
+
+func (gui *Gui) resumeRefresh() {
+	if r := gui.refresher.Load(); r != nil {
+		r.resume()
+	}
+}
+
 func (gui *Gui) Close() {
 	gui.g.Close()
 }
 
-// GetView GetView
 func (gui *Gui) GetView(name string) (*View, error) {
 	if err := gui.ViewExisted(name); err != nil {
 		return nil, err
@@ -331,7 +345,6 @@ func (gui *Gui) GetView(name string) (*View, error) {
 	return gui.getView(name), nil
 }
 
-// RenderView RenderView
 func (gui *Gui) RenderView(view *View) error {
 	x0, y0, x1, y1 := view.GetDimensions()
 	if !gui.ViewDimensionValidated(x0, y0, x1, y1) {
@@ -353,13 +366,12 @@ func (gui *Gui) unRenderNotEnoughSpaceView() error {
 	return nil
 }
 
-// Clear Clear
 func (gui *Gui) Clear() error {
 	if err := gui.unRenderNotEnoughSpaceView(); err != nil {
 		return err
 	}
-	if err := termbox.Clear(termbox.Attribute(gui.g.FgColor), termbox.Attribute(gui.g.BgColor)); err != nil {
-		return err
+	if gocui.Screen != nil {
+		gocui.Screen.Clear()
 	}
 	return nil
 }
@@ -373,11 +385,11 @@ func (gui *Gui) renderNotEnoughSpaceView() error {
 	return gui.renderView(NotEnoughSpace, x0, y0, x1, y1)
 }
 
-// SetView SetView
 func (gui *Gui) SetView(view *View, x0, y0, x1, y1 int) (*View, error) {
 	if v, err := gui.g.SetView(
 		view.Name,
 		x0, y0, x1, y1,
+		0,
 	); err != nil {
 		if !errors.Is(err, gocui.ErrUnknownView) {
 			return nil, err
@@ -414,15 +426,13 @@ func (gui *Gui) renderView(view *View, x0, y0, x1, y1 int) error {
 	return nil
 }
 
-// ViewColors ViewColors
 func (gui *Gui) ViewColors(view *View) (gocui.Attribute, gocui.Attribute) {
 	if gui.Config.Highlight && view == gui.CurrentView() {
-		return gui.Config.SelFgColor, gui.Config.SelBgColor
+		return gui.Config.SelFgColor.Attribute(), gui.Config.SelBgColor.Attribute()
 	}
-	return gui.Config.FgColor, gui.Config.BgColor
+	return gui.Config.FgColor.Attribute(), gui.Config.BgColor.Attribute()
 }
 
-// CurrentView CurrentView
 func (gui *Gui) CurrentView() *View {
 	v := gui.g.CurrentView()
 	if v == nil {
@@ -431,9 +441,7 @@ func (gui *Gui) CurrentView() *View {
 	return gui.getView(v.Name())
 }
 
-// AddView AddView
 func (gui *Gui) AddView(view *View) error {
-	// Todo: Check if view existed
 	gui.views = append(gui.views, view)
 	view.gui = gui
 
@@ -459,7 +467,6 @@ func (gui *Gui) AddView(view *View) error {
 	return nil
 }
 
-// DeleteView DeleteView
 func (gui *Gui) DeleteView(name string) error {
 	if err := gui.ViewExisted(name); err != nil {
 		return err
@@ -475,12 +482,11 @@ func (gui *Gui) DeleteView(name string) error {
 		}
 	}
 
-	gui.g.DeleteKeybindings(name)
+	gui.g.DeleteViewKeybindings(name)
 
 	return nil
 }
 
-// ViewExisted ViewExisted
 func (gui *Gui) ViewExisted(name string) error {
 	_, err := gui.g.View(name)
 	if err != nil {
@@ -489,36 +495,27 @@ func (gui *Gui) ViewExisted(name string) error {
 	return nil
 }
 
-// RenderString RenderString
 func (gui *Gui) RenderString(viewName, s string) error {
+	if view := gui.getView(viewName); view != nil && view.Rendered() && view.content.matches(s) {
+		return nil
+	}
 	gui.Update(func(g *gocui.Gui) error {
 		view, err := gui.GetView(viewName)
 		if err != nil {
-			return nil // return gracefully if view has been deleted
+			return nil
 		}
 
-		if err := view.SetOrigin(0, 0); err != nil {
-			return err
-		}
-		if err := view.SetCursor(0, 0); err != nil {
-			return err
-		}
-
-		if view != nil {
-			return view.SetViewContent(s)
-		}
-
-		return nil
+		view.SetOrigin(0, 0)
+		view.SetCursor(0, 0)
+		return view.SetViewContent(s)
 	})
 	return nil
 }
 
-// Update Update
 func (gui *Gui) Update(f func(*gocui.Gui) error) {
 	gui.g.Update(f)
 }
 
-// SetCurrentView SetCurrentView
 func (gui *Gui) SetCurrentView(name string) (*View, error) {
 	if _, err := gui.g.SetCurrentView(name); err != nil {
 		return nil, err
@@ -527,7 +524,6 @@ func (gui *Gui) SetCurrentView(name string) (*View, error) {
 	return view, nil
 }
 
-// SetViewOnTop SetViewOnTop
 func (gui *Gui) SetViewOnTop(name string) (*View, error) {
 	if _, err := gui.g.SetViewOnTop(name); err != nil {
 		return nil, err
@@ -641,12 +637,10 @@ func (gui *Gui) focusView(name string) error {
 	return nil
 }
 
-// HasPreviousView HasPreviousView
 func (gui *Gui) HasPreviousView() bool {
 	return !gui.previousViews.IsEmpty()
 }
 
-// ReturnPreviousView ReturnPreviousView
 func (gui *Gui) ReturnPreviousView() error {
 	previousViewName := gui.popPreviousView()
 	previousView, err := gui.GetView(previousViewName)
@@ -677,12 +671,10 @@ func (gui *Gui) renderOptions() error {
 	return nil
 }
 
-// SetRune SetRune
 func (gui *Gui) SetRune(x, y int, ch rune, fgColor, bgColor gocui.Attribute) error {
 	return gui.g.SetRune(x, y, ch, fgColor, bgColor)
 }
 
-// ReRenderViews ReRenderViews
 func (gui *Gui) ReRenderViews(viewNames ...string) {
 	for _, name := range viewNames {
 		view, err := gui.GetView(name)
@@ -695,7 +687,6 @@ func (gui *Gui) ReRenderViews(viewNames ...string) {
 	}
 }
 
-// ClearViews ClearViews
 func (gui *Gui) ClearViews(viewNames ...string) {
 	for _, name := range viewNames {
 		view, err := gui.GetView(name)
@@ -708,36 +699,34 @@ func (gui *Gui) ClearViews(viewNames ...string) {
 	}
 }
 
-// ForceFlush ForceFlush
-func (gui *Gui) ForceFlush() error {
-	termbox.Close()
-	if err := termbox.Init(); err != nil {
-		return err
-	}
-	inputMode := termbox.InputAlt
-	if gui.g.InputEsc {
-		inputMode = termbox.InputEsc
-	}
-	if gui.g.Mouse {
-		inputMode |= termbox.InputMouse
-	}
-	termbox.SetInputMode(inputMode)
-
-	// Must to set cursor otherwise hide cursor not work.
-	termbox.SetCursor(0, 0)
-	if !gui.g.Cursor {
-		termbox.HideCursor()
-	}
-
-	return termbox.Flush()
-}
-
-func (gui *Gui) ReInitTermBox() error {
-	termbox.Close()
-	if err := termbox.Init(); err != nil {
+func (gui *Gui) Suspend() error {
+	gui.pauseRefresh()
+	if err := gui.g.Suspend(); err != nil {
+		gui.resumeRefresh()
 		return err
 	}
 	return nil
+}
+
+func (gui *Gui) Resume() error {
+	if err := gui.g.Resume(); err != nil {
+		return err
+	}
+	gui.resumeRefresh()
+	gui.Configure()
+	gui.ReRenderAll()
+	return nil
+}
+
+func (gui *Gui) RunSuspended(run func() error) error {
+	if err := gui.Suspend(); err != nil {
+		return err
+	}
+	runErr := run()
+	if err := gui.Resume(); err != nil {
+		return errors.Join(runErr, err)
+	}
+	return runErr
 }
 
 func (gui *Gui) SetState(key string, value interface{}, reRenderAll bool, reRenderViews ...string) error {

@@ -7,7 +7,7 @@ import (
 	"github.com/TNK-Studio/lazykube/pkg/log"
 	"github.com/TNK-Studio/lazykube/pkg/utils"
 	"github.com/gookit/color"
-	"github.com/jroimartin/gocui"
+	"github.com/jesseduffield/gocui"
 	"strings"
 )
 
@@ -69,8 +69,6 @@ var (
 	}
 )
 
-// Show dialog functions
-
 func showFilterDialog(
 	gui *guilib.Gui,
 	title string,
@@ -80,7 +78,6 @@ func showFilterDialog(
 	showInputValueInFiltered bool,
 ) error {
 	var filterInput, filtered *guilib.View
-	// If views existed.
 	filterInput, _ = gui.GetView(filterInputViewName)
 	if filterInput != nil {
 		_ = gui.DeleteView(filterInputViewName)
@@ -105,7 +102,6 @@ func showFilterDialog(
 
 func showMoreActionDialog(gui *guilib.Gui, view *guilib.View, title string, moreActions []*moreAction) error {
 	var moreActionView *guilib.View
-	// If more action view existed.
 	moreActionView, _ = gui.GetView(moreActionsViewName)
 	if moreActionView != nil {
 		_ = gui.DeleteView(moreActionsViewName)
@@ -128,7 +124,6 @@ func showMoreActionDialog(gui *guilib.Gui, view *guilib.View, title string, more
 
 func showConfirmActionDialog(gui *guilib.Gui, title, relatedViewName string, handler guilib.ViewHandler) error {
 	var confirmDialog *guilib.View
-	// If view existed.
 	confirmDialog, _ = gui.GetView(confirmDialogViewName)
 	if confirmDialog != nil {
 		_ = gui.DeleteView(confirmDialogViewName)
@@ -143,7 +138,6 @@ func showConfirmActionDialog(gui *guilib.Gui, title, relatedViewName string, han
 
 func showOptionsDialog(gui *guilib.Gui, title string, zIndex int, confirmHandler func(string) error, optionsFunc func() []string) error {
 	var optionsDialog *guilib.View
-	// If view existed.
 	optionsDialog, _ = gui.GetView(optionsDialogViewName)
 	if optionsDialog != nil {
 		_ = gui.DeleteView(optionsDialogViewName)
@@ -161,7 +155,6 @@ func showOptionsDialog(gui *guilib.Gui, title string, zIndex int, confirmHandler
 
 func showInputDialog(gui *guilib.Gui, title string, zIndex int, confirmHandler func(string) error, defaultValue string) error {
 	var inputDialog *guilib.View
-	// If view existed.
 	inputDialog, _ = gui.GetView(inputDialogViewName)
 	if inputDialog != nil {
 		_ = gui.DeleteView(inputDialogViewName)
@@ -176,8 +169,6 @@ func showInputDialog(gui *guilib.Gui, title string, zIndex int, confirmHandler f
 	}
 	return nil
 }
-
-// New dialog functions
 
 func newFilterDialog(
 	title string,
@@ -195,7 +186,6 @@ func newFilterDialog(
 		ZIndex:       10,
 		Clickable:    true,
 		Editable:     true,
-		MouseDisable: true,
 		DimensionFunc: func(gui *guilib.Gui, view *guilib.View) (int, int, int, int) {
 			maxWidth, maxHeight := gui.Size()
 			quarterWidth, quarterHeight := maxWidth/4, maxHeight/4
@@ -237,7 +227,6 @@ func newFilterDialog(
 			return nil
 		},
 		OnEditedChange: func(gui *guilib.Gui, view *guilib.View, key gocui.Key, ch rune, mod gocui.Modifier) {
-			// rerender twice times to wait flush.
 			view.ReRenderTimes(2)
 
 			filteredView, err := gui.GetView(filteredViewName)
@@ -271,10 +260,7 @@ func newFilterDialog(
 			}
 
 			view.Clear()
-			if err := view.ResetCursorOrigin(); err != nil {
-				log.Logger.Warningf("OnRender - view %s view.ResetCursorOrigin() error %s", filterInputViewName, err)
-				return err
-			}
+			view.ResetCursorOrigin()
 
 			data, err := dataFunc(value)
 			if err != nil {
@@ -601,7 +587,6 @@ func newInputDialog(title string, zIndex int, confirmHandler func(string) error,
 		CanNotReturn: false,
 		AlwaysOnTop:  true,
 		Editable:     true,
-		MouseDisable: true,
 		ZIndex:       zIndex,
 		DimensionFunc: func(gui *guilib.Gui, view *guilib.View) (int, int, int, int) {
 			maxWidth, maxHeight := gui.Size()
@@ -614,11 +599,7 @@ func newInputDialog(title string, zIndex int, confirmHandler func(string) error,
 		},
 		OnRender: func(gui *guilib.Gui, view *guilib.View) error {
 			if view.ViewBuffer() == "" && defaultValue != "" {
-				if _, err := fmt.Fprint(view, defaultValue); err != nil {
-					return err
-				}
-				dx := len([]rune(defaultValue))
-				view.MoveCursor(dx, 0, true)
+				view.SetEditableContent(defaultValue)
 			}
 			return nil
 		},
@@ -648,8 +629,6 @@ func newInputDialog(title string, zIndex int, confirmHandler func(string) error,
 		}),
 	}
 }
-
-// New dialog function utils.
 
 func filterDialogRenderOption(gui *guilib.Gui, _ *guilib.View) error {
 	return gui.RenderString(
@@ -706,9 +685,7 @@ func getMoreActionTriggerView(moreActionView *guilib.View) (*guilib.View, error)
 
 func moreActionHandlerWrapper(handler guilib.ViewHandler) guilib.ViewHandler {
 	return func(gui *guilib.Gui, view *guilib.View) error {
-		triggerView := view
-		var err error
-		triggerView, err = getMoreActionTriggerView(view)
+		triggerView, err := getMoreActionTriggerView(view)
 		if err != nil {
 			return err
 		}

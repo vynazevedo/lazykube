@@ -7,15 +7,12 @@ import (
 	"github.com/TNK-Studio/lazykube/pkg/kubecli/config"
 	"github.com/TNK-Studio/lazykube/pkg/log"
 	"github.com/go-logr/logr"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"io/ioutil"
+	"io"
 	"k8s.io/cli-runtime/pkg/genericclioptions"
-	_ "k8s.io/client-go/plugin/pkg/client/auth/azure"
+	"k8s.io/cli-runtime/pkg/genericiooptions"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/exec"
-	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/oidc"
-	_ "k8s.io/client-go/plugin/pkg/client/auth/openstack"
 	"k8s.io/klog/v2"
 	"k8s.io/kubectl/pkg/cmd/util"
 )
@@ -24,23 +21,22 @@ var Cli *KubeCLI
 
 func init() {
 	Cli = NewKubeCLI()
-	// To disable aws warning
 	disableKlog()
 }
 
 type KubeCLI struct {
-	factory      util.Factory
-	namespace    *string
-	context      *string
+	factory   util.Factory
+	namespace *string
+	context   *string
 }
 
 type Cmd struct {
 	cmd     *cobra.Command
 	args    []string
-	streams genericclioptions.IOStreams
+	streams genericiooptions.IOStreams
 }
 
-func NewCmd(cmd *cobra.Command, args []string, streams genericclioptions.IOStreams) *Cmd {
+func NewCmd(cmd *cobra.Command, args []string, streams genericiooptions.IOStreams) *Cmd {
 	return &Cmd{
 		cmd:     cmd,
 		args:    args,
@@ -134,40 +130,6 @@ func disableKlog() {
 	flagSet := &flag.FlagSet{}
 	klog.InitFlags(flagSet)
 	_ = flagSet.Set("logtostderr", "false")
-	klog.SetOutput(ioutil.Discard)
-	klog.SetLogger(NewKLogger(log.Logger))
-}
-
-type KLogger struct {
-	logger *logrus.Logger
-}
-
-func NewKLogger(logger *logrus.Logger) *KLogger {
-	return &KLogger{
-		logger: logger,
-	}
-}
-
-func (K KLogger) Enabled() bool {
-	return true
-}
-
-func (K KLogger) Info(msg string, _ ...interface{}) {
-	log.Logger.Info(msg)
-}
-
-func (K KLogger) Error(_ error, msg string, _ ...interface{}) {
-	log.Logger.Error(msg)
-}
-
-func (K KLogger) V(_ int) logr.Logger {
-	return K
-}
-
-func (K KLogger) WithValues(_ ...interface{}) logr.Logger {
-	return K
-}
-
-func (K KLogger) WithName(_ string) logr.Logger {
-	return K
+	klog.SetOutput(io.Discard)
+	klog.SetLogger(logr.New(NewKLogSink(log.Logger)))
 }

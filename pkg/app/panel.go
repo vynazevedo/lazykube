@@ -7,7 +7,7 @@ import (
 	guilib "github.com/TNK-Studio/lazykube/pkg/gui"
 	"github.com/TNK-Studio/lazykube/pkg/kubecli"
 	"github.com/fatih/camelcase"
-	"github.com/jroimartin/gocui"
+	"github.com/jesseduffield/gocui"
 	"strings"
 )
 
@@ -187,7 +187,7 @@ var (
 
 			_, err := view.GetState(iniDefaultNamespaceKey)
 			if err != nil {
-				if errors.Is(err, guilib.StateKeyError) {
+				if errors.Is(err, guilib.ErrStateKey) {
 					ns := kubecli.Cli.Namespace()
 					if err := view.SetState(iniDefaultNamespaceKey, ns, false); err != nil {
 						return err
@@ -399,8 +399,6 @@ func newCustomResourcePanel(resource string) *guilib.View {
 	}
 
 	customPanelMoreActions := []*moreAction{
-		// initialization loop
-		//addCustomResourcePanelMoreAction,
 		editResourceMoreAction,
 		deleteCustomResourcePanelMoreAction,
 	}
@@ -428,16 +426,13 @@ func addCustomResourcePanel(gui *guilib.Gui, resource string) error {
 	customResourcePanel = newCustomResourcePanel(resource)
 	viewNameResourceMap[customResourcePanel.Name] = resource
 
-	// Add to function views and resizeable views.
 	functionViews = append(functionViews, customResourcePanel.Name)
 	resizeableViews = append(resizeableViews, customResourcePanel.Name)
 
-	// Add custom panel navigation.
 	viewNavigationMap[customResourcePanel.Name] = []string{navigationOptConfig, navigationOptDescribe}
 	detailRenderMap[navigationPath(customResourcePanel.Name, navigationOptConfig)] = clearBeforeRender(configRender)
 	detailRenderMap[navigationPath(customResourcePanel.Name, navigationOptDescribe)] = reRenderInterval(clearBeforeRender(describeRender), reRenderIntervalDuration)
 
-	// Add pods and pods log navigation
 	if resourceRestartable(resource) {
 		detailRenderMap[navigationPath(customResourcePanel.Name, navigationOptPods)] = reRenderInterval(clearBeforeRender(labelsPodsRender), reRenderIntervalDuration)
 		detailRenderMap[navigationPath(customResourcePanel.Name, navigationOptPodsLog)] = reRenderInterval(podsLogsRender, reRenderIntervalDuration)
@@ -445,7 +440,6 @@ func addCustomResourcePanel(gui *guilib.Gui, resource string) error {
 		viewNavigationMap[customResourcePanel.Name] = append(viewNavigationMap[customResourcePanel.Name], navigationOptPods, navigationOptPodsLog, navigationOptTopPods)
 	}
 
-	// Add namespace navigation options.
 	viewNavigationMap[namespaceViewName] = append(viewNavigationMap[namespaceViewName], customResourcePanel.Title)
 	detailRenderMap[navigationPath(namespaceViewName, customResourcePanel.Title)] = reRenderInterval(
 		clearBeforeRender(namespaceResourceListRender(resource)),
@@ -486,7 +480,6 @@ func deleteCustomResourcePanel(gui *guilib.Gui, viewName string) error {
 		}
 	}
 
-	// Delete navigation options of namespace panel
 	for index, option := range viewNavigationMap[namespaceViewName] {
 		if option == customResourcePanel.Title {
 			viewNavigationMap[namespaceViewName] = append(

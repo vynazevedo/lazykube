@@ -4,8 +4,7 @@ import (
 	"fmt"
 	guilib "github.com/TNK-Studio/lazykube/pkg/gui"
 	"github.com/TNK-Studio/lazykube/pkg/kubecli"
-	"github.com/TNK-Studio/lazykube/pkg/log"
-	"github.com/jroimartin/gocui"
+	"github.com/jesseduffield/gocui"
 )
 
 var (
@@ -80,16 +79,10 @@ var (
 
 					y := resourceView.WhichLine(filtered)
 					if y < 0 {
-						if err := resourceView.ResetCursorOrigin(); err != nil {
-							return err
-						}
+						resourceView.ResetCursorOrigin()
 					} else {
-						if err := resourceView.SetOrigin(0, y); err != nil {
-							return err
-						}
-						if err := resourceView.SetCursor(0, 0); err != nil {
-							return err
-						}
+						resourceView.SetOrigin(0, y)
+						resourceView.SetCursor(0, 0)
 					}
 					if err := closeFilterDialog(gui); err != nil {
 						return err
@@ -357,10 +350,7 @@ func switchNamespace(gui *guilib.Gui, selectedNamespaceLine string) {
 		if err != nil {
 			return
 		}
-		err = view.SetOrigin(0, 0)
-		if err != nil {
-			log.Logger.Warningf("switchNamespace - error %s", err)
-		}
+		view.SetOrigin(0, 0)
 	}
 
 	detailView, err := gui.GetView(detailViewName)
@@ -368,10 +358,7 @@ func switchNamespace(gui *guilib.Gui, selectedNamespaceLine string) {
 		return
 	}
 	detailView.Autoscroll = false
-	err = detailView.SetOrigin(0, 0)
-	if err != nil {
-		log.Logger.Warningf("switchNamespace - detailView.SetOrigin(0, 0) error %s", err)
-	}
+	detailView.SetOrigin(0, 0)
 	gui.ReRenderViews(resizeableViews...)
 	gui.ReRenderViews(clusterInfoViewName, navigationViewName, detailViewName)
 }

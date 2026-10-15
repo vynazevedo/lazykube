@@ -5,21 +5,26 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	. "k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/kubectl/pkg/metricsutil"
 	metricsapi "k8s.io/metrics/pkg/apis/metrics"
 	metricsv1beta1api "k8s.io/metrics/pkg/apis/metrics/v1beta1"
 	metricsclientset "k8s.io/metrics/pkg/client/clientset/versioned"
 )
 
+var MeasuredResources = []v1.ResourceName{
+	v1.ResourceCPU,
+	v1.ResourceMemory,
+}
+
 func GetPodMetrics(m *metricsapi.PodMetrics) v1.ResourceList {
 	podMetrics := make(v1.ResourceList)
-	for _, res := range metricsutil.MeasuredResources {
+	for _, res := range MeasuredResources {
 		podMetrics[res], _ = resource.ParseQuantity("0")
 	}
 
 	for _, c := range m.Containers {
-		for _, res := range metricsutil.MeasuredResources {
+		for _, res := range MeasuredResources {
 			quantity := podMetrics[res]
 			quantity.Add(c.Usage[res])
 			podMetrics[res] = quantity
@@ -30,7 +35,7 @@ func GetPodMetrics(m *metricsapi.PodMetrics) v1.ResourceList {
 
 func GetAllResourceUsages(metrics *metricsutil.ResourceMetricsInfo) map[v1.ResourceName]int64 {
 	result := make(map[v1.ResourceName]int64)
-	for _, res := range metricsutil.MeasuredResources {
+	for _, res := range MeasuredResources {
 		quantity := metrics.Metrics[res]
 		usage := GetSingleResourceUsage(res, quantity)
 		result[res] = usage
@@ -56,10 +61,10 @@ func GetSingleResourceUsage(resourceType v1.ResourceName, quantity resource.Quan
 func (cli *KubeCLI) GetPodRawMetrics(
 	namespace, name string,
 	allNamespaces bool,
-	selector Selector,
+	selector labels.Selector,
 ) (*metricsapi.PodMetricsList, error) {
 	if selector == nil {
-		selector = Everything()
+		selector = labels.Everything()
 	}
 
 	var err error
@@ -98,7 +103,7 @@ func (cli *KubeCLI) GetPodRawMetrics(
 	return metrics, nil
 }
 
-func (cli *KubeCLI) GetPodMetrics(namespace, name string, allNamespaces bool, selector Selector) ([]map[v1.ResourceName]int64, error) {
+func (cli *KubeCLI) GetPodMetrics(namespace, name string, allNamespaces bool, selector labels.Selector) ([]map[v1.ResourceName]int64, error) {
 	metrics, err := cli.GetPodRawMetrics(namespace, name, allNamespaces, selector)
 	if err != nil {
 		return nil, err

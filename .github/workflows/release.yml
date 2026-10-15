@@ -1,50 +1,41 @@
 name: Build release
 on:
   release:
-      types:
-        - published
+    types:
+      - published
+
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-go@v1
-        with:
-          go-version: 1.14
+      - uses: actions/checkout@v7
 
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/setup-go@v7
+        with:
+          go-version: stable
 
       - run: go mod download
 
-      - name: Get tag
-        id: tag
-        uses: dawidd6/action-get-tag@v1
-
       - name: Current tag
-        run: echo ${{steps.tag.outputs.tag}}
+        run: echo "${{ github.ref_name }}"
 
-      - uses: izumin5210/action-go-crossbuild@v1.0.0
-        with:
-          goxz-version: v0.6.0
-          name: lazykube
-          arch: amd64,386
-          os: darwin,linux,windows
-          package: ./cmd/lazykube
-          ldflags: "-X github.com/TNK-Studio/lazykube/pkg/app.Version=${{steps.tag.outputs.tag}}"
+      - name: Install goxz
+        run: go install github.com/Songmu/goxz/cmd/goxz@v0.12.0
 
-      - uses: izumin5210/action-go-crossbuild@v1.0.0
-        with:
-          goxz-version: v0.6.0
-          name: lazykube
-          arch: arm
-          os: linux
-          package: ./cmd/lazykube
-          ldflags: "-X github.com/TNK-Studio/lazykube/pkg/app.Version=${{steps.tag.outputs.tag}}"
+      - name: Cross build
+        env:
+          CGO_ENABLED: "0"
+          LDFLAGS: "-s -w -X github.com/TNK-Studio/lazykube/pkg/app.Version=${{ github.ref_name }}"
+        run: |
+          goxz -n lazykube -pv "${{ github.ref_name }}" -os darwin,linux,windows -arch amd64,arm64 -d dist -build-ldflags "$LDFLAGS" ./cmd/lazykube
+          goxz -n lazykube -pv "${{ github.ref_name }}" -os linux -arch 386,arm -d dist -build-ldflags "$LDFLAGS" ./cmd/lazykube
 
-      - uses: softprops/action-gh-release@v1
+      - uses: softprops/action-gh-release@v3
         with:
           files: './dist/*'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: startsWith(github.ref, 'refs/tags/')
 
       - uses: izumin5210/action-homebrew-tap@v1.0.0
