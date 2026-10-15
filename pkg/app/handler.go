@@ -1,15 +1,14 @@
 package app
 
 import (
+	"errors"
 	"fmt"
 	"github.com/TNK-Studio/lazykube/pkg/config"
 	guilib "github.com/TNK-Studio/lazykube/pkg/gui"
 	"github.com/TNK-Studio/lazykube/pkg/kubecli"
 	"github.com/TNK-Studio/lazykube/pkg/log"
 	"github.com/atotto/clipboard"
-	"github.com/jroimartin/gocui"
-	"github.com/nsf/termbox-go"
-	"github.com/pkg/errors"
+	"github.com/jesseduffield/gocui"
 	"math"
 	"os"
 	"strings"
@@ -84,7 +83,8 @@ func nextPageHandler(_ *guilib.Gui, view *guilib.View) error {
 	ox, oy := view.Origin()
 	_, height := view.Size()
 	newOy := int(math.Min(float64(len(view.ViewBufferLines())), float64(oy+height)))
-	return view.SetOrigin(ox, newOy)
+	view.SetOrigin(ox, newOy)
+	return nil
 }
 
 func previousPageHandler(_ *guilib.Gui, view *guilib.View) error {
@@ -92,14 +92,16 @@ func previousPageHandler(_ *guilib.Gui, view *guilib.View) error {
 	ox, oy := view.Origin()
 	_, height := view.Size()
 	newOy := int(math.Max(0, float64(oy-height)))
-	return view.SetOrigin(ox, newOy)
+	view.SetOrigin(ox, newOy)
+	return nil
 }
 
 func scrollUpHandler(_ *guilib.Gui, view *guilib.View) error {
 	view.Autoscroll = false
 	ox, oy := view.Origin()
 	newOy := int(math.Max(0, float64(oy-2)))
-	return view.SetOrigin(ox, newOy)
+	view.SetOrigin(ox, newOy)
+	return nil
 }
 
 func scrollDownHandler(_ *guilib.Gui, view *guilib.View) error {
@@ -116,13 +118,15 @@ func scrollDownHandler(_ *guilib.Gui, view *guilib.View) error {
 		return nil
 	}
 
-	return view.SetOrigin(ox, oy+2)
+	view.SetOrigin(ox, oy+2)
+	return nil
 }
 
 func scrollTopHandler(_ *guilib.Gui, view *guilib.View) error {
 	view.Autoscroll = false
 	ox, _ := view.Origin()
-	return view.SetOrigin(ox, 0)
+	view.SetOrigin(ox, 0)
+	return nil
 }
 
 func scrollBottomHandler(_ *guilib.Gui, view *guilib.View) error {
@@ -137,7 +141,8 @@ func scrollBottomHandler(_ *guilib.Gui, view *guilib.View) error {
 
 	ox, _ := view.Origin()
 	view.Autoscroll = true
-	return view.SetOrigin(ox, totalLines-1)
+	view.SetOrigin(ox, totalLines-1)
+	return nil
 }
 
 func previousLineHandler(gui *guilib.Gui, view *guilib.View) error {
@@ -151,19 +156,13 @@ func previousLineHandler(gui *guilib.Gui, view *guilib.View) error {
 	ox, oy := view.Origin()
 
 	if cy-1 <= 0 && oy-1 > 0 {
-		err := view.SetOrigin(ox, int(math.Max(0, float64(oy-height+1))))
-		if err != nil {
-			return err
-		}
+		view.SetOrigin(ox, int(math.Max(0, float64(oy-height+1))))
 
-		err = view.SetCursor(cx, height-1)
-		if err != nil {
-			return err
-		}
+		view.SetCursor(cx, height-1)
 		return nil
 	}
 
-	view.MoveCursor(0, -1, false)
+	view.MoveCursorVertically(-1)
 	return nil
 }
 
@@ -177,24 +176,20 @@ func nextLineHandler(gui *guilib.Gui, view *guilib.View) error {
 	cx, cy := view.Cursor()
 	if cy+1 >= height-1 {
 		ox, oy := view.Origin()
-		err := view.SetOrigin(ox, oy+height-1)
-		if err != nil {
-			return err
-		}
-		err = view.SetCursor(cx, 0)
-		if err != nil {
-			return err
-		}
+		view.SetOrigin(ox, oy+height-1)
+		view.SetCursor(cx, 0)
 		return nil
 	}
 
-	view.MoveCursor(0, 1, false)
+	view.MoveCursorVertically(1)
 	return nil
 }
 
 func copySelectedLineHandler(gui *guilib.Gui, view *guilib.View) error {
 	if view.SelectedLine != "" {
-		clipboard.WriteAll(view.SelectedLine)
+		if err := clipboard.WriteAll(view.SelectedLine); err != nil {
+			log.Logger.Warningf("copySelectedLineHandler - clipboard.WriteAll error %s", err)
+		}
 	}
 	currentView := gui.CurrentView()
 	if currentView != nil && currentView.Name == moreActionsViewName {
@@ -221,13 +216,13 @@ func getResourceNamespaceAndName(gui *guilib.Gui, resourceView *guilib.View) (na
 	selected := resourceView.SelectedLine
 
 	if selected == "" {
-		return "", "", noResourceSelectedErr
+		return "", "", errNoResourceSelected
 	}
 
 	if !notResourceSelected(namespace) {
 		resourceName := formatResourceName(selected, 0)
 		if notResourceSelected(resourceName) {
-			return "", "", noResourceSelectedErr
+			return "", "", errNoResourceSelected
 		}
 		return kubecli.Cli.Namespace(), resourceName, nil
 	}
@@ -235,7 +230,7 @@ func getResourceNamespaceAndName(gui *guilib.Gui, resourceView *guilib.View) (na
 	namespace = formatResourceName(selected, 0)
 	resourceName = formatResourceName(selected, 1)
 	if notResourceSelected(resourceName) {
-		return kubecli.Cli.Namespace(), "", noResourceSelectedErr
+		return kubecli.Cli.Namespace(), "", errNoResourceSelected
 	}
 
 	if notResourceSelected(namespace) {
@@ -253,23 +248,22 @@ func editResourceHandler(gui *guilib.Gui, view *guilib.View) error {
 	} else {
 		_, resource, namespace, resourceName, err = resourceMoreActionHandlerHelper(gui, view)
 	}
-	if errors.Is(err, resourceNotFoundErr) || errors.Is(err, noResourceSelectedErr) {
-		// Todo: show error on panel
+	if errors.Is(err, errResourceNotFound) || errors.Is(err, errNoResourceSelected) {
 		return nil
 	}
 
-	cli(namespace).Edit(newStdStream(), resource, resourceName).Run()
-	if err := gui.ForceFlush(); err != nil {
+	if err := gui.RunSuspended(func() error {
+		cli(namespace).Edit(newStdStream(), resource, resourceName).Run()
+		return nil
+	}); err != nil {
 		return err
 	}
-	gui.ReRenderAll()
 	return nil
 }
 
 func rolloutRestartHandler(gui *guilib.Gui, view *guilib.View) error {
 	view, resource, namespace, resourceName, err := resourceMoreActionHandlerHelper(gui, view)
-	if errors.Is(err, resourceNotFoundErr) || errors.Is(err, noResourceSelectedErr) {
-		// Todo: show error on panel
+	if errors.Is(err, errResourceNotFound) || errors.Is(err, errNoResourceSelected) {
 		return nil
 	}
 
@@ -281,7 +275,7 @@ func rolloutRestartHandler(gui *guilib.Gui, view *guilib.View) error {
 func resourceMoreActionHandlerHelper(gui *guilib.Gui, view *guilib.View) (resourceView *guilib.View, resource string, namespace string, resourceName string, err error) {
 	resource = getViewResourceName(view.Name)
 	if resource == "" {
-		return nil, "", "", "", resourceNotFoundErr
+		return nil, "", "", "", errResourceNotFound
 	}
 	namespace, resourceName, err = getResourceNamespaceAndName(gui, view)
 	if err != nil {
@@ -384,7 +378,7 @@ func deleteCustomResourcePanelHandler(gui *guilib.Gui, view *guilib.View) error 
 func containerExecCommandHandler(gui *guilib.Gui, view *guilib.View) error {
 	namespace, resourceName, err := getResourceNamespaceAndName(gui, view)
 	if err != nil {
-		if errors.Is(err, noResourceSelectedErr) {
+		if errors.Is(err, errNoResourceSelected) {
 			return nil
 		}
 		return err
@@ -406,35 +400,16 @@ func containerExecCommandHandler(gui *guilib.Gui, view *guilib.View) error {
 				"Please input command.",
 				2,
 				func(command string) error {
-					if err := gui.ReInitTermBox(); err != nil {
+					if err := runInteractive(gui, func() {
+						cli(namespace).
+							Exec(newStdStream(), resourceName, command).
+							SetFlag("container", containerName).
+							SetFlag("tty", "true").
+							SetFlag("stdin", "true").
+							Run()
+					}); err != nil {
 						return err
 					}
-					gui.Config.Mouse = false
-					gui.Configure()
-					_ = termbox.Flush()
-
-					cli(namespace).
-						Exec(newStdStream(), resourceName, command).
-						SetFlag("container", containerName).
-						SetFlag("tty", "true").
-						SetFlag("stdin", "true").
-						Run()
-
-					_, err = fmt.Fprintf(os.Stdout, "\n\n%s\n", "Press 'x' twice time return to lazykube.")
-					if err != nil {
-						log.Logger.Error(err)
-					}
-
-					// Note: Enter key not working, but dont know why ...
-					if _, err := fmt.Scanln(); err != nil {
-						log.Logger.Error(err)
-					}
-
-					if err := gui.ForceFlush(); err != nil {
-						return err
-					}
-					gui.Config.Mouse = true
-					gui.Configure()
 					if err := gui.ReturnPreviousView(); err != nil {
 						return err
 					}
@@ -467,7 +442,7 @@ func changePodLogsContainerHandler(gui *guilib.Gui, view *guilib.View) error {
 
 	namespace, resourceName, err := getResourceNamespaceAndName(gui, podView)
 	if err != nil {
-		if errors.Is(err, noResourceSelectedErr) {
+		if errors.Is(err, errNoResourceSelected) {
 			return nil
 		}
 		return err
@@ -493,9 +468,7 @@ func changePodLogsContainerHandler(gui *guilib.Gui, view *guilib.View) error {
 				return err
 			}
 			view.Clear()
-			if err := view.SetOrigin(0, 0); err != nil {
-				return err
-			}
+			view.SetOrigin(0, 0)
 			view.ReRender()
 			if err := gui.FocusView(detailViewName, false); err != nil {
 				return err
@@ -610,41 +583,21 @@ func runPodCommandInput(gui *guilib.Gui, namespace, podName, image string) error
 		gui,
 		"Please input command.",
 		func(command string) error {
-			if err := gui.ReInitTermBox(); err != nil {
+			if err := runInteractive(gui, func() {
+				cli(namespace).
+					Run(newStdStream(), podName, command).
+					SetFlag("rm", "true").
+					SetFlag("restart", "Never").
+					SetFlag("image-pull-policy", "IfNotPresent").
+					SetFlag("tty", "true").
+					SetFlag("stdin", "true").
+					SetFlag("image", image).
+					Run()
+			}); err != nil {
 				return err
 			}
-			gui.Config.Mouse = false
-			gui.Config.Cursor = true
-			gui.Configure()
-			_ = termbox.Flush()
-
-			cli(namespace).
-				Run(newStdStream(), podName, command).
-				SetFlag("rm", "true").
-				SetFlag("restart", "Never").
-				SetFlag("image-pull-policy", "IfNotPresent").
-				SetFlag("tty", "true").
-				SetFlag("stdin", "true").
-				SetFlag("image", image).
-				Run()
-
-			_, err := fmt.Fprintf(os.Stdout, "\n\n%s\n", "Press 'x' twice time return to lazykube.")
-			if err != nil {
-				log.Logger.Error(err)
-			}
-
-			// Note: Enter key not working, but dont know why ...
-			if _, err := fmt.Scanln(); err != nil {
-				log.Logger.Error(err)
-			}
-
-			if err := gui.ForceFlush(); err != nil {
-				return err
-			}
-			gui.Config.Mouse = true
 			gui.Config.Cursor = false
 			gui.Configure()
-			gui.ReRenderAll()
 			config.Conf.UserConfig.History.AddPodNameHistory(podName)
 			config.Conf.UserConfig.History.AddImageHistory(image)
 			config.Conf.UserConfig.History.AddCommandHistory(command)
@@ -691,4 +644,19 @@ func changeContextHandler(gui *guilib.Gui, view *guilib.View) error {
 	}
 
 	return nil
+}
+
+const returnToLazykubeMessage = "Press Enter to return to lazykube."
+
+func runInteractive(gui *guilib.Gui, run func()) error {
+	return gui.RunSuspended(func() error {
+		run()
+		if _, err := fmt.Fprintf(os.Stdout, "\n\n%s\n", returnToLazykubeMessage); err != nil {
+			log.Logger.Error(err)
+		}
+		if _, err := fmt.Scanln(); err != nil {
+			log.Logger.Error(err)
+		}
+		return nil
+	})
 }

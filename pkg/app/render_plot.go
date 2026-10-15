@@ -15,9 +15,6 @@ import (
 
 func podMetricsPlotRender(gui *guilib.Gui, view *guilib.View) error {
 	view.ReRender()
-	//if !canRenderPlot(gui, view) {
-	//	return nil
-	//}
 	view.Clear()
 	var err error
 
@@ -31,14 +28,14 @@ func podMetricsPlotRender(gui *guilib.Gui, view *guilib.View) error {
 		podView,
 	)
 	if err != nil {
-		if errors.Is(err, noResourceSelectedErr) {
+		if errors.Is(err, errNoResourceSelected) {
 			showPleaseSelected(view, resource)
 			return nil
 		}
 		return err
 	}
 
-	fmt.Fprintln(view)
+	_, _ = fmt.Fprintln(view)
 	cpuPlot := getPlot(
 		gui,
 		view,
@@ -64,7 +61,7 @@ func podMetricsPlotRender(gui *guilib.Gui, view *guilib.View) error {
 		color.Blue.Sprintf,
 	)
 	cpuPlot.Render(view)
-	fmt.Fprintln(view)
+	_, _ = fmt.Fprintln(view)
 	memoryPlot := getPlot(
 		gui,
 		view,
@@ -120,7 +117,9 @@ func getPlot(gui *guilib.Gui, view *guilib.View, plotStateKey, captionFormat, na
 				return colorSprintf(graph)
 			},
 		)
-		view.SetState(plotStateKey, plot, true)
+		if err := view.SetState(plotStateKey, plot, true); err != nil {
+			log.Logger.Warningf("getPlot - view.SetState(plotStateKey) error %s", err)
+		}
 	}
 	return plot
 }

@@ -2,7 +2,7 @@ package utils
 
 import (
 	"fmt"
-	"github.com/jroimartin/gocui"
+	"github.com/jesseduffield/gocui"
 	"github.com/spkg/bom"
 	"regexp"
 	"sort"
@@ -14,10 +14,9 @@ func CleanString(s string) string {
 	return NormalizeLinefeeds(output)
 }
 
-// NormalizeLinefeeds - Removes all Windows and Mac style line feeds
 func NormalizeLinefeeds(str string) string {
-	str = strings.Replace(str, "\r\n", "\n", -1)
-	str = strings.Replace(str, "\r", "", -1)
+	str = strings.ReplaceAll(str, "\r\n", "\n")
+	str = strings.ReplaceAll(str, "\r", "")
 	return str
 }
 
@@ -31,7 +30,7 @@ func OptionsMapToString(optionsMap map[string]string) string {
 }
 
 func DeleteExtraSpace(s string) string {
-	s1 := strings.Replace(s, "	", " ", -1)
+	s1 := strings.ReplaceAll(s, "	", " ")
 	regx := "\\s{2,}"
 	reg, _ := regexp.Compile(regx)
 	s2 := make([]byte, len(s1))
@@ -44,40 +43,57 @@ func DeleteExtraSpace(s string) string {
 	return string(s2)
 }
 
-func GetKey(key interface{}) string {
-	var k int
-	if _, ok := key.(rune); ok {
-		k = int(key.(rune))
-	} else {
-		k = int(key.(gocui.Key))
-	}
-
-	// special keys
-	switch k {
-	case 27:
-		return "esc"
-	case 13:
-		return "enter"
-	case 32:
-		return "space"
-	case 65514:
-		return "►"
-	case 65515:
-		return "◄"
-	case 65517:
-		return "▲"
-	case 65516:
-		return "▼"
-	case 65508:
-		return "PgUp"
-	case 65507:
-		return "PgDn"
-	}
-
-	if k >= 65 && k <= 90 {
-		return fmt.Sprintf("Shift+%c", k+32)
-	}
-
-	return fmt.Sprintf("%c", k)
+var keyNames = map[gocui.Key]string{
+	gocui.KeyEsc:         "esc",
+	gocui.KeyEnter:       "enter",
+	gocui.KeySpace:       "space",
+	gocui.KeyTab:         "tab",
+	gocui.KeyArrowRight:  "►",
+	gocui.KeyArrowLeft:   "◄",
+	gocui.KeyArrowUp:     "▲",
+	gocui.KeyArrowDown:   "▼",
+	gocui.KeyPgup:        "PgUp",
+	gocui.KeyPgdn:        "PgDn",
+	gocui.KeyHome:        "Home",
+	gocui.KeyEnd:         "End",
+	gocui.KeyF1:          "F1",
+	gocui.KeyF2:          "F2",
+	gocui.KeyF3:          "F3",
+	gocui.KeyF4:          "F4",
+	gocui.KeyF5:          "F5",
+	gocui.KeyF6:          "F6",
+	gocui.KeyF7:          "F7",
+	gocui.KeyF8:          "F8",
+	gocui.KeyF9:          "F9",
+	gocui.KeyF10:         "F10",
+	gocui.KeyF11:         "F11",
+	gocui.KeyF12:         "F12",
+	gocui.KeyCtrlC:       "Ctrl+c",
+	gocui.MouseLeft:      "MouseLeft",
+	gocui.MouseWheelUp:   "WheelUp",
+	gocui.MouseWheelDown: "WheelDown",
 }
 
+func GetKey(key interface{}) string {
+	switch k := key.(type) {
+	case rune:
+		return runeKeyName(k)
+	case gocui.Key:
+		if name, ok := keyNames[k]; ok {
+			return name
+		}
+		return fmt.Sprintf("%c", rune(k))
+	default:
+		return fmt.Sprintf("%v", key)
+	}
+}
+
+func runeKeyName(r rune) string {
+	if r == ' ' {
+		return "space"
+	}
+	if r >= 'A' && r <= 'Z' {
+		return fmt.Sprintf("Shift+%c", r+32)
+	}
+	return string(r)
+}

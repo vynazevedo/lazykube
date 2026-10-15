@@ -33,9 +33,5 @@ func formatResourceName(selected string, index int) string {
 }
 
 func validateResourceName(resourceName string) bool {
-	if strings.ToLower(resourceName) != resourceName {
-		return false
-	}
-
-	return true
+	return strings.ToLower(resourceName) == resourceName
 }

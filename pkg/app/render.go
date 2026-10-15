@@ -9,7 +9,7 @@ import (
 	"github.com/TNK-Studio/lazykube/pkg/utils"
 	"github.com/gookit/color"
 	"io"
-	"k8s.io/cli-runtime/pkg/genericclioptions"
+	"k8s.io/cli-runtime/pkg/genericiooptions"
 	"os"
 	"strings"
 	"time"
@@ -29,7 +29,6 @@ const (
 )
 
 var (
-	// Todo: use state to control.
 	activeView *guilib.View
 
 	navigationIndex     int
@@ -79,10 +78,7 @@ var (
 )
 
 func notResourceSelected(selectedName string) bool {
-	if selectedName == "" {
-		return true
-	}
-	return false
+	return selectedName == ""
 }
 
 func clearBeforeRender(render guilib.ViewHandler) guilib.ViewHandler {
@@ -155,8 +151,8 @@ func clearDetailViewState(gui *guilib.Gui) {
 		log.Logger.Warningf("clearDetailViewState - clear logContainerStateKey err %s", err)
 		return
 	}
-	_ = detailView.SetOrigin(0, 0)
-	_ = detailView.SetCursor(0, 0)
+	detailView.SetOrigin(0, 0)
+	detailView.SetCursor(0, 0)
 	detailView.Clear()
 }
 
@@ -165,10 +161,7 @@ func navigationPath(args ...string) string {
 }
 
 func switchNavigation(gui *guilib.Gui, index int) string {
-	err := Detail.SetOrigin(0, 0)
-	if err != nil {
-		log.Logger.Warningf("switchNavigation - Detail.SetOrigin(0, 0) error %s", err)
-	}
+	Detail.SetOrigin(0, 0)
 
 	Detail.Clear()
 	clearDetailViewState(gui)
@@ -189,7 +182,6 @@ func switchNavigation(gui *guilib.Gui, index int) string {
 
 func navigationRender(gui *guilib.Gui, view *guilib.View) error {
 	currentView := gui.CurrentView()
-	// Change navigation render
 	var changeNavigation bool
 	if currentView != nil {
 		for _, viewName := range functionViews {
@@ -278,8 +270,8 @@ func detailRender(gui *guilib.Gui, view *guilib.View) error {
 	return nil
 }
 
-func viewStreams(view *guilib.View) genericclioptions.IOStreams {
-	return genericclioptions.IOStreams{
+func viewStreams(view *guilib.View) genericiooptions.IOStreams {
+	return genericiooptions.IOStreams{
 		In:     os.Stdin,
 		Out:    view,
 		ErrOut: view,
@@ -372,7 +364,7 @@ func configRender(gui *guilib.Gui, view *guilib.View) error {
 
 	namespace, resourceName, err := getResourceNamespaceAndName(gui, activeView)
 	if err != nil {
-		if errors.Is(err, noResourceSelectedErr) {
+		if errors.Is(err, errNoResourceSelected) {
 			showPleaseSelected(view, resource)
 			return nil
 		}
@@ -400,7 +392,7 @@ func describeRender(gui *guilib.Gui, view *guilib.View) error {
 
 	namespace, resourceName, err := getResourceNamespaceAndName(gui, activeView)
 	if err != nil {
-		if errors.Is(err, noResourceSelectedErr) {
+		if errors.Is(err, errNoResourceSelected) {
 			showPleaseSelected(view, resource)
 			return nil
 		}
@@ -421,21 +413,16 @@ func onFocusClearSelected(gui *guilib.Gui, view *guilib.View) error {
 		}
 		functionView, err := gui.GetView(functionViewName)
 		if err != nil {
-			log.Logger.Warningf("onFocusClearSelected - view name %s gui.GetView(\"%s\") error %s", view.Name, functionView, err)
+			log.Logger.Warningf("onFocusClearSelected - view name %s gui.GetView(\"%s\") error %s", view.Name, functionViewName, err)
 			continue
 		}
-		if err := functionView.SetOrigin(0, 0); err != nil {
-			return err
-		}
-		if err := functionView.SetCursor(0, 0); err != nil {
-			return err
-		}
+		functionView.SetOrigin(0, 0)
+		functionView.SetCursor(0, 0)
 	}
 	return nil
 }
 
 func podLogsRender(gui *guilib.Gui, view *guilib.View) error {
-	// Todo: Fix chinese character of logs.
 	scrollLogs := true
 	if val, _ := view.GetState(ScrollingLogsStateKey); val != nil {
 		var ok bool
@@ -457,7 +444,7 @@ func podLogsRender(gui *guilib.Gui, view *guilib.View) error {
 	resource := "pod"
 	namespace, resourceName, err := getResourceNamespaceAndName(gui, podView)
 	if err != nil {
-		if errors.Is(err, noResourceSelectedErr) {
+		if errors.Is(err, errNoResourceSelected) {
 			showPleaseSelected(view, resource)
 			return nil
 		}
@@ -507,7 +494,6 @@ func podLogsRender(gui *guilib.Gui, view *guilib.View) error {
 	return nil
 }
 func podsLogsRender(gui *guilib.Gui, view *guilib.View) error {
-	// Todo: Fix chinese character of logs.
 	if err := podsSelectorRenderHelper(func(namespace string, labelsArr []string) error {
 		var since time.Time
 		var hasSince bool
@@ -603,7 +589,7 @@ func podsSelectorRenderHelper(cmdFunc func(namespace string, labelsArr []string)
 
 		namespace, resourceName, err := getResourceNamespaceAndName(gui, activeView)
 		if err != nil {
-			if errors.Is(err, noResourceSelectedErr) {
+			if errors.Is(err, errNoResourceSelected) {
 				showPleaseSelected(view, resource)
 				return nil
 			}

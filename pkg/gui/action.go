@@ -3,11 +3,10 @@ package gui
 import (
 	"errors"
 	"github.com/TNK-Studio/lazykube/pkg/log"
-	"github.com/jroimartin/gocui"
+	"github.com/jesseduffield/gocui"
 )
 
 var (
-	// Quit Quit
 	Quit = &Action{
 		Name: "Quit",
 		Key:  gocui.KeyCtrlC,
@@ -17,7 +16,6 @@ var (
 		Mod: gocui.ModNone,
 	}
 
-	// ClickView ClickView
 	ClickView = &Action{
 		Name:    "clickView",
 		Key:     gocui.MouseLeft,
@@ -26,7 +24,6 @@ var (
 	}
 )
 
-// ActionInterface ActionInterface
 type ActionInterface interface {
 	ActionName() string
 	HandlerFunc(*Gui, *View) error
@@ -36,7 +33,6 @@ type ActionInterface interface {
 	ReRenderAll() bool
 }
 
-// Action Action
 type Action struct {
 	Keys            []interface{}
 	Name            string
@@ -86,10 +82,8 @@ func ViewClickHandler(gui *Gui, view *View) error {
 
 	currentView := gui.CurrentView()
 
-	var canReturn bool
-	canReturn = true
 	if currentView == nil || currentView.Name != viewName {
-		canReturn = true
+		canReturn := true
 
 		if currentView != nil {
 			canReturn = !currentView.CanNotReturn
@@ -103,7 +97,7 @@ func ViewClickHandler(gui *Gui, view *View) error {
 	view, err := gui.GetView(viewName)
 	if err != nil {
 		if errors.Is(err, gocui.ErrUnknownView) {
-			log.Logger.Warningf("ViewClickHandler - gui.GetView(%s) error %+v", view, err)
+			log.Logger.Warningf("ViewClickHandler - gui.GetView(%s) error %+v", viewName, err)
 			return nil
 		}
 		return err
@@ -131,8 +125,11 @@ func ViewClickHandler(gui *Gui, view *View) error {
 }
 
 func actionHandlerWrapper(gui *Gui, handler ViewHandler) func(*gocui.Gui, *gocui.View) error {
-	return func(g *gocui.Gui, v *gocui.View) error {
-		view := gui.getView(v.Name())
+	return func(_ *gocui.Gui, v *gocui.View) error {
+		var view *View
+		if v != nil {
+			view = gui.getView(v.Name())
+		}
 		return handler(gui, view)
 	}
 }

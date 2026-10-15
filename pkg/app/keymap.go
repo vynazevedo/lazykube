@@ -4,12 +4,11 @@ import (
 	"fmt"
 	"github.com/TNK-Studio/lazykube/pkg/utils"
 	"github.com/gookit/color"
-	"github.com/jroimartin/gocui"
+	"github.com/jesseduffield/gocui"
 	"strings"
 )
 
 const (
-	// All common actions name
 	nextFunctionViewAction     = "nextFunctionView"
 	backToPreviousViewAction   = "backToPreviousView"
 	toNavigationAction         = "toNavigation"
@@ -39,7 +38,6 @@ const (
 	optionsDialogEnter         = "optionsDialogEnter"
 	inputDialogEnter           = "inputDialogEnter"
 
-	// More actions
 	copySelectedLineAction              = "Copy Selected Line"
 	editResourceActionName              = "Edit Resource"
 	rolloutRestartActionName            = "Rollout Restart"
@@ -48,13 +46,12 @@ const (
 	containerExecCommandActionName      = "Execute the command"
 	changePodLogsContainerActionName    = "Change pod logs container"
 	tailLogsActionName                  = "Tail logs"
-	scrollLogsActionName                          = "Scroll logs"
+	scrollLogsActionName                = "Scroll logs"
 	runPodActionName                    = "Run a pod with an image"
 	changeContextActionName             = "Change context"
 )
 
 var (
-	// All common actions key map.
 	keyMap = map[string][]interface{}{
 		nextFunctionViewAction:              {gocui.KeyTab},
 		backToPreviousViewAction:            {gocui.KeyEsc},
@@ -92,7 +89,7 @@ var (
 		inputDialogEnter:                    {gocui.KeyEnter},
 		changePodLogsContainerActionName:    {'c'},
 		tailLogsActionName:                  {'t'},
-		scrollLogsActionName:                          {'s'},
+		scrollLogsActionName:                {'s'},
 		runPodActionName:                    {'r'},
 		changeContextActionName:             {'~'},
 	}
@@ -103,5 +100,5 @@ func keyMapDescription(keys []interface{}, description string) string {
 	for _, key := range keys {
 		keysName = append(keysName, utils.GetKey(key))
 	}
-	return fmt.Sprintf("%-20s %s", color.Blue.Sprintf(strings.Join(keysName, "/")), description)
+	return fmt.Sprintf("%-20s %s", color.Blue.Sprint(strings.Join(keysName, "/")), description)
 }
