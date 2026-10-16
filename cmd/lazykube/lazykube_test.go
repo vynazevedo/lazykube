@@ -168,3 +168,38 @@ func TestRunCtrlCCancelsConnection(t *testing.T) {
 		t.Fatal("connection context was not cancelled")
 	}
 }
+
+func TestRunSigintDuringLoadingExitsCancelled(t *testing.T) {
+	cancelled := make(chan struct{})
+	connect := func(ctx context.Context, _ kube.ConnectOptions) (data.Source, func(), error) {
+		<-ctx.Done()
+		close(cancelled)
+		return nil, nil, ctx.Err()
+	}
+	interrupt := tea.WithFilter(func(_ tea.Model, msg tea.Msg) tea.Msg {
+		if _, ok := msg.(tea.KeyPressMsg); ok {
+			return tea.InterruptMsg{}
+		}
+		return msg
+	})
+	keys := feedKeys("x")
+	defer keys.close()
+	var stderr bytes.Buffer
+	done := make(chan int, 1)
+	go func() {
+		done <- run(nil, &stderr, connect, tea.WithInput(keys.r), tea.WithOutput(io.Discard), tea.WithWindowSize(100, 30), interrupt)
+	}()
+	select {
+	case code := <-done:
+		if code != app.ExitCancelled {
+			t.Fatalf("exit code = %d, stderr = %q", code, stderr.String())
+		}
+	case <-time.After(10 * time.Second):
+		t.Fatal("program did not exit on SIGINT")
+	}
+	select {
+	case <-cancelled:
+	case <-time.After(5 * time.Second):
+		t.Fatal("deferred shutdown must cancel the connection")
+	}
+}

@@ -6,11 +6,13 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	goruntime "runtime"
 	"strings"
 	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
+	"unsafe"
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -323,7 +325,7 @@ func TestRecreatedPodStartsFreshSeries(t *testing.T) {
 	s.pollNetwork(ctx)
 	clock.Add(metricsEvery)
 	s.pollNetwork(ctx)
-	if m := s.Metrics(0, "apps/web-1", 10); m.Samples != 1 || len(m.RX) != 1 {
+	if m := s.Metrics(0, "apps/web-1", 10); m.Samples != 1 || len(m.RX) != 1 || len(m.Heat) != 1 {
 		t.Fatalf("expected history before recreation: %+v", m)
 	}
 
@@ -341,6 +343,9 @@ func TestRecreatedPodStartsFreshSeries(t *testing.T) {
 
 	if m := s.Metrics(0, "apps/web-1", 10); m.Samples != 0 || len(m.RX) != 0 || m.PodCPU["apps/web-1"] != 0 {
 		t.Fatalf("recreated pod inherited history: %+v", m)
+	}
+	if m := s.Metrics(0, "apps/web-1", 10); len(m.Heat) != 0 || len(m.HeatLabels) != 0 {
+		t.Fatalf("heatmap kept the previous incarnation before a new sample: %v", m.HeatLabels)
 	}
 	s.pollMetrics(ctx)
 	if m := s.Metrics(0, "apps/web-1", 10); m.Samples != 0 {
@@ -366,6 +371,33 @@ func TestRecreatedPodStartsFreshSeries(t *testing.T) {
 	}
 	if m.RXNow != 2 {
 		t.Fatalf("network baseline must restart with the new pod, got %.2f kB/s", m.RXNow)
+	}
+	if len(m.Heat) != 1 {
+		t.Fatalf("new incarnation must appear in the heatmap: %v", m.HeatLabels)
+	}
+
+	setPhase := func(phase corev1.PodPhase) {
+		t.Helper()
+		cur, err := pods.Get(ctx, "web-1", metav1.GetOptions{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		cur.Status.Phase = phase
+		if _, err := pods.UpdateStatus(ctx, cur, metav1.UpdateOptions{}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	heatRows := func() int { return len(s.Metrics(0, "apps/web-1", 10).Heat) }
+	setPhase(corev1.PodSucceeded)
+	waitFor(t, func() bool { return heatRows() == 0 })
+	setPhase(corev1.PodRunning)
+	waitFor(t, func() bool { return heatRows() == 1 })
+	if err := pods.Delete(ctx, "web-1", metav1.DeleteOptions{}); err != nil {
+		t.Fatal(err)
+	}
+	waitFor(t, func() bool { return s.pod("apps/web-1") == nil })
+	if m := s.Metrics(0, "apps/web-1", 10); len(m.Heat) != 0 || len(m.HeatLabels) != 0 {
+		t.Fatalf("deleted pod must leave the heatmap without a new collection: %v", m.HeatLabels)
 	}
 }
 
@@ -518,4 +550,60 @@ func resourceMust(v string) resource.Quantity {
 
 func bufioReader(s string) *bufio.Reader {
 	return bufio.NewReaderSize(strings.NewReader(s), 16)
+}
+
+type ansiFlood struct {
+	lines, done int
+	pending     []byte
+}
+
+func (a *ansiFlood) Read(p []byte) (int, error) {
+	if len(a.pending) == 0 {
+		if a.done == a.lines {
+			return 0, io.EOF
+		}
+		a.done++
+		a.pending = []byte(stamp(a.done, 0) + " " + strings.Repeat("\x1b[0m", 15*1024) + "x\n")
+	}
+	n := copy(p, a.pending)
+	a.pending = a.pending[n:]
+	return n, nil
+}
+
+func TestSanitizedLogsRetainOnlyVisibleText(t *testing.T) {
+	s, st := logSource(t)
+	goruntime.GC()
+	var before, after goruntime.MemStats
+	goruntime.ReadMemStats(&before)
+	const lines = 400
+	if err := s.consumeLogs(context.Background(), st, &ansiFlood{lines: lines}, time.Time{}, 0); err != nil {
+		t.Fatal(err)
+	}
+	goruntime.GC()
+	goruntime.ReadMemStats(&after)
+	if len(st.lines) != lines || st.lines[0].Message != "x" || st.bytes != lines {
+		t.Fatalf("lines=%d first=%q bytes=%d", len(st.lines), st.lines[0].Message, st.bytes)
+	}
+	retained := int64(after.HeapAlloc) - int64(before.HeapAlloc)
+	if limit := int64(4 << 20); retained > limit {
+		t.Fatalf("sanitized lines retain %d bytes for %d visible bytes (input was %d MiB)", retained, st.bytes, lines*60/1024)
+	}
+	goruntime.KeepAlive(st)
+}
+
+func TestClampMessageDoesNotShareInput(t *testing.T) {
+	big := strings.Repeat("a", maxLogMessage*4)
+	small := big[:10]
+	out := clampMessage(small, false)
+	if out != small || unsafe.StringData(out) == unsafe.StringData(big) {
+		t.Fatal("untruncated result must not alias a larger buffer")
+	}
+	cut := clampMessage(big, false)
+	if unsafe.StringData(cut) == unsafe.StringData(big) || !strings.HasSuffix(cut, truncatedMark) {
+		t.Fatal("truncated result must be a fresh string")
+	}
+	clean := data.Sanitize(big[:20] + "\x1b[31m")
+	if unsafe.StringData(clean) == unsafe.StringData(big) || len(clean) != 20 {
+		t.Fatal("sanitize must return a compact copy")
+	}
 }

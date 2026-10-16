@@ -34,7 +34,6 @@ const (
 
 func Sanitize(s string) string {
 	var b strings.Builder
-	b.Grow(len(s))
 	state := escNone
 	for _, r := range s {
 		switch state {
@@ -75,5 +74,5 @@ func Sanitize(s string) string {
 			b.WriteRune(r)
 		}
 	}
-	return b.String()
+	return strings.Clone(b.String())
 }
