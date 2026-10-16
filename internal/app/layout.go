@@ -49,6 +49,9 @@ type Layout struct {
 	Pods        Rect
 	Heatmap     Rect
 	Details     Rect
+	Scope       Rect
+	Events      Rect
+	Message     Rect
 	DividerY    int
 	FooterY     int
 }
@@ -133,6 +136,22 @@ func ComputeNodes(w, h int) Layout {
 	summary := round(float64(l.Body.W)*0.4 - 9.2)
 	l.Node = Rect{X: l.Body.X, Y: l.Body.Y, W: summary, H: l.Body.H}
 	l.Pods = Rect{X: l.Body.X + summary + 1, Y: l.Body.Y, W: l.Body.W - summary - 1, H: l.Body.H}
+	return l
+}
+
+func ComputeEvents(w, h int) Layout {
+	l := Layout{W: w, H: h}
+	if w < MinWidth || h < MinHeight {
+		l.TooSmall = true
+		return l
+	}
+	l.shell(w, h)
+	b := l.Body
+	extra := max(0, h-40) / 4
+	scope, message := 6+extra, 11+extra
+	l.Scope = Rect{X: b.X, Y: b.Y, W: b.W, H: scope}
+	l.Events = Rect{X: b.X, Y: b.Y + scope, W: b.W, H: b.H - scope - message}
+	l.Message = Rect{X: b.X, Y: b.Y + b.H - message, W: b.W, H: message}
 	return l
 }
 

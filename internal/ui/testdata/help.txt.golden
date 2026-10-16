@@ -10,7 +10,6 @@
                                                                                                                                                                 
                                                                                                                                                                 
                                                                                                                                                                 
-                                                                                                                                                                
                                    ╭─ Help ────────────────────────────────────────────────────────────────────────────────╮                                    
                                    │                                                                                       │                                    
                                    │  ↑/↓ k/j    move selection                 pgup/pgdn  scroll viewport                 │                                    
@@ -23,10 +22,11 @@
                                    │  2          Dashboard screen               / n N      search Log (details focus)      │                                    
                                    │  3          Workloads screen               E          events pod / ns / cluster       │                                    
                                    │  4          Nodes screen                   p          cycle palette                   │                                    
-                                   │  l c t d e  Log Config Top Describe Events 1          toggle left column              │                                    
-                                   │  S          Security / namespace posture   ctrl+p     pause animations                │                                    
-                                   │  A          ack all Security alerts        ?          toggle help                     │                                    
-                                   │  [ ]        previous / next tab            q ctrl+c   quit                            │                                    
+                                   │  6          Events screen                  1          toggle left column              │                                    
+                                   │  l c t d e  Log Config Top Describe Events ctrl+p     pause animations                │                                    
+                                   │  S          Security / namespace posture   ?          toggle help                     │                                    
+                                   │  A          ack all Security alerts        q ctrl+c   quit                            │                                    
+                                   │  [ ]        previous / next tab                                                       │                                    
                                    │  Security score v2: max(0,100-40H-6M-I), per pod and dimension.                       │                                    
                                    │  Each rule once at worst severity; Security and Hygiene are separate.                 │                                    
                                    │  Scope: mean, median, lowest ceil(N/10) mean. SEC = Security; p = partial.            │                                    

@@ -1,0 +1,266 @@
+package app
+
+import (
+	"slices"
+
+	"charm.land/bubbles/v2/key"
+	tea "charm.land/bubbletea/v2"
+
+	"github.com/vynazevedo/lazykube/internal/data"
+	"github.com/vynazevedo/lazykube/internal/draw"
+	"github.com/vynazevedo/lazykube/internal/ui"
+)
+
+type eventsScreen struct{}
+
+type eventsFrame struct {
+	Scope     data.EventScope
+	Pod       string
+	Namespace string
+	Cursor    int
+}
+
+type eventsView struct {
+	eventsFrame
+	feed      data.EventFeed
+	reading   bool
+	msgScroll int
+}
+
+func (eventsScreen) ID() ScreenID {
+	return ScreenEvents
+}
+
+func (eventsScreen) Title() string {
+	return "Events"
+}
+
+func (eventsScreen) ShowsDetails() bool {
+	return false
+}
+
+func (eventsScreen) Init(Model) tea.Cmd {
+	return nil
+}
+
+func (s eventsScreen) Update(m Model, msg tea.Msg) (Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyPressMsg:
+		if m.helpOpen {
+			return updateBody(m, msg)
+		}
+		if !slices.ContainsFunc(s.Keys(m), func(b key.Binding) bool { return key.Matches(msg, b) }) {
+			return m, nil
+		}
+		return m.handleEventsKey(msg)
+	case tea.MouseClickMsg:
+		if !m.helpOpen && msg.Button == tea.MouseLeft {
+			m.handleEventsClick(tea.Mouse(msg))
+			return m, nil
+		}
+	case tea.MouseWheelMsg:
+		m.handleEventsWheel(tea.Mouse(msg))
+		return m, nil
+	case tea.MouseMotionMsg:
+		return m, nil
+	}
+	return updateBody(m, msg)
+}
+
+func (eventsScreen) Keys(m Model) []key.Binding {
+	k := m.keys
+	out := []key.Binding{k.Up, k.Down, k.PageUp, k.PageDown, k.Home, k.End, k.Enter, k.Esc}
+	if m.dg.full {
+		out = append(out, k.EventScope)
+	}
+	return append(out,
+		k.SecurityAck, k.Palette, k.Pause, k.Help, k.Quit,
+		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads, k.Nodes, k.Events,
+	)
+}
+
+func (eventsScreen) Help(m Model) []ui.KeyHelp {
+	return ui.EventsHelp(m.dg.full)
+}
+
+func (eventsScreen) FullHelp(m Model) []ui.KeyHelp {
+	return ui.FullHelpEvents(m.dg.full)
+}
+
+func (eventsScreen) View(m Model, body draw.Region, ctx ui.Ctx) {
+	st := m.eventsState()
+	ui.EventsScopePanel(region(body, m.layout.Scope), st, ctx)
+	ui.EventsTable(region(body, m.layout.Events), st, ctx)
+	ui.EventMessagePanel(region(body, m.layout.Message), st, ctx)
+}
+
+func (m Model) eventsState() ui.EventsScreenState {
+	return ui.EventsScreenState{
+		Feed:       m.ev.feed,
+		Scope:      m.ev.Scope,
+		Pod:        m.ev.Pod,
+		Namespace:  m.ev.Namespace,
+		Connected:  m.snap.Cluster.Namespace,
+		Full:       m.dg.full,
+		Cursor:     m.ev.Cursor,
+		Reading:    m.ev.reading,
+		MsgScroll:  m.ev.msgScroll,
+		Selectable: m.eventsSelectable(),
+	}
+}
+
+func (m Model) eventsSelectable() bool {
+	return m.ev.Scope != data.ScopePod || m.ev.Pod != ""
+}
+
+func (m Model) eventsAnchor() eventsFrame {
+	f := eventsFrame{Namespace: m.scopeNamespace()}
+	if p := m.selectedPod(); p != nil {
+		f.Pod = p.Key()
+		if f.Namespace == "" {
+			f.Namespace = p.Namespace
+		}
+	}
+	if f.Namespace == "" {
+		f.Namespace = m.snap.Cluster.Namespace
+	}
+	switch {
+	case !m.dg.full:
+		f.Scope = data.ScopePod
+	case f.Namespace != "":
+		f.Scope = data.ScopeNamespace
+	default:
+		f.Scope = data.ScopeCluster
+	}
+	return f
+}
+
+func (m Model) eventScopes() []data.EventScope {
+	var out []data.EventScope
+	if m.ev.Pod != "" || !m.dg.full {
+		out = append(out, data.ScopePod)
+	}
+	if m.dg.full {
+		if m.ev.Namespace != "" {
+			out = append(out, data.ScopeNamespace)
+		}
+		out = append(out, data.ScopeCluster)
+	}
+	return out
+}
+
+func (m *Model) cycleEventsScope() {
+	scopes := m.eventScopes()
+	if len(scopes) < 2 {
+		return
+	}
+	i := slices.Index(scopes, m.ev.Scope)
+	m.ev.Scope = scopes[(i+1)%len(scopes)]
+	m.ev.Cursor, m.ev.msgScroll, m.ev.reading = 0, 0, false
+	m.refreshEventsScreen()
+}
+
+func (m *Model) restoreEvents(f eventsFrame) {
+	m.ev = eventsView{eventsFrame: f}
+	if f.Scope == data.ScopeCluster && m.snap.Cluster.Namespace != "" {
+		m.ev.Scope = data.ScopeNamespace
+		if m.ev.Namespace == "" {
+			m.ev.Namespace = m.snap.Cluster.Namespace
+		}
+	}
+}
+
+func (m *Model) refreshEventsScreen() {
+	if !m.onScreen(ScreenEvents) || m.dg.diag == nil || !m.eventsSelectable() {
+		m.ev.feed = data.EventFeed{Scope: m.ev.Scope}
+		return
+	}
+	m.ev.feed = m.dg.diag.ScopedEvents(data.EventQuery{Scope: m.ev.Scope, Pod: m.ev.Pod, Namespace: m.ev.Namespace})
+	m.ev.Cursor = max(0, min(m.ev.Cursor, len(m.ev.feed.Items)-1))
+}
+
+func (m Model) eventsPage() int {
+	return max(1, ui.EventsTableRows(m.layout.Events.H))
+}
+
+func (m *Model) moveEvent(delta int) {
+	if m.ev.reading {
+		m.ev.msgScroll = max(0, min(m.ev.msgScroll+delta, m.maxMsgScroll()))
+		return
+	}
+	next := max(0, min(len(m.ev.feed.Items)-1, m.ev.Cursor+delta))
+	if next != m.ev.Cursor {
+		m.ev.Cursor, m.ev.msgScroll = next, 0
+	}
+}
+
+func (m Model) maxMsgScroll() int {
+	lines := ui.EventMessageLines(m.eventsState(), max(1, m.layout.Message.W-4))
+	return max(0, len(lines)-ui.EventMessageRows(m.layout.Message.H))
+}
+
+func (m Model) handleEventsKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
+	k := m.keys
+	switch {
+	case key.Matches(msg, k.Up):
+		m.moveEvent(-1)
+	case key.Matches(msg, k.Down):
+		m.moveEvent(1)
+	case key.Matches(msg, k.PageUp):
+		m.moveEvent(-m.eventsPage())
+	case key.Matches(msg, k.PageDown):
+		m.moveEvent(m.eventsPage())
+	case key.Matches(msg, k.Home):
+		m.moveEvent(-len(m.ev.feed.Items) - m.maxMsgScroll())
+	case key.Matches(msg, k.End):
+		m.moveEvent(len(m.ev.feed.Items) + m.maxMsgScroll())
+	case key.Matches(msg, k.Enter):
+		if m.eventsState().Selected() != nil {
+			m.ev.reading, m.ev.msgScroll = true, 0
+		}
+	case key.Matches(msg, k.EventScope):
+		m.cycleEventsScope()
+	default:
+		return updateBody(m, msg)
+	}
+	return m, nil
+}
+
+func (m *Model) handleEventsClick(ms tea.Mouse) {
+	switch {
+	case m.layout.Events.Contains(ms.X, ms.Y):
+		m.ev.reading = false
+		row := ms.Y - (m.layout.Events.Y + 1 + ui.EventsTableTop)
+		rows := ui.EventsTableRows(m.layout.Events.H)
+		if row < 0 || row >= rows {
+			return
+		}
+		idx := ui.ScrollOffset(m.ev.Cursor, len(m.ev.feed.Items), rows) + row
+		if idx < len(m.ev.feed.Items) && idx != m.ev.Cursor {
+			m.ev.Cursor, m.ev.msgScroll = idx, 0
+		}
+	case m.layout.Message.Contains(ms.X, ms.Y) && m.eventsState().Selected() != nil:
+		m.ev.reading = true
+	}
+}
+
+func (m *Model) handleEventsWheel(ms tea.Mouse) {
+	delta := 0
+	switch ms.Button {
+	case tea.MouseWheelUp:
+		delta = -1
+	case tea.MouseWheelDown:
+		delta = 1
+	default:
+		return
+	}
+	switch {
+	case m.layout.Events.Contains(ms.X, ms.Y):
+		reading := m.ev.reading
+		m.ev.reading = false
+		m.moveEvent(delta)
+		m.ev.reading = reading
+	case m.layout.Message.Contains(ms.X, ms.Y):
+		m.ev.msgScroll = max(0, min(m.ev.msgScroll+delta, m.maxMsgScroll()))
+	}
+}

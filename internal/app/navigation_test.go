@@ -212,7 +212,7 @@ func TestMenuByKeyboard(t *testing.T) {
 	for _, step := range []struct {
 		key    string
 		cursor int
-	}{{"right", 1}, {"right", 2}, {"right", 2}, {"left", 1}, {"left", 0}, {"left", 0}, {"end", 2}, {"home", 0}, {"j", 0}, {"q", 0}, {"l", 0}, {"/", 0}} {
+	}{{"right", 1}, {"right", 2}, {"right", 3}, {"right", 3}, {"left", 2}, {"left", 1}, {"left", 0}, {"left", 0}, {"end", 3}, {"home", 0}, {"j", 0}, {"q", 0}, {"l", 0}, {"/", 0}} {
 		m = press(t, m, step.key)
 		if !m.menu.open || m.menu.cursor != step.cursor || m.selName != sel || m.tab != ui.TabTop || m.filtering {
 			t.Fatalf("menu consumes %q without touching the content, cursor %d", step.key, m.menu.cursor)

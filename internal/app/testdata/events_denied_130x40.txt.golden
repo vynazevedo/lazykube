@@ -1,0 +1,40 @@
+ lazykube [DEMO]  v2.0   ◎ context demo   k8s demo  nodes 1  ns 8  pods 13  uptime 119d                ⠙ metrics every 5s ● live  
+  2 Dashboard  |  3 Workloads  |  4 Nodes  | [6 Events]                                                                   m menu  
+ Events                                                                                                                           
+ ╭─ Escopo e cobertura ─────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ │ Escopo: namespace bilibili-raffle | estado: sem permissão                                                                    │ 
+ │   sem permissão: events                                                                                                      │ 
+ │ Conexão: restrita a bilibili-raffle; cluster só com E, amplia a leitura                                                      │ 
+ │ Escolha explícita: E  pod   ns   cluster                                                                                     │ 
+ ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+ ╭─ Eventos · focus ────────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ │   MENSAGEM                                                         NAMESPACE        TIPO     OBJETO                   COUNT  │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                    sem permissão: events                                                     │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │ 0 eventos · enter abre a mensagem completa, sem resolver o objeto pelo texto                                                 │ 
+ ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+ ╭─ Mensagem completa ──────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ │ nenhum evento selecionado                                                                                                    │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   E  scope   enter  full message   esc  back   m  menu   ?  help   q  quit                           bubbletea · 0 fps 
