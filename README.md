@@ -64,10 +64,28 @@ elegância quando falta permissão ou metrics-server.
 
 ## `[0x01]` Instalação
 
-Baixe a última release, verifique o SHA-256 e instale com Bash:
+Baixe o instalador completo para um arquivo temporário e execute somente
+se o download terminar com sucesso. Ele instala a última release após
+verificar o SHA-256:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/vynazevedo/lazykube/main/install.sh | bash
+(
+  set -euo pipefail
+  instalador=$(mktemp)
+  trap 'rm -f "$instalador"' EXIT
+  curl -fsSL https://raw.githubusercontent.com/vynazevedo/lazykube/main/install.sh -o "$instalador"
+  bash "$instalador"
+)
+```
+
+Alternativa com execução pelo pipe, em Bash. `pipefail` propaga falhas do
+download; prefira o arquivo temporário para aguardar o download completo:
+
+```bash
+(
+  set -o pipefail
+  curl -fsSL https://raw.githubusercontent.com/vynazevedo/lazykube/main/install.sh | bash
+)
 ```
 
 Compatível com Linux, macOS e Windows via Git Bash, MSYS ou Cygwin, nas
@@ -79,15 +97,26 @@ em `~/.local/bin` caso contrário. Não executa `sudo`. Para escolher a versão
 e o destino (substitua `vX.Y.Z` por uma tag publicada):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/vynazevedo/lazykube/main/install.sh |
-  VERSION=vX.Y.Z INSTALL_DIR="$HOME/.local/bin" bash
+(
+  set -euo pipefail
+  instalador=$(mktemp)
+  trap 'rm -f "$instalador"' EXIT
+  curl -fsSL https://raw.githubusercontent.com/vynazevedo/lazykube/main/install.sh -o "$instalador"
+  VERSION=vX.Y.Z INSTALL_DIR="$HOME/.local/bin" bash "$instalador"
+)
 export PATH="$HOME/.local/bin:$PATH"
 ```
 
 Alternativa com wget:
 
 ```bash
-wget -qO- https://raw.githubusercontent.com/vynazevedo/lazykube/main/install.sh | bash
+(
+  set -euo pipefail
+  instalador=$(mktemp)
+  trap 'rm -f "$instalador"' EXIT
+  wget -qO "$instalador" https://raw.githubusercontent.com/vynazevedo/lazykube/main/install.sh
+  bash "$instalador"
+)
 ```
 
 ### Download manual
@@ -109,8 +138,10 @@ arquivo=lazykube_X.Y.Z_linux_amd64.tar.gz
 awk -v nome="$arquivo" '$2 == nome {print}' checksums.txt > checksum-selecionado.txt
 test "$(wc -l < checksum-selecionado.txt)" -eq 1
 sha256sum -c checksum-selecionado.txt
-# No macOS: shasum -a 256 -c checksum-selecionado.txt
 ```
+
+No macOS, use `shasum -a 256 -c checksum-selecionado.txt` no lugar de
+`sha256sum -c checksum-selecionado.txt`.
 
 Prossiga apenas se a verificação terminar com sucesso (`OK`). Extraia com
 `tar -xzf "$arquivo"` (Linux/macOS) ou `unzip "$arquivo"` (Git Bash) e copie
