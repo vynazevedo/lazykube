@@ -80,3 +80,13 @@ func DefaultKeyMap() KeyMap {
 		Bottom:      b("G", "bottom", "G"),
 	}
 }
+
+func (k KeyMap) Bindings() []key.Binding {
+	return []key.Binding{
+		k.Up, k.Down, k.NextPanel, k.PrevPanel, k.Filter, k.Enter, k.Esc,
+		k.TabLog, k.TabConfig, k.TabTop, k.TabDescribe, k.TabEvents, k.TabSecurity, k.SecurityAck,
+		k.TabPrev, k.TabNext, k.Container, k.Previous, k.SearchNext, k.SearchPrev, k.EventScope,
+		k.Palette, k.ToggleLeft, k.Pause, k.Help, k.Quit,
+		k.PageUp, k.PageDown, k.Home, k.End, k.Follow, k.Wrap, k.Top, k.Bottom,
+	}
+}

@@ -1,0 +1,1279 @@
+== initial ansi=009c79a3e8ce6899a60ef357b15a6b22e5ef5acb8f525b4903abe72490e3b2dd
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Pods · focus ────────────────────────────────────────╮ ╭────────────────────────────────────────────────────────────────────╮ 
+ │                                                       │ │  Log   Config   Top   Describe   Events   Security                 │ 
+ │ / filter pods…▌                              13 items │ │ ────────────────────────────────────────────────────────────────── │ 
+ │                                                       │ │ ● bilibili-live-7f6b8d9c5-mn4tz                          [Running] │ 
+ │   NAME             NAMESPACE    RST   AGE CPU/STATUS  │ │   bilibili-raffle · Running · ready 2/2 · node huawei-k3s-01 · 10… │ 
+ │ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │ │                                                                    │ 
+ │ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │ │ CPU 11m req 10m · lim 50m                 streamline · braille 2×4 │ 
+ │ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │ │  20m │                                                             │ 
+ │ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │ │      │                                    ⢠                        │ 
+ │ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │ │  15m │──────────────────⡀────────────────⢠⣿⡇────────────────────── │ 
+ │ ○ qiandao-1605400… xcx            0    2h Completed   │ │      │  ⡀   ⡀⢀⣦⢀⣠⣦⣤⣤⣄ ⡠⣼⣧              ⢀ ⣾⣿⣿⣲⣤⣀ ⣠⡀⣴⡀   request 10m │ 
+ │ ○ lingqu-16054860… xcx            0   41m Completed   │ │  10m │╌⣰⣷⣠⣦⣰⣿⣾⣿⣷⣿⣿⣿⣿⣿⣾⣿⣿⣿⡀⣀⡀╌╌╌╌╌╌⢀⣶⣿⣶⣶⣿⣿⣿⣿⣿⣿⣿⣿⣷⣿⣿⣿⣧╌⢀╌╌╌╌╌╌⢠⣀⣠⣿⣿● │ 
+ │ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │ │      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦ ⣠⣶⣦⢠⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣆⣾⣧⣀⢤⣤⣤⣀⣿⣿⣿⣿⣿⣿ │ 
+ │ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │ │   5m │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● metrics-server-… kube-system    0  119d ready 0/1   │ │      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │ │    0 │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● local-path-prov… kube-system    0  119d ImagePullB… │ │      └──────────────────────────────────────────────────────────── │ 
+ │ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │ │                                                                    │ 
+ ╰───────────────────────────────────────────────────────╯ │ ╭──────────────────────────────╮ ╭───────────────────────────────╮ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ Memory 73Mi / 128Mi          │ │ Network ↓ 7.1 kB/s ↑ 2.7 kB/s │ │ 
+ │                                                       │ │ │ ████████████████████████████ │ │ ▃▆▁▆▆▄▆▁▃▅▄▇▆█▄█▆▆▃██▄▂▇▄█▄▇▆ │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │ ▆▅▅▆▅▆▅▄▅▅▄▄▄▅▃▄▄▄▄▄▅▄▄▄▅▄▄▅ │ │ ▆▅▄▃▇▃█▃▆▁▃▆▇▅▅█▆▅▆▄▅▅▂▂▇▂▇▄▄ │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ ╰──────────────────────────────╯ ╰───────────────────────────────╯ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │                                                                    │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ ╭ logs · tail -f ───────────────────────────────────── viewport ─╮ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │ 20:14:24  INFO  raffle detected id=883117 type=guard           │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:27  ERROR join raffle failed id=883117: already ended    │ │ 
+ │ psql-6bc7744… ███████████████████████████████████████ │ │ │ 20:14:30  INFO  reconnecting ws in 1s                          │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:33  INFO  ws connected room=21452505 shard=3             │ │ 
+ │ odoo-7575bf6… ███████████████████████████████████████ │ │ │ 20:14:36  INFO  ws connected room=21452505 shard=3             │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:39  DEBUG heartbeat ok rtt=42ms                          │ │ 
+ │ coredns-6799… ███████████████████████████████████████ │ │ │ 20:14:42  INFO  danmaku batch received count=38                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:45  INFO  raffle detected id=883104 type=gift            │ │ 
+ │                                                       │ │ │ 20:14:48  INFO  join raffle ok id=883104 latency=118ms         │ │ 
+ │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== down ansi=42b37a2bf9fefdd1bc046a3051929ff2bd80e22cf60b9f3542eac8bff58f75ca
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Pods · focus ────────────────────────────────────────╮ ╭────────────────────────────────────────────────────────────────────╮ 
+ │                                                       │ │  Log   Config   Top   Describe   Events   Security                 │ 
+ │ / filter pods…▌                              13 items │ │ ────────────────────────────────────────────────────────────────── │ 
+ │                                                       │ │ ● lgo-7c5d97584-hq8wd                                    [Running] │ 
+ │   NAME             NAMESPACE    RST   AGE CPU/STATUS  │ │   lgo · Running · ready 1/1 · node huawei-k3s-01 · 10.42.0.31      │ 
+ │ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │ │                                                                    │ 
+ │ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │ │ CPU 9m req 10m · lim 50m                  streamline · braille 2×4 │ 
+ │ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │ │  20m │                                                ⢀            │ 
+ │ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │ │      │                        ⡆                       ⣸⣿⡄          │ 
+ │ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │ │  15m │───────────────────────⢸⣿──────────────────⢰────⣿⣿⣧───────⢰─ │ 
+ │ ○ qiandao-1605400… xcx            0    2h Completed   │ │      │⣔⣦⣄⡀⢀⣄⢠⣆            ⣴⣷⡀⣼⣿⣗⣶⣦⣄⡀             ⣾⡇ ⣰⣴⣿request 10m │ 
+ │ ○ lingqu-16054860… xcx            0   41m Completed   │ │  10m │⣿⣿⣿⣿⣾⣿⣿⣿⡄╌⡀╌╌╌╌╌╌⣄⣀⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣆⢤⣀╌╌⢀╌╌╌╌╌╌⢀⣿⣧⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣼⣿● │ 
+ │ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │ │      │⣿⣿⣿⣿⣿⣿⣿⣿⣷⣰⣿⣄⡠⣤⣤⣄⣸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⣀⣾⣧⣤⣾⣆⣾⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │ │   5m │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● metrics-server-… kube-system    0  119d ready 0/1   │ │      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │ │    0 │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● local-path-prov… kube-system    0  119d ImagePullB… │ │      └──────────────────────────────────────────────────────────── │ 
+ │ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │ │                                                                    │ 
+ ╰───────────────────────────────────────────────────────╯ │ ╭──────────────────────────────╮ ╭───────────────────────────────╮ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ Memory 72Mi / 128Mi          │ │ Network ↓ 6.4 kB/s ↑ 5.8 kB/s │ │ 
+ │                                                       │ │ │ ████████████████████████████ │ │ ▁█▆▆▅▄▅▃▄▆▄▇▅▇█▇▆▅▆▁█▆▆▆▆▁▃▄▅ │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │ ▇▇▇█▇▇▇▇▇▇▇▇▇▇▇▇▇▇▆▆▆▅▆▅▆▅▅▄ │ │ ▅▃▃▆▂▄▂▅▅▂▆▂▆▇▇▂▄▇▂▄▄▅▃▄▄▄▅▅█ │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ ╰──────────────────────────────╯ ╰───────────────────────────────╯ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │                                                                    │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ ╭ logs · tail -f ───────────────────────────────────── viewport ─╮ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │ 20:14:24  INFO  raffle detected id=883117 type=guard           │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:27  ERROR join raffle failed id=883117: already ended    │ │ 
+ │ psql-6bc7744… ███████████████████████████████████████ │ │ │ 20:14:30  INFO  reconnecting ws in 1s                          │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:33  INFO  ws connected room=21452505 shard=3             │ │ 
+ │ odoo-7575bf6… ███████████████████████████████████████ │ │ │ 20:14:36  INFO  ws connected room=21452505 shard=3             │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:39  DEBUG heartbeat ok rtt=42ms                          │ │ 
+ │ coredns-6799… ███████████████████████████████████████ │ │ │ 20:14:42  INFO  danmaku batch received count=38                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:45  INFO  raffle detected id=883104 type=gift            │ │ 
+ │                                                       │ │ │ 20:14:48  INFO  join raffle ok id=883104 latency=118ms         │ │ 
+ │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== down-again ansi=f1cdc3ca592bcfa9cb56c434dcabdceed1bf5b251247e7f2ce597d0e9b437f0a
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Pods · focus ────────────────────────────────────────╮ ╭────────────────────────────────────────────────────────────────────╮ 
+ │                                                       │ │  Log   Config   Top   Describe   Events   Security                 │ 
+ │ / filter pods…▌                              13 items │ │ ────────────────────────────────────────────────────────────────── │ 
+ │                                                       │ │ ● psql-6bc7744f9-r7zlc                                   [Running] │ 
+ │   NAME             NAMESPACE    RST   AGE CPU/STATUS  │ │   ys-odoo · Running · ready 1/1 · node huawei-k3s-01 · 10.42.0.40  │ 
+ │ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │ │                                                                    │ 
+ │ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │ │ CPU 10m req 10m · lim 50m                 streamline · braille 2×4 │ 
+ │ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │ │  20m │           ⡀                                                 │ 
+ │ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │ │      │          ⢀⣿⣧                        ⢠                       │ 
+ │ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │ │  15m │──────⡆───⢸⣿⣿⡄───────⡆───────────────⣾⣧──⣰────────────────── │ 
+ │ ○ qiandao-1605400… xcx            0    2h Completed   │ │      │     ⢰⣿ ⢀⣦⣾⣿⣿⣷⣠⣮⣷⡀  ⢸⣿              ⢠⣿⣿⣧⣠⣿⡇      request 10m │ 
+ │ ○ lingqu-16054860… xcx            0   41m Completed   │ │  10m │╌╌╌╌╌⣸⣿⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣦⣿⣿⡆╌╌╌╌╌⡀⢀⣠⣤⣾⣿⣶⣽⣿⣿⣿⣿⣿⣿⣿⣾⣦⡀╌╌╌╌╌╌╌╌╌╌⢀⣾⣷● │ 
+ │ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │ │      │⣴⣷⣰⣷⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⢠⣿⣷⡀⣰⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⡄ ⣼⡄ ⣠⣤⣤⣤⣾⣿⣿⣿ │ 
+ │ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │ │   5m │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣽⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● metrics-server-… kube-system    0  119d ready 0/1   │ │      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │ │    0 │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● local-path-prov… kube-system    0  119d ImagePullB… │ │      └──────────────────────────────────────────────────────────── │ 
+ │ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │ │                                                                    │ 
+ ╰───────────────────────────────────────────────────────╯ │ ╭──────────────────────────────╮ ╭───────────────────────────────╮ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ Memory 77Mi / 128Mi          │ │ Network ↓ 8.0 kB/s ↑ 1.0 kB/s │ │ 
+ │                                                       │ │ │ ████████████████████████████ │ │ ▄▃▇▄▇▇▃▆▇▂▇▃▇▃▁▃▄▄▄▄▄▆▂▄▃▆▃▆▇ │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │ ▄▄▄▅▅▄▄▅▅▅▅▆▆▆▆▆▆▇▇▆▇▇█▇▇▇▇▇ │ │ ▇▂█▇▁▂▄█▇▂▆▄▃▁▁▂█▇▄▇▂▄▆▆▃▅▁▅▂ │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ ╰──────────────────────────────╯ ╰───────────────────────────────╯ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │                                                                    │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ ╭ logs · tail -f ───────────────────────────────────── viewport ─╮ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │ 20:14:24  INFO  raffle detected id=883117 type=guard           │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:27  ERROR join raffle failed id=883117: already ended    │ │ 
+ │ psql-6bc7744… ███████████████████████████████████████ │ │ │ 20:14:30  INFO  reconnecting ws in 1s                          │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:33  INFO  ws connected room=21452505 shard=3             │ │ 
+ │ odoo-7575bf6… ███████████████████████████████████████ │ │ │ 20:14:36  INFO  ws connected room=21452505 shard=3             │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:39  DEBUG heartbeat ok rtt=42ms                          │ │ 
+ │ coredns-6799… ███████████████████████████████████████ │ │ │ 20:14:42  INFO  danmaku batch received count=38                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:45  INFO  raffle detected id=883104 type=gift            │ │ 
+ │                                                       │ │ │ 20:14:48  INFO  join raffle ok id=883104 latency=118ms         │ │ 
+ │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== tab-focus ansi=474e5b4cc744771e8ac11d44f6ee543052c98f25c0142b278bf51b5daa15d3f0
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Pods ────────────────────────────────────────────────╮ ╭────────────────────────────────────────────────────────────────────╮ 
+ │                                                       │ │  Log   Config   Top   Describe   Events   Security                 │ 
+ │ / filter pods…                               13 items │ │ ────────────────────────────────────────────────────────────────── │ 
+ │                                                       │ │ ● psql-6bc7744f9-r7zlc                                   [Running] │ 
+ │   NAME             NAMESPACE    RST   AGE CPU/STATUS  │ │   ys-odoo · Running · ready 1/1 · node huawei-k3s-01 · 10.42.0.40  │ 
+ │ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │ │                                                                    │ 
+ │ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │ │ CPU 10m req 10m · lim 50m                 streamline · braille 2×4 │ 
+ │ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │ │  20m │           ⡀                                                 │ 
+ │ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │ │      │          ⢀⣿⣧                        ⢠                       │ 
+ │ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │ │  15m │──────⡆───⢸⣿⣿⡄───────⡆───────────────⣾⣧──⣰────────────────── │ 
+ │ ○ qiandao-1605400… xcx            0    2h Completed   │ │      │     ⢰⣿ ⢀⣦⣾⣿⣿⣷⣠⣮⣷⡀  ⢸⣿              ⢠⣿⣿⣧⣠⣿⡇      request 10m │ 
+ │ ○ lingqu-16054860… xcx            0   41m Completed   │ │  10m │╌╌╌╌╌⣸⣿⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣦⣿⣿⡆╌╌╌╌╌⡀⢀⣠⣤⣾⣿⣶⣽⣿⣿⣿⣿⣿⣿⣿⣾⣦⡀╌╌╌╌╌╌╌╌╌╌⢀⣾⣷● │ 
+ │ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │ │      │⣴⣷⣰⣷⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⢠⣿⣷⡀⣰⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⡄ ⣼⡄ ⣠⣤⣤⣤⣾⣿⣿⣿ │ 
+ │ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │ │   5m │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣽⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● metrics-server-… kube-system    0  119d ready 0/1   │ │      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │ │    0 │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● local-path-prov… kube-system    0  119d ImagePullB… │ │      └──────────────────────────────────────────────────────────── │ 
+ │ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │ │                                                                    │ 
+ ╰───────────────────────────────────────────────────────╯ │ ╭──────────────────────────────╮ ╭───────────────────────────────╮ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ Memory 77Mi / 128Mi          │ │ Network ↓ 8.0 kB/s ↑ 1.0 kB/s │ │ 
+ │                                                       │ │ │ ████████████████████████████ │ │ ▄▃▇▄▇▇▃▆▇▂▇▃▇▃▁▃▄▄▄▄▄▆▂▄▃▆▃▆▇ │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │ ▄▄▄▅▅▄▄▅▅▅▅▆▆▆▆▆▆▇▇▆▇▇█▇▇▇▇▇ │ │ ▇▂█▇▁▂▄█▇▂▆▄▃▁▁▂█▇▄▇▂▄▆▆▃▅▁▅▂ │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ ╰──────────────────────────────╯ ╰───────────────────────────────╯ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │                                                                    │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ ╭ logs · tail -f ───────────────────────────────────── viewport ─╮ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │ 20:14:24  INFO  raffle detected id=883117 type=guard           │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:27  ERROR join raffle failed id=883117: already ended    │ │ 
+ │ psql-6bc7744… ███████████████████████████████████████ │ │ │ 20:14:30  INFO  reconnecting ws in 1s                          │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:33  INFO  ws connected room=21452505 shard=3             │ │ 
+ │ odoo-7575bf6… ███████████████████████████████████████ │ │ │ 20:14:36  INFO  ws connected room=21452505 shard=3             │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:39  DEBUG heartbeat ok rtt=42ms                          │ │ 
+ │ coredns-6799… ███████████████████████████████████████ │ │ │ 20:14:42  INFO  danmaku batch received count=38                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:45  INFO  raffle detected id=883104 type=gift            │ │ 
+ │                                                       │ │ │ 20:14:48  INFO  join raffle ok id=883104 latency=118ms         │ │ 
+ │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== tab-log ansi=ef58bf69eb4495bfb719b0e4b78c0bdaedaca8e0d0f2e149a828e9ccf211bcc1
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Pods ────────────────────────────────────────────────╮ ╭────────────────────────────────────────────────────────────────────╮ 
+ │                                                       │ │  Log   Config   Top   Describe   Events   Security                 │ 
+ │ / filter pods…                               13 items │ │ ────────────────────────────────────────────────────────────────── │ 
+ │                                                       │ │ ● psql-6bc7744f9-r7zlc                                   [Running] │ 
+ │   NAME             NAMESPACE    RST   AGE CPU/STATUS  │ │   ys-odoo · Running · ready 1/1 · node huawei-k3s-01 · 10.42.0.40  │ 
+ │ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │ │                                                                    │ 
+ │ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │ │ ╭────────────────────────────────────────────────────────────────╮ │ 
+ │ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │ │ │ 20:14:00  INFO  ws connected room=21452505 shard=3             │ │ 
+ │ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │ │ │ 20:14:03  DEBUG heartbeat ok rtt=42ms                          │ │ 
+ │ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │ │ │ 20:14:06  INFO  danmaku batch received count=38                │ │ 
+ │ ○ qiandao-1605400… xcx            0    2h Completed   │ │ │ 20:14:09  INFO  raffle detected id=883104 type=gift            │ │ 
+ │ ○ lingqu-16054860… xcx            0   41m Completed   │ │ │ 20:14:12  INFO  join raffle ok id=883104 latency=118ms         │ │ 
+ │ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │ │ │ 20:14:15  WARN  rate limited by upstream, backoff 2s           │ │ 
+ │ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │ │ │ 20:14:18  DEBUG heartbeat ok rtt=39ms                          │ │ 
+ │ ● metrics-server-… kube-system    0  119d ready 0/1   │ │ │ 20:14:21  INFO  danmaku batch received count=51                │ │ 
+ │ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │ │ │ 20:14:24  INFO  raffle detected id=883117 type=guard           │ │ 
+ │ ● local-path-prov… kube-system    0  119d ImagePullB… │ │ │ 20:14:27  ERROR join raffle failed id=883117: already ended    │ │ 
+ │ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │ │ │ 20:14:30  INFO  reconnecting ws in 1s                          │ │ 
+ ╰───────────────────────────────────────────────────────╯ │ │ 20:14:33  INFO  ws connected room=21452505 shard=3             │ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ 20:14:36  INFO  ws connected room=21452505 shard=3             │ │ 
+ │                                                       │ │ │ 20:14:39  DEBUG heartbeat ok rtt=42ms                          │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │ 20:14:42  INFO  danmaku batch received count=38                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:45  INFO  raffle detected id=883104 type=gift            │ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │ │ 20:14:48  INFO  join raffle ok id=883104 latency=118ms         │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ psql-6bc7744… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ odoo-7575bf6… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ coredns-6799… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │                                                       │ │ │ ❯ ▌                                 app · atual · 2 containers │ │ 
+ │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== tab-next ansi=161a12676a99cb06cf911dab0b95a21d009cbc97a775ddd60efe78df7ec96ad5
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Pods ────────────────────────────────────────────────╮ ╭────────────────────────────────────────────────────────────────────╮ 
+ │                                                       │ │  Log   Config   Top   Describe   Events   Security                 │ 
+ │ / filter pods…                               13 items │ │ ────────────────────────────────────────────────────────────────── │ 
+ │                                                       │ │ ● psql-6bc7744f9-r7zlc                                   [Running] │ 
+ │   NAME             NAMESPACE    RST   AGE CPU/STATUS  │ │   ys-odoo · Running · ready 1/1 · node huawei-k3s-01 · 10.42.0.40  │ 
+ │ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │ │                                                                    │ 
+ │ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │ │ ╭────────────────────────────────────────────────────────────────╮ │ 
+ │ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │ │ │  1  apiVersion: v1                                             │ │ 
+ │ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │ │ │  2  kind: Pod                                                  │ │ 
+ │ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │ │ │  3  metadata:                                                  │ │ 
+ │ ○ qiandao-1605400… xcx            0    2h Completed   │ │ │  4    name: psql-6bc7744f9-r7zlc                               │ │ 
+ │ ○ lingqu-16054860… xcx            0   41m Completed   │ │ │  5    namespace: ys-odoo                                       │ │ 
+ │ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │ │ │  6    labels:                                                  │ │ 
+ │ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │ │ │  7      app: psql-6bc7744f9                                    │ │ 
+ │ ● metrics-server-… kube-system    0  119d ready 0/1   │ │ │  8  spec:                                                      │ │ 
+ │ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │ │ │  9    containers:                                              │ │ 
+ │ ● local-path-prov… kube-system    0  119d ImagePullB… │ │ │ 10    - name: app                                              │ │ 
+ │ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │ │ │ 11      image: registry.local/ys-odoo:1.4.2                    │ │ 
+ ╰───────────────────────────────────────────────────────╯ │ │ 12      resources:                                             │ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ 13        requests: { cpu: 10m, memory: 64Mi }                 │ │ 
+ │                                                       │ │ │ 14        limits: { cpu: 50m, memory: 128Mi }                  │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │ 15      env:                                                   │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 16      - name: LOG_LEVEL                                      │ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │ │ 17        value: info                                          │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 18    restartPolicy: Always                                    │ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │ 19    nodeName: huawei-k3s-01                                  │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ psql-6bc7744… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ odoo-7575bf6… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ coredns-6799… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │                                                       │ │ │                                                                │ │ 
+ │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== tab-security ansi=fc511b94be4082c3b2ec6040f8ad95aa73237e9b9182931782c3d6f1959e5b88
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Pods ────────────────────────────────────────────────╮ ╭────────────────────────────────────────────────────────────────────╮ 
+ │                                                       │ │  Log   Config   Top   Describe   Events   Security                 │ 
+ │ / filter pods…                               13 items │ │ ────────────────────────────────────────────────────────────────── │ 
+ │                                                       │ │ ╭────────────────────────────────────────────────────────────────╮ │ 
+ │   NAME             NAMESPACE    RST   AGE CPU/STATUS  │ │ │ S: namespace | Pod: ys-odoo/psql-6bc7744f9-r7zlc               │ │ 
+ │ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │ │ │ Dashboard coverage: complete in scope | pods 13/13             │ │ 
+ │ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │ │ │ No findings does not mean safe                                 │ │ 
+ │ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │ │ │ Local checks only; not PSS compliance.                         │ │ 
+ │ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │ │ │ POSTURE | Cluster | 78/100 (C) | 13/13 pods                    │ │ 
+ │ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │ │ │ Score ████████████████████████████░░░░░░░░                     │ │ 
+ │ ○ qiandao-1605400… xcx            0    2h Completed   │ │ │ high      9 ████████████████████████                           │ │ 
+ │ ○ lingqu-16054860… xcx            0   41m Completed   │ │ │ medium    6 ████████████████░░░░░░░░                           │ │ 
+ │ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │ │ │ info      4 ███████████░░░░░░░░░░░░░                           │ │ 
+ │ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │ │ │ Unknown checks: 4 | confirmed findings only in score           │ │ 
+ │ ● metrics-server-… kube-system    0  119d ready 0/1   │ │ │ Trend: ▆ (revision samples)                                    │ │ 
+ │ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │ │ │ ALERTS | new high since baseline / last ack | A: ack all       │ │ 
+ │ ● local-path-prov… kube-system    0  119d ImagePullB… │ │ │ No unacknowledged high alerts.                                 │ │ 
+ │ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │ │ │ TOP RULES | confirmed findings                                 │ │ 
+ ╰───────────────────────────────────────────────────────╯ │ │ serviceAccountToken       4 ██████████████████                 │ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ capabilitiesAdded         3 ██████████████░░░░                 │ │ 
+ │                                                       │ │ │ hostNetwork               3 ██████████████░░░░                 │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │ imageLatest               3 ██████████████░░░░                 │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ limit-memory              3 ██████████████░░░░                 │ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │ │ NAMESPACES | lowest scores first                               │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ lgo                50 ████░░░░ | 2 findings                    │ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │ xcx                70 ██████░░ | 5 findings                    │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ bilibili-raffle    79 ██████░░ | 4 findings                    │ │ 
+ │ psql-6bc7744… ███████████████████████████████████████ │ │ │ kube-system        81 ██████░░ | 7 findings                    │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ ys-odoo            99 ████████ | 1 findings                    │ │ 
+ │ odoo-7575bf6… ███████████████████████████████████████ │ │ │ More namespaces: use the namespace filter.                     │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Score: 100 - (25*high + 8*medium + 2*info)/evaluated pods;     │ │ 
+ │ coredns-6799… ███████████████████████████████████████ │ │ │ floor 0, rounded.                                              │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Grades: A >=90, B >=80, C >=70, D >=60, F <60. Not a safety    │ │ 
+ │                                                       │ │ │ rating.                                                        │ │ 
+ │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== security-namespace ansi=c8477fefa43391b61a05b56ca770cc4d5a5a423f100a543bf47f3f2e0939983c
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Pods ────────────────────────────────────────────────╮ ╭────────────────────────────────────────────────────────────────────╮ 
+ │                                                       │ │  Log   Config   Top   Describe   Events   Security                 │ 
+ │ / filter pods…                               13 items │ │ ────────────────────────────────────────────────────────────────── │ 
+ │                                                       │ │ ╭────────────────────────────────────────────────────────────────╮ │ 
+ │   NAME             NAMESPACE    RST   AGE CPU/STATUS  │ │ │ S: pod | Namespace: ys-odoo                                    │ │ 
+ │ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │ │ │ Dashboard coverage: complete in scope | pods 13/13             │ │ 
+ │ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │ │ │ No findings does not mean safe                                 │ │ 
+ │ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │ │ │ Local checks only; not PSS compliance.                         │ │ 
+ │ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │ │ │ POSTURE | Cluster | 78/100 (C) | 13/13 pods                    │ │ 
+ │ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │ │ │ Score ████████████████████████████░░░░░░░░                     │ │ 
+ │ ○ qiandao-1605400… xcx            0    2h Completed   │ │ │ high      9 ████████████████████████                           │ │ 
+ │ ○ lingqu-16054860… xcx            0   41m Completed   │ │ │ medium    6 ████████████████░░░░░░░░                           │ │ 
+ │ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │ │ │ info      4 ███████████░░░░░░░░░░░░░                           │ │ 
+ │ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │ │ │ Unknown checks: 4 | confirmed findings only in score           │ │ 
+ │ ● metrics-server-… kube-system    0  119d ready 0/1   │ │ │ Trend: ▆ (revision samples)                                    │ │ 
+ │ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │ │ │ ALERTS | new high since baseline / last ack | A: ack all       │ │ 
+ │ ● local-path-prov… kube-system    0  119d ImagePullB… │ │ │ No unacknowledged high alerts.                                 │ │ 
+ │ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │ │ │ TOP RULES | confirmed findings                                 │ │ 
+ ╰───────────────────────────────────────────────────────╯ │ │ serviceAccountToken       4 ██████████████████                 │ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ capabilitiesAdded         3 ██████████████░░░░                 │ │ 
+ │                                                       │ │ │ hostNetwork               3 ██████████████░░░░                 │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │ imageLatest               3 ██████████████░░░░                 │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ limit-memory              3 ██████████████░░░░                 │ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │ │ NAMESPACES | lowest scores first                               │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ lgo                50 ████░░░░ | 2 findings                    │ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │ xcx                70 ██████░░ | 5 findings                    │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ bilibili-raffle    79 ██████░░ | 4 findings                    │ │ 
+ │ psql-6bc7744… ███████████████████████████████████████ │ │ │ kube-system        81 ██████░░ | 7 findings                    │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ ys-odoo            99 ████████ | 1 findings                    │ │ 
+ │ odoo-7575bf6… ███████████████████████████████████████ │ │ │ More namespaces: use the namespace filter.                     │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Score: 100 - (25*high + 8*medium + 2*info)/evaluated pods;     │ │ 
+ │ coredns-6799… ███████████████████████████████████████ │ │ │ floor 0, rounded.                                              │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Grades: A >=90, B >=80, C >=70, D >=60, F <60. Not a safety    │ │ 
+ │                                                       │ │ │ rating.                                                        │ │ 
+ │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== tab-events ansi=10d800648cc4f934f2c962d8bf2210c083037f85ba9264ed85d7673ae0dbd3f4
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Pods ────────────────────────────────────────────────╮ ╭────────────────────────────────────────────────────────────────────╮ 
+ │                                                       │ │  Log   Config   Top   Describe   Events   Security                 │ 
+ │ / filter pods…                               13 items │ │ ────────────────────────────────────────────────────────────────── │ 
+ │                                                       │ │ ● psql-6bc7744f9-r7zlc                                   [Running] │ 
+ │   NAME             NAMESPACE    RST   AGE CPU/STATUS  │ │   ys-odoo · Running · ready 1/1 · node huawei-k3s-01 · 10.42.0.40  │ 
+ │ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │ │                                                                    │ 
+ │ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │ │ ╭────────────────────────────────────────────────────────────────╮ │ 
+ │ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │ │ │ AGE    TYPE     REASON         MESSAGE  E  pod   ns   cluster  │ │ 
+ │ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │ │ │                                                                │ │ 
+ │ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │ │ │                                                                │ │ 
+ │ ○ qiandao-1605400… xcx            0    2h Completed   │ │ │                                                                │ │ 
+ │ ○ lingqu-16054860… xcx            0   41m Completed   │ │ │                                                                │ │ 
+ │ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │ │ │                                                                │ │ 
+ │ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │ │ │                                                                │ │ 
+ │ ● metrics-server-… kube-system    0  119d ready 0/1   │ │ │                                                                │ │ 
+ │ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │ │ │                                                                │ │ 
+ │ ● local-path-prov… kube-system    0  119d ImagePullB… │ │ │                                                                │ │ 
+ │ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │ │ │                                                                │ │ 
+ ╰───────────────────────────────────────────────────────╯ │ │                                                                │ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │                                                                │ │ 
+ │                                                       │ │ │                                                                │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │                   nenhum evento neste escopo                   │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ psql-6bc7744… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ odoo-7575bf6… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ coredns-6799… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │                                                       │ │ │                                                                │ │ 
+ │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== events-scope ansi=f716c9bf42b0c31ff2a10a438d73365c902f4baad429db781904d31fd318dea4
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Pods ────────────────────────────────────────────────╮ ╭────────────────────────────────────────────────────────────────────╮ 
+ │                                                       │ │  Log   Config   Top   Describe   Events   Security                 │ 
+ │ / filter pods…                               13 items │ │ ────────────────────────────────────────────────────────────────── │ 
+ │                                                       │ │ ● psql-6bc7744f9-r7zlc                                   [Running] │ 
+ │   NAME             NAMESPACE    RST   AGE CPU/STATUS  │ │   ys-odoo · Running · ready 1/1 · node huawei-k3s-01 · 10.42.0.40  │ 
+ │ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │ │                                                                    │ 
+ │ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │ │ ╭────────────────────────────────────────────────────────────────╮ │ 
+ │ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │ │ │ AGE    TYPE     REASON         OBJECT          MESSAGE         │ │ 
+ │ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │ │ │ 12d    Warning  OOMKilling     Pod/odoo-7575b… Memory cgroup … │ │ 
+ │ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │ │ │ 12d    Normal   Started        Pod/odoo-7575b… Started contai… │ │ 
+ │ ○ qiandao-1605400… xcx            0    2h Completed   │ │ │                                                                │ │ 
+ │ ○ lingqu-16054860… xcx            0   41m Completed   │ │ │                                                                │ │ 
+ │ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │ │ │                                                                │ │ 
+ │ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │ │ │                                                                │ │ 
+ │ ● metrics-server-… kube-system    0  119d ready 0/1   │ │ │                                                                │ │ 
+ │ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │ │ │                                                                │ │ 
+ │ ● local-path-prov… kube-system    0  119d ImagePullB… │ │ │                                                                │ │ 
+ │ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │ │ │                                                                │ │ 
+ ╰───────────────────────────────────────────────────────╯ │ │                                                                │ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │                                                                │ │ 
+ │                                                       │ │ │                                                                │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ psql-6bc7744… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ odoo-7575bf6… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ coredns-6799… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │                                                       │ │ │                                                                │ │ 
+ │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== tab-describe ansi=a87b324bdedd7327a5ced86fb4b2f0ec735a617ef31cd53ba3cc62d19e56fdd6
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Pods ────────────────────────────────────────────────╮ ╭────────────────────────────────────────────────────────────────────╮ 
+ │                                                       │ │  Log   Config   Top   Describe   Events   Security                 │ 
+ │ / filter pods…                               13 items │ │ ────────────────────────────────────────────────────────────────── │ 
+ │                                                       │ │ ● psql-6bc7744f9-r7zlc                                   [Running] │ 
+ │   NAME             NAMESPACE    RST   AGE CPU/STATUS  │ │   ys-odoo · Running · ready 1/1 · node huawei-k3s-01 · 10.42.0.40  │ 
+ │ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │ │                                                                    │ 
+ │ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │ │ ╭────────────────────────────────────────────────────────────────╮ │ 
+ │ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │ │ │ Containers  2 · ready 1/1                                      │ │ 
+ │ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │ │ │ ● init    init-perms        Completed · exit 0 · 64d ago (202… │ │ 
+ │ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │ │ │ ● app     app               running 64d · ready ✓ · st… ◂ logs │ │ 
+ │ ○ qiandao-1605400… xcx            0    2h Completed   │ │ │                                                                │ │ 
+ │ ○ lingqu-16054860… xcx            0   41m Completed   │ │ │ Name              psql-6bc7744f9-r7zlc                         │ │ 
+ │ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │ │ │ Namespace         ys-odoo                                      │ │ 
+ │ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │ │ │ Node              huawei-k3s-01/192.168.0.12                   │ │ 
+ │ ● metrics-server-… kube-system    0  119d ready 0/1   │ │ │ Status            Running                                      │ │ 
+ │ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │ │ │ Ready             1/1                                          │ │ 
+ │ ● local-path-prov… kube-system    0  119d ImagePullB… │ │ │ IP                10.42.0.40                                   │ │ 
+ │ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │ │ │ Controlled By     ReplicaSet/psql-6bc7744f9                    │ │ 
+ ╰───────────────────────────────────────────────────────╯ │ │ Image             registry.local/ys-odoo:1.4.2                 │ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ Restart Count     0                                            │ │ 
+ │                                                       │ │ │ Requests          cpu: 10m, memory: 64Mi                       │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │ Limits            cpu: 50m, memory: 128Mi                      │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ QoS Class         Burstable                                    │ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │ │ Conditions        Initialized ✓ Ready ✓ ContainersReady ✓ Pod… │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Tolerations       node.kubernetes.io/not-ready:NoExecute for … │ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ psql-6bc7744… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ odoo-7575bf6… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ coredns-6799… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │                                                       │ │ │                                                                │ │ 
+ │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== page-down ansi=a87b324bdedd7327a5ced86fb4b2f0ec735a617ef31cd53ba3cc62d19e56fdd6
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Pods ────────────────────────────────────────────────╮ ╭────────────────────────────────────────────────────────────────────╮ 
+ │                                                       │ │  Log   Config   Top   Describe   Events   Security                 │ 
+ │ / filter pods…                               13 items │ │ ────────────────────────────────────────────────────────────────── │ 
+ │                                                       │ │ ● psql-6bc7744f9-r7zlc                                   [Running] │ 
+ │   NAME             NAMESPACE    RST   AGE CPU/STATUS  │ │   ys-odoo · Running · ready 1/1 · node huawei-k3s-01 · 10.42.0.40  │ 
+ │ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │ │                                                                    │ 
+ │ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │ │ ╭────────────────────────────────────────────────────────────────╮ │ 
+ │ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │ │ │ Containers  2 · ready 1/1                                      │ │ 
+ │ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │ │ │ ● init    init-perms        Completed · exit 0 · 64d ago (202… │ │ 
+ │ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │ │ │ ● app     app               running 64d · ready ✓ · st… ◂ logs │ │ 
+ │ ○ qiandao-1605400… xcx            0    2h Completed   │ │ │                                                                │ │ 
+ │ ○ lingqu-16054860… xcx            0   41m Completed   │ │ │ Name              psql-6bc7744f9-r7zlc                         │ │ 
+ │ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │ │ │ Namespace         ys-odoo                                      │ │ 
+ │ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │ │ │ Node              huawei-k3s-01/192.168.0.12                   │ │ 
+ │ ● metrics-server-… kube-system    0  119d ready 0/1   │ │ │ Status            Running                                      │ │ 
+ │ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │ │ │ Ready             1/1                                          │ │ 
+ │ ● local-path-prov… kube-system    0  119d ImagePullB… │ │ │ IP                10.42.0.40                                   │ │ 
+ │ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │ │ │ Controlled By     ReplicaSet/psql-6bc7744f9                    │ │ 
+ ╰───────────────────────────────────────────────────────╯ │ │ Image             registry.local/ys-odoo:1.4.2                 │ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ Restart Count     0                                            │ │ 
+ │                                                       │ │ │ Requests          cpu: 10m, memory: 64Mi                       │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │ Limits            cpu: 50m, memory: 128Mi                      │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ QoS Class         Burstable                                    │ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │ │ Conditions        Initialized ✓ Ready ✓ ContainersReady ✓ Pod… │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Tolerations       node.kubernetes.io/not-ready:NoExecute for … │ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ psql-6bc7744… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ odoo-7575bf6… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ coredns-6799… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │                                                       │ │ │                                                                │ │ 
+ │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== filter-open ansi=2564a54af91021b13f7de0815df526ade7900e3035bc6146941cce88d95d3e43
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Pods · focus ────────────────────────────────────────╮ ╭────────────────────────────────────────────────────────────────────╮ 
+ │                                                       │ │  Log   Config   Top   Describe   Events   Security                 │ 
+ │ / ▌                                          13 items │ │ ────────────────────────────────────────────────────────────────── │ 
+ │                                                       │ │ ● psql-6bc7744f9-r7zlc                                   [Running] │ 
+ │   NAME             NAMESPACE    RST   AGE CPU/STATUS  │ │   ys-odoo · Running · ready 1/1 · node huawei-k3s-01 · 10.42.0.40  │ 
+ │ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │ │                                                                    │ 
+ │ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │ │ ╭────────────────────────────────────────────────────────────────╮ │ 
+ │ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │ │ │ Containers  2 · ready 1/1                                      │ │ 
+ │ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │ │ │ ● init    init-perms        Completed · exit 0 · 64d ago (202… │ │ 
+ │ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │ │ │ ● app     app               running 64d · ready ✓ · st… ◂ logs │ │ 
+ │ ○ qiandao-1605400… xcx            0    2h Completed   │ │ │                                                                │ │ 
+ │ ○ lingqu-16054860… xcx            0   41m Completed   │ │ │ Name              psql-6bc7744f9-r7zlc                         │ │ 
+ │ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │ │ │ Namespace         ys-odoo                                      │ │ 
+ │ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │ │ │ Node              huawei-k3s-01/192.168.0.12                   │ │ 
+ │ ● metrics-server-… kube-system    0  119d ready 0/1   │ │ │ Status            Running                                      │ │ 
+ │ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │ │ │ Ready             1/1                                          │ │ 
+ │ ● local-path-prov… kube-system    0  119d ImagePullB… │ │ │ IP                10.42.0.40                                   │ │ 
+ │ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │ │ │ Controlled By     ReplicaSet/psql-6bc7744f9                    │ │ 
+ ╰───────────────────────────────────────────────────────╯ │ │ Image             registry.local/ys-odoo:1.4.2                 │ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ Restart Count     0                                            │ │ 
+ │                                                       │ │ │ Requests          cpu: 10m, memory: 64Mi                       │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │ Limits            cpu: 50m, memory: 128Mi                      │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ QoS Class         Burstable                                    │ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │ │ Conditions        Initialized ✓ Ready ✓ ContainersReady ✓ Pod… │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Tolerations       node.kubernetes.io/not-ready:NoExecute for … │ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ psql-6bc7744… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ odoo-7575bf6… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ coredns-6799… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │                                                       │ │ │                                                                │ │ 
+ │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== filter-b ansi=4fe84169873c38c3d0bd2610345c25091c7c26a3b6170e5da0454c653a3b8ba0
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Pods · focus ────────────────────────────────────────╮ ╭────────────────────────────────────────────────────────────────────╮ 
+ │                                                       │ │  Log   Config   Top   Describe   Events   Security                 │ 
+ │ / b▌                                         10 items │ │ ────────────────────────────────────────────────────────────────── │ 
+ │                                                       │ │ ● psql-6bc7744f9-r7zlc                                   [Running] │ 
+ │   NAME             NAMESPACE    RST   AGE CPU/STATUS  │ │   ys-odoo · Running · ready 1/1 · node huawei-k3s-01 · 10.42.0.40  │ 
+ │ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │ │                                                                    │ 
+ │ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │ │ ╭────────────────────────────────────────────────────────────────╮ │ 
+ │ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │ │ │ Containers  2 · ready 1/1                                      │ │ 
+ │ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │ │ │ ● init    init-perms        Completed · exit 0 · 64d ago (202… │ │ 
+ │ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │ │ │ ● app     app               running 64d · ready ✓ · st… ◂ logs │ │ 
+ │ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │ │ │                                                                │ │ 
+ │ ● metrics-server-… kube-system    0  119d ready 0/1   │ │ │ Name              psql-6bc7744f9-r7zlc                         │ │ 
+ │ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │ │ │ Namespace         ys-odoo                                      │ │ 
+ │ ● local-path-prov… kube-system    0  119d ImagePullB… │ │ │ Node              huawei-k3s-01/192.168.0.12                   │ │ 
+ │ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │ │ │ Status            Running                                      │ │ 
+ │                                                       │ │ │ Ready             1/1                                          │ │ 
+ │                                                       │ │ │ IP                10.42.0.40                                   │ │ 
+ │                                                       │ │ │ Controlled By     ReplicaSet/psql-6bc7744f9                    │ │ 
+ ╰───────────────────────────────────────────────────────╯ │ │ Image             registry.local/ys-odoo:1.4.2                 │ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ Restart Count     0                                            │ │ 
+ │                                                       │ │ │ Requests          cpu: 10m, memory: 64Mi                       │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │ Limits            cpu: 50m, memory: 128Mi                      │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ QoS Class         Burstable                                    │ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │ │ Conditions        Initialized ✓ Ready ✓ ContainersReady ✓ Pod… │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Tolerations       node.kubernetes.io/not-ready:NoExecute for … │ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ psql-6bc7744… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ odoo-7575bf6… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ coredns-6799… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │                                                       │ │ │                                                                │ │ 
+ │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== filter-i ansi=fae4ce26485a7a3554fa5e3b3fee66306369e53d35b329ce596302e4fbf80d04
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Pods · focus ────────────────────────────────────────╮ ╭────────────────────────────────────────────────────────────────────╮ 
+ │                                                       │ │  Log   Config   Top   Describe   Events   Security                 │ 
+ │ / bi▌                                         3 items │ │ ────────────────────────────────────────────────────────────────── │ 
+ │                                                       │ │ ● bilibili-raffle-5d8f9c7b4-x2kqp                        [Running] │ 
+ │   NAME             NAMESPACE    RST   AGE CPU/STATUS  │ │   bilibili-raffle · Running · ready 1/1 · node huawei-k3s-01 · 10… │ 
+ │ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │ │                                                                    │ 
+ │ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │ │ ╭────────────────────────────────────────────────────────────────╮ │ 
+ │ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │ │ │ Containers  1 · ready 1/1                                      │ │ 
+ │                                                       │ │ │ ● app     app               running 119d · ready ✓ · s… ◂ logs │ │ 
+ │                                                       │ │ │                                                                │ │ 
+ │                                                       │ │ │ Name              bilibili-raffle-5d8f9c7b4-x2kqp              │ │ 
+ │                                                       │ │ │ Namespace         bilibili-raffle                              │ │ 
+ │                                                       │ │ │ Node              huawei-k3s-01/192.168.0.12                   │ │ 
+ │                                                       │ │ │ Status            Running                                      │ │ 
+ │                                                       │ │ │ Ready             1/1                                          │ │ 
+ │                                                       │ │ │ IP                10.42.0.23                                   │ │ 
+ │                                                       │ │ │ Controlled By     ReplicaSet/bilibili-raffle-5d8f9c7b4         │ │ 
+ │                                                       │ │ │ Image             registry.local/bilibili-raffle:1.4.2         │ │ 
+ ╰───────────────────────────────────────────────────────╯ │ │ Restart Count     0                                            │ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ Requests          cpu: 10m, memory: 64Mi                       │ │ 
+ │                                                       │ │ │ Limits            cpu: 50m, memory: 128Mi                      │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │ QoS Class         Burstable                                    │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Conditions        Initialized ✓ Ready ✓ ContainersReady ✓ Pod… │ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │ │ Tolerations       node.kubernetes.io/not-ready:NoExecute for … │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ psql-6bc7744… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ odoo-7575bf6… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ coredns-6799… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │                                                       │ │ │                                                                │ │ 
+ │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== filter-confirm ansi=fae4ce26485a7a3554fa5e3b3fee66306369e53d35b329ce596302e4fbf80d04
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Pods · focus ────────────────────────────────────────╮ ╭────────────────────────────────────────────────────────────────────╮ 
+ │                                                       │ │  Log   Config   Top   Describe   Events   Security                 │ 
+ │ / bi▌                                         3 items │ │ ────────────────────────────────────────────────────────────────── │ 
+ │                                                       │ │ ● bilibili-raffle-5d8f9c7b4-x2kqp                        [Running] │ 
+ │   NAME             NAMESPACE    RST   AGE CPU/STATUS  │ │   bilibili-raffle · Running · ready 1/1 · node huawei-k3s-01 · 10… │ 
+ │ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │ │                                                                    │ 
+ │ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │ │ ╭────────────────────────────────────────────────────────────────╮ │ 
+ │ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │ │ │ Containers  1 · ready 1/1                                      │ │ 
+ │                                                       │ │ │ ● app     app               running 119d · ready ✓ · s… ◂ logs │ │ 
+ │                                                       │ │ │                                                                │ │ 
+ │                                                       │ │ │ Name              bilibili-raffle-5d8f9c7b4-x2kqp              │ │ 
+ │                                                       │ │ │ Namespace         bilibili-raffle                              │ │ 
+ │                                                       │ │ │ Node              huawei-k3s-01/192.168.0.12                   │ │ 
+ │                                                       │ │ │ Status            Running                                      │ │ 
+ │                                                       │ │ │ Ready             1/1                                          │ │ 
+ │                                                       │ │ │ IP                10.42.0.23                                   │ │ 
+ │                                                       │ │ │ Controlled By     ReplicaSet/bilibili-raffle-5d8f9c7b4         │ │ 
+ │                                                       │ │ │ Image             registry.local/bilibili-raffle:1.4.2         │ │ 
+ ╰───────────────────────────────────────────────────────╯ │ │ Restart Count     0                                            │ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ Requests          cpu: 10m, memory: 64Mi                       │ │ 
+ │                                                       │ │ │ Limits            cpu: 50m, memory: 128Mi                      │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │ QoS Class         Burstable                                    │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Conditions        Initialized ✓ Ready ✓ ContainersReady ✓ Pod… │ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │ │ Tolerations       node.kubernetes.io/not-ready:NoExecute for … │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ psql-6bc7744… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ odoo-7575bf6… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ coredns-6799… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │                                                       │ │ │                                                                │ │ 
+ │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== filter-clear ansi=a39347349a8ccaad8b3478f120b0a8de312e726f0a96cd067aa16a160bf794eb
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Pods · focus ────────────────────────────────────────╮ ╭────────────────────────────────────────────────────────────────────╮ 
+ │                                                       │ │  Log   Config   Top   Describe   Events   Security                 │ 
+ │ / filter pods…▌                              13 items │ │ ────────────────────────────────────────────────────────────────── │ 
+ │                                                       │ │ ● bilibili-raffle-5d8f9c7b4-x2kqp                        [Running] │ 
+ │   NAME             NAMESPACE    RST   AGE CPU/STATUS  │ │   bilibili-raffle · Running · ready 1/1 · node huawei-k3s-01 · 10… │ 
+ │ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │ │                                                                    │ 
+ │ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │ │ ╭────────────────────────────────────────────────────────────────╮ │ 
+ │ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │ │ │ Containers  1 · ready 1/1                                      │ │ 
+ │ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │ │ │ ● app     app               running 119d · ready ✓ · s… ◂ logs │ │ 
+ │ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │ │ │                                                                │ │ 
+ │ ○ qiandao-1605400… xcx            0    2h Completed   │ │ │ Name              bilibili-raffle-5d8f9c7b4-x2kqp              │ │ 
+ │ ○ lingqu-16054860… xcx            0   41m Completed   │ │ │ Namespace         bilibili-raffle                              │ │ 
+ │ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │ │ │ Node              huawei-k3s-01/192.168.0.12                   │ │ 
+ │ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │ │ │ Status            Running                                      │ │ 
+ │ ● metrics-server-… kube-system    0  119d ready 0/1   │ │ │ Ready             1/1                                          │ │ 
+ │ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │ │ │ IP                10.42.0.23                                   │ │ 
+ │ ● local-path-prov… kube-system    0  119d ImagePullB… │ │ │ Controlled By     ReplicaSet/bilibili-raffle-5d8f9c7b4         │ │ 
+ │ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │ │ │ Image             registry.local/bilibili-raffle:1.4.2         │ │ 
+ ╰───────────────────────────────────────────────────────╯ │ │ Restart Count     0                                            │ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ Requests          cpu: 10m, memory: 64Mi                       │ │ 
+ │                                                       │ │ │ Limits            cpu: 50m, memory: 128Mi                      │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │ QoS Class         Burstable                                    │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Conditions        Initialized ✓ Ready ✓ ContainersReady ✓ Pod… │ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │ │ Tolerations       node.kubernetes.io/not-ready:NoExecute for … │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ psql-6bc7744… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ odoo-7575bf6… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ coredns-6799… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │                                                       │ │ │                                                                │ │ 
+ │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== click-pod ansi=a1a42fff892ee47a9c0c5a23d48532402aae251aeffd7f0372c84bb7d79a73f2
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Pods · focus ────────────────────────────────────────╮ ╭────────────────────────────────────────────────────────────────────╮ 
+ │                                                       │ │  Log   Config   Top   Describe   Events   Security                 │ 
+ │ / filter pods…▌                              13 items │ │ ────────────────────────────────────────────────────────────────── │ 
+ │                                                       │ │ ● psql-6bc7744f9-r7zlc                                   [Running] │ 
+ │   NAME             NAMESPACE    RST   AGE CPU/STATUS  │ │   ys-odoo · Running · ready 1/1 · node huawei-k3s-01 · 10.42.0.40  │ 
+ │ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │ │                                                                    │ 
+ │ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │ │ ╭────────────────────────────────────────────────────────────────╮ │ 
+ │ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │ │ │ Containers  2 · ready 1/1                                      │ │ 
+ │ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │ │ │ ● init    init-perms        Completed · exit 0 · 64d ago (202… │ │ 
+ │ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │ │ │ ● app     app               running 64d · ready ✓ · st… ◂ logs │ │ 
+ │ ○ qiandao-1605400… xcx            0    2h Completed   │ │ │                                                                │ │ 
+ │ ○ lingqu-16054860… xcx            0   41m Completed   │ │ │ Name              psql-6bc7744f9-r7zlc                         │ │ 
+ │ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │ │ │ Namespace         ys-odoo                                      │ │ 
+ │ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │ │ │ Node              huawei-k3s-01/192.168.0.12                   │ │ 
+ │ ● metrics-server-… kube-system    0  119d ready 0/1   │ │ │ Status            Running                                      │ │ 
+ │ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │ │ │ Ready             1/1                                          │ │ 
+ │ ● local-path-prov… kube-system    0  119d ImagePullB… │ │ │ IP                10.42.0.40                                   │ │ 
+ │ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │ │ │ Controlled By     ReplicaSet/psql-6bc7744f9                    │ │ 
+ ╰───────────────────────────────────────────────────────╯ │ │ Image             registry.local/ys-odoo:1.4.2                 │ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ Restart Count     0                                            │ │ 
+ │                                                       │ │ │ Requests          cpu: 10m, memory: 64Mi                       │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │ Limits            cpu: 50m, memory: 128Mi                      │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ QoS Class         Burstable                                    │ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │ │ Conditions        Initialized ✓ Ready ✓ ContainersReady ✓ Pod… │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Tolerations       node.kubernetes.io/not-ready:NoExecute for … │ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ psql-6bc7744… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ odoo-7575bf6… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ coredns-6799… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │                                                       │ │ │                                                                │ │ 
+ │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== wheel-pod ansi=fe51e37ea66c68bafe5f697dfb80988e34d3e7dc7cd4391c10e7a939178399d7
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Pods · focus ────────────────────────────────────────╮ ╭────────────────────────────────────────────────────────────────────╮ 
+ │                                                       │ │  Log   Config   Top   Describe   Events   Security                 │ 
+ │ / filter pods…▌                              13 items │ │ ────────────────────────────────────────────────────────────────── │ 
+ │                                                       │ │ ● odoo-7575bf6d8-9wjvk                                   [Running] │ 
+ │   NAME             NAMESPACE    RST   AGE CPU/STATUS  │ │   ys-odoo · Running · ready 1/1 · node huawei-k3s-01 · 10.42.0.41  │ 
+ │ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │ │                                                                    │ 
+ │ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │ │ ╭────────────────────────────────────────────────────────────────╮ │ 
+ │ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │ │ │ Containers  1 · ready 1/1                                      │ │ 
+ │ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │ │ │ ● app     app               running 12d · ready ✓ · st… ◂ logs │ │ 
+ │ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │ │ │           last      OOMKilled · exit 137 · 12d ago (2026-10-0… │ │ 
+ │ ○ qiandao-1605400… xcx            0    2h Completed   │ │ │           ↳ P logs anteriores · C troca container · E eventos  │ │ 
+ │ ○ lingqu-16054860… xcx            0   41m Completed   │ │ │                                                                │ │ 
+ │ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │ │ │ Name              odoo-7575bf6d8-9wjvk                         │ │ 
+ │ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │ │ │ Namespace         ys-odoo                                      │ │ 
+ │ ● metrics-server-… kube-system    0  119d ready 0/1   │ │ │ Node              huawei-k3s-01/192.168.0.12                   │ │ 
+ │ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │ │ │ Status            Running                                      │ │ 
+ │ ● local-path-prov… kube-system    0  119d ImagePullB… │ │ │ Ready             1/1                                          │ │ 
+ │ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │ │ │ IP                10.42.0.41                                   │ │ 
+ ╰───────────────────────────────────────────────────────╯ │ │ Controlled By     ReplicaSet/odoo-7575bf6d8                    │ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ Image             registry.local/ys-odoo:1.4.2                 │ │ 
+ │                                                       │ │ │ Restart Count     1                                            │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │ Requests          cpu: 10m, memory: 64Mi                       │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Limits            cpu: 50m, memory: 128Mi                      │ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │ │ QoS Class         Burstable                                    │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Conditions        Initialized ✓ Ready ✓ ContainersReady ✓ Pod… │ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │ Tolerations       node.kubernetes.io/not-ready:NoExecute for … │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ psql-6bc7744… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ odoo-7575bf6… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ coredns-6799… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │                                                       │ │ │                                                                │ │ 
+ │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== hover-pod ansi=d9779644762359e63a7204236898ef866fc49e719e8c0abb080a8063fec78409
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Pods · focus ────────────────────────────────────────╮ ╭────────────────────────────────────────────────────────────────────╮ 
+ │                                                       │ │  Log   Config   Top   Describe   Events   Security                 │ 
+ │ / filter pods…▌                              13 items │ │ ────────────────────────────────────────────────────────────────── │ 
+ │                                                       │ │ ● odoo-7575bf6d8-9wjvk                                   [Running] │ 
+ │   NAME             NAMESPACE    RST   AGE CPU/STATUS  │ │   ys-odoo · Running · ready 1/1 · node huawei-k3s-01 · 10.42.0.41  │ 
+ │ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │ │                                                                    │ 
+ │ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │ │ ╭────────────────────────────────────────────────────────────────╮ │ 
+ │ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │ │ │ Containers  1 · ready 1/1                                      │ │ 
+ │ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │ │ │ ● app     app               running 12d · ready ✓ · st… ◂ logs │ │ 
+ │ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │ │ │           last      OOMKilled · exit 137 · 12d ago (2026-10-0… │ │ 
+ │ ○ qiandao-1605400… xcx            0    2h Completed   │ │ │           ↳ P logs anteriores · C troca container · E eventos  │ │ 
+ │ ○ lingqu-16054860… xcx            0   41m Completed   │ │ │                                                                │ │ 
+ │ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │ │ │ Name              odoo-7575bf6d8-9wjvk                         │ │ 
+ │ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │ │ │ Namespace         ys-odoo                                      │ │ 
+ │ ● metrics-server-… kube-system    0  119d ready 0/1   │ │ │ Node              huawei-k3s-01/192.168.0.12                   │ │ 
+ │ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │ │ │ Status            Running                                      │ │ 
+ │ ● local-path-prov… kube-system    0  119d ImagePullB… │ │ │ Ready             1/1                                          │ │ 
+ │ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │ │ │ IP                10.42.0.41                                   │ │ 
+ ╰───────────────────────────────────────────────────────╯ │ │ Controlled By     ReplicaSet/odoo-7575bf6d8                    │ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ Image             registry.local/ys-odoo:1.4.2                 │ │ 
+ │                                                       │ │ │ Restart Count     1                                            │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │ Requests          cpu: 10m, memory: 64Mi                       │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Limits            cpu: 50m, memory: 128Mi                      │ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │ │ QoS Class         Burstable                                    │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Conditions        Initialized ✓ Ready ✓ ContainersReady ✓ Pod… │ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │ Tolerations       node.kubernetes.io/not-ready:NoExecute for … │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ psql-6bc7744… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ odoo-7575bf6… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ coredns-6799… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │                                                       │ │ │                                                                │ │ 
+ │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== click-tab ansi=313f600f0f4ea28642594dd9303aa586983a8e56eddd4ea2ea238a24d1dca981
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Pods ────────────────────────────────────────────────╮ ╭────────────────────────────────────────────────────────────────────╮ 
+ │                                                       │ │  Log   Config   Top   Describe   Events   Security                 │ 
+ │ / filter pods…                               13 items │ │ ────────────────────────────────────────────────────────────────── │ 
+ │                                                       │ │ ● odoo-7575bf6d8-9wjvk                                   [Running] │ 
+ │   NAME             NAMESPACE    RST   AGE CPU/STATUS  │ │   ys-odoo · Running · ready 1/1 · node huawei-k3s-01 · 10.42.0.41  │ 
+ │ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │ │                                                                    │ 
+ │ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │ │ ╭────────────────────────────────────────────────────────────────╮ │ 
+ │ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │ │ │ 20:14:00  INFO  ws connected room=21452505 shard=3             │ │ 
+ │ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │ │ │ 20:14:03  DEBUG heartbeat ok rtt=42ms                          │ │ 
+ │ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │ │ │ 20:14:06  INFO  danmaku batch received count=38                │ │ 
+ │ ○ qiandao-1605400… xcx            0    2h Completed   │ │ │ 20:14:09  INFO  raffle detected id=883104 type=gift            │ │ 
+ │ ○ lingqu-16054860… xcx            0   41m Completed   │ │ │ 20:14:12  INFO  join raffle ok id=883104 latency=118ms         │ │ 
+ │ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │ │ │ 20:14:15  WARN  rate limited by upstream, backoff 2s           │ │ 
+ │ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │ │ │ 20:14:18  DEBUG heartbeat ok rtt=39ms                          │ │ 
+ │ ● metrics-server-… kube-system    0  119d ready 0/1   │ │ │ 20:14:21  INFO  danmaku batch received count=51                │ │ 
+ │ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │ │ │ 20:14:24  INFO  raffle detected id=883117 type=guard           │ │ 
+ │ ● local-path-prov… kube-system    0  119d ImagePullB… │ │ │ 20:14:27  ERROR join raffle failed id=883117: already ended    │ │ 
+ │ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │ │ │ 20:14:30  INFO  reconnecting ws in 1s                          │ │ 
+ ╰───────────────────────────────────────────────────────╯ │ │ 20:14:33  INFO  ws connected room=21452505 shard=3             │ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ 20:14:36  INFO  ws connected room=21452505 shard=3             │ │ 
+ │                                                       │ │ │ 20:14:39  DEBUG heartbeat ok rtt=42ms                          │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │ 20:14:42  INFO  danmaku batch received count=38                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:45  INFO  raffle detected id=883104 type=gift            │ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │ │ 20:14:48  INFO  join raffle ok id=883104 latency=118ms         │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ psql-6bc7744… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ odoo-7575bf6… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │ coredns-6799… ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
+ │                                                       │ │ │ ❯ ▌                                                app · atual │ │ 
+ │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== toggle-left ansi=8756a931d225b4ddccf29589dbaea2e208c45dcd5125b137566a6f038505de4e
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Node ───────────────────────╮ ╭─ Pods ─────────────────────────────────────╮ ╭──────────────────────────────────────────────╮ 
+ │                              │ │                                            │ │  Log   Config   Top   Describe   Events   Se │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  huawei-…│ │ / filter pods…                    13 items │ │ ──────────────────────────────────────────── │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready │ │                                            │ │ ● odoo-7575bf6d8-9wjvk             [Running] │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25% │ │   NAME  NAMESPACE    RST   AGE CPU/STATUS  │ │   ys-odoo · Running · ready 1/1 · node huaw… │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ████████│ │ ● bili… bilibili-r…    0  119d █░░░░░░     │ │                                              │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4…│ │ ● bili… bilibili-r…    2  119d ████░░░     │ │ ╭──────────────────────────────────────────╮ │ 
+ │    ▀    ▀▀▀▀▀▀▀▀▀    ████████│ │ ● lgo-… lgo            0   87d ██░░░░░     │ │ │ 20:14:00  INFO  ws connected room=21452… │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13…│ │ ● psql… ys-odoo        0   64d ████░░░     │ │ │ 20:14:03  DEBUG heartbeat ok rtt=42ms    │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch am…│ │ ● odoo… ys-odoo        1   64d ██████░     │ │ │ 20:14:06  INFO  danmaku batch received … │ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀            │ │ ○ qian… xcx            0    2h Completed   │ │ │ 20:14:09  INFO  raffle detected id=8831… │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀           │ │ ○ ling… xcx            0   41m Completed   │ │ │ 20:14:12  INFO  join raffle ok id=88310… │ │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀          │ │ ⠙ ling… xcx            0    8s Init:0/1    │ │ │ 20:14:15  WARN  rate limited by upstrea… │ │ 
+ │                              │ │ ● core… kube-system    0  119d █░░░░░░     │ │ │ 20:14:18  DEBUG heartbeat ok rtt=39ms    │ │ 
+ │                              │ │ ● metr… kube-system    0  119d ready 0/1   │ │ │ 20:14:21  INFO  danmaku batch received … │ │ 
+ ╰──────────────────────────────╯ │ ● trae… kube-system    0  119d ░░░░░░░     │ │ │ 20:14:24  INFO  raffle detected id=8831… │ │ 
+ ╭─ Namespaces ─────────────────╮ │ ● loca… kube-system    0  119d ImagePullB… │ │ │ 20:14:27  ERROR join raffle failed id=8… │ │ 
+ │                              │ │ ● svcl… kube-system    7  119d CrashLoopB… │ │ │ 20:14:30  INFO  reconnecting ws in 1s    │ │ 
+ │ default            ·····   0 │ ╰────────────────────────────────────────────╯ │ │ 20:14:33  INFO  ws connected room=21452… │ │ 
+ │ kube-system        █████   5 │ ╭─ CPU heatmap · last 2 min ─────────────────╮ │ │ 20:14:36  INFO  ws connected room=21452… │ │ 
+ │ kube-public        ·····   0 │ │                                            │ │ │ 20:14:39  DEBUG heartbeat ok rtt=42ms    │ │ 
+ │ kube-node-lease    ·····   0 │ │ bilibili-raf… ████████████████████████████ │ │ │ 20:14:42  INFO  danmaku batch received … │ │ 
+ │ bilibili-raffle    ██░░░   2 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:45  INFO  raffle detected id=8831… │ │ 
+ │ lgo                █░░░░   1 │ │ bilibili-live ████████████████████████████ │ │ │ 20:14:48  INFO  join raffle ok id=88310… │ │ 
+ │ xcx                ███░░   3 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │ ys-odoo            ██░░░   2 │ │ lgo-7c5d97584 ████████████████████████████ │ │ │                                          │ │ 
+ │                              │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ ╰──────────────────────────────╯ │ psql-6bc7744… ████████████████████████████ │ │ │                                          │ │ 
+ ╭─ Deployments ────────────────╮ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │                              │ │ odoo-7575bf6… ████████████████████████████ │ │ │                                          │ │ 
+ │ bilibili-raffle/bilib… ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │ bilibili-raffle/bilib… ● 1/1 │ │ coredns-6799… ████████████████████████████ │ │ │                                          │ │ 
+ │ ys-odoo/psql           ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │ ys-odoo/odoo           ● 1/1 │ │                                            │ │ │ ❯ ▌                          app · atual │ │ 
+ │                              │ │               -2m ████████████████████ now │ │ ╰──────────────────────────────────────────╯ │ 
+ ╰──────────────────────────────╯ ╰────────────────────────────────────────────╯ ╰──────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== palette ansi=01df73d3b1494abd53796f6ef4e24498a706fb044ec38c33c723a7d7a2746598
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Node ───────────────────────╮ ╭─ Pods ─────────────────────────────────────╮ ╭──────────────────────────────────────────────╮ 
+ │                              │ │                                            │ │  Log   Config   Top   Describe   Events   Se │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  huawei-…│ │ / filter pods…                    13 items │ │ ──────────────────────────────────────────── │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready │ │                                            │ │ ● odoo-7575bf6d8-9wjvk             [Running] │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25% │ │   NAME  NAMESPACE    RST   AGE CPU/STATUS  │ │   ys-odoo · Running · ready 1/1 · node huaw… │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ████████│ │ ● bili… bilibili-r…    0  119d █░░░░░░     │ │                                              │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4…│ │ ● bili… bilibili-r…    2  119d ████░░░     │ │ ╭──────────────────────────────────────────╮ │ 
+ │    ▀    ▀▀▀▀▀▀▀▀▀    ████████│ │ ● lgo-… lgo            0   87d ██░░░░░     │ │ │ 20:14:00  INFO  ws connected room=21452… │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13…│ │ ● psql… ys-odoo        0   64d ████░░░     │ │ │ 20:14:03  DEBUG heartbeat ok rtt=42ms    │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch am…│ │ ● odoo… ys-odoo        1   64d ██████░     │ │ │ 20:14:06  INFO  danmaku batch received … │ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀            │ │ ○ qian… xcx            0    2h Completed   │ │ │ 20:14:09  INFO  raffle detected id=8831… │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀           │ │ ○ ling… xcx            0   41m Completed   │ │ │ 20:14:12  INFO  join raffle ok id=88310… │ │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀          │ │ ⠙ ling… xcx            0    8s Init:0/1    │ │ │ 20:14:15  WARN  rate limited by upstrea… │ │ 
+ │                              │ │ ● core… kube-system    0  119d █░░░░░░     │ │ │ 20:14:18  DEBUG heartbeat ok rtt=39ms    │ │ 
+ │                              │ │ ● metr… kube-system    0  119d ready 0/1   │ │ │ 20:14:21  INFO  danmaku batch received … │ │ 
+ ╰──────────────────────────────╯ │ ● trae… kube-system    0  119d ░░░░░░░     │ │ │ 20:14:24  INFO  raffle detected id=8831… │ │ 
+ ╭─ Namespaces ─────────────────╮ │ ● loca… kube-system    0  119d ImagePullB… │ │ │ 20:14:27  ERROR join raffle failed id=8… │ │ 
+ │                              │ │ ● svcl… kube-system    7  119d CrashLoopB… │ │ │ 20:14:30  INFO  reconnecting ws in 1s    │ │ 
+ │ default            ·····   0 │ ╰────────────────────────────────────────────╯ │ │ 20:14:33  INFO  ws connected room=21452… │ │ 
+ │ kube-system        █████   5 │ ╭─ CPU heatmap · last 2 min ─────────────────╮ │ │ 20:14:36  INFO  ws connected room=21452… │ │ 
+ │ kube-public        ·····   0 │ │                                            │ │ │ 20:14:39  DEBUG heartbeat ok rtt=42ms    │ │ 
+ │ kube-node-lease    ·····   0 │ │ bilibili-raf… ████████████████████████████ │ │ │ 20:14:42  INFO  danmaku batch received … │ │ 
+ │ bilibili-raffle    ██░░░   2 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:45  INFO  raffle detected id=8831… │ │ 
+ │ lgo                █░░░░   1 │ │ bilibili-live ████████████████████████████ │ │ │ 20:14:48  INFO  join raffle ok id=88310… │ │ 
+ │ xcx                ███░░   3 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │ ys-odoo            ██░░░   2 │ │ lgo-7c5d97584 ████████████████████████████ │ │ │                                          │ │ 
+ │                              │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ ╰──────────────────────────────╯ │ psql-6bc7744… ████████████████████████████ │ │ │                                          │ │ 
+ ╭─ Deployments ────────────────╮ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │                              │ │ odoo-7575bf6… ████████████████████████████ │ │ │                                          │ │ 
+ │ bilibili-raffle/bilib… ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │ bilibili-raffle/bilib… ● 1/1 │ │ coredns-6799… ████████████████████████████ │ │ │                                          │ │ 
+ │ ys-odoo/psql           ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │ ys-odoo/odoo           ● 1/1 │ │                                            │ │ │ ❯ ▌                          app · atual │ │ 
+ │                              │ │               -2m ████████████████████ now │ │ ╰──────────────────────────────────────────╯ │ 
+ ╰──────────────────────────────╯ ╰────────────────────────────────────────────╯ ╰──────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== data ansi=01df73d3b1494abd53796f6ef4e24498a706fb044ec38c33c723a7d7a2746598
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Node ───────────────────────╮ ╭─ Pods ─────────────────────────────────────╮ ╭──────────────────────────────────────────────╮ 
+ │                              │ │                                            │ │  Log   Config   Top   Describe   Events   Se │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  huawei-…│ │ / filter pods…                    13 items │ │ ──────────────────────────────────────────── │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready │ │                                            │ │ ● odoo-7575bf6d8-9wjvk             [Running] │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25% │ │   NAME  NAMESPACE    RST   AGE CPU/STATUS  │ │   ys-odoo · Running · ready 1/1 · node huaw… │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ████████│ │ ● bili… bilibili-r…    0  119d █░░░░░░     │ │                                              │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4…│ │ ● bili… bilibili-r…    2  119d ████░░░     │ │ ╭──────────────────────────────────────────╮ │ 
+ │    ▀    ▀▀▀▀▀▀▀▀▀    ████████│ │ ● lgo-… lgo            0   87d ██░░░░░     │ │ │ 20:14:00  INFO  ws connected room=21452… │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13…│ │ ● psql… ys-odoo        0   64d ████░░░     │ │ │ 20:14:03  DEBUG heartbeat ok rtt=42ms    │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch am…│ │ ● odoo… ys-odoo        1   64d ██████░     │ │ │ 20:14:06  INFO  danmaku batch received … │ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀            │ │ ○ qian… xcx            0    2h Completed   │ │ │ 20:14:09  INFO  raffle detected id=8831… │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀           │ │ ○ ling… xcx            0   41m Completed   │ │ │ 20:14:12  INFO  join raffle ok id=88310… │ │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀          │ │ ⠙ ling… xcx            0    8s Init:0/1    │ │ │ 20:14:15  WARN  rate limited by upstrea… │ │ 
+ │                              │ │ ● core… kube-system    0  119d █░░░░░░     │ │ │ 20:14:18  DEBUG heartbeat ok rtt=39ms    │ │ 
+ │                              │ │ ● metr… kube-system    0  119d ready 0/1   │ │ │ 20:14:21  INFO  danmaku batch received … │ │ 
+ ╰──────────────────────────────╯ │ ● trae… kube-system    0  119d ░░░░░░░     │ │ │ 20:14:24  INFO  raffle detected id=8831… │ │ 
+ ╭─ Namespaces ─────────────────╮ │ ● loca… kube-system    0  119d ImagePullB… │ │ │ 20:14:27  ERROR join raffle failed id=8… │ │ 
+ │                              │ │ ● svcl… kube-system    7  119d CrashLoopB… │ │ │ 20:14:30  INFO  reconnecting ws in 1s    │ │ 
+ │ default            ·····   0 │ ╰────────────────────────────────────────────╯ │ │ 20:14:33  INFO  ws connected room=21452… │ │ 
+ │ kube-system        █████   5 │ ╭─ CPU heatmap · last 2 min ─────────────────╮ │ │ 20:14:36  INFO  ws connected room=21452… │ │ 
+ │ kube-public        ·····   0 │ │                                            │ │ │ 20:14:39  DEBUG heartbeat ok rtt=42ms    │ │ 
+ │ kube-node-lease    ·····   0 │ │ bilibili-raf… ████████████████████████████ │ │ │ 20:14:42  INFO  danmaku batch received … │ │ 
+ │ bilibili-raffle    ██░░░   2 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:45  INFO  raffle detected id=8831… │ │ 
+ │ lgo                █░░░░   1 │ │ bilibili-live ████████████████████████████ │ │ │ 20:14:48  INFO  join raffle ok id=88310… │ │ 
+ │ xcx                ███░░   3 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │ ys-odoo            ██░░░   2 │ │ lgo-7c5d97584 ████████████████████████████ │ │ │                                          │ │ 
+ │                              │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ ╰──────────────────────────────╯ │ psql-6bc7744… ████████████████████████████ │ │ │                                          │ │ 
+ ╭─ Deployments ────────────────╮ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │                              │ │ odoo-7575bf6… ████████████████████████████ │ │ │                                          │ │ 
+ │ bilibili-raffle/bilib… ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │ bilibili-raffle/bilib… ● 1/1 │ │ coredns-6799… ████████████████████████████ │ │ │                                          │ │ 
+ │ ys-odoo/psql           ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │ ys-odoo/odoo           ● 1/1 │ │                                            │ │ │ ❯ ▌                          app · atual │ │ 
+ │                              │ │               -2m ████████████████████ now │ │ ╰──────────────────────────────────────────╯ │ 
+ ╰──────────────────────────────╯ ╰────────────────────────────────────────────╯ ╰──────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== resize-other ansi=435b103bcc1ede346e4e9f76db78ea938271a86631a39f5e9a07659765bea969
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d                                       ⠙ metrics every 5s ● live  
+                                                                                                                                                                
+ ╭─ Node ────────────────────────────╮ ╭─ Pods ─────────────────────────────────────────────╮ ╭───────────────────────────────────────────────────────────────╮ 
+ │                                   │ │                                                    │ │  Log   Config   Top   Describe   Events   Security            │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  huawei-k3s-01│ │ / filter pods…                            13 items │ │ ───────────────────────────────────────────────────────────── │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready      │ │                                                    │ │ ● odoo-7575bf6d8-9wjvk                              [Running] │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25%      │ │   NAME          NAMESPACE    RST   AGE CPU/STATUS  │ │   ys-odoo · Running · ready 1/1 · node huawei-k3s-01 · 10.42… │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   █████████████│ │ ● bilibili-raf… bilibili-r…    0  119d █░░░░░░     │ │                                                               │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4/3.8Gi│ │ ● bilibili-liv… bilibili-r…    2  119d ████░░░     │ │ ╭───────────────────────────────────────────────────────────╮ │ 
+ │    ▀    ▀▀▀▀▀▀▀▀▀    █████████████│ │ ● lgo-7c5d9758… lgo            0   87d ██░░░░░     │ │ │ 20:14:00  INFO  ws connected room=21452505 shard=3        │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13 / 110│ │ ● psql-6bc7744… ys-odoo        0   64d ████░░░     │ │ │ 20:14:03  DEBUG heartbeat ok rtt=42ms                     │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch amd64   │ │ ● odoo-7575bf6… ys-odoo        1   64d ██████░     │ │ │ 20:14:06  INFO  danmaku batch received count=38           │ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀                 │ │ ○ qiandao-1605… xcx            0    2h Completed   │ │ │ 20:14:09  INFO  raffle detected id=883104 type=gift       │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                │ │ ○ lingqu-16054… xcx            0   41m Completed   │ │ │ 20:14:12  INFO  join raffle ok id=883104 latency=118ms    │ │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀               │ │ ⠙ lingqu-16054… xcx            0    8s Init:0/1    │ │ │ 20:14:15  WARN  rate limited by upstream, backoff 2s      │ │ 
+ │                                   │ │ ● coredns-6799… kube-system    0  119d █░░░░░░     │ │ │ 20:14:18  DEBUG heartbeat ok rtt=39ms                     │ │ 
+ │                                   │ │ ● metrics-serv… kube-system    0  119d ready 0/1   │ │ │ 20:14:21  INFO  danmaku batch received count=51           │ │ 
+ ╰───────────────────────────────────╯ │ ● traefik-f456… kube-system    0  119d ░░░░░░░     │ │ │ 20:14:24  INFO  raffle detected id=883117 type=guard      │ │ 
+ ╭─ Namespaces ──────────────────────╮ │ ● local-path-p… kube-system    0  119d ImagePullB… │ │ │ 20:14:27  ERROR join raffle failed id=883117: already en… │ │ 
+ │                                   │ │ ● svclb-traefi… kube-system    7  119d CrashLoopB… │ │ │ 20:14:30  INFO  reconnecting ws in 1s                     │ │ 
+ │ default                 ·····   0 │ ╰────────────────────────────────────────────────────╯ │ │ 20:14:33  INFO  ws connected room=21452505 shard=3        │ │ 
+ │ kube-system             █████   5 │ ╭─ CPU heatmap · last 2 min ─────────────────────────╮ │ │ 20:14:36  INFO  ws connected room=21452505 shard=3        │ │ 
+ │ kube-public             ·····   0 │ │                                                    │ │ │ 20:14:39  DEBUG heartbeat ok rtt=42ms                     │ │ 
+ │ kube-node-lease         ·····   0 │ │ bilibili-raf… ████████████████████████████████████ │ │ │ 20:14:42  INFO  danmaku batch received count=38           │ │ 
+ │ bilibili-raffle         ██░░░   2 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:45  INFO  raffle detected id=883104 type=gift       │ │ 
+ │ lgo                     █░░░░   1 │ │ bilibili-live ████████████████████████████████████ │ │ │ 20:14:48  INFO  join raffle ok id=883104 latency=118ms    │ │ 
+ │ xcx                     ███░░   3 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                           │ │ 
+ │ ys-odoo                 ██░░░   2 │ │ lgo-7c5d97584 ████████████████████████████████████ │ │ │                                                           │ │ 
+ │                                   │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                           │ │ 
+ ╰───────────────────────────────────╯ │ psql-6bc7744… ████████████████████████████████████ │ │ │                                                           │ │ 
+ ╭─ Deployments ─────────────────────╮ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                           │ │ 
+ │                                   │ │ odoo-7575bf6… ████████████████████████████████████ │ │ │                                                           │ │ 
+ │ bilibili-raffle/bilibili-l… ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                           │ │ 
+ │ bilibili-raffle/bilibili-r… ● 1/1 │ │ coredns-6799… ████████████████████████████████████ │ │ │                                                           │ │ 
+ │ ys-odoo/psql                ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                           │ │ 
+ │ ys-odoo/odoo                ● 1/1 │ │ metrics-serv… ████████████████████████████████████ │ │ │                                                           │ │ 
+ │ lgo/lgo                     ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                           │ │ 
+ │ kube-system/coredns         ● 1/1 │ │ traefik-f456… ████████████████████████████████████ │ │ │                                                           │ │ 
+ │ kube-system/metrics-server  ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                           │ │ 
+ │ kube-system/traefik         ● 1/1 │ │                                                    │ │ │                                                           │ │ 
+ │                                   │ │                                                    │ │ │                                                           │ │ 
+ │                                   │ │                                                    │ │ │                                                           │ │ 
+ │                                   │ │                                                    │ │ │                                                           │ │ 
+ │                                   │ │                                                    │ │ │ ❯ ▌                                           app · atual │ │ 
+ │                                   │ │               -2m ████████████████████████████ now │ │ ╰───────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────╯ ╰────────────────────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                                                   bubbletea · 0 fps 
+== resize-back ansi=01df73d3b1494abd53796f6ef4e24498a706fb044ec38c33c723a7d7a2746598
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Node ───────────────────────╮ ╭─ Pods ─────────────────────────────────────╮ ╭──────────────────────────────────────────────╮ 
+ │                              │ │                                            │ │  Log   Config   Top   Describe   Events   Se │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  huawei-…│ │ / filter pods…                    13 items │ │ ──────────────────────────────────────────── │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready │ │                                            │ │ ● odoo-7575bf6d8-9wjvk             [Running] │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25% │ │   NAME  NAMESPACE    RST   AGE CPU/STATUS  │ │   ys-odoo · Running · ready 1/1 · node huaw… │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ████████│ │ ● bili… bilibili-r…    0  119d █░░░░░░     │ │                                              │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4…│ │ ● bili… bilibili-r…    2  119d ████░░░     │ │ ╭──────────────────────────────────────────╮ │ 
+ │    ▀    ▀▀▀▀▀▀▀▀▀    ████████│ │ ● lgo-… lgo            0   87d ██░░░░░     │ │ │ 20:14:00  INFO  ws connected room=21452… │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13…│ │ ● psql… ys-odoo        0   64d ████░░░     │ │ │ 20:14:03  DEBUG heartbeat ok rtt=42ms    │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch am…│ │ ● odoo… ys-odoo        1   64d ██████░     │ │ │ 20:14:06  INFO  danmaku batch received … │ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀            │ │ ○ qian… xcx            0    2h Completed   │ │ │ 20:14:09  INFO  raffle detected id=8831… │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀           │ │ ○ ling… xcx            0   41m Completed   │ │ │ 20:14:12  INFO  join raffle ok id=88310… │ │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀          │ │ ⠙ ling… xcx            0    8s Init:0/1    │ │ │ 20:14:15  WARN  rate limited by upstrea… │ │ 
+ │                              │ │ ● core… kube-system    0  119d █░░░░░░     │ │ │ 20:14:18  DEBUG heartbeat ok rtt=39ms    │ │ 
+ │                              │ │ ● metr… kube-system    0  119d ready 0/1   │ │ │ 20:14:21  INFO  danmaku batch received … │ │ 
+ ╰──────────────────────────────╯ │ ● trae… kube-system    0  119d ░░░░░░░     │ │ │ 20:14:24  INFO  raffle detected id=8831… │ │ 
+ ╭─ Namespaces ─────────────────╮ │ ● loca… kube-system    0  119d ImagePullB… │ │ │ 20:14:27  ERROR join raffle failed id=8… │ │ 
+ │                              │ │ ● svcl… kube-system    7  119d CrashLoopB… │ │ │ 20:14:30  INFO  reconnecting ws in 1s    │ │ 
+ │ default            ·····   0 │ ╰────────────────────────────────────────────╯ │ │ 20:14:33  INFO  ws connected room=21452… │ │ 
+ │ kube-system        █████   5 │ ╭─ CPU heatmap · last 2 min ─────────────────╮ │ │ 20:14:36  INFO  ws connected room=21452… │ │ 
+ │ kube-public        ·····   0 │ │                                            │ │ │ 20:14:39  DEBUG heartbeat ok rtt=42ms    │ │ 
+ │ kube-node-lease    ·····   0 │ │ bilibili-raf… ████████████████████████████ │ │ │ 20:14:42  INFO  danmaku batch received … │ │ 
+ │ bilibili-raffle    ██░░░   2 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:45  INFO  raffle detected id=8831… │ │ 
+ │ lgo                █░░░░   1 │ │ bilibili-live ████████████████████████████ │ │ │ 20:14:48  INFO  join raffle ok id=88310… │ │ 
+ │ xcx                ███░░   3 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │ ys-odoo            ██░░░   2 │ │ lgo-7c5d97584 ████████████████████████████ │ │ │                                          │ │ 
+ │                              │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ ╰──────────────────────────────╯ │ psql-6bc7744… ████████████████████████████ │ │ │                                          │ │ 
+ ╭─ Deployments ────────────────╮ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │                              │ │ odoo-7575bf6… ████████████████████████████ │ │ │                                          │ │ 
+ │ bilibili-raffle/bilib… ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │ bilibili-raffle/bilib… ● 1/1 │ │ coredns-6799… ████████████████████████████ │ │ │                                          │ │ 
+ │ ys-odoo/psql           ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │ ys-odoo/odoo           ● 1/1 │ │                                            │ │ │ ❯ ▌                          app · atual │ │ 
+ │                              │ │               -2m ████████████████████ now │ │ ╰──────────────────────────────────────────╯ │ 
+ ╰──────────────────────────────╯ ╰────────────────────────────────────────────╯ ╰──────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== help-open ansi=ca5dc37333eba2686c1198b188abde1623df6563c1d13bf1d421d8a8d2a6a2c1
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Node ───────────────────────╮ ╭─ Pods ─────────────────────────────────────╮ ╭──────────────────────────────────────────────╮ 
+ │                              │ │                                            │ │  Log   Config   Top   Describe   Events   Se │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  huawei-…│ │ / filter pods…                    13 items │ │ ──────────────────────────────────────────── │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready │ │                                            │ │ ● odoo-7575bf6d8-9wjvk             [Running] │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25% │ │   NAME  NAMESPACE    RST   AGE CPU/STATUS  │ │   ys-odoo · Running · ready 1/1 · node huaw… │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ████████│ │ ● bili… bilibili-r…    0  119d █░░░░░░     │ │                                              │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4…│ │ ● bili… bilibili-r…    2  119d ████░░░     │ │ ╭──────────────────────────────────────────╮ │ 
+ │    ▀    ▀▀▀▀▀▀▀▀▀    ████████│ │ ● lgo-… lgo            0   87d ██░░░░░     │ │ │ 20:14:00  INFO  ws connected room=21452… │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13…│ │ ● psql… ys-odoo        0   64d ████░░░     │ │ │ 20:14:03  DEBUG heartbeat ok rtt=42ms    │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch am…│ │ ● odoo… ys-odoo        1   64d ██████░     │ │ │ 20:14:06  INFO  danmaku batch received … │ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀╭─ Help ────────────────────────────────────────────────────────────────────────────────╮etected id=8831… │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀│                                                                                       │fle ok id=88310… │ │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀│  ↑/↓ k/j    move selection                 g G        top / bottom (details)          │ited by upstrea… │ │ 
+ │                  │  tab        next panel                     f          toggle follow (Log)             │t ok rtt=39ms    │ │ 
+ │                  │  shift+tab  previous panel                 w          toggle wrap (Log)               │batch received … │ │ 
+ ╰──────────────────│  /          filter pods                    C          next log container              │etected id=8831… │ │ 
+ ╭─ Namespaces ─────│  enter      confirm / filter namespace     P          current / previous logs         │fle failed id=8… │ │ 
+ │                  │  esc        leave filter / clear           / n N      search Log (details focus)      │ting ws in 1s    │ │ 
+ │ default          │  l c t d e  Log Config Top Describe Events E          events pod / ns / cluster       │cted room=21452… │ │ 
+ │ kube-system      │  S          Security / namespace posture   p          cycle palette                   │cted room=21452… │ │ 
+ │ kube-public      │  A          ack all Security alerts        1          toggle left column              │t ok rtt=42ms    │ │ 
+ │ kube-node-lease  │  [ ]        previous / next tab            ctrl+p     pause animations                │batch received … │ │ 
+ │ bilibili-raffle  │  pgup/pgdn  scroll viewport                ?          toggle help                     │etected id=8831… │ │ 
+ │ lgo              │  home/end   top / bottom                   q ctrl+c   quit                            │fle ok id=88310… │ │ 
+ │ xcx              │                                                                                       │                 │ │ 
+ │ ys-odoo          ╰───────────────────────────────────────────────────────────────────────────────────────╯                 │ │ 
+ │                              │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ ╰──────────────────────────────╯ │ psql-6bc7744… ████████████████████████████ │ │ │                                          │ │ 
+ ╭─ Deployments ────────────────╮ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │                              │ │ odoo-7575bf6… ████████████████████████████ │ │ │                                          │ │ 
+ │ bilibili-raffle/bilib… ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │ bilibili-raffle/bilib… ● 1/1 │ │ coredns-6799… ████████████████████████████ │ │ │                                          │ │ 
+ │ ys-odoo/psql           ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │ ys-odoo/odoo           ● 1/1 │ │                                            │ │ │ ❯ ▌                          app · atual │ │ 
+ │                              │ │               -2m ████████████████████ now │ │ ╰──────────────────────────────────────────╯ │ 
+ ╰──────────────────────────────╯ ╰────────────────────────────────────────────╯ ╰──────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== help-close ansi=01df73d3b1494abd53796f6ef4e24498a706fb044ec38c33c723a7d7a2746598
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Node ───────────────────────╮ ╭─ Pods ─────────────────────────────────────╮ ╭──────────────────────────────────────────────╮ 
+ │                              │ │                                            │ │  Log   Config   Top   Describe   Events   Se │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  huawei-…│ │ / filter pods…                    13 items │ │ ──────────────────────────────────────────── │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready │ │                                            │ │ ● odoo-7575bf6d8-9wjvk             [Running] │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25% │ │   NAME  NAMESPACE    RST   AGE CPU/STATUS  │ │   ys-odoo · Running · ready 1/1 · node huaw… │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ████████│ │ ● bili… bilibili-r…    0  119d █░░░░░░     │ │                                              │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4…│ │ ● bili… bilibili-r…    2  119d ████░░░     │ │ ╭──────────────────────────────────────────╮ │ 
+ │    ▀    ▀▀▀▀▀▀▀▀▀    ████████│ │ ● lgo-… lgo            0   87d ██░░░░░     │ │ │ 20:14:00  INFO  ws connected room=21452… │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13…│ │ ● psql… ys-odoo        0   64d ████░░░     │ │ │ 20:14:03  DEBUG heartbeat ok rtt=42ms    │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch am…│ │ ● odoo… ys-odoo        1   64d ██████░     │ │ │ 20:14:06  INFO  danmaku batch received … │ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀            │ │ ○ qian… xcx            0    2h Completed   │ │ │ 20:14:09  INFO  raffle detected id=8831… │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀           │ │ ○ ling… xcx            0   41m Completed   │ │ │ 20:14:12  INFO  join raffle ok id=88310… │ │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀          │ │ ⠙ ling… xcx            0    8s Init:0/1    │ │ │ 20:14:15  WARN  rate limited by upstrea… │ │ 
+ │                              │ │ ● core… kube-system    0  119d █░░░░░░     │ │ │ 20:14:18  DEBUG heartbeat ok rtt=39ms    │ │ 
+ │                              │ │ ● metr… kube-system    0  119d ready 0/1   │ │ │ 20:14:21  INFO  danmaku batch received … │ │ 
+ ╰──────────────────────────────╯ │ ● trae… kube-system    0  119d ░░░░░░░     │ │ │ 20:14:24  INFO  raffle detected id=8831… │ │ 
+ ╭─ Namespaces ─────────────────╮ │ ● loca… kube-system    0  119d ImagePullB… │ │ │ 20:14:27  ERROR join raffle failed id=8… │ │ 
+ │                              │ │ ● svcl… kube-system    7  119d CrashLoopB… │ │ │ 20:14:30  INFO  reconnecting ws in 1s    │ │ 
+ │ default            ·····   0 │ ╰────────────────────────────────────────────╯ │ │ 20:14:33  INFO  ws connected room=21452… │ │ 
+ │ kube-system        █████   5 │ ╭─ CPU heatmap · last 2 min ─────────────────╮ │ │ 20:14:36  INFO  ws connected room=21452… │ │ 
+ │ kube-public        ·····   0 │ │                                            │ │ │ 20:14:39  DEBUG heartbeat ok rtt=42ms    │ │ 
+ │ kube-node-lease    ·····   0 │ │ bilibili-raf… ████████████████████████████ │ │ │ 20:14:42  INFO  danmaku batch received … │ │ 
+ │ bilibili-raffle    ██░░░   2 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:45  INFO  raffle detected id=8831… │ │ 
+ │ lgo                █░░░░   1 │ │ bilibili-live ████████████████████████████ │ │ │ 20:14:48  INFO  join raffle ok id=88310… │ │ 
+ │ xcx                ███░░   3 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │ ys-odoo            ██░░░   2 │ │ lgo-7c5d97584 ████████████████████████████ │ │ │                                          │ │ 
+ │                              │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ ╰──────────────────────────────╯ │ psql-6bc7744… ████████████████████████████ │ │ │                                          │ │ 
+ ╭─ Deployments ────────────────╮ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │                              │ │ odoo-7575bf6… ████████████████████████████ │ │ │                                          │ │ 
+ │ bilibili-raffle/bilib… ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │ bilibili-raffle/bilib… ● 1/1 │ │ coredns-6799… ████████████████████████████ │ │ │                                          │ │ 
+ │ ys-odoo/psql           ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │ ys-odoo/odoo           ● 1/1 │ │                                            │ │ │ ❯ ▌                          app · atual │ │ 
+ │                              │ │               -2m ████████████████████ now │ │ ╰──────────────────────────────────────────╯ │ 
+ ╰──────────────────────────────╯ ╰────────────────────────────────────────────╯ ╰──────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== focus-namespaces ansi=094fa5de009b00a040cb698aa2a99eb45c498f5aa11441715d9193b3d48600f1
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Node ───────────────────────╮ ╭─ Pods ─────────────────────────────────────╮ ╭──────────────────────────────────────────────╮ 
+ │                              │ │                                            │ │  Log   Config   Top   Describe   Events   Se │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  huawei-…│ │ / filter pods…                    13 items │ │ ──────────────────────────────────────────── │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready │ │                                            │ │ ● odoo-7575bf6d8-9wjvk             [Running] │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25% │ │   NAME  NAMESPACE    RST   AGE CPU/STATUS  │ │   ys-odoo · Running · ready 1/1 · node huaw… │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ████████│ │ ● bili… bilibili-r…    0  119d █░░░░░░     │ │                                              │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4…│ │ ● bili… bilibili-r…    2  119d ████░░░     │ │ ╭──────────────────────────────────────────╮ │ 
+ │    ▀    ▀▀▀▀▀▀▀▀▀    ████████│ │ ● lgo-… lgo            0   87d ██░░░░░     │ │ │ 20:14:00  INFO  ws connected room=21452… │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13…│ │ ● psql… ys-odoo        0   64d ████░░░     │ │ │ 20:14:03  DEBUG heartbeat ok rtt=42ms    │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch am…│ │ ● odoo… ys-odoo        1   64d ██████░     │ │ │ 20:14:06  INFO  danmaku batch received … │ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀            │ │ ○ qian… xcx            0    2h Completed   │ │ │ 20:14:09  INFO  raffle detected id=8831… │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀           │ │ ○ ling… xcx            0   41m Completed   │ │ │ 20:14:12  INFO  join raffle ok id=88310… │ │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀          │ │ ⠙ ling… xcx            0    8s Init:0/1    │ │ │ 20:14:15  WARN  rate limited by upstrea… │ │ 
+ │                              │ │ ● core… kube-system    0  119d █░░░░░░     │ │ │ 20:14:18  DEBUG heartbeat ok rtt=39ms    │ │ 
+ │                              │ │ ● metr… kube-system    0  119d ready 0/1   │ │ │ 20:14:21  INFO  danmaku batch received … │ │ 
+ ╰──────────────────────────────╯ │ ● trae… kube-system    0  119d ░░░░░░░     │ │ │ 20:14:24  INFO  raffle detected id=8831… │ │ 
+ ╭─ Namespaces ─────────────────╮ │ ● loca… kube-system    0  119d ImagePullB… │ │ │ 20:14:27  ERROR join raffle failed id=8… │ │ 
+ │                              │ │ ● svcl… kube-system    7  119d CrashLoopB… │ │ │ 20:14:30  INFO  reconnecting ws in 1s    │ │ 
+ │ default            ·····   0 │ ╰────────────────────────────────────────────╯ │ │ 20:14:33  INFO  ws connected room=21452… │ │ 
+ │ kube-system        █████   5 │ ╭─ CPU heatmap · last 2 min ─────────────────╮ │ │ 20:14:36  INFO  ws connected room=21452… │ │ 
+ │ kube-public        ·····   0 │ │                                            │ │ │ 20:14:39  DEBUG heartbeat ok rtt=42ms    │ │ 
+ │ kube-node-lease    ·····   0 │ │ bilibili-raf… ████████████████████████████ │ │ │ 20:14:42  INFO  danmaku batch received … │ │ 
+ │ bilibili-raffle    ██░░░   2 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:45  INFO  raffle detected id=8831… │ │ 
+ │ lgo                █░░░░   1 │ │ bilibili-live ████████████████████████████ │ │ │ 20:14:48  INFO  join raffle ok id=88310… │ │ 
+ │ xcx                ███░░   3 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │ ys-odoo            ██░░░   2 │ │ lgo-7c5d97584 ████████████████████████████ │ │ │                                          │ │ 
+ │                              │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ ╰──────────────────────────────╯ │ psql-6bc7744… ████████████████████████████ │ │ │                                          │ │ 
+ ╭─ Deployments ────────────────╮ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │                              │ │ odoo-7575bf6… ████████████████████████████ │ │ │                                          │ │ 
+ │ bilibili-raffle/bilib… ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │ bilibili-raffle/bilib… ● 1/1 │ │ coredns-6799… ████████████████████████████ │ │ │                                          │ │ 
+ │ ys-odoo/psql           ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │ ys-odoo/odoo           ● 1/1 │ │                                            │ │ │ ❯ ▌                          app · atual │ │ 
+ │                              │ │               -2m ████████████████████ now │ │ ╰──────────────────────────────────────────╯ │ 
+ ╰──────────────────────────────╯ ╰────────────────────────────────────────────╯ ╰──────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== namespace-enter ansi=a961608c7915a38f76521a110ad10d38044a0cdb4628cb74d440210dd97c4d4a
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Node ───────────────────────╮ ╭─ Pods ─────────────────────────────────────╮ ╭──────────────────────────────────────────────╮ 
+ │                              │ │                                            │ │  Log   Config   Top   Describe   Events   Se │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  huawei-…│ │ / filter pods…         ns:default  0 items │ │ ──────────────────────────────────────────── │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready │ │                                            │ │                                              │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25% │ │   NAME  NAMESPACE    RST   AGE CPU/STATUS  │ │                                              │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ████████│ │   no pods match the filter                 │ │                                              │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4…│ │                                            │ │                                              │ 
+ │    ▀    ▀▀▀▀▀▀▀▀▀    ████████│ │                                            │ │                                              │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13…│ │                                            │ │                                              │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch am…│ │                                            │ │                                              │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀            │ │                                            │ │                                              │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀           │ │                                            │ │                                              │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀          │ │                                            │ │                                              │ 
+ │                              │ │                                            │ │                                              │ 
+ │                              │ │                                            │ │                                              │ 
+ ╰──────────────────────────────╯ │                                            │ │                                              │ 
+ ╭─ Namespaces ─────────────────╮ │                                            │ │                                              │ 
+ │                              │ │                                            │ │                                              │ 
+ │ default            ·····   0 │ ╰────────────────────────────────────────────╯ │                                              │ 
+ │ kube-system        █████   5 │ ╭─ CPU heatmap · last 2 min ─────────────────╮ │               no pod selected                │ 
+ │ kube-public        ·····   0 │ │                                            │ │                                              │ 
+ │ kube-node-lease    ·····   0 │ │ bilibili-raf… ████████████████████████████ │ │                                              │ 
+ │ bilibili-raffle    ██░░░   2 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │                                              │ 
+ │ lgo                █░░░░   1 │ │ bilibili-live ████████████████████████████ │ │                                              │ 
+ │ xcx                ███░░   3 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │                                              │ 
+ │ ys-odoo            ██░░░   2 │ │ lgo-7c5d97584 ████████████████████████████ │ │                                              │ 
+ │                              │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │                                              │ 
+ ╰──────────────────────────────╯ │ psql-6bc7744… ████████████████████████████ │ │                                              │ 
+ ╭─ Deployments ────────────────╮ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │                                              │ 
+ │                              │ │ odoo-7575bf6… ████████████████████████████ │ │                                              │ 
+ │ bilibili-raffle/bilib… ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │                                              │ 
+ │ bilibili-raffle/bilib… ● 1/1 │ │ coredns-6799… ████████████████████████████ │ │                                              │ 
+ │ ys-odoo/psql           ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │                                              │ 
+ │ ys-odoo/odoo           ● 1/1 │ │                                            │ │                                              │ 
+ │                              │ │               -2m ████████████████████ now │ │                                              │ 
+ ╰──────────────────────────────╯ ╰────────────────────────────────────────────╯ ╰──────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+== namespace-clear ansi=094fa5de009b00a040cb698aa2a99eb45c498f5aa11441715d9193b3d48600f1
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d         ⠙ metrics every 5s ● live  
+                                                                                                                                  
+ ╭─ Node ───────────────────────╮ ╭─ Pods ─────────────────────────────────────╮ ╭──────────────────────────────────────────────╮ 
+ │                              │ │                                            │ │  Log   Config   Top   Describe   Events   Se │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  huawei-…│ │ / filter pods…                    13 items │ │ ──────────────────────────────────────────── │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready │ │                                            │ │ ● odoo-7575bf6d8-9wjvk             [Running] │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25% │ │   NAME  NAMESPACE    RST   AGE CPU/STATUS  │ │   ys-odoo · Running · ready 1/1 · node huaw… │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ████████│ │ ● bili… bilibili-r…    0  119d █░░░░░░     │ │                                              │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4…│ │ ● bili… bilibili-r…    2  119d ████░░░     │ │ ╭──────────────────────────────────────────╮ │ 
+ │    ▀    ▀▀▀▀▀▀▀▀▀    ████████│ │ ● lgo-… lgo            0   87d ██░░░░░     │ │ │ 20:14:00  INFO  ws connected room=21452… │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13…│ │ ● psql… ys-odoo        0   64d ████░░░     │ │ │ 20:14:03  DEBUG heartbeat ok rtt=42ms    │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch am…│ │ ● odoo… ys-odoo        1   64d ██████░     │ │ │ 20:14:06  INFO  danmaku batch received … │ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀            │ │ ○ qian… xcx            0    2h Completed   │ │ │ 20:14:09  INFO  raffle detected id=8831… │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀           │ │ ○ ling… xcx            0   41m Completed   │ │ │ 20:14:12  INFO  join raffle ok id=88310… │ │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀          │ │ ⠙ ling… xcx            0    8s Init:0/1    │ │ │ 20:14:15  WARN  rate limited by upstrea… │ │ 
+ │                              │ │ ● core… kube-system    0  119d █░░░░░░     │ │ │ 20:14:18  DEBUG heartbeat ok rtt=39ms    │ │ 
+ │                              │ │ ● metr… kube-system    0  119d ready 0/1   │ │ │ 20:14:21  INFO  danmaku batch received … │ │ 
+ ╰──────────────────────────────╯ │ ● trae… kube-system    0  119d ░░░░░░░     │ │ │ 20:14:24  INFO  raffle detected id=8831… │ │ 
+ ╭─ Namespaces ─────────────────╮ │ ● loca… kube-system    0  119d ImagePullB… │ │ │ 20:14:27  ERROR join raffle failed id=8… │ │ 
+ │                              │ │ ● svcl… kube-system    7  119d CrashLoopB… │ │ │ 20:14:30  INFO  reconnecting ws in 1s    │ │ 
+ │ default            ·····   0 │ ╰────────────────────────────────────────────╯ │ │ 20:14:33  INFO  ws connected room=21452… │ │ 
+ │ kube-system        █████   5 │ ╭─ CPU heatmap · last 2 min ─────────────────╮ │ │ 20:14:36  INFO  ws connected room=21452… │ │ 
+ │ kube-public        ·····   0 │ │                                            │ │ │ 20:14:39  DEBUG heartbeat ok rtt=42ms    │ │ 
+ │ kube-node-lease    ·····   0 │ │ bilibili-raf… ████████████████████████████ │ │ │ 20:14:42  INFO  danmaku batch received … │ │ 
+ │ bilibili-raffle    ██░░░   2 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:45  INFO  raffle detected id=8831… │ │ 
+ │ lgo                █░░░░   1 │ │ bilibili-live ████████████████████████████ │ │ │ 20:14:48  INFO  join raffle ok id=88310… │ │ 
+ │ xcx                ███░░   3 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │ ys-odoo            ██░░░   2 │ │ lgo-7c5d97584 ████████████████████████████ │ │ │                                          │ │ 
+ │                              │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ ╰──────────────────────────────╯ │ psql-6bc7744… ████████████████████████████ │ │ │                                          │ │ 
+ ╭─ Deployments ────────────────╮ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │                              │ │ odoo-7575bf6… ████████████████████████████ │ │ │                                          │ │ 
+ │ bilibili-raffle/bilib… ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │ bilibili-raffle/bilib… ● 1/1 │ │ coredns-6799… ████████████████████████████ │ │ │                                          │ │ 
+ │ ys-odoo/psql           ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                          │ │ 
+ │ ys-odoo/odoo           ● 1/1 │ │                                            │ │ │ ❯ ▌                          app · atual │ │ 
+ │                              │ │               -2m ████████████████████ now │ │ ╰──────────────────────────────────────────╯ │ 
+ ╰──────────────────────────────╯ ╰────────────────────────────────────────────╯ ╰──────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 

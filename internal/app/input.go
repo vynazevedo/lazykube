@@ -8,11 +8,8 @@ import (
 	"github.com/TNK-Studio/lazykube/internal/ui"
 )
 
-func (m Model) handleKey(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
+func (m Model) handleKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 	k := m.keys
-	if msg.String() == "ctrl+c" {
-		return m, tea.Quit
-	}
 	if m.helpOpen {
 		switch {
 		case key.Matches(msg, k.Help), key.Matches(msg, k.Esc):
@@ -128,7 +125,7 @@ func (m Model) handleKey(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m Model) handleFilterKey(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
+func (m Model) handleFilterKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 	switch msg.String() {
 	case "esc":
 		m.filtering = false
@@ -190,7 +187,7 @@ func (m Model) tabAt(x, y int) (ui.Tab, bool) {
 	return ui.TabAt(x-(d.X+2), len(m.securitySession.Alerts))
 }
 
-func (m Model) handleClick(ms tea.Mouse) (tea.Model, tea.Cmd) {
+func (m Model) handleClick(ms tea.Mouse) (Model, tea.Cmd) {
 	if ms.Button != tea.MouseLeft || m.layout.TooSmall {
 		return m, nil
 	}
@@ -225,7 +222,7 @@ func (m Model) handleClick(ms tea.Mouse) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m Model) handleWheel(ms tea.Mouse) (tea.Model, tea.Cmd) {
+func (m Model) handleWheel(ms tea.Mouse) (Model, tea.Cmd) {
 	delta := 0
 	switch ms.Button {
 	case tea.MouseWheelUp:

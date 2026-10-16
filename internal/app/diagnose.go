@@ -143,7 +143,7 @@ func (m *Model) startSearch() tea.Cmd {
 	return m.dg.search.Focus()
 }
 
-func (m Model) handleSearchKey(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
+func (m Model) handleSearchKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 	switch msg.String() {
 	case "esc":
 		m.dg.searching = false

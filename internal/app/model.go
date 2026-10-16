@@ -37,6 +37,8 @@ type Options struct {
 }
 
 type Model struct {
+	nav router
+
 	security          data.SecuritySnapshot
 	securitySession   data.SecuritySession
 	securityKey       string
@@ -119,6 +121,7 @@ func New(opts Options) Model {
 		dg:       newDiagState(opts.Source),
 		follow:   true,
 		motion:   newMotion(fps),
+		nav:      newRouter(),
 	}
 	if m.animated {
 		m.clock = anim.NewClock(now(), fps)
@@ -138,7 +141,7 @@ func New(opts Options) Model {
 }
 
 func (m Model) Init() tea.Cmd {
-	return tea.Batch(m.scheduleTick(), m.waitData())
+	return tea.Batch(m.scheduleTick(), m.waitData(), m.screen().Init(m))
 }
 
 func (m Model) waitData() tea.Cmd {
@@ -202,10 +205,6 @@ func (m *Model) refresh() {
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-	case tea.WindowSizeMsg:
-		m.setLayout(msg.Width, msg.Height)
-		m.refresh()
-		return m, nil
 	case dataMsg:
 		m.reload()
 		return m, m.waitData()
@@ -240,38 +239,23 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmd := m.restartTick()
 		return m, cmd
 	case tea.KeyPressMsg:
-		idle := !m.busy()
-		next, cmd := m.handleKey(msg)
-		return wake(idle, next, cmd)
-	case tea.MouseClickMsg:
-		idle := !m.busy()
-		next, cmd := m.handleClick(tea.Mouse(msg))
-		return wake(idle, next, cmd)
-	case tea.MouseWheelMsg:
-		idle := !m.busy()
-		next, cmd := m.handleWheel(tea.Mouse(msg))
-		return wake(idle, next, cmd)
-	case tea.MouseMotionMsg:
-		m.handleMotion(tea.Mouse(msg))
-		return m, nil
-	}
-	if m.filtering {
-		var cmd tea.Cmd
-		before := m.filter.Value()
-		m.filter, cmd = m.filter.Update(msg)
-		if m.filter.Value() != before {
-			m.syncSelection()
+		if msg.String() == "ctrl+c" {
+			return wake(!m.busy(), m, tea.Quit)
 		}
-		return m, cmd
+		return m.delegateInput(msg)
+	case tea.MouseClickMsg, tea.MouseWheelMsg:
+		return m.delegateInput(msg)
 	}
-	return m, nil
+	return m.screen().Update(m, msg)
 }
 
-func wake(wasIdle bool, next tea.Model, cmd tea.Cmd) (tea.Model, tea.Cmd) {
-	nm, ok := next.(Model)
-	if !ok {
-		return next, cmd
-	}
+func (m Model) delegateInput(msg tea.Msg) (tea.Model, tea.Cmd) {
+	idle := !m.busy()
+	next, cmd := m.screen().Update(m, msg)
+	return wake(idle, next, cmd)
+}
+
+func wake(wasIdle bool, nm Model, cmd tea.Cmd) (tea.Model, tea.Cmd) {
 	nm.noteInput()
 	if wasIdle && nm.running() {
 		tick := nm.restartTick()
