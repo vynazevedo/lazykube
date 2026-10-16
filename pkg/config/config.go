@@ -1,8 +1,8 @@
 package config
 
 import (
-	"github.com/TNK-Studio/lazykube/pkg/utils"
 	"github.com/sirupsen/logrus"
+	"github.com/vynazevedo/lazykube/pkg/utils"
 	"gopkg.in/yaml.v3"
 	"os"
 	"path"

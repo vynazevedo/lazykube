@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/TNK-Studio/lazykube/internal/theme"
+	"github.com/vynazevedo/lazykube/internal/theme"
 )
 
 var (

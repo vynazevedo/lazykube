@@ -4,15 +4,12 @@ import (
 	"charm.land/bubbles/v2/key"
 	tea "charm.land/bubbletea/v2"
 
-	"github.com/TNK-Studio/lazykube/internal/theme"
-	"github.com/TNK-Studio/lazykube/internal/ui"
+	"github.com/vynazevedo/lazykube/internal/theme"
+	"github.com/vynazevedo/lazykube/internal/ui"
 )
 
-func (m Model) handleKey(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
+func (m Model) handleKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 	k := m.keys
-	if msg.String() == "ctrl+c" {
-		return m, tea.Quit
-	}
 	if m.helpOpen {
 		switch {
 		case key.Matches(msg, k.Help), key.Matches(msg, k.Esc):
@@ -73,6 +70,8 @@ func (m Model) handleKey(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		m.setTab(ui.TabSecurity)
 		m.scroll = 0
 		m.refreshSecurity()
+	case key.Matches(msg, k.SecurityAck):
+		m.acknowledgeSecurity()
 	case key.Matches(msg, k.TabEvents):
 		m.setTab(ui.TabEvents)
 	case key.Matches(msg, k.TabPrev):
@@ -126,7 +125,7 @@ func (m Model) handleKey(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m Model) handleFilterKey(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
+func (m Model) handleFilterKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 	switch msg.String() {
 	case "esc":
 		m.filtering = false
@@ -185,10 +184,10 @@ func (m Model) tabAt(x, y int) (ui.Tab, bool) {
 	if d.Empty() || y != d.Y+1+ui.DetailsTabsRow {
 		return 0, false
 	}
-	return ui.TabAt(x - (d.X + 2))
+	return ui.TabAt(x-(d.X+2), len(m.securitySession.Alerts))
 }
 
-func (m Model) handleClick(ms tea.Mouse) (tea.Model, tea.Cmd) {
+func (m Model) handleClick(ms tea.Mouse) (Model, tea.Cmd) {
 	if ms.Button != tea.MouseLeft || m.layout.TooSmall {
 		return m, nil
 	}
@@ -223,7 +222,7 @@ func (m Model) handleClick(ms tea.Mouse) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m Model) handleWheel(ms tea.Mouse) (tea.Model, tea.Cmd) {
+func (m Model) handleWheel(ms tea.Mouse) (Model, tea.Cmd) {
 	delta := 0
 	switch ms.Button {
 	case tea.MouseWheelUp:

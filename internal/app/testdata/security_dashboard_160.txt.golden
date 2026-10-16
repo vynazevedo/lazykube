@@ -1,0 +1,48 @@
+ lazykube [DEMO]  v2.0   ◎ context demo   k8s demo  nodes 1  ns 8  pods 13  uptime 119d                               ! 1 high new   ⠙ metrics every 5s ● live  
+                                                                                                                                                                
+ ╭─ Node ────────────────────────────╮ ╭─ Pods · focus ─────────────────────────────────────╮ ╭───────────────────────────────────────────────────────────────╮ 
+ │                                   │ │                                                    │ │  Log   Config   Top   Describe   Events   Security 1          │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  demo-node-01 │ │ / filter pods…▌                           13 items │ │ ───────────────────────────────────────────────────────────── │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready      │ │                                                    │ │ ╭───────────────────────────────────────────────────────────╮ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 21%      │ │   NAME          NAMESPACE    RST   AGE CPU/STATUS  │ │ │ S: namespace | Pod: bilibili-raffle/bilibili-live-7f6b8d… │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   █████████████│ │ ● bilibili-raf… bilibili-r…    0  119d █░░░░░░     │ │ │ Dashboard coverage: complete in scope | pods 13/13        │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4/3.8Gi│ │ ● bilibili-liv… bilibili-r…    2  119d ████░░░     │ │ │ No findings does not mean safe                            │ │ 
+ │    ▀    ▀▀▀▀▀▀▀▀▀    █████████████│ │ ● lgo-7c5d9758… lgo            0   87d ██░░░░░     │ │ │ Local checks only; not PSS compliance.                    │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13 / 110│ │ ● psql-6bc7744… ys-odoo        0   64d ████░░░     │ │ │ POSTURE | Cluster | 76/100 (C) | 13/13 pods               │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch amd64   │ │ ● odoo-7575bf6… ys-odoo        1   64d ██████░     │ │ │ Synthetic data (demo)                                     │ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀                 │ │ ○ qiandao-1605… xcx            0    2h Completed   │ │ │ Score ███████████████████████████░░░░░░░░░                │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                │ │ ○ lingqu-16054… xcx            0   41m Completed   │ │ │ high     10 ████████████████████████                      │ │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀               │ │ ⠙ lingqu-16054… xcx            0    8s Init:0/1    │ │ │ medium    6 ██████████████░░░░░░░░░░                      │ │ 
+ │                                   │ │ ● coredns-6799… kube-system    0  119d ░░░░░░░     │ │ │ info      4 ██████████░░░░░░░░░░░░░░                      │ │ 
+ │                                   │ │ ● metrics-serv… kube-system    0  119d ready 0/1   │ │ │ Unknown checks: 4 | confirmed findings only in score      │ │ 
+ ╰───────────────────────────────────╯ │ ● traefik-f456… kube-system    0  119d ░░░░░░░     │ │ │ Trend: ▆▆ (revision samples)                              │ │ 
+ ╭─ Namespaces ──────────────────────╮ │ ● local-path-p… kube-system    0  119d ImagePullB… │ │ │ ALERTS | new high since baseline / last ack | A: ack all  │ │ 
+ │                                   │ │ ● svclb-traefi… kube-system    7  119d CrashLoopB… │ │ │ ! bilibili-raffle/bilibili-raffle-5d8f9c7b4-x2kqp |       │ │ 
+ │ default                 ·····   0 │ ╰────────────────────────────────────────────────────╯ │ │ hostPID | pod                                             │ │ 
+ │ kube-system             █████   5 │ ╭─ CPU heatmap · last 2 min ─────────────────────────╮ │ │ TOP RULES | confirmed findings                            │ │ 
+ │ kube-public             ·····   0 │ │                                                    │ │ │ serviceAccountToken       4 ██████████████████            │ │ 
+ │ kube-node-lease         ·····   0 │ │ bilibili-raf… ████████████████████████████████████ │ │ │ capabilitiesAdded         3 ██████████████░░░░            │ │ 
+ │ bilibili-raffle         ██░░░   2 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ hostNetwork               3 ██████████████░░░░            │ │ 
+ │ lgo                     █░░░░   1 │ │ bilibili-live ████████████████████████████████████ │ │ │ imageLatest               3 ██████████████░░░░            │ │ 
+ │ xcx                     ███░░   3 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ limit-memory              3 ██████████████░░░░            │ │ 
+ │ ys-odoo                 ██░░░   2 │ │ lgo-7c5d97584 ████████████████████████████████████ │ │ │ NAMESPACES | lowest scores first                          │ │ 
+ │                                   │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ lgo                50 ████░░░░ | 2 findings               │ │ 
+ ╰───────────────────────────────────╯ │ psql-6bc7744… ████████████████████████████████████ │ │ │ bilibili-raffle    66 █████░░░ | 5 findings               │ │ 
+ ╭─ Deployments ─────────────────────╮ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ xcx                70 ██████░░ | 5 findings               │ │ 
+ │                                   │ │ odoo-7575bf6… ████████████████████████████████████ │ │ │ kube-system        81 ██████░░ | 7 findings               │ │ 
+ │ bilibili-raffle/bilibili-l… ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ ys-odoo            99 ████████ | 1 finding                │ │ 
+ │ bilibili-raffle/bilibili-r… ● 1/1 │ │ coredns-6799… ████████████████████████████████████ │ │ │ More namespaces: use the namespace filter.                │ │ 
+ │ ys-odoo/psql                ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Score: 100 - (25*high + 8*medium + 2*info)/evaluated      │ │ 
+ │ ys-odoo/odoo                ● 1/1 │ │ metrics-serv… ████████████████████████████████████ │ │ │ pods; floor 0, rounded.                                   │ │ 
+ │ lgo/lgo                     ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Grades: A >=90, B >=80, C >=70, D >=60, F <60. Not a      │ │ 
+ │ kube-system/coredns         ● 1/1 │ │ traefik-f456… ████████████████████████████████████ │ │ │ safety rating.                                            │ │ 
+ │ kube-system/metrics-server  ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ SELECTED POD | 59/100 (F) | 1/1 pod                       │ │ 
+ │ kube-system/traefik         ● 1/1 │ │                                                    │ │ │ Pod bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz |       │ │ 
+ │                                   │ │                                                    │ │ │ complete in scope                                         │ │ 
+ │                                   │ │                                                    │ │ │ Observed 2026-10-16 12:00:00Z | UID                       │ │ 
+ │                                   │ │                                                    │ │ │ demo-bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz | RV 1 │ │ 
+ │                                   │ │                                                    │ │ │ [high] privileged | finding | container: init-permissions │ │ 
+ │                                   │ │               -2m ████████████████████████████ now │ │ ╰───────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────╯ ╰────────────────────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                                                   bubbletea · 0 fps 

@@ -9,7 +9,7 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 
-	"github.com/TNK-Studio/lazykube/internal/data"
+	"github.com/vynazevedo/lazykube/internal/data"
 )
 
 const (

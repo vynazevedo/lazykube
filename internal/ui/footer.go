@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/TNK-Studio/lazykube/internal/draw"
-	"github.com/TNK-Studio/lazykube/internal/theme"
+	"github.com/vynazevedo/lazykube/internal/draw"
+	"github.com/vynazevedo/lazykube/internal/theme"
 )
 
 type KeyHelp struct {
@@ -36,6 +36,7 @@ func FullHelp() []KeyHelp {
 		{"esc", "leave filter / clear"},
 		{"l c t d e", "Log Config Top Describe Events"},
 		{"S", "Security / namespace posture"},
+		{"A", "ack all Security alerts"},
 		{"[ ]", "previous / next tab"},
 		{"pgup/pgdn", "scroll viewport"},
 		{"home/end", "top / bottom"},

@@ -13,7 +13,7 @@ import (
 	"k8s.io/klog/v2"
 	metricsclient "k8s.io/metrics/pkg/client/clientset/versioned"
 
-	"github.com/TNK-Studio/lazykube/internal/data"
+	"github.com/vynazevedo/lazykube/internal/data"
 )
 
 const (

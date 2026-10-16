@@ -76,9 +76,10 @@ type Coverage struct {
 }
 
 type PodPosture struct {
-	Target   ResourceRef
-	Coverage Coverage
-	Findings []Finding
+	LocalCoverage Coverage
+	Target        ResourceRef
+	Coverage      Coverage
+	Findings      []Finding
 }
 
 type NamespacePosture struct {
@@ -89,11 +90,18 @@ type NamespacePosture struct {
 }
 
 type SecuritySnapshot struct {
-	Pods       map[string]PodPosture
-	Namespaces map[string]NamespacePosture
-	Coverage   Coverage
+	ListCoverage Coverage
+	Revision     uint64
+	Pods         map[string]PodPosture
+	Namespaces   map[string]NamespacePosture
+	Coverage     Coverage
 }
 
 type SecuritySource interface {
 	Security() SecuritySnapshot
+}
+
+type SecurityRevisionSource interface {
+	SecuritySource
+	SecurityRevision() uint64
 }

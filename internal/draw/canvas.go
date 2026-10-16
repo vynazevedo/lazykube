@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/TNK-Studio/lazykube/internal/theme"
+	"github.com/vynazevedo/lazykube/internal/theme"
 )
 
 type Cell struct {

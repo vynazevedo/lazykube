@@ -1,9 +1,9 @@
 package ui
 
 import (
-	"github.com/TNK-Studio/lazykube/internal/anim"
-	"github.com/TNK-Studio/lazykube/internal/draw"
-	"github.com/TNK-Studio/lazykube/internal/theme"
+	"github.com/vynazevedo/lazykube/internal/anim"
+	"github.com/vynazevedo/lazykube/internal/draw"
+	"github.com/vynazevedo/lazykube/internal/theme"
 )
 
 type Ctx struct {

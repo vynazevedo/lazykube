@@ -1,4 +1,4 @@
-module github.com/TNK-Studio/lazykube
+module github.com/vynazevedo/lazykube
 
 go 1.26.0
 

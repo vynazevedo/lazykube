@@ -4,8 +4,8 @@ import (
 	"charm.land/bubbles/v2/textinput"
 	tea "charm.land/bubbletea/v2"
 
-	"github.com/TNK-Studio/lazykube/internal/data"
-	"github.com/TNK-Studio/lazykube/internal/ui"
+	"github.com/vynazevedo/lazykube/internal/data"
+	"github.com/vynazevedo/lazykube/internal/ui"
 )
 
 type diagState struct {
@@ -40,6 +40,9 @@ func (m *Model) resetLogTarget() {
 
 func (m *Model) refreshLogs(pod string) {
 	if pod == "" {
+		if m.dg.diag != nil {
+			m.dg.diag.PodLogs(data.LogRequest{}, m.clock.T, 0)
+		}
 		m.dg.logView = data.LogView{}
 		m.applyLogs(nil)
 		return
@@ -140,7 +143,7 @@ func (m *Model) startSearch() tea.Cmd {
 	return m.dg.search.Focus()
 }
 
-func (m Model) handleSearchKey(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
+func (m Model) handleSearchKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 	switch msg.String() {
 	case "esc":
 		m.dg.searching = false

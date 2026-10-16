@@ -3,16 +3,18 @@ package ui
 import (
 	"fmt"
 
-	"github.com/TNK-Studio/lazykube/internal/data"
-	"github.com/TNK-Studio/lazykube/internal/draw"
-	"github.com/TNK-Studio/lazykube/internal/theme"
+	"github.com/vynazevedo/lazykube/internal/data"
+	"github.com/vynazevedo/lazykube/internal/draw"
+	"github.com/vynazevedo/lazykube/internal/theme"
 )
 
-const Version = "v2.0"
+var Version = "v2.0"
 
 type HeaderState struct {
-	Cluster   data.Cluster
-	MetricsOK bool
+	Synthetic      bool
+	Cluster        data.Cluster
+	MetricsOK      bool
+	SecurityAlerts int
 }
 
 func Header(r draw.Region, st HeaderState, ctx Ctx) {
@@ -24,9 +26,15 @@ func Header(r draw.Region, st HeaderState, ctx Ctx) {
 		r.Put(x+i, 0, ch, draw.Fg(colors[i]).WithBold())
 	}
 	x += len(logo)
+	if st.Synthetic {
+		x += r.Text(x, 0, " [DEMO]", draw.Fg(theme.Warn).WithBold())
+	}
 	x += r.Line(x, 0, draw.Line{muted("  " + Version + "  ")})
 
 	pill := statusPill(st, ctx)
+	if st.SecurityAlerts > 0 {
+		pill = append(draw.Line{draw.S(fmt.Sprintf("! %d high new  ", st.SecurityAlerts), draw.Fg(theme.Err).WithBold())}, pill...)
+	}
 	right := r.W - pill.Width()
 
 	chip := theme.BgChip

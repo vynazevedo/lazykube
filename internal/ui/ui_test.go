@@ -8,10 +8,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/TNK-Studio/lazykube/internal/anim"
-	"github.com/TNK-Studio/lazykube/internal/data"
-	"github.com/TNK-Studio/lazykube/internal/draw"
-	"github.com/TNK-Studio/lazykube/internal/theme"
+	"github.com/vynazevedo/lazykube/internal/anim"
+	"github.com/vynazevedo/lazykube/internal/data"
+	"github.com/vynazevedo/lazykube/internal/draw"
+	"github.com/vynazevedo/lazykube/internal/theme"
 )
 
 var update = flag.Bool("update", false, "update golden files")
@@ -83,10 +83,10 @@ func TestPanelGoldens(t *testing.T) {
 	m := d.Metrics(40, selectedPod, 36)
 
 	check(t, "header", canvas(158, 1, func(r draw.Region) {
-		Header(r, HeaderState{Cluster: snap.Cluster, MetricsOK: true}, ctx)
+		Header(r, HeaderState{Synthetic: snap.Synthetic, Cluster: snap.Cluster, MetricsOK: true}, ctx)
 	}))
 	check(t, "header_stale", canvas(158, 1, func(r draw.Region) {
-		Header(r, HeaderState{Cluster: snap.Cluster, MetricsOK: false}, ctx)
+		Header(r, HeaderState{Synthetic: snap.Synthetic, Cluster: snap.Cluster, MetricsOK: false}, ctx)
 	}))
 	check(t, "node", canvas(37, 16, func(r draw.Region) {
 		NodePanel(r, NodeState{Node: snap.Node, CPU: m.NodeCPU, CPUFrac: float64(m.NodeCPU) / 100, MemFrac: snap.Node.MemFraction}, ctx)

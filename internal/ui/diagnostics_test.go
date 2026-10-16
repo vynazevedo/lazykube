@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/TNK-Studio/lazykube/internal/data"
+	"github.com/vynazevedo/lazykube/internal/data"
 )
 
 func TestIndexFoldAndMatchRows(t *testing.T) {

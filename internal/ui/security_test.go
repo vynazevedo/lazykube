@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/TNK-Studio/lazykube/internal/data"
-	"github.com/TNK-Studio/lazykube/internal/draw"
+	"github.com/vynazevedo/lazykube/internal/data"
+	"github.com/vynazevedo/lazykube/internal/draw"
 )
 
 func TestSecurityCoverageViews(t *testing.T) {

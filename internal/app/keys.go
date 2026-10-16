@@ -16,6 +16,7 @@ type KeyMap struct {
 	TabDescribe key.Binding
 	TabEvents   key.Binding
 	TabSecurity key.Binding
+	SecurityAck key.Binding
 	TabPrev     key.Binding
 	TabNext     key.Binding
 	Container   key.Binding
@@ -54,6 +55,7 @@ func DefaultKeyMap() KeyMap {
 		TabConfig:   b("c", "config", "c"),
 		TabTop:      b("t", "top", "t"),
 		TabDescribe: b("d", "describe", "d"),
+		SecurityAck: b("A", "acknowledge all security alerts", "A"),
 		TabSecurity: b("S", "security / namespace posture", "S"),
 		TabEvents:   b("e", "events", "e"),
 		TabPrev:     b("[", "previous tab", "["),
@@ -76,5 +78,15 @@ func DefaultKeyMap() KeyMap {
 		Wrap:        b("w", "wrap", "w"),
 		Top:         b("g", "top", "g"),
 		Bottom:      b("G", "bottom", "G"),
+	}
+}
+
+func (k KeyMap) Bindings() []key.Binding {
+	return []key.Binding{
+		k.Up, k.Down, k.NextPanel, k.PrevPanel, k.Filter, k.Enter, k.Esc,
+		k.TabLog, k.TabConfig, k.TabTop, k.TabDescribe, k.TabEvents, k.TabSecurity, k.SecurityAck,
+		k.TabPrev, k.TabNext, k.Container, k.Previous, k.SearchNext, k.SearchPrev, k.EventScope,
+		k.Palette, k.ToggleLeft, k.Pause, k.Help, k.Quit,
+		k.PageUp, k.PageDown, k.Home, k.End, k.Follow, k.Wrap, k.Top, k.Bottom,
 	}
 }

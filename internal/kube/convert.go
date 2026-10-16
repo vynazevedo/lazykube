@@ -14,7 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/duration"
 	"sigs.k8s.io/yaml"
 
-	"github.com/TNK-Studio/lazykube/internal/data"
+	"github.com/vynazevedo/lazykube/internal/data"
 )
 
 var failedReasons = map[string]bool{

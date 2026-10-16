@@ -11,9 +11,9 @@ import (
 
 	tea "charm.land/bubbletea/v2"
 
-	"github.com/TNK-Studio/lazykube/internal/anim"
-	"github.com/TNK-Studio/lazykube/internal/data"
-	"github.com/TNK-Studio/lazykube/internal/theme"
+	"github.com/vynazevedo/lazykube/internal/anim"
+	"github.com/vynazevedo/lazykube/internal/data"
+	"github.com/vynazevedo/lazykube/internal/theme"
 )
 
 var update = flag.Bool("update", false, "update golden files")
