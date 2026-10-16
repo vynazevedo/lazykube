@@ -112,5 +112,5 @@ func (r router) crumbStart() int {
 }
 
 func registeredScreens() []ScreenID {
-	return []ScreenID{ScreenDashboard}
+	return []ScreenID{ScreenDashboard, ScreenWorkloads}
 }

@@ -38,6 +38,7 @@ func FullHelp() []KeyHelp {
 		{"esc", "clear search/filter, back"},
 		{"m", "screens menu ← → enter"},
 		{"2", "Dashboard screen"},
+		{"3", "Workloads screen"},
 		{"l c t d e", "Log Config Top Describe Events"},
 		{"S", "Security / namespace posture"},
 		{"A", "ack all Security alerts"},
@@ -100,6 +101,20 @@ func FullHelpDetail() []KeyHelp {
 		}
 		if h.Key == "esc" {
 			h.Desc = "clear search, back"
+		}
+		out = append(out, h)
+	}
+	return out
+}
+
+func FullHelpWorkloads() []KeyHelp {
+	var out []KeyHelp
+	for _, h := range FullHelp() {
+		switch h.Key {
+		case "1":
+			continue
+		case "enter":
+			h.Desc = "open pod / deployment replicas"
 		}
 		out = append(out, h)
 	}

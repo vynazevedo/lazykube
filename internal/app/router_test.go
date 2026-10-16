@@ -16,7 +16,7 @@ func TestRouterRegistersOnlyFunctionalDestinations(t *testing.T) {
 	if r.Active() != (Route{Kind: RouteScreen, Screen: ScreenDashboard}) || r.Depth() != 0 {
 		t.Fatalf("initial route = %+v", r.Active())
 	}
-	if got := registeredScreens(); !reflect.DeepEqual(got, []ScreenID{ScreenDashboard}) {
+	if got := registeredScreens(); !reflect.DeepEqual(got, []ScreenID{ScreenDashboard, ScreenWorkloads}) {
 		t.Fatalf("registered screens = %v", got)
 	}
 	s, ok := screenFor(ScreenDashboard)
@@ -26,14 +26,17 @@ func TestRouterRegistersOnlyFunctionalDestinations(t *testing.T) {
 	if s, ok := screenFor(ScreenPodDetail); !ok || s.ID() != ScreenPodDetail {
 		t.Fatal("pod detail is a child route")
 	}
-	if _, ok := screenFor(ScreenPodDetail + 1); ok {
+	if s, ok := screenFor(ScreenWorkloads); !ok || s.ID() != ScreenWorkloads {
+		t.Fatal("workloads is a functional destination")
+	}
+	if _, ok := screenFor(ScreenWorkloads + 1); ok {
 		t.Fatal("no other screen may be registered before it works")
 	}
 	m := demoModel(t, 160, 48)
 	if m.nav.Active().Screen != ScreenDashboard || m.screen().ID() != ScreenDashboard {
 		t.Fatalf("model route = %+v", m.nav.Active())
 	}
-	if got := m.menuItems(); !reflect.DeepEqual(got, []ui.MenuItem{{Key: "2", Title: "Dashboard"}}) {
+	if got := m.menuItems(); !reflect.DeepEqual(got, []ui.MenuItem{{Key: "2", Title: "Dashboard"}, {Key: "3", Title: "Workloads"}}) {
 		t.Fatalf("menu lists only functional destinations: %+v", got)
 	}
 }
@@ -237,12 +240,12 @@ func TestDashboardKeysMatchKeyMap(t *testing.T) {
 			seen[k] = true
 		}
 	}
-	for _, k := range []string{"m", "2", "left", "right"} {
+	for _, k := range []string{"m", "2", "3", "left", "right"} {
 		if !seen[k] {
 			t.Fatalf("navigation key %q must be bound", k)
 		}
 	}
-	for _, k := range []string{"3", "4", "5", "6"} {
+	for _, k := range []string{"4", "5", "6"} {
 		if seen[k] {
 			t.Fatalf("screen key %q belongs to a later PR", k)
 		}

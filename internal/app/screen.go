@@ -13,6 +13,7 @@ type ScreenID int
 const (
 	ScreenDashboard ScreenID = iota
 	ScreenPodDetail
+	ScreenWorkloads
 )
 
 type Screen interface {
@@ -32,6 +33,8 @@ func screenFor(id ScreenID) (Screen, bool) {
 		return dashboardScreen{}, true
 	case ScreenPodDetail:
 		return podScreen{}, true
+	case ScreenWorkloads:
+		return workloadsScreen{}, true
 	}
 	return nil, false
 }

@@ -1,0 +1,48 @@
+ lazykube [DEMO]  v2.0   ◎ context demo   k8s demo  nodes 1  ns 8  pods 13  uptime 119d                                              ⠙ metrics every 5s ● live  
+  2 Dashboard  | [3 Workloads]                                                                                                                          m menu  
+ Workloads > kube-system                                                                                                                                        
+ ╭─ Pods · focus ─────────────────────────────────────────────────────────────────────────────╮ ╭─ Preview ───────────────────────────────────────────────────╮ 
+ │                                                                                            │ │  Log   Config   Top   Describe   Events   Security          │ 
+ │ / filter pods…▌                                                    ns:kube-system  5 items │ │ ─────────────────────────────────────────────────────────── │ 
+ │                                                                                            │ │ ● coredns-6799fbcd5-w9t4p                         [Running] │ 
+ │   NAME                                                  NAMESPACE    RST   AGE CPU/STATUS  │ │   kube-system · Running · ready 1/1 · node demo-node-01 · … │ 
+ │ ● coredns-6799fbcd5-w9t4p                               kube-system    0  119d █░░░░░░     │ │                                                             │ 
+ │ ● metrics-server-67c658944b-lm2x                        kube-system    0  119d ready 0/1   │ │ CPU 10m req 10m · lim 50m          streamline · braille 2×4 │ 
+ │ ● traefik-f4564c4f4-zq7rn                               kube-system    0  119d ░░░░░░░     │ │  20m │                                                      │ 
+ │ ● local-path-provisioner-84db5d-h4                      kube-system    0  119d ImagePullB… │ │      │     ⣸                 ⣇                              │ 
+ │ ● svclb-traefik-8c2f1-6n2vb                             kube-system    7  119d CrashLoopB… │ │  15m │──⡀─⢀⣿⡇───────────────⢸⣿⡀─⣀────────────────────────── │ 
+ │                                                                                            │ │      │⡠⣼⣷⡀⣼⣿⣷⡀      ⡄       ⣼⣿⣧⣰⣿⣷⡄             request 10m │ 
+ │                                                                                            │ │  10m │⣿⣿⣿⣿⣿⣿⣿⣿⣄⡠⣤⡀╌╌⣿╌╌╌⢀⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣤⣀⣶⣶⣆╌╌╌╌╌╌╌╌⣼⣿⣿⣿⣿⣿⣿⣿⣿⣤● │ 
+ │                                                                                            │ │      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣄⢸⣿⣇⢠⣷⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣾⣿⡄⣠⣀⢀⣔⣮⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │                                                                                            │ │   5m │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │                                                                                            │ │      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │                                                                                            │ │    0 │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │                                                                                            │ │      └───────────────────────────────────────────────────── │ 
+ │                                                                                            │ │                                                             │ 
+ │                                                                                            │ │ ╭───────────────────────────╮ ╭───────────────────────────╮ │ 
+ │                                                                                            │ │ │ Memory 74Mi / 128Mi       │ │ Net ↓6.6 kB/s ↑3.0 kB/s   │ │ 
+ │                                                                                            │ │ │ █████████████████████████ │ │ ▆▂▃█▄▃▂▄▅▁█▅▁▄▄▄▁▄▁▂▅▂▇▇▆ │ │ 
+ │                                                                                            │ │ │ ▆▇▇▇▇▇█▇▇█▇▇████▇▇▇▆▆▆▆▆▆ │ │ ▇▇▄█▅▆▅▇▅▅▆▄▂▇▅▇▆▄▂▆▅▂▆█▅ │ │ 
+ │                                                                                            │ │ ╰───────────────────────────╯ ╰───────────────────────────╯ │ 
+ │                                                                                            │ │                                                             │ 
+ │                                                                                            │ │ ╭ logs · tail -f ────────────────────────────── viewport ─╮ │ 
+ │                                                                                            │ │ │ 20:14:03  DEBUG heartbeat ok rtt=42ms                   │ │ 
+ ╰────────────────────────────────────────────────────────────────────────────────────────────╯ │ │ 20:14:06  INFO  danmaku batch received count=38         │ │ 
+ ╭─ Deployments ──────────────────────────────────────────────────────────────────────────────╮ │ │ 20:14:09  INFO  raffle detected id=883104 type=gift     │ │ 
+ │                                                                                            │ │ │ 20:14:12  INFO  join raffle ok id=883104 latency=118ms  │ │ 
+ │ kube-system/coredns                                                                  ● 1/1 │ │ │ 20:14:15  WARN  rate limited by upstream, backoff 2s    │ │ 
+ │ kube-system/metrics-server                                                           ● 1/1 │ │ │ 20:14:18  DEBUG heartbeat ok rtt=39ms                   │ │ 
+ │ kube-system/traefik                                                                  ● 1/1 │ │ │ 20:14:21  INFO  danmaku batch received count=51         │ │ 
+ │                                                                                            │ │ │ 20:14:24  INFO  raffle detected id=883117 type=guard    │ │ 
+ │                                                                                            │ │ │ 20:14:27  ERROR join raffle failed id=883117: already … │ │ 
+ │                                                                                            │ │ │ 20:14:30  INFO  reconnecting ws in 1s                   │ │ 
+ │                                                                                            │ │ │ 20:14:33  INFO  ws connected room=21452505 shard=3      │ │ 
+ │                                                                                            │ │ │ 20:14:36  INFO  ws connected room=21452505 shard=3      │ │ 
+ │                                                                                            │ │ │ 20:14:39  DEBUG heartbeat ok rtt=42ms                   │ │ 
+ │                                                                                            │ │ │ 20:14:42  INFO  danmaku batch received count=38         │ │ 
+ │                                                                                            │ │ │ 20:14:45  INFO  raffle detected id=883104 type=gift     │ │ 
+ │                                                                                            │ │ │ 20:14:48  INFO  join raffle ok id=883104 latency=118ms  │ │ 
+ │                                                                                            │ │ ╰─────────────────────────────────────────────────────────╯ │ 
+ ╰────────────────────────────────────────────────────────────────────────────────────────────╯ ╰─────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   enter  open   m  menu   l  logs   d  describe   e  events   ?  help   q  quit                           bubbletea · 0 fps 

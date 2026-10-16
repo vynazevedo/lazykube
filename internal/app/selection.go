@@ -119,6 +119,9 @@ func (m *Model) ensurePodVisible() {
 }
 
 func (m *Model) focusOrder() []Focus {
+	if m.onScreen(ScreenWorkloads) {
+		return []Focus{FocusPods, FocusDeployments, FocusDetails}
+	}
 	if m.layout.ShowLeft {
 		return []Focus{FocusNamespaces, FocusDeployments, FocusPods, FocusDetails}
 	}

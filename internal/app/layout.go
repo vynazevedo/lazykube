@@ -106,6 +106,23 @@ func Compute(w, h int, mode LeftMode) Layout {
 	return l
 }
 
+func ComputeWorkloads(w, h int) Layout {
+	l := Layout{W: w, H: h}
+	if w < MinWidth || h < MinHeight {
+		l.TooSmall = true
+		return l
+	}
+	l.shell(w, h)
+	top, m, u := l.Body.Y, l.Body.H, l.Body.W
+	preview := max(minRightWidth, round(float64(u)*0.2+31.4))
+	list := u - 1 - preview
+	pods := round(float64(m) * 0.63)
+	l.Pods = Rect{X: l.Body.X, Y: top, W: list, H: pods}
+	l.Deployments = Rect{X: l.Body.X, Y: top + pods, W: list, H: m - pods}
+	l.Details = Rect{X: l.Body.X + list + 1, Y: top, W: preview, H: m}
+	return l
+}
+
 func ComputeDetail(w, h int) Layout {
 	l := Layout{W: w, H: h}
 	if w < MinWidth || h < MinHeight {
