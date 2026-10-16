@@ -46,16 +46,3 @@ func TestFixedClock(t *testing.T) {
 		t.Fatal("frozen effects keep the first spinner frame regardless of data ticks")
 	}
 }
-
-func TestManualTicksSurviveResume(t *testing.T) {
-	start := time.Unix(1000, 0)
-	c := NewClock(start, 30)
-	c.Pause(start)
-	c.Tick()
-	c.Tick()
-	c.Resume(start.Add(time.Second))
-	c.Advance(start.Add(time.Second + 150*time.Millisecond))
-	if c.T != 3 {
-		t.Fatalf("manual ticks must be kept after resume, T=%d", c.T)
-	}
-}

@@ -1,0 +1,32 @@
+                                                                                                    
+                                         ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                                         
+                                          ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                                          
+                                           ▀ ▀  ▀▀▀▀▀▀▀▀▀                                           
+                                          ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                                          
+                                          ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                                          
+                                           ▀    ▀▀▀▀▀▀▀▀▀                                           
+                                          ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                                          
+                                          ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                                          
+                                           ▀ ▀  ▀▀▀▀▀▀▀▀▀                                           
+                                          ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                                          
+                                         ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                                         
+                                                                                                    
+                                                                                                    
+                                  █   ▄▀▄ ▀▀█ █ █ █ ▄ █ █ █▀▄ █▀▀                                   
+                                  █   █▀█ ▄▀  ▀█▀ █▀▄ █ █ █▀▄ █▀▀                                   
+                                  ▀▀▀ ▀ ▀ ▀▀▀  ▀  ▀ ▀ ▀▀▀ ▀▀  ▀▀▀                                   
+                                                                                                    
+                                     v2.0  ·  falha na conexão                                      
+                                                                                                    
+                  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━                  
+                                                                                                    
+                  ✓  carregando kubeconfig                             3 contextos                  
+                  ✓  conectando ao contexto dev                            v1.31.2                  
+                  ✓  verificando permissões                      sem acesso: nodes                  
+                  ✗  sincronizando cache                                                            
+                                                                                                    
+                  ✗ falhou: sincronizando cache                                                     
+                    timed out waiting for the cluster cache to sync                                 
+                                                                                                    
+                                               q sair                                               
+                                                                                                    

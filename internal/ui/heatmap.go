@@ -5,12 +5,16 @@ import (
 	"github.com/TNK-Studio/lazykube/internal/theme"
 )
 
-const heatLabelW = 14
+const (
+	heatLabelW  = 14
+	metricsDown = "metrics-server indisponível"
+)
 
 type HeatmapState struct {
 	Labels    []string
 	Heat      [][]float64
 	Available bool
+	Reason    string
 }
 
 func HeatCols(panelWidth int) int {
@@ -24,7 +28,11 @@ func HeatmapPanel(r draw.Region, st HeatmapState, ctx Ctx) {
 		return
 	}
 	if !st.Available {
-		centered(c, "metrics-server indisponível")
+		centered(c, reasonOr(st.Reason, metricsDown))
+		return
+	}
+	if len(st.Labels) == 0 {
+		centered(c, "coletando amostras")
 		return
 	}
 	grid := c.Sub(heatLabelW, 0, c.W-heatLabelW, c.H)

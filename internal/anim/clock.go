@@ -12,7 +12,6 @@ type Clock struct {
 	paused   time.Duration
 	frozenAt time.Time
 	frozen   bool
-	manual   int
 	Phase    float64
 	T        int
 	FPS      float64
@@ -41,12 +40,7 @@ func (c *Clock) Advance(now time.Time) {
 	c.last = now
 	elapsed := now.Sub(c.start) - c.paused
 	c.Phase = elapsed.Seconds()
-	c.T = int(elapsed/TickInterval) + c.manual
-}
-
-func (c *Clock) Tick() {
-	c.T++
-	c.manual++
+	c.T = int(elapsed / TickInterval)
 }
 
 func (c *Clock) Pause(now time.Time) {

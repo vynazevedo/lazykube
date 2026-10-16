@@ -118,3 +118,13 @@ func writeRGB(b *strings.Builder, c theme.RGB) {
 	b.WriteByte(';')
 	b.WriteString(strconv.Itoa(int(c.B)))
 }
+
+func (c *Canvas) Fade(to theme.RGB, k float64) {
+	if k <= 0 {
+		return
+	}
+	for i := range c.cells {
+		c.cells[i].Fg = theme.Mix(c.cells[i].Fg, to, k)
+		c.cells[i].Bg = theme.Mix(c.cells[i].Bg, to, k)
+	}
+}

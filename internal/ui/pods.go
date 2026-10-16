@@ -121,7 +121,7 @@ func PodsPanel(r draw.Region, st PodsState, ctx Ctx) {
 		}
 		c.Text(rstX, y, draw.PadLeft(fmt.Sprint(p.Restarts), podsRSTW), draw.Fg(rstColor))
 		c.Text(ageX, y, draw.PadLeft(p.Age, podsAgeW), draw.Fg(theme.Muted))
-		full := draw.Filled(float64(st.CPU[p.Name]), podsCPUScale, podsCPUW)
+		full := draw.Filled(float64(st.CPU[p.Key()]), podsCPUScale, podsCPUW)
 		c.Text(cpuX, y, strings.Repeat("█", full)+strings.Repeat("░", podsCPUW-full), draw.Fg(ctx.Pal.C))
 	}
 	if len(st.Pods) == 0 {

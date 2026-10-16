@@ -88,6 +88,14 @@ type Pod struct {
 	QoS        string
 }
 
+func PodKey(namespace, name string) string {
+	return namespace + "/" + name
+}
+
+func (p Pod) Key() string {
+	return PodKey(p.Namespace, p.Name)
+}
+
 type Deployment struct {
 	Namespace string
 	Name      string
@@ -140,6 +148,14 @@ type Metrics struct {
 	TXNow      float64
 	HeatLabels []string
 	Heat       [][]float64
+	MemMax     float64
+	RXMax      float64
+	TXMax      float64
+	Samples    int
+	Window     int
+	Reason     string
+	NetReason  string
+	NetStale   bool
 }
 
 type Source interface {
@@ -149,4 +165,8 @@ type Source interface {
 	Events(pod string) []Event
 	Manifest(pod string) []string
 	Describe(pod string) []Field
+}
+
+type Live interface {
+	Changes() <-chan struct{}
 }

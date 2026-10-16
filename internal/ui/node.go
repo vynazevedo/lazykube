@@ -25,8 +25,10 @@ var (
 )
 
 type NodeState struct {
-	Node data.Node
-	CPU  int
+	Node    data.Node
+	CPU     int
+	CPUFrac float64
+	MemFrac float64
 }
 
 func Sprite(pal theme.Palette, t int, transparent func(y int) theme.RGB) draw.Pixels {
@@ -150,8 +152,8 @@ func NodePanel(r draw.Region, st NodeState, ctx Ctx) {
 	for y, l := range lines {
 		info.Line(0, y, l)
 	}
-	Bar(info, 0, 3, w, float64(st.CPU)/100, ctx.Pal.C, ctx.Pal.B)
-	Bar(info, 0, 5, w, n.MemFraction, ctx.Pal.B, ctx.Pal.A)
+	Bar(info, 0, 3, w, st.CPUFrac, ctx.Pal.C, ctx.Pal.B)
+	Bar(info, 0, 5, w, st.MemFrac, ctx.Pal.B, ctx.Pal.A)
 }
 
 func trimUnit(s string) string {

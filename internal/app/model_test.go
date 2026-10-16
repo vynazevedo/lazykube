@@ -3,6 +3,7 @@ package app
 import (
 	"strings"
 	"testing"
+	"time"
 
 	tea "charm.land/bubbletea/v2"
 
@@ -55,7 +56,7 @@ func TestInitialState(t *testing.T) {
 	if m.focus != FocusPods || m.tab != ui.TabTop {
 		t.Fatal("pods focused and Top tab by default")
 	}
-	if m.selName != "bilibili-live-7f6b8d9c5-mn4tz" {
+	if m.selName != "bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz" {
 		t.Fatalf("initial pod got %s", m.selName)
 	}
 }
@@ -83,17 +84,17 @@ func TestFocusCycle(t *testing.T) {
 func TestSelectionMovesAndScrolls(t *testing.T) {
 	m := demoModel(t, 160, 48)
 	m = press(t, m, "j", "j")
-	if m.selName != "psql-6bc7744f9-r7zlc" {
+	if m.selName != "ys-odoo/psql-6bc7744f9-r7zlc" {
 		t.Fatalf("got %s", m.selName)
 	}
 	for i := 0; i < 20; i++ {
 		m = press(t, m, "j")
 	}
-	if m.selName != "svclb-traefik-8c2f1-6n2vb" {
+	if m.selName != "kube-system/svclb-traefik-8c2f1-6n2vb" {
 		t.Fatalf("selection must clamp at the end, got %s", m.selName)
 	}
 	m = press(t, m, "k")
-	if m.selName != "local-path-provisioner-84db5d-h4" {
+	if m.selName != "kube-system/local-path-provisioner-84db5d-h4" {
 		t.Fatalf("got %s", m.selName)
 	}
 }
@@ -185,7 +186,7 @@ func TestMouseSelectsPodAndTab(t *testing.T) {
 	rowY := m.layout.Pods.Y + 1 + ui.PodsRowsTop + 3
 	next, _ := m.Update(tea.MouseClickMsg{X: m.layout.Pods.X + 5, Y: rowY, Button: tea.MouseLeft})
 	m = next.(Model)
-	if m.selName != "psql-6bc7744f9-r7zlc" {
+	if m.selName != "ys-odoo/psql-6bc7744f9-r7zlc" {
 		t.Fatalf("click selects 4th row, got %s", m.selName)
 	}
 	span := ui.TabSpans()[4]
@@ -195,7 +196,7 @@ func TestMouseSelectsPodAndTab(t *testing.T) {
 		t.Fatalf("click on Events tab, got tab %d focus %d", m.tab, m.focus)
 	}
 	next, _ = m.Update(tea.MouseWheelMsg{X: m.layout.Pods.X + 5, Y: rowY, Button: tea.MouseWheelDown})
-	if next.(Model).selName != "odoo-7575bf6d8-9wjvk" {
+	if next.(Model).selName != "ys-odoo/odoo-7575bf6d8-9wjvk" {
 		t.Fatal("wheel over pods moves selection")
 	}
 }
@@ -217,21 +218,30 @@ func TestHoverAndHelp(t *testing.T) {
 }
 
 func TestPauseAndFocusStopFrames(t *testing.T) {
-	m := demoModel(t, 160, 48)
-	m.animated = true
+	m, start := animModel(t)
 	gen := m.gen
 	m = press(t, m, "ctrl+p")
-	if !m.paused || m.gen == gen {
-		t.Fatal("ctrl+p pauses and restarts the tick chain")
+	if !m.paused || m.gen == gen || m.scheduleTick() != nil {
+		t.Fatal("ctrl+p pauses and stops the tick chain")
 	}
-	stale, _ := m.Update(frameMsg{gen: gen})
-	if stale.(Model).clock.T != m.clock.T {
-		t.Fatal("stale frames are ignored")
+	before := m.clock
+	next, _ := m.Update(frameMsg{at: start.Add(5 * time.Second), gen: m.gen})
+	if next.(Model).clock.T != before.T || next.(Model).clock.Phase != before.Phase {
+		t.Fatal("frames are ignored while paused")
 	}
-	before := m.clock.T
-	next, _ := m.Update(dataTickMsg{gen: m.gen})
-	if next.(Model).clock.T != before+1 {
-		t.Fatal("data ticks keep advancing while paused")
+	next, cmd := m.Update(keyPress("ctrl+p"))
+	if next.(Model).paused || cmd == nil {
+		t.Fatal("ctrl+p resumes and restarts ticking")
+	}
+
+	b, _ := animModel(t)
+	next, cmd = b.Update(tea.BlurMsg{})
+	if !next.(Model).blurred || next.(Model).scheduleTick() != nil || cmd != nil {
+		t.Fatal("blur stops ticking")
+	}
+	next, cmd = next.(Model).Update(tea.FocusMsg{})
+	if next.(Model).blurred || cmd == nil {
+		t.Fatal("focus restarts ticking")
 	}
 }
 
@@ -257,16 +267,29 @@ func spriteCells(c *draw.Canvas, l Layout) []draw.Cell {
 
 func TestNoAnimFreezesEffects(t *testing.T) {
 	m := New(Options{Source: data.NewDemo(), NoAnim: true, InitialPod: 1})
+	if m.Init() != nil {
+		t.Fatal("--no-anim must not schedule any tick")
+	}
 	next, _ := m.Update(tea.WindowSizeMsg{Width: 160, Height: 48})
 	m = next.(Model)
 	before := m.Render()
 	for i := 0; i < 23; i++ {
-		next, _ = m.Update(dataTickMsg{gen: m.gen})
+		var cmd tea.Cmd
+		next, cmd = m.Update(frameMsg{at: time.Now().Add(time.Duration(i) * time.Second), gen: m.gen})
 		m = next.(Model)
+		if cmd != nil {
+			t.Fatal("frames must not reschedule with --no-anim")
+		}
+	}
+	if _, cmd := m.Update(keyPress("j")); cmd != nil {
+		t.Fatal("input must not start ticking with --no-anim")
 	}
 	after := m.Render()
-	if !strings.Contains(before.Plain(), "⠋ metrics") || !strings.Contains(after.Plain(), "⠋ metrics") {
-		t.Fatal("header spinner must stay on the first frame with --no-anim")
+	if before.String() != after.String() {
+		t.Fatal("the screen must be frozen with --no-anim")
+	}
+	if !strings.Contains(after.Plain(), "⠋ metrics") {
+		t.Fatal("header spinner stays on the first frame")
 	}
 	b, a := spriteCells(before, m.layout), spriteCells(after, m.layout)
 	for i := range b {
@@ -333,10 +356,8 @@ func TestLogNewLinesWhileScrolledUp(t *testing.T) {
 	m.animated = false
 	m = press(t, m, "tab", "l", "k")
 	top := m.scroll
-	for i := 0; i < 16; i++ {
-		next, _ := m.Update(dataTickMsg{gen: m.gen})
-		m = next.(Model)
-	}
+	m.clock = anim.Fixed(m.clock.T+16, goldenPhase, 30)
+	m.refresh()
 	if m.newLines != 2 {
 		t.Fatalf("two lines arrive in 16 ticks, got %d", m.newLines)
 	}
@@ -431,4 +452,125 @@ func longLogModel(t *testing.T, w, h int) Model {
 	m.clock = anim.Fixed(400, goldenPhase, 30)
 	m.refresh()
 	return m
+}
+
+func animModel(t *testing.T) (Model, time.Time) {
+	t.Helper()
+	start := time.Unix(1000, 0)
+	m := New(Options{Source: data.NewDemo(), InitialPod: 1, Now: func() time.Time { return start }})
+	next, _ := m.Update(tea.WindowSizeMsg{Width: 160, Height: 48})
+	return next.(Model), start
+}
+
+func frames(m Model, from time.Time, d time.Duration, n int) (Model, time.Time) {
+	at := from
+	for i := 0; i < n; i++ {
+		at = at.Add(d)
+		next, _ := m.Update(frameMsg{at: at, gen: m.gen})
+		m = next.(Model)
+	}
+	return m, at
+}
+
+func TestSelectionFade(t *testing.T) {
+	m, start := animModel(t)
+	old := m.selName
+	m = press(t, m, "j")
+	cur := m.selName
+	if k := m.selectionK(cur); k != 0 {
+		t.Fatalf("new row starts transparent, got %f", k)
+	}
+	if k := m.selectionK(old); k != selectionTarget {
+		t.Fatalf("old row starts highlighted, got %f", k)
+	}
+	m, at := frames(m, start, 30*time.Millisecond, 3)
+	mid := m.selectionK(cur)
+	if mid <= 0.05 || mid >= selectionTarget {
+		t.Fatalf("fade must be in progress at 90ms, got %f", mid)
+	}
+	m, _ = frames(m, at, 30*time.Millisecond, 4)
+	if m.selectionK(cur) != selectionTarget || m.selectionK(old) != 0 || len(m.motion.fades) != 0 {
+		t.Fatal("fade must finish in about 180ms")
+	}
+}
+
+func TestBarsUseSprings(t *testing.T) {
+	m, start := animModel(t)
+	target := m.motion.memBar.Target
+	m.motion.memBar.Pos = 0
+	m, at := frames(m, start, 33*time.Millisecond, 1)
+	if p := m.motion.memBar.Pos; p <= 0 || p >= target {
+		t.Fatalf("memory bar must move gradually, pos=%f target=%f", p, target)
+	}
+	_ = at
+	for i := 0; i < 200; i++ {
+		m.stepMotion()
+	}
+	if !m.motion.memBar.AtRest() || m.motion.memBar.Pos != m.motion.memBar.Target {
+		t.Fatal("memory bar must settle on its target")
+	}
+}
+
+func TestTabSlide(t *testing.T) {
+	m, start := animModel(t)
+	m = press(t, m, "l")
+	if m.slideOffset() != slideColumns {
+		t.Fatalf("slide starts at %d columns, got %d", slideColumns, m.slideOffset())
+	}
+	m, _ = frames(m, start, 33*time.Millisecond, 30)
+	if m.slideOffset() != 0 {
+		t.Fatal("slide must settle at zero")
+	}
+	n := press(t, demoModel(t, 160, 48), "l")
+	n.animated = false
+	n = press(t, n, "c")
+	if n.slideOffset() != 0 {
+		t.Fatal("no slide without animations")
+	}
+}
+
+func TestIdleFrameRate(t *testing.T) {
+	m, start := animModel(t)
+	m, at := frames(m, start, 100*time.Millisecond, 40)
+	m.snapMotion()
+	if m.busy() || m.frameRate() != IdleFPS {
+		t.Fatalf("at rest the loop drops to %d fps, got %d", IdleFPS, m.frameRate())
+	}
+	next, cmd := m.Update(keyPress("j"))
+	m = next.(Model)
+	if !m.busy() || m.frameRate() != DefaultFPS || cmd == nil {
+		t.Fatalf("input wakes the loop back to the configured fps: busy=%v rate=%d cmd=%v", m.busy(), m.frameRate(), cmd != nil)
+	}
+	m, _ = frames(m, at, 100*time.Millisecond, 40)
+	m.snapMotion()
+	if m.frameRate() != IdleFPS {
+		t.Fatal("loop must idle again after the input window")
+	}
+}
+
+func TestNoAnimSnapsMotion(t *testing.T) {
+	m := New(Options{Source: data.NewDemo(), NoAnim: true, InitialPod: 1})
+	next, _ := m.Update(tea.WindowSizeMsg{Width: 160, Height: 48})
+	m = press(t, next.(Model), "j")
+	if !m.motion.memBar.AtRest() || len(m.motion.fades) != 0 || m.selectionK(m.selName) != selectionTarget {
+		t.Fatal("without animations state changes are instant")
+	}
+}
+
+func TestFilterFocusIsKept(t *testing.T) {
+	m := press(t, demoModel(t, 160, 48), "/")
+	if !m.filter.Focused() || !m.filtering {
+		t.Fatal("the returned model must keep the focused filter")
+	}
+}
+
+func TestWakeKeepsNewGeneration(t *testing.T) {
+	m, start := animModel(t)
+	m, _ = frames(m, start, 100*time.Millisecond, 40)
+	m.snapMotion()
+	gen := m.gen
+	next, _ := m.Update(keyPress("j"))
+	if next.(Model).gen != gen+1 {
+		t.Fatal("waking from idle must keep the restarted tick generation")
+	}
 }

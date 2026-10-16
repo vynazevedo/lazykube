@@ -16,7 +16,7 @@ import (
 
 var update = flag.Bool("update", false, "update golden files")
 
-const selectedPod = "bilibili-live-7f6b8d9c5-mn4tz"
+const selectedPod = "bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz"
 
 func fixedCtx() Ctx {
 	return Ctx{Pal: theme.DefaultPalette(), Clock: anim.Fixed(40, 0.25, 30)}
@@ -69,6 +69,7 @@ func demoDetails(tab Tab) DetailsState {
 		Manifest: d.Manifest(selectedPod),
 		Describe: d.Describe(selectedPod),
 		Follow:   true,
+		MemBar:   float64(d.Metrics(40, selectedPod, 36).MemNow) / float64(pod.MemLimit),
 	}
 }
 
@@ -85,7 +86,7 @@ func TestPanelGoldens(t *testing.T) {
 		Header(r, HeaderState{Cluster: snap.Cluster, MetricsOK: false}, ctx)
 	}))
 	check(t, "node", canvas(37, 16, func(r draw.Region) {
-		NodePanel(r, NodeState{Node: snap.Node, CPU: m.NodeCPU}, ctx)
+		NodePanel(r, NodeState{Node: snap.Node, CPU: m.NodeCPU, CPUFrac: float64(m.NodeCPU) / 100, MemFrac: snap.Node.MemFraction}, ctx)
 	}))
 	check(t, "namespaces", canvas(37, 12, func(r draw.Region) {
 		NamespacesPanel(r, NamespacesState{Items: snap.Namespaces, Highlight: "bilibili-raffle"}, ctx)
@@ -196,5 +197,18 @@ func TestTabAt(t *testing.T) {
 	}
 	if TabTop.Next(1) != TabDescribe || TabLog.Next(-1) != TabEvents {
 		t.Fatal("tab cycling broken")
+	}
+}
+
+func TestNetworkCardFlagsStaleData(t *testing.T) {
+	m := data.NewDemo().Metrics(40, selectedPod, 36)
+	fresh := canvas(60, 5, func(r draw.Region) { networkCard(r, m) }).Plain()
+	if !strings.Contains(fresh, "kB/s") || strings.Contains(fresh, "obsoleto") {
+		t.Fatalf("fresh network card:\n%s", fresh)
+	}
+	m.NetStale, m.NetReason = true, "kubelet indisponível"
+	stale := canvas(60, 5, func(r draw.Region) { networkCard(r, m) }).Plain()
+	if !strings.Contains(stale, "obsoleto: kubelet indisponível") || strings.Contains(stale, "kB/s") {
+		t.Fatalf("stale network card:\n%s", stale)
 	}
 }

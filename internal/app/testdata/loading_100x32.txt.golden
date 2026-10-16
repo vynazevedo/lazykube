@@ -1,0 +1,32 @@
+                                                                                                    
+                                                                                                    
+                                                                                                    
+                                         ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                                         
+                                          ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                                          
+                                           ▀ ▀  ▀▀▀▀▀▀▀▀▀                                           
+                                          ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                                          
+                                          ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                                          
+                                           ▀    ▀▀▀▀▀▀▀▀▀                                           
+                                          ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                                          
+                                          ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                                          
+                                           ▀ ▀  ▀▀▀▀▀▀▀▀▀                                           
+                                          ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                                          
+                                         ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                                         
+                                                                                                    
+                                                                                                    
+                                  █   ▄▀▄ ▀▀█ █ █ █ ▄ █ █ █▀▄ █▀▀                                   
+                                  █   █▀█ ▄▀  ▀█▀ █▀▄ █ █ █▀▄ █▀▀                                   
+                                  ▀▀▀ ▀ ▀ ▀▀▀  ▀  ▀ ▀ ▀▀▀ ▀▀  ▀▀▀                                   
+                                                                                                    
+                                   v2.0  ·  conectando ao cluster                                   
+                                                                                                    
+                  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━                  
+                                                                                                    
+                  ✓  carregando kubeconfig                             3 contextos                  
+                  ✓  conectando ao contexto dev                            v1.31.2                  
+                  ✓  verificando permissões                      sem acesso: nodes                  
+                  ⠙  sincronizando cache                 pods, deployments, events                  
+                                                                                                    
+                                          ctrl+c cancelar                                           
+                                                                                                    
+                                                                                                    
