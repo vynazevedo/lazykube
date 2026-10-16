@@ -24,6 +24,10 @@ func (workloadsScreen) Title() string {
 	return "Workloads"
 }
 
+func (workloadsScreen) ShowsDetails() bool {
+	return true
+}
+
 func (workloadsScreen) Init(Model) tea.Cmd {
 	return nil
 }

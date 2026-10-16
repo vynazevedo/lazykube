@@ -24,6 +24,7 @@ type Screen interface {
 	Update(m Model, msg tea.Msg) (Model, tea.Cmd)
 	View(m Model, body draw.Region, ctx ui.Ctx)
 	Keys(m Model) []key.Binding
+	ShowsDetails() bool
 	Help(m Model) []ui.KeyHelp
 	FullHelp(m Model) []ui.KeyHelp
 }
@@ -54,4 +55,11 @@ func (r Route) screen() Screen {
 
 func (m Model) screen() Screen {
 	return m.nav.Active().screen()
+}
+
+func (m Model) detailTarget() string {
+	if !m.screen().ShowsDetails() {
+		return ""
+	}
+	return m.activeName()
 }

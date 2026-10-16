@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"slices"
 	"strings"
@@ -270,4 +271,94 @@ func TestNodesGoldens(t *testing.T) {
 		denied := nodes(t, nodeModel(t, nodeSource{Demo: data.NewDemo(), node: deniedNode}, size[0], size[1])).Render()
 		golden(t, fmt.Sprintf("nodes_denied_%dx%d", size[0], size[1])+".txt", denied.Plain())
 	}
+}
+
+type consumerSource struct {
+	*data.Demo
+	cancel   context.CancelFunc
+	current  context.Context
+	logs     []string
+	events   int
+	describe int
+}
+
+func (s *consumerSource) PodLogs(req data.LogRequest, tick, n int) data.LogView {
+	s.logs = append(s.logs, req.Pod)
+	if s.cancel != nil {
+		s.cancel()
+		s.cancel = nil
+	}
+	if req.Pod == "" {
+		return data.LogView{}
+	}
+	s.current, s.cancel = context.WithCancel(context.Background())
+	return s.Demo.PodLogs(req, tick, n)
+}
+
+func (s *consumerSource) ScopedEvents(q data.EventQuery) data.EventFeed {
+	s.events++
+	return s.Demo.ScopedEvents(q)
+}
+
+func (s *consumerSource) Describe(pod string) []data.Field {
+	s.describe++
+	return s.Demo.Describe(pod)
+}
+
+func (s *consumerSource) streaming() bool {
+	return s.current != nil && s.current.Err() == nil
+}
+
+func (s *consumerSource) quiet(t *testing.T, step string, m Model, f func(Model) Model) Model {
+	t.Helper()
+	logs, events, describe := len(s.logs), s.events, s.describe
+	m = f(m)
+	if s.streaming() {
+		t.Fatalf("%s: Nodes must not keep a log stream open", step)
+	}
+	for _, p := range s.logs[logs:] {
+		if p != "" {
+			t.Fatalf("%s: Nodes opened logs for %q", step, p)
+		}
+	}
+	if s.events != events || s.describe != describe {
+		t.Fatalf("%s: Nodes must not query events or describe for hidden details", step)
+	}
+	return m
+}
+
+func TestNodesReleasesDetailConsumers(t *testing.T) {
+	src := &consumerSource{Demo: data.NewDemo()}
+	m := New(Options{Source: src, NoAnim: true, InitialPod: 1})
+	next, _ := m.Update(tea.WindowSizeMsg{Width: 160, Height: 48})
+	m = press(t, next.(Model), "e")
+	if !src.streaming() || src.events == 0 {
+		t.Fatal("the dashboard preview consumes logs and events")
+	}
+	m = src.quiet(t, "enter Nodes", m, func(m Model) Model { return press(t, m, "4") })
+	if len(src.logs) == 0 || src.logs[len(src.logs)-1] != "" {
+		t.Fatal("entering Nodes cancels the log subscription")
+	}
+	m = src.quiet(t, "move in Nodes", m, func(m Model) Model { return press(t, m, "down", "down", "up") })
+	m = src.quiet(t, "data in Nodes", m, func(m Model) Model { next, _ := m.Update(dataMsg{}); return next.(Model) })
+	for range 3 {
+		m = press(t, m, "enter")
+		if !m.inDetail() || !src.streaming() || src.logs[len(src.logs)-1] != m.selectedPod().Key() {
+			t.Fatal("pod detail opened from Nodes consumes the selected pod logs")
+		}
+		m = src.quiet(t, "back to Nodes", m, func(m Model) Model { return press(t, m, "esc") })
+		if !m.onScreen(ScreenNodes) {
+			t.Fatal("esc returns to Nodes")
+		}
+	}
+	m = press(t, m, "2")
+	if !src.streaming() || src.logs[len(src.logs)-1] != m.selectedPod().Key() {
+		t.Fatal("leaving Nodes for the dashboard reopens the preview logs")
+	}
+	m = src.quiet(t, "Nodes again", m, func(m Model) Model { return press(t, m, "4") })
+	w := press(t, m, "3")
+	if !src.streaming() {
+		t.Fatal("the workloads preview consumes logs")
+	}
+	src.quiet(t, "esc from workloads", w, func(m Model) Model { return press(t, m, "esc") })
 }

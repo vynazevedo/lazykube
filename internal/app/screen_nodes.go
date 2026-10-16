@@ -20,6 +20,10 @@ func (nodesScreen) Title() string {
 	return "Nodes"
 }
 
+func (nodesScreen) ShowsDetails() bool {
+	return false
+}
+
 func (nodesScreen) Init(Model) tea.Cmd {
 	return nil
 }

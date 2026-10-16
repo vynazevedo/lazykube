@@ -205,16 +205,12 @@ func (s *Source) poll() {
 
 func (s *Source) pollMetrics(ctx context.Context) {
 	if s.metrics == nil {
-		s.mu.Lock()
-		s.usage.ok, s.usage.reason = false, reasonNoClient
-		s.mu.Unlock()
+		s.failMetrics(reasonNoClient)
 		return
 	}
 	pms, err := s.metrics.MetricsV1beta1().PodMetricses(s.opts.Namespace).List(ctx, metav1.ListOptions{})
 	if err != nil {
-		s.mu.Lock()
-		s.usage.ok, s.usage.reason = false, metricsReason(err)
-		s.mu.Unlock()
+		s.failMetrics(metricsReason(err))
 		return
 	}
 	type sample struct {
@@ -270,6 +266,13 @@ func (s *Source) pollMetrics(ctx context.Context) {
 		}
 	}
 	u.nodeCPU, u.nodeMem = nodeCPU, nodeMem
+}
+
+func (s *Source) failMetrics(reason string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.usage.ok, s.usage.reason = false, reason
+	s.usage.nodeCPU, s.usage.nodeMem = map[string]int64{}, map[string]int64{}
 }
 
 type statsSummary struct {
@@ -405,7 +408,7 @@ func (s *Source) Metrics(_ int, key string, heatCols int) data.Metrics {
 		if alloc := n.Status.Allocatable.Cpu().MilliValue(); alloc > 0 {
 			used, ok := u.nodeCPU[node]
 			m.NodeCPU = int(math.Round(float64(used) * 100 / float64(alloc)))
-			m.NodeCPUKnown = ok
+			m.NodeCPUKnown = ok && u.ok
 		}
 	}
 	p := s.byKey[key]
