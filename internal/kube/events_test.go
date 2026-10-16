@@ -1,6 +1,7 @@
 package kube
 
 import (
+	"context"
 	"errors"
 	"sync"
 	"sync/atomic"
@@ -14,6 +15,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/fake"
+	corev1client "k8s.io/client-go/kubernetes/typed/core/v1"
 	k8stesting "k8s.io/client-go/testing"
 
 	"github.com/TNK-Studio/lazykube/internal/data"
@@ -401,5 +403,283 @@ func TestClusterEventsRecoveryWaitsForFullRelistAndWatch(t *testing.T) {
 	got := waitState(t, s, data.FeedReady)
 	if len(got.Items) != 1 || got.Items[0].Reason != "Re2" {
 		t.Fatalf("recovered events must reflect the new list: %+v", got.Items)
+	}
+}
+
+type eventsWatchPlan struct {
+	mu      sync.Mutex
+	calls   int
+	current *watch.FakeWatcher
+	steps   map[int]func() error
+}
+
+func (p *eventsWatchPlan) react(a k8stesting.Action) (bool, watch.Interface, error) {
+	if a.GetNamespace() != "" {
+		return false, nil, nil
+	}
+	p.mu.Lock()
+	p.calls++
+	step := p.steps[p.calls]
+	p.mu.Unlock()
+	if step != nil {
+		if err := step(); err != nil {
+			return true, nil, err
+		}
+	}
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.current = watch.NewFake()
+	return true, p.current, nil
+}
+
+func (p *eventsWatchPlan) count() int {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	return p.calls
+}
+
+func (p *eventsWatchPlan) watcher(t *testing.T) *watch.FakeWatcher {
+	t.Helper()
+	var w *watch.FakeWatcher
+	waitFor(t, func() bool {
+		p.mu.Lock()
+		defer p.mu.Unlock()
+		w = p.current
+		return w != nil
+	})
+	p.mu.Lock()
+	p.current = nil
+	p.mu.Unlock()
+	return w
+}
+
+func eventsEndNormally(t *testing.T, p *eventsWatchPlan, obj runtime.Object) {
+	t.Helper()
+	w := p.watcher(t)
+	w.Add(obj)
+	w.Stop()
+}
+
+func eventsListCounter(c *fake.Clientset) *atomic.Int32 {
+	var n atomic.Int32
+	c.PrependReactor("list", "events", func(a k8stesting.Action) (bool, runtime.Object, error) {
+		if a.GetNamespace() == "" && !isProbe(a) {
+			n.Add(1)
+		}
+		return false, nil, nil
+	})
+	return &n
+}
+
+func eventsUnblockOnCleanup(t *testing.T, release chan struct{}) {
+	t.Cleanup(func() {
+		select {
+		case <-release:
+		default:
+			close(release)
+		}
+	})
+}
+
+type eventsGate func(ctx context.Context, o metav1.ListOptions)
+
+type eventsGatedClient struct {
+	*fake.Clientset
+	list, watch eventsGate
+}
+
+type eventsGatedCore struct {
+	corev1client.CoreV1Interface
+	list, watch eventsGate
+}
+
+type eventsGatedEvents struct {
+	corev1client.EventInterface
+	list, watch eventsGate
+}
+
+func (c eventsGatedClient) CoreV1() corev1client.CoreV1Interface {
+	return eventsGatedCore{c.Clientset.CoreV1(), c.list, c.watch}
+}
+
+func (c eventsGatedCore) Events(namespace string) corev1client.EventInterface {
+	return eventsGatedEvents{c.CoreV1Interface.Events(namespace), c.list, c.watch}
+}
+
+func (e eventsGatedEvents) List(ctx context.Context, o metav1.ListOptions) (*corev1.EventList, error) {
+	if e.list != nil {
+		e.list(ctx, o)
+	}
+	return e.EventInterface.List(ctx, o)
+}
+
+func (e eventsGatedEvents) Watch(ctx context.Context, o metav1.ListOptions) (watch.Interface, error) {
+	if e.watch != nil {
+		e.watch(ctx, o)
+	}
+	return e.EventInterface.Watch(ctx, o)
+}
+
+func eventsHold(ctx context.Context, release <-chan struct{}) {
+	select {
+	case <-release:
+	case <-ctx.Done():
+	}
+}
+
+func eventsDefaultStart(t *testing.T, setup func(*fake.Clientset), gated eventsGatedClient, objs ...runtime.Object) *Source {
+	t.Helper()
+	return startWith(t, nil, func(s *Source) {
+		s.manualPoll = true
+		c := s.client.(*fake.Clientset)
+		setup(c)
+		if gated.list != nil || gated.watch != nil {
+			gated.Clientset = c
+			s.client = gated
+		}
+	}, objs...)
+}
+
+func eventsStamped(name, rv string) *corev1.Event {
+	e := event("apps", name, "Pod", "web-1", "", "Warning", fixedNow)
+	e.ResourceVersion = rv
+	return e
+}
+
+func TestEventsTransientWatchFailureRecoversWithoutRelist(t *testing.T) {
+	plan := &eventsWatchPlan{steps: map[int]func() error{
+		2: func() error { return apierrors.NewTooManyRequests("slow down", 0) },
+	}}
+	var lists *atomic.Int32
+	s := eventsDefaultStart(t, func(c *fake.Clientset) {
+		c.PrependWatchReactor("events", plan.react)
+		lists = eventsListCounter(c)
+	}, eventsGatedClient{}, testPod("apps", "web-1", "node-a", corev1.PodRunning), eventsStamped("e1", "1"))
+	waitState(t, s, data.FeedReady)
+	before := lists.Load()
+	eventsEndNormally(t, plan, eventsStamped("e2", "2"))
+	waitFor(t, func() bool { return plan.count() >= 3 })
+	got := waitState(t, s, data.FeedReady)
+	if len(got.Items) != 2 {
+		t.Fatalf("events after watch retry = %+v", got.Items)
+	}
+	if lists.Load() != before {
+		t.Fatalf("scenario must resume by resourceVersion without a new List, lists %d -> %d", before, lists.Load())
+	}
+}
+
+func TestEventsExpiredWatchWaitsForPagedRelist(t *testing.T) {
+	plan := &eventsWatchPlan{}
+	release := make(chan struct{})
+	seen := make(chan data.FeedState, 1)
+	var relist atomic.Bool
+	var s *Source
+	s = eventsDefaultStart(t, func(c *fake.Clientset) {
+		c.PrependWatchReactor("events", plan.react)
+		c.PrependReactor("list", "events", func(a k8stesting.Action) (bool, runtime.Object, error) {
+			if a.GetNamespace() != "" || isProbe(a) || !relist.Load() {
+				return false, nil, nil
+			}
+			if a.(k8stesting.ListActionImpl).ListOptions.Continue == "" {
+				return true, &corev1.EventList{ListMeta: metav1.ListMeta{Continue: "page-2", ResourceVersion: "9"}, Items: []corev1.Event{*eventsStamped("e3", "8")}}, nil
+			}
+			return true, &corev1.EventList{ListMeta: metav1.ListMeta{ResourceVersion: "9"}, Items: []corev1.Event{*eventsStamped("e4", "9")}}, nil
+		})
+	}, eventsGatedClient{list: func(ctx context.Context, o metav1.ListOptions) {
+		if o.Continue == "" || !relist.Load() {
+			return
+		}
+		eventsReport(seen, s)
+		eventsHold(ctx, release)
+	}}, testPod("apps", "web-1", "node-a", corev1.PodRunning), eventsStamped("e1", "1"))
+	eventsUnblockOnCleanup(t, release)
+	waitState(t, s, data.FeedReady)
+	relist.Store(true)
+	plan.watcher(t).Error(&metav1.Status{Status: metav1.StatusFailure, Code: 410, Reason: metav1.StatusReasonExpired, Message: "too old resource version"})
+	select {
+	case st := <-seen:
+		if st == data.FeedReady {
+			t.Fatal("an expired watch must not keep the old cache as current during the relist")
+		}
+	case <-time.After(eventsWaitLimit):
+		t.Fatal("second page never requested")
+	}
+	if got := clusterState(s); got.State == data.FeedReady {
+		t.Fatalf("paged relist in progress must not look current: %+v", got)
+	}
+	close(release)
+	got := waitState(t, s, data.FeedReady)
+	if len(got.Items) != 2 || got.Items[0].Reason == "Re1" || got.Items[1].Reason == "Re1" {
+		t.Fatalf("events after relist = %+v", got.Items)
+	}
+}
+
+func TestEventsDefaultFirstWatchPendingIsNotReady(t *testing.T) {
+	release := make(chan struct{})
+	entered := make(chan struct{})
+	var once sync.Once
+	s := eventsDefaultStart(t, func(*fake.Clientset) {}, eventsGatedClient{watch: func(ctx context.Context, _ metav1.ListOptions) {
+		first := false
+		once.Do(func() { first = true })
+		if !first {
+			return
+		}
+		close(entered)
+		eventsHold(ctx, release)
+	}}, testPod("apps", "web-1", "node-a", corev1.PodRunning), eventsStamped("e1", "1"))
+	eventsUnblockOnCleanup(t, release)
+	select {
+	case <-entered:
+	case <-time.After(eventsWaitLimit):
+		t.Fatal("first watch never requested")
+	}
+	if got := clusterState(s); got.State == data.FeedReady {
+		t.Fatalf("listed cache without a confirmed watch must not be Ready: %+v", got)
+	}
+	if ns := s.ScopedEvents(data.EventQuery{Scope: data.ScopeNamespace, Namespace: "apps"}); ns.State == data.FeedReady {
+		t.Fatalf("namespace feed without a confirmed watch must not be Ready: %+v", ns)
+	}
+	close(release)
+	if got := waitState(t, s, data.FeedReady); len(got.Items) != 1 {
+		t.Fatalf("events after first watch = %+v", got.Items)
+	}
+}
+
+func TestEventsNormalWatchCloseStaysReady(t *testing.T) {
+	release := make(chan struct{})
+	seen := make(chan data.FeedState, 1)
+	plan := &eventsWatchPlan{}
+	var lists *atomic.Int32
+	var watches atomic.Int32
+	var s *Source
+	s = eventsDefaultStart(t, func(c *fake.Clientset) {
+		c.PrependWatchReactor("events", plan.react)
+		lists = eventsListCounter(c)
+	}, eventsGatedClient{watch: func(ctx context.Context, _ metav1.ListOptions) {
+		if watches.Add(1) != 2 {
+			return
+		}
+		eventsReport(seen, s)
+		eventsHold(ctx, release)
+	}}, testPod("apps", "web-1", "node-a", corev1.PodRunning), eventsStamped("e1", "1"))
+	eventsUnblockOnCleanup(t, release)
+	waitState(t, s, data.FeedReady)
+	before := lists.Load()
+	eventsEndNormally(t, plan, eventsStamped("e2", "2"))
+	select {
+	case st := <-seen:
+		if st != data.FeedReady {
+			t.Fatalf("a normal watch reconnection must not degrade the feed, state = %v", st)
+		}
+	case <-time.After(eventsWaitLimit):
+		t.Fatal("watch never reconnected")
+	}
+	close(release)
+	waitFor(t, func() bool {
+		got := clusterState(s)
+		return got.State == data.FeedReady && len(got.Items) == 2
+	})
+	if lists.Load() != before {
+		t.Fatalf("normal reconnection must not relist, lists %d -> %d", before, lists.Load())
 	}
 }

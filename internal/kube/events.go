@@ -216,7 +216,6 @@ type eventsInformer struct {
 	listed   bool
 	watching bool
 	degraded bool
-	expired  bool
 	epoch    uint64
 	state    data.FeedState
 	reason   string
@@ -239,21 +238,18 @@ func (s *Source) newEventsInformer() cache.SharedIndexInformer {
 		if s.opts.Namespace == "" {
 			lost = reasonClusterLost
 		}
-		return s.buildEventsInformer(client, s.opts.Namespace, resync, lost, false, nil)
+		return s.buildEventsInformer(client, s.opts.Namespace, resync, lost, nil)
 	})
 }
 
-func (s *Source) buildEventsInformer(client kubernetes.Interface, namespace string, resync time.Duration, lost string, pending bool, failed func(error)) *eventsInformer {
-	t := &eventsInformer{lost: lost, dirty: s.markDirty, failed: failed}
-	if pending {
-		t.degraded, t.state, t.reason = true, data.FeedLoading, reasonEventsLoading
-	}
+func (s *Source) buildEventsInformer(client kubernetes.Interface, namespace string, resync time.Duration, lost string, failed func(error)) *eventsInformer {
+	t := &eventsInformer{lost: lost, dirty: s.markDirty, failed: failed, degraded: true, state: data.FeedLoading, reason: reasonEventsLoading}
 	events := client.CoreV1().Events(namespace)
 	lw := &cache.ListWatch{
 		ListWithContextFunc: func(ctx context.Context, o metav1.ListOptions) (runtime.Object, error) {
 			obj, err := events.List(ctx, o)
 			if err != nil {
-				t.fail(err)
+				t.failList(err)
 				return nil, err
 			}
 			t.listedPage(obj, o.Continue == "")
@@ -262,7 +258,7 @@ func (s *Source) buildEventsInformer(client kubernetes.Interface, namespace stri
 		WatchFuncWithContext: func(ctx context.Context, o metav1.ListOptions) (watch.Interface, error) {
 			wt, err := events.Watch(ctx, o)
 			if err != nil {
-				t.fail(err)
+				t.failWatch(err)
 				return nil, err
 			}
 			return t.observe(ctx, wt, o.SendInitialEvents != nil && *o.SendInitialEvents), nil
@@ -272,10 +268,10 @@ func (s *Source) buildEventsInformer(client kubernetes.Interface, namespace stri
 		cache.SharedIndexInformerOptions{ResyncPeriod: resync, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}})
 	if err := t.SetWatchErrorHandlerWithContext(func(_ context.Context, _ *cache.Reflector, err error) {
 		if !routine(err) {
-			t.fail(err)
+			t.failWatch(err)
 		}
 	}); err != nil {
-		t.fail(err)
+		t.failList(err)
 	}
 	return t
 }
@@ -284,17 +280,24 @@ func routine(err error) bool {
 	return errors.Is(err, context.Canceled) || errors.Is(err, io.EOF) || apierrors.IsResourceExpired(err) || apierrors.IsGone(err)
 }
 
-func (t *eventsInformer) fail(err error) {
+func (t *eventsInformer) failList(err error) {
+	t.fail(err, true)
+}
+
+func (t *eventsInformer) failWatch(err error) {
+	t.fail(err, false)
+}
+
+func (t *eventsInformer) fail(err error, list bool) {
 	if errors.Is(err, context.Canceled) {
 		return
 	}
-	state, reason := data.FeedUnavailable, reasonEventsDown+": "+clip(err.Error())
-	if denied(err) {
-		state, reason = data.FeedForbidden, t.lost
-	}
 	t.mu.Lock()
-	t.listed, t.watching, t.degraded = false, false, true
-	t.state, t.reason = state, reason
+	if list {
+		t.listed = false
+	}
+	t.watching = false
+	t.degradeLocked(err)
 	t.mu.Unlock()
 	t.dirty()
 	if t.failed != nil {
@@ -305,12 +308,12 @@ func (t *eventsInformer) fail(err error) {
 func (t *eventsInformer) listedPage(list runtime.Object, first bool) {
 	items, err := meta.ExtractList(list)
 	if err != nil {
-		t.fail(err)
+		t.failList(err)
 		return
 	}
 	metadata, err := meta.ListAccessor(list)
 	if err != nil {
-		t.fail(err)
+		t.failList(err)
 		return
 	}
 	t.mu.Lock()
@@ -380,7 +383,7 @@ func (t *eventsInformer) observe(ctx context.Context, upstream watch.Interface, 
 					return
 				}
 				if err := t.apply(epoch, initial, event); err != nil {
-					t.fail(err)
+					t.failWatch(err)
 				}
 				select {
 				case <-ctx.Done():
@@ -425,15 +428,21 @@ func (t *eventsInformer) apply(epoch uint64, initial bool, event watch.Event) er
 		if !routine(err) {
 			return err
 		}
-		t.expired = true
+		t.resync()
 	}
 	return nil
 }
 
+func (t *eventsInformer) degradeLocked(err error) {
+	t.degraded = true
+	t.state, t.reason = data.FeedUnavailable, reasonEventsDown+": "+clip(err.Error())
+	if denied(err) {
+		t.state, t.reason = data.FeedForbidden, t.lost
+	}
+}
+
 func (t *eventsInformer) resync() {
-	expired := t.expired
-	t.expired = false
-	if t.expected == nil || expired || t.degraded {
+	if t.degraded {
 		return
 	}
 	t.degraded, t.state, t.reason = true, data.FeedLoading, reasonEventsResync
@@ -477,7 +486,7 @@ func (s *Source) wideAttempt(w *wideEvents) error {
 		return classify(err)
 	}
 	errs := make(chan error, 1)
-	inf := s.buildEventsInformer(s.client, "", 0, reasonClusterLost, true, func(err error) {
+	inf := s.buildEventsInformer(s.client, "", 0, reasonClusterLost, func(err error) {
 		select {
 		case errs <- err:
 		default:
