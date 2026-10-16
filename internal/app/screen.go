@@ -14,6 +14,7 @@ const (
 	ScreenDashboard ScreenID = iota
 	ScreenPodDetail
 	ScreenWorkloads
+	ScreenNodes
 )
 
 type Screen interface {
@@ -35,6 +36,8 @@ func screenFor(id ScreenID) (Screen, bool) {
 		return podScreen{}, true
 	case ScreenWorkloads:
 		return workloadsScreen{}, true
+	case ScreenNodes:
+		return nodesScreen{}, true
 	}
 	return nil, false
 }

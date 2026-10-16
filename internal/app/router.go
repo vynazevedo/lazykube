@@ -17,6 +17,7 @@ type Route struct {
 	Screen    ScreenID
 	Namespace string
 	Pod       string
+	Node      string
 }
 
 type Frame struct {
@@ -112,5 +113,5 @@ func (r router) crumbStart() int {
 }
 
 func registeredScreens() []ScreenID {
-	return []ScreenID{ScreenDashboard, ScreenWorkloads}
+	return []ScreenID{ScreenDashboard, ScreenWorkloads, ScreenNodes}
 }

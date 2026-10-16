@@ -187,6 +187,8 @@ func (m *Model) setLayout(w, h int) {
 		m.layout = ComputeDetail(w, h)
 	case m.onScreen(ScreenWorkloads):
 		m.layout = ComputeWorkloads(w, h)
+	case m.onScreen(ScreenNodes):
+		m.layout = ComputeNodes(w, h)
 	default:
 		m.layout = Compute(w, h, m.leftMode)
 	}

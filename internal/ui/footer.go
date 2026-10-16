@@ -40,6 +40,7 @@ func FullHelp() []KeyHelp {
 		{"m", "screens menu ← → enter"},
 		{"2", "Dashboard screen"},
 		{"3", "Workloads screen"},
+		{"4", "Nodes screen"},
 		{"l c t d e", "Log Config Top Describe Events"},
 		{"S", "Security / namespace posture"},
 		{"A", "ack all Security alerts"},
@@ -120,6 +121,36 @@ func FullHelpWorkloads() []KeyHelp {
 		out = append(out, h)
 	}
 	return out
+}
+
+func NodesHelp() []KeyHelp {
+	return []KeyHelp{
+		{"↑↓", "move"},
+		{"/", "filter"},
+		{"enter", "pod detail"},
+		{"esc", "back"},
+		{"m", "menu"},
+		{"?", "help"},
+		{"q", "quit"},
+	}
+}
+
+func FullHelpNodes() []KeyHelp {
+	return []KeyHelp{
+		{"↑/↓ k/j", "move selection"},
+		{"/", "filter pods on this node"},
+		{"enter", "open pod detail"},
+		{"esc", "clear filter, back"},
+		{"m", "screens menu ← → enter"},
+		{"2", "Dashboard screen"},
+		{"3", "Workloads screen"},
+		{"4", "Nodes screen"},
+		{"A", "ack all Security alerts"},
+		{"p", "cycle palette"},
+		{"ctrl+p", "pause animations"},
+		{"?", "toggle help"},
+		{"q ctrl+c", "quit"},
+	}
 }
 
 func HelpOverlay(screen draw.Region, items []KeyHelp, ctx Ctx) {

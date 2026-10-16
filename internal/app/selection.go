@@ -9,8 +9,9 @@ import (
 
 func (m Model) visiblePods() []data.Pod {
 	pods := make([]data.Pod, 0, len(m.snap.Pods))
+	node, byNode := m.nodeScope()
 	for _, p := range m.snap.Pods {
-		if m.nsFilter == "" || p.Namespace == m.nsFilter {
+		if (m.nsFilter == "" || p.Namespace == m.nsFilter) && (!byNode || (node != "" && p.Node == node)) {
 			pods = append(pods, p)
 		}
 	}
@@ -121,6 +122,9 @@ func (m *Model) ensurePodVisible() {
 func (m *Model) focusOrder() []Focus {
 	if m.onScreen(ScreenWorkloads) {
 		return []Focus{FocusPods, FocusDeployments, FocusDetails}
+	}
+	if m.onScreen(ScreenNodes) {
+		return []Focus{FocusPods}
 	}
 	if m.layout.ShowLeft {
 		return []Focus{FocusNamespaces, FocusDeployments, FocusPods, FocusDetails}

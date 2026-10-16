@@ -1,0 +1,48 @@
+ lazykube [DEMO]  v2.0   ◎ context demo   k8s demo  nodes 1  ns 8  pods 13  uptime 119d                                              ⠙ metrics every 5s ● live  
+  2 Dashboard  |  3 Workloads  | [4 Nodes]                                                                                                              m menu  
+ Nodes                                                                                                                                                          
+ ╭─ Node do pod selecionado ──────────────────────────╮ ╭─ Pods · focus ──────────────────────────────────────────────────────────────────────────────────────╮ 
+ │                                                    │ │                                                                                                     │ 
+ │ demo-node-01                                       │ │ / filter pods…▌                                                                            13 items │ 
+ │ Origem: Snapshot.Node                              │ │                                                                                                     │ 
+ │ Cobertura: no permission                           │ │   NAME                                                           NAMESPACE    RST   SEC CPU/STATUS  │ 
+ │   sem permissão: nodes                             │ │ ● bilibili-raffle-5d8f9c7b4-x2kqp                                bilibili-r…    0  75 C █░░░░░░     │ 
+ │ Ready: desconhecido                                │ │ ● bilibili-live-7f6b8d9c5-mn4tz                                  bilibili-r…    2  20 F ████░░░     │ 
+ │ CPU: indisponível                                  │ │ ● lgo-7c5d97584-hq8wd                                            lgo            0  20 F ██░░░░░     │ 
+ │ Memória: indisponível                              │ │ ● psql-6bc7744f9-r7zlc                                           ys-odoo        0 100 A ████░░░     │ 
+ │ Pods observados: 13                                │ │ ● odoo-7575bf6d8-9wjvk                                           ys-odoo        1  75 C ██████░     │ 
+ │ Pods na lista: 13                                  │ │ ○ qiandao-1605400800-k8f2m                                       xcx            0  20 F Completed   │ 
+ │ Escopo dos pods: conectado                         │ │ ○ lingqu-1605486000-4tq8n                                        xcx            0  20 F Completed   │ 
+ │                                                    │ │ ⠙ lingqu-1605489600-b7xsd                                        xcx            0 100 A Init:0/1    │ 
+ │ Lista derivada de Snapshot.Pods,                   │ │ ● coredns-6799fbcd5-w9t4p                                        kube-system    0  75 C █░░░░░░     │ 
+ │ pode ser parcial                                   │ │ ● metrics-server-67c658944b-lm2x                                 kube-system    0  20 F ready 0/1   │ 
+ │ Inventário completo: fase futura                   │ │ ● traefik-f4564c4f4-zq7rn                                        kube-system    0  20 F ░░░░░░░     │ 
+ │ Sem seleção independente de node                   │ │ ● local-path-provisioner-84db5d-h4                               kube-system    0 100 A ImagePullB… │ 
+ │                                                    │ │ ● svclb-traefik-8c2f1-6n2vb                                      kube-system    7  75 C CrashLoopB… │ 
+ │                                                    │ │                                                                                                     │ 
+ │                                                    │ │                                                                                                     │ 
+ │                                                    │ │                                                                                                     │ 
+ │                                                    │ │                                                                                                     │ 
+ │                                                    │ │                                                                                                     │ 
+ │                                                    │ │                                                                                                     │ 
+ │                                                    │ │                                                                                                     │ 
+ │                                                    │ │                                                                                                     │ 
+ │                                                    │ │                                                                                                     │ 
+ │                                                    │ │                                                                                                     │ 
+ │                                                    │ │                                                                                                     │ 
+ │                                                    │ │                                                                                                     │ 
+ │                                                    │ │                                                                                                     │ 
+ │                                                    │ │                                                                                                     │ 
+ │                                                    │ │                                                                                                     │ 
+ │                                                    │ │                                                                                                     │ 
+ │                                                    │ │                                                                                                     │ 
+ │                                                    │ │                                                                                                     │ 
+ │                                                    │ │                                                                                                     │ 
+ │                                                    │ │                                                                                                     │ 
+ │                                                    │ │                                                                                                     │ 
+ │                                                    │ │                                                                                                     │ 
+ │                                                    │ │                                                                                                     │ 
+ │                                                    │ │                                                                                                     │ 
+ ╰────────────────────────────────────────────────────╯ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   /  filter   enter  pod detail   esc  back   m  menu   ?  help   q  quit                                                          bubbletea · 0 fps 

@@ -43,15 +43,15 @@ func TestHelpIsHonest(t *testing.T) {
 			keys[k] = true
 		}
 	}
-	for _, k := range []string{"C", "P", "n", "N", "E", "S", "w", "g", "G", "m", "2", "enter", "esc"} {
+	for _, k := range []string{"C", "P", "n", "N", "E", "S", "w", "g", "G", "m", "2", "3", "4", "enter", "esc"} {
 		if !keys[k] {
 			t.Fatalf("implemented key %q missing from help", k)
 		}
 	}
-	for _, list := range [][]ui.KeyHelp{ui.FullHelp(), ui.ShortHelp(), ui.PodDetailHelp(), ui.MenuHelp()} {
+	for _, list := range [][]ui.KeyHelp{ui.FullHelp(), ui.ShortHelp(), ui.PodDetailHelp(), ui.MenuHelp(), ui.NodesHelp(), ui.FullHelpNodes()} {
 		for _, h := range list {
 			for _, k := range strings.Fields(h.Key) {
-				if k == "4" || k == "5" || k == "6" {
+				if k == "5" || k == "6" {
 					t.Fatalf("screen key %q is announced before its screen exists", k)
 				}
 			}
@@ -84,7 +84,10 @@ func TestHelpIsHonest(t *testing.T) {
 	if w := press(t, m, "3"); !w.onScreen(ScreenWorkloads) || w.nav.Depth() != 1 {
 		t.Fatal("3 activates Workloads")
 	}
-	for _, k := range []string{"4", "5", "6"} {
+	if n := press(t, m, "4"); !n.onScreen(ScreenNodes) || n.nav.Depth() != 1 {
+		t.Fatal("4 activates Nodes")
+	}
+	for _, k := range []string{"5", "6"} {
 		if got := press(t, m, k); got.nav != m.nav || got.menu.open {
 			t.Fatalf("%s must stay unbound until its screen exists", k)
 		}
@@ -419,6 +422,8 @@ func TestHelpOverlayMatchesActiveRoute(t *testing.T) {
 		{"workloads", press(t, dash, "3"), []string{"toggle left column", "namespace scope"}},
 		{"workloads scope", press(t, scope, "3"), []string{"toggle left column", "namespace scope"}},
 		{"detail", detail, []string{"next panel", "previous panel", "toggle left column", "filter pods", "open pod"}},
+		{"nodes", press(t, dash, "4"), []string{"next panel", "previous panel", "toggle left column", "namespace scope", "Log Config", "follow", "scroll viewport"}},
+		{"nodes scope", press(t, scope, "4"), []string{"next panel", "toggle left column", "namespace scope", "Log Config"}},
 	} {
 		t.Run(c.name, func(t *testing.T) {
 			bound := map[string]bool{}
