@@ -25,6 +25,9 @@ func (m Model) handleKey(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 	if m.filtering {
 		return m.handleFilterKey(msg)
 	}
+	if m.dg.searching {
+		return m.handleSearchKey(msg)
+	}
 
 	switch {
 	case key.Matches(msg, k.Quit):
@@ -35,11 +38,17 @@ func (m Model) handleKey(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		m.cycleFocus(1)
 	case key.Matches(msg, k.PrevPanel):
 		m.cycleFocus(-1)
+	case key.Matches(msg, k.Filter) && m.searchActive():
+		cmd := m.startSearch()
+		return m, cmd
 	case key.Matches(msg, k.Filter):
 		m.focus = FocusPods
 		m.filtering = true
 		cmd := m.filter.Focus()
 		return m, cmd
+	case key.Matches(msg, k.Esc) && m.tab == ui.TabLog && m.dg.search.Value() != "":
+		m.dg.search.SetValue("")
+		m.updateMatches()
 	case key.Matches(msg, k.Esc):
 		m.nsFilter = ""
 		m.filter.SetValue("")
@@ -63,6 +72,16 @@ func (m Model) handleKey(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		m.setTab(m.tab.Next(-1))
 	case key.Matches(msg, k.TabNext):
 		m.setTab(m.tab.Next(1))
+	case key.Matches(msg, k.Container):
+		m.cycleContainer()
+	case key.Matches(msg, k.Previous):
+		m.togglePrevious()
+	case key.Matches(msg, k.SearchNext) && m.tab == ui.TabLog:
+		m.stepMatch(1)
+	case key.Matches(msg, k.SearchPrev) && m.tab == ui.TabLog:
+		m.stepMatch(-1)
+	case key.Matches(msg, k.EventScope):
+		m.cycleScope()
 	case key.Matches(msg, k.Palette):
 		m.pal = theme.NextPalette(m.pal)
 	case key.Matches(msg, k.ToggleLeft):

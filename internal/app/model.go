@@ -62,7 +62,8 @@ type Model struct {
 	snap     data.Snapshot
 	metrics  data.Metrics
 	logs     []data.LogLine
-	events   []data.Event
+	events   data.EventFeed
+	dg       diagState
 	manifest []string
 	describe []data.Field
 
@@ -109,6 +110,7 @@ func New(opts Options) Model {
 		keys:     DefaultKeyMap(),
 		filter:   ti,
 		src:      opts.Source,
+		dg:       newDiagState(opts.Source),
 		follow:   true,
 		motion:   newMotion(fps),
 	}
@@ -148,6 +150,7 @@ func (m *Model) reload() {
 	if m.selectedIndex(pods) < 0 && len(pods) > 0 {
 		m.selName = pods[0].Key()
 		m.follow, m.newLines, m.logs = true, 0, nil
+		m.resetLogTarget()
 	}
 	m.ensurePodVisible()
 	m.refresh()
@@ -172,17 +175,15 @@ func (m *Model) heatCols() int {
 func (m *Model) refresh() {
 	name := m.activeName()
 	m.metrics = m.src.Metrics(m.clock.T, name, m.heatCols())
-	var logs []data.LogLine
+	m.refreshLogs(name)
+	m.refreshEvents(name)
+	m.manifest, m.describe, m.dg.containers = nil, nil, nil
 	if name != "" {
-		logs = m.src.Logs(name, m.clock.T, logBuffer)
-	}
-	m.applyLogs(logs)
-	m.events, m.manifest, m.describe = nil, nil, nil
-	if name != "" {
-		m.events = m.src.Events(name)
 		m.manifest = m.src.Manifest(name)
 		m.describe = m.src.Describe(name)
+		m.dg.containers = m.dg.diag.Containers(name)
 	}
+	m.updateMatches()
 	m.clampScroll()
 	m.setBarTargets()
 }

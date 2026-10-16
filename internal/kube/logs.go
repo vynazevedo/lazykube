@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"strings"
 	"time"
 	"unicode/utf8"
 
@@ -25,52 +26,140 @@ const (
 	truncatedMark = " [linha truncada]"
 )
 
+type streamKey struct {
+	pod       string
+	uid       string
+	container string
+	previous  bool
+	instance  int
+}
+
 type logStream struct {
-	key    string
-	uid    string
+	key    streamKey
+	ctx    context.Context
 	cancel context.CancelFunc
 	lines  []data.LogLine
 	bytes  int
 	lastTS time.Time
 	atLast int
 	err    string
+	done   bool
 }
 
-func (s *Source) Logs(key string, _ int, n int) []data.LogLine {
+func (s *Source) Logs(key string, tick int, n int) []data.LogLine {
+	v := s.PodLogs(data.LogRequest{Pod: key}, tick, n)
+	if len(v.Lines) == 0 && v.State == data.FeedUnavailable && v.Container != "" {
+		return []data.LogLine{{Time: "--:--:--", Level: data.LevelWarn, Message: v.Reason}}
+	}
+	return v.Lines
+}
+
+func (s *Source) PodLogs(req data.LogRequest, _ int, n int) data.LogView {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	st := s.ensureStreamLocked(key)
-	if st == nil || n <= 0 {
-		return nil
-	}
-	if len(st.lines) == 0 && st.err != "" {
-		return []data.LogLine{{Time: "--:--:--", Level: data.LevelWarn, Message: st.err}}
-	}
-	lines := st.lines
-	if len(lines) > n {
-		lines = lines[len(lines)-n:]
-	}
-	return append([]data.LogLine(nil), lines...)
-}
-
-func (s *Source) ensureStreamLocked(key string) *logStream {
-	p := s.byKey[key]
+	view := data.LogView{Previous: req.Previous}
+	p := s.byKey[req.Pod]
 	if p == nil {
 		s.stopStreamLocked()
-		return nil
+		view.State, view.Reason = data.FeedUnavailable, "pod não encontrado"
+		return view
 	}
-	if st := s.stream; st != nil && st.key == key && st.uid == string(p.UID) {
+	name := req.Container
+	if name == "" || !containerSpec(p, name) {
+		name = defaultContainerName(p)
+	}
+	view.Container = name
+	if reason := s.unavailableLocked(p, name, req.Previous); reason != "" {
+		s.stopStreamLocked()
+		view.State, view.Reason = data.FeedUnavailable, reason
+		return view
+	}
+	st := s.ensureStreamLocked(p, streamKey{
+		pod:       req.Pod,
+		uid:       string(p.UID),
+		container: name,
+		previous:  req.Previous,
+		instance:  instanceOf(p, name, req.Previous),
+	})
+	if st == nil {
+		view.State, view.Reason = data.FeedUnavailable, "logs indisponíveis"
+		return view
+	}
+	lines := st.lines
+	if n <= 0 {
+		lines = nil
+	} else if len(lines) > n {
+		lines = lines[len(lines)-n:]
+	}
+	view.Lines = append([]data.LogLine(nil), lines...)
+	view.Reason = st.err
+	switch {
+	case len(view.Lines) == 0 && st.err != "":
+		view.State = data.FeedUnavailable
+	case len(view.Lines) == 0 && !st.done:
+		view.State = data.FeedLoading
+	}
+	return view
+}
+
+func (s *Source) unavailableLocked(p *corev1.Pod, name string, previous bool) string {
+	switch {
+	case name == "":
+		return "pod sem containers"
+	case s.client == nil:
+		return "logs indisponíveis"
+	case previous && lastTermination(p, name) == nil:
+		return "sem instância anterior do container " + name
+	}
+	if previous {
+		return ""
+	}
+	for _, c := range toContainers(p, s.opts.Now(), s.opts.Location) {
+		if c.Name == name && c.Phase == data.PhaseWaiting && c.Restarts == 0 && c.Last == nil {
+			return "container " + name + " aguardando: " + reasonText(c.Reason)
+		}
+	}
+	return ""
+}
+
+func reasonText(reason string) string {
+	if reason == "" {
+		return "sem status"
+	}
+	return reason
+}
+
+func instanceOf(p *corev1.Pod, name string, previous bool) int {
+	if !previous {
+		return 0
+	}
+	for _, list := range [][]corev1.ContainerStatus{p.Status.InitContainerStatuses, p.Status.ContainerStatuses, p.Status.EphemeralContainerStatuses} {
+		for _, cs := range list {
+			if cs.Name == name {
+				return int(cs.RestartCount)
+			}
+		}
+	}
+	return 0
+}
+
+func (s *Source) ensureStreamLocked(p *corev1.Pod, key streamKey) *logStream {
+	if st := s.stream; st != nil && st.key == key {
 		return st
 	}
 	s.stopStreamLocked()
-	if s.client == nil || s.ctx.Err() != nil || len(p.Spec.Containers) == 0 {
+	if s.ctx.Err() != nil {
 		return nil
 	}
 	ctx, cancel := context.WithCancel(s.ctx)
-	st := &logStream{key: key, uid: string(p.UID), cancel: cancel}
+	st := &logStream{key: key, ctx: ctx, cancel: cancel}
 	s.stream = st
 	s.wg.Add(1)
-	go s.follow(ctx, st, p.Namespace, p.Name, p.Spec.Containers[0].Name)
+	if key.previous {
+		go s.readPrevious(ctx, st, p.Namespace, p.Name, key.container)
+	} else {
+		go s.follow(ctx, st, p.Namespace, p.Name, key.container)
+	}
 	return st
 }
 
@@ -90,7 +179,7 @@ func (s *Source) follow(ctx context.Context, st *logStream, namespace, name, con
 		}
 		if err != nil {
 			s.mu.Lock()
-			st.err = "logs unavailable: " + sanitize(err.Error())
+			st.err = "logs unavailable: " + clip(err.Error())
 			s.mu.Unlock()
 			s.notify()
 		}
@@ -100,6 +189,30 @@ func (s *Source) follow(ctx context.Context, st *logStream, namespace, name, con
 		case <-time.After(logRetry):
 		}
 	}
+}
+
+func (s *Source) readPrevious(ctx context.Context, st *logStream, namespace, name, container string) {
+	defer s.wg.Done()
+	tail := int64(logTail)
+	opts := &corev1.PodLogOptions{Container: container, Previous: true, Timestamps: true, TailLines: &tail}
+	err := func() error {
+		rc, err := s.client.CoreV1().Pods(namespace).GetLogs(name, opts).Stream(ctx)
+		if err != nil {
+			return err
+		}
+		defer func() { _ = rc.Close() }()
+		return s.consumeLogs(ctx, st, rc, time.Time{}, 0)
+	}()
+	if ctx.Err() != nil {
+		return
+	}
+	s.mu.Lock()
+	st.done = true
+	if err != nil {
+		st.err = "previous indisponível: " + clip(err.Error())
+	}
+	s.mu.Unlock()
+	s.notify()
 }
 
 func (s *Source) readLogs(ctx context.Context, st *logStream, namespace, name, container string) error {
@@ -119,6 +232,9 @@ func (s *Source) readLogs(ctx context.Context, st *logStream, namespace, name, c
 		return err
 	}
 	defer func() { _ = rc.Close() }()
+	s.mu.Lock()
+	st.done = true
+	s.mu.Unlock()
 	return s.consumeLogs(ctx, st, rc, since, skipEqual)
 }
 
@@ -223,7 +339,7 @@ func clampMessage(msg string, truncated bool) string {
 		msg, truncated = msg[:cut], true
 	}
 	if truncated {
-		msg += truncatedMark
+		return msg + truncatedMark
 	}
-	return msg
+	return strings.Clone(msg)
 }

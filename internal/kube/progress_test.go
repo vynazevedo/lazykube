@@ -3,12 +3,18 @@ package kube
 import (
 	"context"
 	"errors"
+	"io"
+	"net/http"
+	"strings"
 	"sync"
 	"testing"
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/version"
+	"k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/rest"
+	restfake "k8s.io/client-go/rest/fake"
 
 	"github.com/TNK-Studio/lazykube/internal/data"
 )
@@ -86,5 +92,55 @@ func TestServerVersionHonorsCancel(t *testing.T) {
 		}
 	case <-time.After(5 * time.Second):
 		t.Fatal("serverVersion ignored cancellation")
+	}
+}
+
+type restVersion struct {
+	rest.Interface
+}
+
+func (r restVersion) RESTClient() rest.Interface { return r.Interface }
+
+func (r restVersion) ServerVersion() (*version.Info, error) {
+	return nil, errors.New("context-free path must not be used")
+}
+
+func TestServerVersionPropagatesContext(t *testing.T) {
+	started, aborted := make(chan struct{}), make(chan struct{})
+	client := &restfake.RESTClient{
+		NegotiatedSerializer: scheme.Codecs.WithoutConversion(),
+		Client: restfake.CreateHTTPClient(func(req *http.Request) (*http.Response, error) {
+			close(started)
+			<-req.Context().Done()
+			close(aborted)
+			return nil, req.Context().Err()
+		}),
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	done := make(chan error, 1)
+	go func() {
+		_, err := serverVersion(ctx, restVersion{client})
+		done <- err
+	}()
+	<-started
+	cancel()
+	select {
+	case <-aborted:
+	case <-time.After(5 * time.Second):
+		t.Fatal("discovery request kept running after cancel")
+	}
+	if err := <-done; err == nil {
+		t.Fatal("cancelled discovery must fail")
+	}
+
+	ok := &restfake.RESTClient{
+		NegotiatedSerializer: scheme.Codecs.WithoutConversion(),
+		Client: restfake.CreateHTTPClient(func(*http.Request) (*http.Response, error) {
+			return &http.Response{StatusCode: http.StatusOK, Header: http.Header{"Content-Type": {"application/json"}}, Body: io.NopCloser(strings.NewReader(`{"gitVersion":"v1.31.2"}`))}, nil
+		}),
+	}
+	info, err := serverVersion(context.Background(), restVersion{ok})
+	if err != nil || info.GitVersion != "v1.31.2" {
+		t.Fatalf("info=%+v err=%v", info, err)
 	}
 }

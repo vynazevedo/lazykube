@@ -17,8 +17,10 @@ const (
 )
 
 type demoPod struct {
-	pod     Pod
-	cpuBase int
+	pod        Pod
+	cpuBase    int
+	containers []Container
+	events     []Event
 }
 
 type Demo struct {
@@ -45,8 +47,8 @@ func NewDemo() *Demo {
 		{"coredns-6799fbcd5-w9t4p", "kube-system", StatusRunning, 0, "119d", 3, 2},
 		{"metrics-server-67c658944b-lm2x", "kube-system", StatusRunning, 0, "119d", 5, 3},
 		{"traefik-f4564c4f4-zq7rn", "kube-system", StatusRunning, 0, "119d", 2, 4},
-		{"local-path-provisioner-84db5d-h4", "kube-system", StatusRunning, 0, "119d", 1, 5},
-		{"svclb-traefik-8c2f1-6n2vb", "kube-system", StatusRunning, 0, "119d", 1, 6},
+		{"local-path-provisioner-84db5d-h4", "kube-system", StatusFailed, 0, "119d", 1, 5},
+		{"svclb-traefik-8c2f1-6n2vb", "kube-system", StatusFailed, 7, "119d", 1, 6},
 	}
 	d := &Demo{pods: make([]demoPod, len(rows))}
 	for i, r := range rows {
@@ -69,6 +71,9 @@ func NewDemo() *Demo {
 				QoS:        "Burstable",
 			},
 		}
+		d.pods[i].containers = demoContainers(r.name, d.pods[i].pod.Image)
+		d.pods[i].pod.Reason, d.pods[i].pod.Ready, d.pods[i].pod.Containers = demoSummary(r.status, d.pods[i].containers)
+		d.pods[i].events = demoPodEvents(d.pods[i].pod)
 	}
 	return d
 }
@@ -203,10 +208,7 @@ func (d *Demo) Metrics(tick int, pod string, heatCols int) Metrics {
 	return m
 }
 
-var demoLogs = []struct {
-	level Level
-	msg   string
-}{
+var demoLogs = []demoLine{
 	{LevelInfo, "ws connected room=21452505 shard=3"},
 	{LevelDebug, "heartbeat ok rtt=42ms"},
 	{LevelInfo, "danmaku batch received count=38"},
@@ -221,15 +223,24 @@ var demoLogs = []struct {
 	{LevelInfo, "ws connected room=21452505 shard=3"},
 }
 
-func (d *Demo) Logs(_ string, tick int, n int) []LogLine {
-	if n <= 0 {
+func (d *Demo) Logs(pod string, tick int, n int) []LogLine {
+	return d.PodLogs(LogRequest{Pod: pod}, tick, n).Lines
+}
+
+type demoLine struct {
+	level Level
+	msg   string
+}
+
+func rotatingLogs(lines []demoLine, tick, n int) []LogLine {
+	if n <= 0 || len(lines) == 0 {
 		return nil
 	}
-	end := tick/logEvery + len(demoLogs) - 1
+	end := tick/logEvery + len(lines) - 1
 	start := max(0, end-n+1)
 	out := make([]LogLine, 0, end-start+1)
 	for j := start; j <= end; j++ {
-		l := demoLogs[j%len(demoLogs)]
+		l := lines[j%len(lines)]
 		s := (14*60 + 3*j) % 3600
 		out = append(out, LogLine{
 			Time:    fmt.Sprintf("20:%02d:%02d", s/60, s%60),
@@ -240,16 +251,8 @@ func (d *Demo) Logs(_ string, tick int, n int) []LogLine {
 	return out
 }
 
-func (d *Demo) Events(_ string) []Event {
-	return []Event{
-		{"8s", "Normal", "Scheduled", "Successfully assigned xcx/lingqu-1605489600-b7xsd"},
-		{"7s", "Normal", "Pulling", `Pulling image "registry.local/xcx:1.4.2"`},
-		{"41m", "Normal", "Completed", "Job completed: lingqu-1605486000"},
-		{"3d", "Warning", "BackOff", "Back-off restarting failed container in bilibili-live"},
-		{"3d", "Normal", "Started", "Started container app"},
-		{"12d", "Warning", "OOMKilled", "Container odoo exceeded memory limit"},
-		{"12d", "Normal", "Created", "Created container odoo"},
-	}
+func (d *Demo) Events(pod string) []Event {
+	return d.ScopedEvents(EventQuery{Scope: ScopePod, Pod: pod}).Items
 }
 
 func (d *Demo) Manifest(pod string) []string {
@@ -291,7 +294,8 @@ func (d *Demo) Describe(pod string) []Field {
 		{"Name", p.Name},
 		{"Namespace", p.Namespace},
 		{"Node", p.Node + "/" + demoNodeAddress},
-		{"Status", p.Status.String()},
+		{"Status", p.Reason},
+		{"Ready", fmt.Sprintf("%d/%d", p.Ready, p.Containers)},
 		{"IP", p.IP},
 		{"Controlled By", p.Controller},
 		{"Image", p.Image},
@@ -299,7 +303,7 @@ func (d *Demo) Describe(pod string) []Field {
 		{"Requests", "cpu: 10m, memory: 64Mi"},
 		{"Limits", "cpu: 50m, memory: 128Mi"},
 		{"QoS Class", p.QoS},
-		{"Conditions", "Initialized ✓ Ready ✓ ContainersReady ✓ PodScheduled ✓"},
+		{"Conditions", demoConditions(p)},
 		{"Tolerations", "node.kubernetes.io/not-ready:NoExecute for 300s"},
 	}
 }

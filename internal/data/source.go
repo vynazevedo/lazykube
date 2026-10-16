@@ -75,6 +75,9 @@ type Pod struct {
 	Name       string
 	Namespace  string
 	Status     PodStatus
+	Reason     string
+	Ready      int
+	Containers int
 	Restarts   int
 	Age        string
 	IP         string
@@ -109,10 +112,13 @@ type Namespace struct {
 }
 
 type Event struct {
-	Age     string
-	Type    string
-	Reason  string
-	Message string
+	Age       string
+	Type      string
+	Reason    string
+	Object    string
+	Namespace string
+	Count     int
+	Message   string
 }
 
 type LogLine struct {

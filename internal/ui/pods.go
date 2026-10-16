@@ -12,10 +12,11 @@ import (
 const (
 	PodsRowsTop  = 4
 	podsFixedW   = 37
-	podsNSW      = 15
+	podsNSW      = 11
 	podsRSTW     = 4
 	podsAgeW     = 5
 	podsCPUW     = 7
+	podsStateW   = 11
 	podsCPUScale = 20.0
 )
 
@@ -61,6 +62,26 @@ func StatusColor(s data.PodStatus) theme.RGB {
 	}
 }
 
+func PodReason(p data.Pod) string {
+	if p.Reason != "" {
+		return p.Reason
+	}
+	return p.Status.String()
+}
+
+func PodStateLabel(p data.Pod) (string, theme.RGB, bool) {
+	switch {
+	case p.Status == data.StatusRunning && p.Containers > 0 && p.Ready < p.Containers:
+		return fmt.Sprintf("ready %d/%d", p.Ready, p.Containers), theme.Warn, true
+	case p.Status == data.StatusRunning:
+		return "", theme.OK, false
+	case p.Status == data.StatusCompleted:
+		return PodReason(p), theme.DimGlyph, true
+	default:
+		return PodReason(p), StatusColor(p.Status), true
+	}
+}
+
 func PodsVisibleRows(panelHeight int) int {
 	return max(0, panelHeight-2-PodsRowsTop)
 }
@@ -87,7 +108,7 @@ func PodsPanel(r draw.Region, st PodsState, ctx Ctx) {
 	c.Text(nsX, 2, "NAMESPACE", hdr)
 	c.Text(rstX, 2, draw.PadLeft("RST", podsRSTW), hdr)
 	c.Text(ageX, 2, draw.PadLeft("AGE", podsAgeW), hdr)
-	c.Text(cpuX, 2, "CPU", hdr)
+	c.Text(cpuX, 2, "CPU/STATUS", hdr)
 
 	rows := c.H - 3
 	for row := 0; row < rows; row++ {
@@ -121,6 +142,10 @@ func PodsPanel(r draw.Region, st PodsState, ctx Ctx) {
 		}
 		c.Text(rstX, y, draw.PadLeft(fmt.Sprint(p.Restarts), podsRSTW), draw.Fg(rstColor))
 		c.Text(ageX, y, draw.PadLeft(p.Age, podsAgeW), draw.Fg(theme.Muted))
+		if label, color, ok := PodStateLabel(p); ok {
+			c.Text(cpuX, y, draw.Truncate(label, podsStateW), draw.Fg(color))
+			continue
+		}
 		full := draw.Filled(float64(st.CPU[p.Key()]), podsCPUScale, podsCPUW)
 		c.Text(cpuX, y, strings.Repeat("█", full)+strings.Repeat("░", podsCPUW-full), draw.Fg(ctx.Pal.C))
 	}

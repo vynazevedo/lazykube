@@ -1,0 +1,294 @@
+package app
+
+import (
+	"reflect"
+	"strings"
+	"testing"
+
+	"github.com/TNK-Studio/lazykube/internal/data"
+	"github.com/TNK-Studio/lazykube/internal/ui"
+)
+
+const (
+	livePod  = "bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz"
+	crashPod = 12
+	lgoPod   = 2
+)
+
+func TestHelpIsHonest(t *testing.T) {
+	km := reflect.TypeOf(KeyMap{})
+	for _, gone := range []string{"Shell", "Delete", "Context"} {
+		if _, ok := km.FieldByName(gone); ok {
+			t.Fatalf("KeyMap still declares unimplemented %s", gone)
+		}
+	}
+	all := append(ui.ShortHelp(), ui.FullHelp()...)
+	for _, h := range all {
+		desc := strings.ToLower(h.Desc)
+		for _, word := range []string{"shell", "delete", "context"} {
+			if strings.Contains(desc, word) {
+				t.Fatalf("help still announces %q: %+v", word, h)
+			}
+		}
+		if h.Key == "s" || strings.Contains(h.Key, "ctrl+d") || strings.Contains(h.Key, "ctrl+k") {
+			t.Fatalf("help still lists %q", h.Key)
+		}
+	}
+	keys := map[string]bool{}
+	for _, h := range ui.FullHelp() {
+		for _, k := range strings.Fields(h.Key) {
+			keys[k] = true
+		}
+	}
+	for _, k := range []string{"C", "P", "n", "N", "E", "w", "g", "G"} {
+		if !keys[k] {
+			t.Fatalf("implemented key %q missing from help", k)
+		}
+	}
+	m := demoModel(t, 160, 48)
+	before := m.tab
+	for _, k := range []string{"s", "S"} {
+		m = press(t, m, k)
+	}
+	if m.tab != before {
+		t.Fatal("unbound keys must not change state")
+	}
+}
+
+func TestPodListShowsRealCause(t *testing.T) {
+	m := demoModel(t, 160, 48)
+	plain := m.Render().Plain()
+	for _, want := range []string{"Init:0/1", "ready 0/1", "ImagePullB", "CrashLoopB", "Completed", "CPU/STATUS"} {
+		if !strings.Contains(plain, want) {
+			t.Fatalf("pods list missing %q", want)
+		}
+	}
+	m.selectPod(crashPod)
+	if !strings.Contains(m.Render().Plain(), "[CrashLoopBackOff]") {
+		t.Fatal("details header must show the kubectl reason")
+	}
+}
+
+func detailsModel(t *testing.T, pod int) Model {
+	t.Helper()
+	m := demoModel(t, 160, 48)
+	m.selectPod(pod)
+	m.focus = FocusDetails
+	return m
+}
+
+func TestContainerCycleAndPrevious(t *testing.T) {
+	m := detailsModel(t, 1)
+	m = press(t, m, "l")
+	if m.dg.logView.Container != "app" || len(m.dg.containers) != 2 {
+		t.Fatalf("default container = %q (%d containers)", m.dg.logView.Container, len(m.dg.containers))
+	}
+	m = press(t, m, "C")
+	if m.dg.logView.Container != "log-shipper" || !strings.Contains(m.logs[len(m.logs)-1].Message, "") || !strings.Contains(joinLogs(m.logs), "sink=loki") {
+		t.Fatalf("C must switch the stream to the sidecar: %q", m.dg.logView.Container)
+	}
+	m = press(t, m, "C")
+	if m.dg.logView.Container != "app" {
+		t.Fatal("C must cycle back to the first container")
+	}
+	m = press(t, m, "t", "P")
+	if m.tab != ui.TabTop || !m.dg.previous {
+		t.Fatal("P keeps Top (mini logs) and enables previous")
+	}
+	m = press(t, m, "d", "P")
+	if m.tab != ui.TabLog || m.dg.previous {
+		t.Fatal("P from Describe toggles back and opens Log")
+	}
+	m = press(t, m, "P")
+	if !m.dg.logView.Previous || !strings.Contains(joinLogs(m.logs), "panic: runtime error") {
+		t.Fatalf("previous logs not shown: %+v", m.dg.logView)
+	}
+	if !strings.Contains(m.Render().Plain(), "app · previous") {
+		t.Fatal("log source label must flag previous")
+	}
+	m.selectPod(lgoPod)
+	if m.dg.previous || m.dg.logContainer != "" {
+		t.Fatal("selecting another pod resets the log target")
+	}
+	m = press(t, m, "P")
+	if m.dg.logView.State != data.FeedUnavailable || !strings.Contains(m.dg.logView.Reason, "sem instância anterior") {
+		t.Fatalf("previous without termination must be unavailable: %+v", m.dg.logView)
+	}
+	if !strings.Contains(m.Render().Plain(), "sem instância anterior do container app") {
+		t.Fatal("unavailable previous must be explained on screen")
+	}
+}
+
+func joinLogs(lines []data.LogLine) string {
+	var b strings.Builder
+	for _, l := range lines {
+		b.WriteString(l.Message)
+		b.WriteByte('\n')
+	}
+	return b.String()
+}
+
+func TestWaitingContainerLogsExplainWhy(t *testing.T) {
+	m := detailsModel(t, 11)
+	m = press(t, m, "l")
+	if m.dg.logView.State != data.FeedUnavailable || !strings.Contains(m.Render().Plain(), "aguardando: ImagePullBackOff") {
+		t.Fatalf("waiting container: %+v", m.dg.logView)
+	}
+}
+
+func TestLogSearch(t *testing.T) {
+	m := detailsModel(t, 1)
+	m = press(t, m, "l", "/")
+	if !m.dg.searching || m.filtering {
+		t.Fatal("/ in a focused Log tab searches the log, not the pod list")
+	}
+	m = press(t, m, "h", "e", "a", "r", "t")
+	if len(m.dg.matches) < 2 || m.follow {
+		t.Fatalf("matches=%d follow=%v", len(m.dg.matches), m.follow)
+	}
+	m = press(t, m, "enter")
+	if m.dg.searching || m.dg.search.Value() != "heart" {
+		t.Fatal("enter keeps the query and leaves edit mode")
+	}
+	first := m.dg.matchIdx
+	m = press(t, m, "n")
+	if m.dg.matchIdx != (first+1)%len(m.dg.matches) {
+		t.Fatal("n must go to the next match")
+	}
+	m = press(t, m, "N", "N")
+	if m.dg.matchIdx != (first-1+len(m.dg.matches))%len(m.dg.matches) {
+		t.Fatal("N must go to the previous match")
+	}
+	row := m.dg.matches[m.dg.matchIdx]
+	if row < m.scroll || row >= m.scroll+ui.ScrollRows(ui.TabLog, m.layout.Details.H) {
+		t.Fatal("current match must be visible")
+	}
+	golden(t, "log_search.txt", m.Render().Plain())
+	m = press(t, m, "esc")
+	if m.dg.search.Value() != "" || len(m.dg.matches) != 0 {
+		t.Fatal("esc clears the search")
+	}
+	m.focus = FocusPods
+	m = press(t, m, "/")
+	if !m.filtering || m.dg.searching {
+		t.Fatal("/ outside the details keeps filtering pods")
+	}
+}
+
+func TestSearchKeepsReceivingLines(t *testing.T) {
+	m := detailsModel(t, 1)
+	m = press(t, m, "l", "/", "w", "s", "enter")
+	before := len(m.logs)
+	m.clock.T += 8 * 4
+	m.refresh()
+	if len(m.logs) <= before && len(m.logs) < logBuffer {
+		t.Fatal("new lines must keep arriving while a search is active")
+	}
+	if m.newLines == 0 {
+		t.Fatal("new lines must be counted while away from the bottom")
+	}
+}
+
+func TestEventScopes(t *testing.T) {
+	m := detailsModel(t, 1)
+	m = press(t, m, "E")
+	if m.tab != ui.TabEvents || m.events.Scope != data.ScopePod {
+		t.Fatal("E first opens the Events tab")
+	}
+	if m.events.Items[0].Type != "Warning" {
+		t.Fatal("warnings come first")
+	}
+	m = press(t, m, "E")
+	if m.events.Scope != data.ScopeNamespace || m.events.Target != "bilibili-raffle" {
+		t.Fatalf("namespace scope = %+v", m.events)
+	}
+	m = press(t, m, "E")
+	if m.events.Scope != data.ScopeCluster {
+		t.Fatal("third press shows the cluster")
+	}
+	seenNode := false
+	lastWarning := -1
+	for i, e := range m.events.Items {
+		if strings.HasPrefix(e.Object, "Node/") {
+			seenNode = true
+		}
+		if e.Type == "Warning" {
+			if lastWarning != i-1 {
+				t.Fatal("warnings must be grouped first")
+			}
+			lastWarning = i
+		}
+	}
+	if !seenNode {
+		t.Fatal("cluster scope must include non-pod objects")
+	}
+	golden(t, "events_cluster.txt", m.Render().Plain())
+	m = press(t, m, "E")
+	if m.events.Scope != data.ScopePod {
+		t.Fatal("scope cycles back to pod")
+	}
+}
+
+func TestNamespaceEventsWithoutPod(t *testing.T) {
+	m := demoModel(t, 160, 48)
+	m.nsFilter = "default"
+	m.syncSelection()
+	m.focus = FocusDetails
+	m = press(t, m, "E", "E")
+	if m.selectedPod() != nil || m.events.Scope != data.ScopeNamespace || m.events.Target != "default" {
+		t.Fatalf("namespace events must not require a pod: %+v", m.events)
+	}
+	if !strings.Contains(m.Render().Plain(), "nenhum evento neste escopo") {
+		t.Fatal("empty namespace must show the empty state")
+	}
+}
+
+func TestCrashDiagnosisGolden(t *testing.T) {
+	m := detailsModel(t, crashPod)
+	m = press(t, m, "d")
+	plain := m.Render().Plain()
+	for _, want := range []string{"CrashLoopBackOff", "Error · exit 1", "back-off 5m0s"} {
+		if !strings.Contains(plain, want) {
+			t.Fatalf("crash describe missing %q", want)
+		}
+	}
+	golden(t, "describe_crash.txt", plain)
+	m.selectPod(4)
+	if !strings.Contains(m.Render().Plain(), "OOMKilled · exit 137") {
+		t.Fatal("OOM evidence must survive with metrics present")
+	}
+}
+
+type countingSource struct {
+	*data.Demo
+	events int
+}
+
+func (c *countingSource) ScopedEvents(q data.EventQuery) data.EventFeed {
+	c.events++
+	return c.Demo.ScopedEvents(q)
+}
+
+func TestEventsFetchedOnlyForEventsTab(t *testing.T) {
+	src := &countingSource{Demo: data.NewDemo()}
+	m := New(Options{Source: src, NoAnim: true, InitialPod: 1})
+	for i := 0; i < 5; i++ {
+		m.refresh()
+	}
+	if src.events != 0 {
+		t.Fatalf("events queried %d times outside the Events tab", src.events)
+	}
+	m = press(t, m, "e")
+	if src.events == 0 || len(m.events.Items) == 0 {
+		t.Fatal("events must load when the tab opens")
+	}
+}
+
+func TestBasicSourceFallsBack(t *testing.T) {
+	src := &keyedSource{pods: []data.Pod{{Name: "web-0", Namespace: "apps"}}}
+	m := New(Options{Source: src, NoAnim: true})
+	m = press(t, m, "P", "E", "E")
+	if m.dg.logView.State != data.FeedUnavailable || m.events.State != data.FeedUnavailable {
+		t.Fatalf("sources without diagnostics degrade explicitly: %+v %+v", m.dg.logView, m.events)
+	}
+}

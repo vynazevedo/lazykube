@@ -65,9 +65,11 @@ func demoDetails(tab Tab) DetailsState {
 		Pod:      &pod,
 		Metrics:  d.Metrics(40, selectedPod, 36),
 		Logs:     d.Logs(selectedPod, 40, 500),
-		Events:   d.Events(selectedPod),
+		Events:   d.ScopedEvents(data.EventQuery{Scope: data.ScopePod, Pod: selectedPod}),
 		Manifest: d.Manifest(selectedPod),
 		Describe: d.Describe(selectedPod),
+		Diag:     Diagnosis{Containers: d.Containers(selectedPod), LogContainer: "app"},
+		LogInfo:  LogInfo{Container: "app", Containers: 2},
 		Follow:   true,
 		MemBar:   float64(d.Metrics(40, selectedPod, 36).MemNow) / float64(pod.MemLimit),
 	}

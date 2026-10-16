@@ -2,6 +2,7 @@ package kube
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"sort"
@@ -74,6 +75,7 @@ type Source struct {
 	nsInf      cache.SharedIndexInformer
 	nodeInf    cache.SharedIndexInformer
 	eventInf   cache.SharedIndexInformer
+	wide       *wideEvents
 	dirty      chan struct{}
 	changes    chan struct{}
 	pollNow    chan struct{}
@@ -159,7 +161,7 @@ func (s *Source) start(ctx context.Context) error {
 		synced = append(synced, s.nodeInf.HasSynced)
 		resources = append(resources, "nodes")
 	}
-	for _, inf := range []cache.SharedIndexInformer{s.podInf, s.deployInf, s.nsInf, s.nodeInf} {
+	for _, inf := range []cache.SharedIndexInformer{s.podInf, s.deployInf, s.nsInf, s.nodeInf, s.eventInf} {
 		if inf == nil {
 			continue
 		}
@@ -199,7 +201,24 @@ func (s *Source) report(stage data.Stage, done bool, detail string) {
 	report(s.opts.Progress, data.Progress{Stage: stage, Done: done, Context: s.opts.Context, Detail: detail})
 }
 
+type restDiscovery interface {
+	RESTClient() rest.Interface
+}
+
 func serverVersion(ctx context.Context, v discovery.ServerVersionInterface) (*version.Info, error) {
+	if rd, ok := v.(restDiscovery); ok {
+		if rc := rd.RESTClient(); rc != nil {
+			raw, err := rc.Get().AbsPath("/version").Do(ctx).Raw()
+			if err != nil {
+				return nil, err
+			}
+			var info version.Info
+			if err := json.Unmarshal(raw, &info); err != nil {
+				return nil, fmt.Errorf("invalid /version response: %w", err)
+			}
+			return &info, nil
+		}
+	}
 	type result struct {
 		info *version.Info
 		err  error
@@ -340,6 +359,7 @@ func (s *Source) Close() {
 			}
 		}
 		s.wg.Wait()
+		s.shutdownWideEvents()
 		s.notifyMu.Lock()
 		s.closed = true
 		close(s.changes)
@@ -469,6 +489,7 @@ func (s *Source) rebuild() {
 	s.mu.Lock()
 	s.snap = snap
 	s.byKey = byKey
+	s.usage.noteEligibility(pods)
 	s.nodes = nodes
 	s.nodeList = nodeList
 	if s.nodeInf != nil {
@@ -544,24 +565,11 @@ func (s *Source) pod(key string) *corev1.Pod {
 }
 
 func (s *Source) Events(key string) []data.Event {
-	p := s.pod(key)
-	if p == nil {
-		return nil
-	}
-	if s.eventInf == nil {
+	feed := s.ScopedEvents(data.EventQuery{Scope: data.ScopePod, Pod: key})
+	if feed.State == data.FeedForbidden {
 		return []data.Event{{Age: "-", Type: "Warning", Reason: "Forbidden", Message: "no permission to list events"}}
 	}
-	objs, err := s.eventInf.GetIndexer().ByIndex(involvedIndex, podKey(p.Namespace, p.Name))
-	if err != nil {
-		return nil
-	}
-	events := make([]*corev1.Event, 0, len(objs))
-	for _, o := range objs {
-		if e, ok := o.(*corev1.Event); ok {
-			events = append(events, e)
-		}
-	}
-	return toEvents(events, s.opts.Now(), eventsLimit)
+	return feed.Items
 }
 
 func (s *Source) Manifest(key string) []string {
