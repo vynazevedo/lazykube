@@ -8,6 +8,9 @@ import (
 )
 
 func (m *Model) loadSecurity() {
+	if src, ok := m.src.(data.SecurityRevisionSource); ok && m.security.Coverage.State != "" && src.SecurityRevision() == m.security.Revision {
+		return
+	}
 	m.security = data.SecuritySnapshot{Coverage: data.Coverage{State: data.CoverageUnsupported, Reason: "source does not provide posture"}}
 	if src, ok := m.src.(data.SecuritySource); ok {
 		m.security = src.Security()

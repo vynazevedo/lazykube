@@ -148,14 +148,14 @@ func (s *Source) start(ctx context.Context) error {
 	s.factory = informers.NewSharedInformerFactoryWithOptions(s.client, 0,
 		informers.WithNamespace(ns),
 		informers.WithTransform(stripManagedFields))
-	s.podInf = s.factory.Core().V1().Pods().Informer()
+	s.podInf = s.newSecurityInformer(false)
 	if err := s.podInf.SetWatchErrorHandler(s.watchSecurityError(false)); err != nil {
 		return err
 	}
 	synced := []cache.InformerSynced{s.podInf.HasSynced}
 	resources := []string{"pods"}
 	if s.caps.deployments {
-		s.deployInf = s.factory.Apps().V1().Deployments().Informer()
+		s.deployInf = s.newSecurityInformer(true)
 		if err := s.deployInf.SetWatchErrorHandler(s.watchSecurityError(true)); err != nil {
 			return err
 		}
@@ -271,7 +271,10 @@ func (s *Source) probe(ctx context.Context) error {
 	if _, err := s.client.CoreV1().Pods(ns).List(ctx, one); err != nil {
 		return fmt.Errorf("cannot list pods: %w", err)
 	}
-	if _, err := s.client.AppsV1().Deployments(ns).List(ctx, one); err != nil {
+	deploymentCtx, cancelDeployments := context.WithTimeout(ctx, min(s.opts.SyncTimeout/4, 2*time.Second))
+	_, deploymentErr := s.client.AppsV1().Deployments(ns).List(deploymentCtx, one)
+	cancelDeployments()
+	if err := deploymentErr; err != nil {
 		s.deploymentCoverage = data.Coverage{State: data.CoverageUnavailable, Reason: "deployments unavailable"}
 		if apierrors.IsForbidden(err) {
 			s.deploymentCoverage = data.Coverage{State: data.CoverageDenied, Reason: "no permission to list deployments"}

@@ -30,7 +30,11 @@ func (d *Demo) buildSecurity() SecuritySnapshot {
 		pods[p.Key()] = posture
 	}
 	names := []string{"default", "kube-system", "kube-public", "kube-node-lease", "bilibili-raffle", "lgo", "xcx", "ys-odoo"}
-	return SummarizeSecurity(pods, names, Coverage{State: CoverageComplete, ObservedAt: at})
+	snapshot := SummarizeSecurity(pods, names, Coverage{State: CoverageComplete, ObservedAt: at})
+	snapshot.Revision = 1
+	return snapshot
 }
 
 func (d *Demo) Security() SecuritySnapshot { return d.security.Clone() }
+
+func (d *Demo) SecurityRevision() uint64 { return d.security.Revision }

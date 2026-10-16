@@ -53,8 +53,8 @@ func TestSecurityNotFetchedOrBuiltPerFrame(t *testing.T) {
 		t.Fatal("posture recomputed per refresh/frame")
 	}
 	m.reload()
-	if s.calls != 2 {
-		t.Fatal("data reload did not refresh posture")
+	if s.calls != 1 {
+		t.Fatal("unchanged data reload copied posture")
 	}
 }
 
