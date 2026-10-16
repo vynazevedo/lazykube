@@ -6,8 +6,33 @@
 │ │ Dashboard coverage: complete in scope | pods 13/13        │ │
 │ │ No findings does not mean safe                            │ │
 │ │ Local checks only; not PSS compliance.                    │ │
-│ │ POSTURE | Cluster | 76/100 (C) | 13/13 pods               │ │
+│ │ Scores /100: Pod 59 F | Namespace 66 D | Cluster 76 C     │ │
+│ │ Namespace mean (2 pods) | Cluster mean (13 pods)          │ │
+│ │ Selected pod: 59/100 (F) | 1/1 pod                        │ │
 │ │ Synthetic data (demo)                                     │ │
+│ │ Pod bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz |       │ │
+│ │ complete in scope                                         │ │
+│ │ Observed 2026-10-16 12:00:00Z | UID                       │ │
+│ │ demo-bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz | RV 1 │ │
+│ │ HIGH findings                                             │ │
+│ │ [high] privileged | finding | container: init-permissions │ │
+│ │ Field: spec.initContainers[0].securityContext.privileged  │ │
+│ │ Evidence: true                                            │ │
+│ │ Privileged init container configured. Disable privileged  │ │
+│ │ mode                                                      │ │
+│ │ Source: demo fixture v1 | configuration observed          │ │
+│ │ MEDIUM findings                                           │ │
+│ │ [medium] imageLatest | finding | container: app           │ │
+│ │ Field: spec.containers[0].image                           │ │
+│ │ Evidence: latest tag without digest                       │ │
+│ │ Image reference is mutable. Pin a verified digest         │ │
+│ │ Source: demo fixture v1 | configuration observed          │ │
+│ │ [medium] limit-memory | finding | container: app          │ │
+│ │ Field: spec.containers[0].resources.limits.memory         │ │
+│ │ Evidence: absent at container and pod levels              │ │
+│ │ Availability risk. Set a suitable memory limit            │ │
+│ │ Source: demo fixture v1 | configuration observed          │ │
+│ │ POSTURE | Cluster | 76/100 (C) | 13/13 pods               │ │
 │ │ Score ███████████████████████████░░░░░░░░░                │ │
 │ │ high     10 ████████████████████████                      │ │
 │ │ medium    6 ██████████████░░░░░░░░░░                      │ │
@@ -19,30 +44,5 @@
 │ │ hostPID | pod                                             │ │
 │ │ TOP RULES | confirmed findings                            │ │
 │ │ serviceAccountToken       4 ██████████████████            │ │
-│ │ capabilitiesAdded         3 ██████████████░░░░            │ │
-│ │ hostNetwork               3 ██████████████░░░░            │ │
-│ │ imageLatest               3 ██████████████░░░░            │ │
-│ │ limit-memory              3 ██████████████░░░░            │ │
-│ │ NAMESPACES | lowest scores first                          │ │
-│ │ lgo                50 ████░░░░ | 2 findings               │ │
-│ │ bilibili-raffle    66 █████░░░ | 5 findings               │ │
-│ │ xcx                70 ██████░░ | 5 findings               │ │
-│ │ kube-system        81 ██████░░ | 7 findings               │ │
-│ │ ys-odoo            99 ████████ | 1 finding                │ │
-│ │ More namespaces: use the namespace filter.                │ │
-│ │ Score: 100 - (25*high + 8*medium + 2*info)/evaluated      │ │
-│ │ pods; floor 0, rounded.                                   │ │
-│ │ Grades: A >=90, B >=80, C >=70, D >=60, F <60. Not a      │ │
-│ │ safety rating.                                            │ │
-│ │ SELECTED POD | 59/100 (F) | 1/1 pod                       │ │
-│ │ Pod bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz |       │ │
-│ │ complete in scope                                         │ │
-│ │ Observed 2026-10-16 12:00:00Z | UID                       │ │
-│ │ demo-bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz | RV 1 │ │
-│ │ [high] privileged | finding | container: init-permissions │ │
-│ │ Field: spec.initContainers[0].securityContext.privileged  │ │
-│ │ Evidence: true                                            │ │
-│ │ Privileged init container configured. Disable privileged  │ │
-│ │ mode                                                      │ │
 │ ╰───────────────────────────────────────────────────────────╯ │
 ╰───────────────────────────────────────────────────────────────╯

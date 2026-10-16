@@ -5,20 +5,20 @@
  │                                   │ │                                                    │ │  Log   Config   Top   Describe   Events   Security            │ 
  │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  demo-node-01 │ │ / filter pods…                            13 items │ │ ───────────────────────────────────────────────────────────── │ 
  │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready      │ │                                                    │ │ ● bilibili-live-7f6b8d9c5-mn4tz                     [Running] │ 
- │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25%      │ │   NAME          NAMESPACE    RST   AGE CPU/STATUS  │ │   bilibili-raffle · Running · ready 2/2 · node demo-node-01 … │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   █████████████│ │ ● bilibili-raf… bilibili-r…    0  119d █░░░░░░     │ │                                                               │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4/3.8Gi│ │ ● bilibili-liv… bilibili-r…    2  119d ████░░░     │ │ ╭───────────────────────────────────────────────────────────╮ │ 
- │    ▀    ▀▀▀▀▀▀▀▀▀    █████████████│ │ ● lgo-7c5d9758… lgo            0   87d ██░░░░░     │ │ │ 20:14:00  INFO  ws connected room=21452505 shard=3        │ │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13 / 110│ │ ● psql-6bc7744… ys-odoo        0   64d ████░░░     │ │ │ 20:14:03  DEBUG heartbeat ok rtt=42ms                     │ │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch amd64   │ │ ● odoo-7575bf6… ys-odoo        1   64d ██████░     │ │ │ 20:14:06  INFO  danmaku batch received count=38           │ │ 
- │    ▀ ▀  ▀▀▀▀▀▀▀▀▀                 │ │ ○ qiandao-1605… xcx            0    2h Completed   │ │ │ 20:14:09  INFO  raffle detected id=883104 type=gift       │ │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                │ │ ○ lingqu-16054… xcx            0   41m Completed   │ │ │ 20:14:12  INFO  join raffle ok id=883104 latency=118ms    │ │ 
- │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀               │ │ ⠙ lingqu-16054… xcx            0    8s Init:0/1    │ │ │ 20:14:15  WARN  rate limited by upstream, backoff 2s      │ │ 
- │                                   │ │ ● coredns-6799… kube-system    0  119d █░░░░░░     │ │ │ 20:14:18  DEBUG heartbeat ok rtt=39ms                     │ │ 
- │                                   │ │ ● metrics-serv… kube-system    0  119d ready 0/1   │ │ │ 20:14:21  INFO  danmaku batch received count=51           │ │ 
- ╰───────────────────────────────────╯ │ ● traefik-f456… kube-system    0  119d ░░░░░░░     │ │ │ 20:14:24  INFO  raffle detected id=883117 type=guard      │ │ 
- ╭─ Namespaces ──────────────────────╮ │ ● local-path-p… kube-system    0  119d ImagePullB… │ │ │ 20:14:27  ERROR join raffle failed id=883117: already en… │ │ 
- │                                   │ │ ● svclb-traefi… kube-system    7  119d CrashLoopB… │ │ │ 20:14:30  INFO  reconnecting ws in 1s                     │ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25%      │ │   NAME          NAMESPACE    RST   SEC CPU/STATUS  │ │   bilibili-raffle · Running · ready 2/2 · node demo-node-01 … │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   █████████████│ │ ● bilibili-raf… bilibili-r…    0  98 A █░░░░░░     │ │                                                               │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4/3.8Gi│ │ ● bilibili-liv… bilibili-r…    2  59 F ████░░░     │ │ ╭───────────────────────────────────────────────────────────╮ │ 
+ │    ▀    ▀▀▀▀▀▀▀▀▀    █████████████│ │ ● lgo-7c5d9758… lgo            0  50 F ██░░░░░     │ │ │ 20:14:00  INFO  ws connected room=21452505 shard=3        │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13 / 110│ │ ● psql-6bc7744… ys-odoo        0 100 A ████░░░     │ │ │ 20:14:03  DEBUG heartbeat ok rtt=42ms                     │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch amd64   │ │ ● odoo-7575bf6… ys-odoo        1  98 A ██████░     │ │ │ 20:14:06  INFO  danmaku batch received count=38           │ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀                 │ │ ○ qiandao-1605… xcx            0  59 F Completed   │ │ │ 20:14:09  INFO  raffle detected id=883104 type=gift       │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                │ │ ○ lingqu-16054… xcx            0  50 F Completed   │ │ │ 20:14:12  INFO  join raffle ok id=883104 latency=118ms    │ │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀               │ │ ⠙ lingqu-16054… xcx            0 100 A Init:0/1    │ │ │ 20:14:15  WARN  rate limited by upstream, backoff 2s      │ │ 
+ │                                   │ │ ● coredns-6799… kube-system    0  98 A █░░░░░░     │ │ │ 20:14:18  DEBUG heartbeat ok rtt=39ms                     │ │ 
+ │                                   │ │ ● metrics-serv… kube-system    0  59 F ready 0/1   │ │ │ 20:14:21  INFO  danmaku batch received count=51           │ │ 
+ ╰───────────────────────────────────╯ │ ● traefik-f456… kube-system    0  50 F ░░░░░░░     │ │ │ 20:14:24  INFO  raffle detected id=883117 type=guard      │ │ 
+ ╭─ Namespaces ──────────────────────╮ │ ● local-path-p… kube-system    0 100 A ImagePullB… │ │ │ 20:14:27  ERROR join raffle failed id=883117: already en… │ │ 
+ │                                   │ │ ● svclb-traefi… kube-system    7  98 A CrashLoopB… │ │ │ 20:14:30  INFO  reconnecting ws in 1s                     │ │ 
  │ default                 ·····   0 │ ╰────────────────────────────────────────────────────╯ │ │ 20:14:33  INFO  ws connected room=21452505 shard=3        │ │ 
  │ kube-system             █████   5 │ ╭─ CPU heatmap · last 2 min ─────────────────────────╮ │ │ 20:14:36  INFO  ws connected room=21452505 shard=3        │ │ 
  │ kube-public             ·····   0 │ │                                                    │ │ │ 20:14:39  DEBUG heartbeat ok rtt=42ms                     │ │ 

@@ -10,12 +10,14 @@
 │ │ complete in scope                                         │ │
 │ │ Observed 2026-10-16 12:00:00Z | UID                       │ │
 │ │ demo-bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz | RV 1 │ │
+│ │ HIGH findings                                             │ │
 │ │ [high] privileged | finding | container: init-permissions │ │
 │ │ Field: spec.initContainers[0].securityContext.privileged  │ │
 │ │ Evidence: true                                            │ │
 │ │ Privileged init container configured. Disable privileged  │ │
 │ │ mode                                                      │ │
 │ │ Source: demo fixture v1 | configuration observed          │ │
+│ │ MEDIUM findings                                           │ │
 │ │ [medium] imageLatest | finding | container: app           │ │
 │ │ Field: spec.containers[0].image                           │ │
 │ │ Evidence: latest tag without digest                       │ │
@@ -26,8 +28,6 @@
 │ │ Evidence: absent at container and pod levels              │ │
 │ │ Availability risk. Set a suitable memory limit            │ │
 │ │ Source: demo fixture v1 | configuration observed          │ │
-│ │                                                           │ │
-│ │                                                           │ │
 │ │                                                           │ │
 │ │                                                           │ │
 │ │                                                           │ │

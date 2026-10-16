@@ -20,7 +20,7 @@ func TestSecurityDashboardCoverage(t *testing.T) {
 			if !strings.Contains(text, "partial | 40/55 pods") {
 				t.Fatalf("partial not visible: %s", text)
 			}
-		} else if !strings.Contains(text, "not rated | test coverage reason") || strings.Contains(text, "/100") {
+		} else if !strings.Contains(text, "not rated | test coverage reason") || strings.Contains(text, "/100 (") {
 			t.Fatalf("unavailable score not suppressed: %s", text)
 		}
 		for _, row := range view.Rows {

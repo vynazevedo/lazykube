@@ -5,20 +5,20 @@
  │                                   │ │                                                    │ │  Log   Config   Top   Describe   Events   Security            │ 
  │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  demo-node-01 │ │ / filter pods…                            13 items │ │ ───────────────────────────────────────────────────────────── │ 
  │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready      │ │                                                    │ │ ● bilibili-live-7f6b8d9c5-mn4tz                     [Running] │ 
- │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25%      │ │   NAME          NAMESPACE    RST   AGE CPU/STATUS  │ │   bilibili-raffle · Running · ready 2/2 · node demo-node-01 … │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   █████████████│ │ ● bilibili-raf… bilibili-r…    0  119d █░░░░░░     │ │                                                               │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4/3.8Gi│ │ ● bilibili-liv… bilibili-r…    2  119d ████░░░     │ │ ╭───────────────────────────────────────────────────────────╮ │ 
- │    ▀    ▀▀▀▀▀▀▀▀▀    █████████████│ │ ● lgo-7c5d9758… lgo            0   87d ██░░░░░     │ │ │ AGE    TYPE     REASON         OBJECT         MESSAGE     │ │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13 / 110│ │ ● psql-6bc7744… ys-odoo        0   64d ████░░░     │ │ │ 17m    Warning  BackOff        Pod/bilibili-… ×3 Back-of… │ │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch amd64   │ │ ● odoo-7575bf6… ys-odoo        1   64d ██████░     │ │ │ 12d    Warning  OOMKilling     Pod/odoo-7575… Memory cgr… │ │ 
- │    ▀ ▀  ▀▀▀▀▀▀▀▀▀                 │ │ ○ qiandao-1605… xcx            0    2h Completed   │ │ │ 2m     Warning  Unhealthy      Pod/metrics-s… ×41 Readin… │ │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                │ │ ○ lingqu-16054… xcx            0   41m Completed   │ │ │ 3m     Warning  Failed         Pod/local-pat… ×6 Failed … │ │ 
- │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀               │ │ ⠙ lingqu-16054… xcx            0    8s Init:0/1    │ │ │ 1m     Warning  BackOff        Pod/svclb-tra… ×29 Back-o… │ │ 
- │                                   │ │ ● coredns-6799… kube-system    0  119d █░░░░░░     │ │ │ 5m     Warning  FreeDiskSpace… Node/demo-nod… ×2 failed … │ │ 
- │                                   │ │ ● metrics-serv… kube-system    0  119d ready 0/1   │ │ │ 17m    Normal   Pulled         Pod/bilibili-… ×2 Contain… │ │ 
- ╰───────────────────────────────────╯ │ ● traefik-f456… kube-system    0  119d ░░░░░░░     │ │ │ 17m    Normal   Started        Pod/bilibili-… ×2 Started… │ │ 
- ╭─ Namespaces ──────────────────────╮ │ ● local-path-p… kube-system    0  119d ImagePullB… │ │ │ 12d    Normal   Started        Pod/odoo-7575… Started co… │ │ 
- │                                   │ │ ● svclb-traefi… kube-system    7  119d CrashLoopB… │ │ │ 41m    Normal   Completed      Pod/qiandao-1… Job comple… │ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25%      │ │   NAME          NAMESPACE    RST   SEC CPU/STATUS  │ │   bilibili-raffle · Running · ready 2/2 · node demo-node-01 … │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   █████████████│ │ ● bilibili-raf… bilibili-r…    0  98 A █░░░░░░     │ │                                                               │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4/3.8Gi│ │ ● bilibili-liv… bilibili-r…    2  59 F ████░░░     │ │ ╭───────────────────────────────────────────────────────────╮ │ 
+ │    ▀    ▀▀▀▀▀▀▀▀▀    █████████████│ │ ● lgo-7c5d9758… lgo            0  50 F ██░░░░░     │ │ │ AGE    TYPE     REASON         OBJECT         MESSAGE     │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13 / 110│ │ ● psql-6bc7744… ys-odoo        0 100 A ████░░░     │ │ │ 17m    Warning  BackOff        Pod/bilibili-… ×3 Back-of… │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch amd64   │ │ ● odoo-7575bf6… ys-odoo        1  98 A ██████░     │ │ │ 12d    Warning  OOMKilling     Pod/odoo-7575… Memory cgr… │ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀                 │ │ ○ qiandao-1605… xcx            0  59 F Completed   │ │ │ 2m     Warning  Unhealthy      Pod/metrics-s… ×41 Readin… │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                │ │ ○ lingqu-16054… xcx            0  50 F Completed   │ │ │ 3m     Warning  Failed         Pod/local-pat… ×6 Failed … │ │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀               │ │ ⠙ lingqu-16054… xcx            0 100 A Init:0/1    │ │ │ 1m     Warning  BackOff        Pod/svclb-tra… ×29 Back-o… │ │ 
+ │                                   │ │ ● coredns-6799… kube-system    0  98 A █░░░░░░     │ │ │ 5m     Warning  FreeDiskSpace… Node/demo-nod… ×2 failed … │ │ 
+ │                                   │ │ ● metrics-serv… kube-system    0  59 F ready 0/1   │ │ │ 17m    Normal   Pulled         Pod/bilibili-… ×2 Contain… │ │ 
+ ╰───────────────────────────────────╯ │ ● traefik-f456… kube-system    0  50 F ░░░░░░░     │ │ │ 17m    Normal   Started        Pod/bilibili-… ×2 Started… │ │ 
+ ╭─ Namespaces ──────────────────────╮ │ ● local-path-p… kube-system    0 100 A ImagePullB… │ │ │ 12d    Normal   Started        Pod/odoo-7575… Started co… │ │ 
+ │                                   │ │ ● svclb-traefi… kube-system    7  98 A CrashLoopB… │ │ │ 41m    Normal   Completed      Pod/qiandao-1… Job comple… │ │ 
  │ default                 ·····   0 │ ╰────────────────────────────────────────────────────╯ │ │ 41m    Normal   Completed      Pod/lingqu-16… Job comple… │ │ 
  │ kube-system             █████   5 │ ╭─ CPU heatmap · last 2 min ─────────────────────────╮ │ │ 8s     Normal   Scheduled      Pod/lingqu-16… Successful… │ │ 
  │ kube-public             ·····   0 │ │                                                    │ │ │ 7s     Normal   Started        Pod/lingqu-16… Started co… │ │ 

@@ -158,6 +158,12 @@ func TestDashboardNodePodsHeatmapDetailsMatchLegacy(t *testing.T) {
 					t.Fatalf("%s must restore the body shown at %s", step, from)
 				}
 			}
+			if *update {
+				if err := os.WriteFile(filepath.Join("testdata", name), []byte(got), 0o644); err != nil {
+					t.Fatal(err)
+				}
+				return
+			}
 			if got == string(want) {
 				return
 			}

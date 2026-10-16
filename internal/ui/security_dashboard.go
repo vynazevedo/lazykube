@@ -45,10 +45,21 @@ func DashboardSecurityView(detail SecurityView, session data.SecuritySession, sc
 	detail.Coverage = fmt.Sprintf("Dashboard coverage: %s | pods %d/%d", a.Score.Coverage.State, a.Score.Coverage.Evaluated, a.Score.Coverage.Total)
 	rows := make([]string, 0, 64+len(detail.Rows))
 	add := func(s string) { rows = append(rows, draw.Wrap(s, max(1, width))...) }
-	add("POSTURE | " + scopeLabel + " | " + securityScoreLabel(a.Score))
+	namespace, _, _ := strings.Cut(pod, "/")
+	if namespace == "" {
+		namespace = scope
+	}
+	selected := session.Dashboard.Pods[pod]
+	ns := session.Dashboard.Namespaces[namespace]
+	cluster := session.Dashboard.Cluster
+	add("Scores /100: Pod " + securityCompactScore(selected) + " | Namespace " + securityCompactScore(ns.Score) + " | Cluster " + securityCompactScore(cluster.Score))
+	add(fmt.Sprintf("Namespace mean (%d pods) | Cluster mean (%d pods)", ns.Score.Coverage.Evaluated, cluster.Score.Coverage.Evaluated))
+	add("Selected pod: " + securityScoreLabel(selected))
 	if detail.Synthetic {
 		add("Synthetic data (demo)")
 	}
+	rows = append(rows, detail.Rows...)
+	add("POSTURE | " + scopeLabel + " | " + securityScoreLabel(a.Score))
 	if a.Score.Available {
 		add("Score " + securityBar(a.Score.Value, 100, max(1, min(36, width-6))))
 	}
@@ -125,10 +136,7 @@ func DashboardSecurityView(detail SecurityView, session data.SecuritySession, sc
 	}
 	add("Score: " + data.SecurityScoreFormula)
 	add("Grades: A >=90, B >=80, C >=70, D >=60, F <60. Not a safety rating.")
-	if score, ok := session.Dashboard.Pods[pod]; ok {
-		add("SELECTED POD | " + securityScoreLabel(score))
-	}
-	rows = append(rows, detail.Rows...)
+
 	if count > 5 {
 		add("MORE ALERTS | pending since baseline / last ack")
 		seen := 0
@@ -164,4 +172,15 @@ func securityPlural(count int, singular string) string {
 		return singular
 	}
 	return singular + "s"
+}
+
+func securityCompactScore(s data.PostureScore) string {
+	if !s.Available {
+		return "-"
+	}
+	label := fmt.Sprintf("%d %s", s.Value, s.Grade)
+	if s.Partial {
+		label += " partial"
+	}
+	return label
 }

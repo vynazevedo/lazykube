@@ -98,6 +98,7 @@ func (dashboardScreen) View(m Model, body draw.Region, ctx ui.Ctx) {
 	pods := m.visiblePods()
 	sel := m.selectedIndex(pods)
 	ui.PodsPanel(region(body, m.layout.Pods), ui.PodsState{
+		Security:   m.securitySession.Dashboard.Pods,
 		Pods:       pods,
 		Selected:   sel,
 		Offset:     m.podOffset,

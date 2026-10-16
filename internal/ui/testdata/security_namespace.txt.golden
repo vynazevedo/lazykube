@@ -10,12 +10,14 @@
 │ │ complete in scope                                         │ │
 │ │ Observed 2026-10-16 12:00:00Z | UID                       │ │
 │ │ demo-bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz | RV 1 │ │
+│ │ HIGH findings                                             │ │
 │ │ [high] privileged | finding | container: init-permissions │ │
 │ │ Field: spec.initContainers[0].securityContext.privileged  │ │
 │ │ Evidence: true                                            │ │
 │ │ Privileged init container configured. Disable privileged  │ │
 │ │ mode                                                      │ │
 │ │ Source: demo fixture v1 | configuration observed          │ │
+│ │ MEDIUM findings                                           │ │
 │ │ [medium] imageLatest | finding | container: app           │ │
 │ │ Field: spec.containers[0].image                           │ │
 │ │ Evidence: latest tag without digest                       │ │
@@ -31,14 +33,12 @@
 │ │ Observed 2026-10-16 12:00:00Z | UID                       │ │
 │ │ demo-bilibili-raffle/bilibili-raffle-5d8f9c7b4-x2kqp |    │ │
 │ │ RV 1                                                      │ │
+│ │ INFO findings                                             │ │
 │ │ [info] serviceAccountToken | finding | container: app     │ │
 │ │ Field: spec.automountServiceAccountToken                  │ │
 │ │ Evidence: default token mount enabled                     │ │
 │ │ Credentials available to workload. Disable automatic      │ │
 │ │ mount when unused                                         │ │
 │ │ Source: demo fixture v1 | configuration observed          │ │
-│ │ [info] runAsRoot | unknown | container: app               │ │
-│ │ Field: spec.containers[0].securityContext.runAsUser       │ │
-│ │ Evidence: UID unspecified; runtime user unknown           │ │
 │ ╰───────────────────────────────────────────────────────────╯ │
 ╰───────────────────────────────────────────────────────────────╯

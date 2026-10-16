@@ -2,6 +2,7 @@ package ui
 
 import (
 	"fmt"
+	"slices"
 	"sort"
 	"strings"
 
@@ -37,7 +38,15 @@ func BuildSecurityView(s data.SecuritySnapshot, key, namespace string, namespace
 				pods = append(pods, p)
 			}
 		}
-		sort.Slice(pods, func(i, j int) bool { return pods[i].Target.Name < pods[j].Target.Name })
+		sort.Slice(pods, func(i, j int) bool {
+			if pods[i].Target.Namespace+"/"+pods[i].Target.Name == key {
+				return true
+			}
+			if pods[j].Target.Namespace+"/"+pods[j].Target.Name == key {
+				return false
+			}
+			return pods[i].Target.Name < pods[j].Target.Name
+		})
 	} else if p, ok := s.Pods[key]; ok {
 		coverage, pods = p.Coverage, []data.PodPosture{p}
 	} else if s.Coverage.State != "" {
@@ -68,7 +77,24 @@ func BuildSecurityView(s data.SecuritySnapshot, key, namespace string, namespace
 		if len(p.Findings) == 0 {
 			appendRow("No findings in evaluated local checks.")
 		}
-		for _, f := range p.Findings {
+		findings := slices.Clone(p.Findings)
+		rank := func(s data.Severity) int {
+			switch s {
+			case data.SeverityHigh:
+				return 0
+			case data.SeverityMedium:
+				return 1
+			default:
+				return 2
+			}
+		}
+		slices.SortStableFunc(findings, func(a, b data.Finding) int { return rank(a.Severity) - rank(b.Severity) })
+		var severity data.Severity
+		for _, f := range findings {
+			if severity != f.Severity {
+				severity = f.Severity
+				appendRow(strings.ToUpper(string(severity)) + " findings")
+			}
 			if truncated {
 				break
 			}

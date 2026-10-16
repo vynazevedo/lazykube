@@ -5,20 +5,20 @@
  │                                   │ │                                                    │ │  Log   Config   Top   Describe   Events   Security            │ 
  │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  demo-node-01 │ │ / filter pods…▌                           13 items │ │ ───────────────────────────────────────────────────────────── │ 
  │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready      │ │                                                    │ │ ● bilibili-live-7f6b8d9c5-mn4tz                     [Running] │ 
- │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25%      │ │   NAME          NAMESPACE    RST   AGE CPU/STATUS  │ │   bilibili-raffle · Running · ready 2/2 · node demo-node-01 … │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   █████████████│ │ ● bilibili-raf… bilibili-r…    0  119d █░░░░░░     │ │                                                               │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4/3.8Gi│ │ ● bilibili-liv… bilibili-r…    2  119d ████░░░     │ │ ╭───────────────────────────────────────────────────────────╮ │ 
- │    ▀    ▀▀▀▀▀▀▀▀▀    █████████████│ │ ● lgo-7c5d9758… lgo            0   87d ██░░░░░     │ │ │ Containers  2 · ready 2/2                                 │ │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13 / 110│ │ ● psql-6bc7744… ys-odoo        0   64d ████░░░     │ │ │ ● app     app               running 17m · ready ✓… ◂ logs │ │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch amd64   │ │ ● odoo-7575bf6… ys-odoo        1   64d ██████░     │ │ │           last      Error · exit 1 · 17m ago (2026-10-16… │ │ 
- │    ▀ ▀  ▀▀▀▀▀▀▀▀▀                 │ │ ○ qiandao-1605… xcx            0    2h Completed   │ │ │           last msg  panic: runtime error: invalid memory… │ │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                │ │ ○ lingqu-16054… xcx            0   41m Completed   │ │ │           ↳ P logs anteriores · C troca container · E ev… │ │ 
- │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀               │ │ ⠙ lingqu-16054… xcx            0    8s Init:0/1    │ │ │ ● app     log-shipper       running 119d · ready ✓ · sta… │ │ 
- │                                   │ │ ● coredns-6799… kube-system    0  119d █░░░░░░     │ │ │                                                           │ │ 
- │                                   │ │ ● metrics-serv… kube-system    0  119d ready 0/1   │ │ │ Name              bilibili-live-7f6b8d9c5-mn4tz           │ │ 
- ╰───────────────────────────────────╯ │ ● traefik-f456… kube-system    0  119d ░░░░░░░     │ │ │ Namespace         bilibili-raffle                         │ │ 
- ╭─ Namespaces ──────────────────────╮ │ ● local-path-p… kube-system    0  119d ImagePullB… │ │ │ Node              demo-node-01/192.168.0.12               │ │ 
- │                                   │ │ ● svclb-traefi… kube-system    7  119d CrashLoopB… │ │ │ Status            Running                                 │ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25%      │ │   NAME          NAMESPACE    RST   SEC CPU/STATUS  │ │   bilibili-raffle · Running · ready 2/2 · node demo-node-01 … │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   █████████████│ │ ● bilibili-raf… bilibili-r…    0  98 A █░░░░░░     │ │                                                               │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4/3.8Gi│ │ ● bilibili-liv… bilibili-r…    2  59 F ████░░░     │ │ ╭───────────────────────────────────────────────────────────╮ │ 
+ │    ▀    ▀▀▀▀▀▀▀▀▀    █████████████│ │ ● lgo-7c5d9758… lgo            0  50 F ██░░░░░     │ │ │ Containers  2 · ready 2/2                                 │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13 / 110│ │ ● psql-6bc7744… ys-odoo        0 100 A ████░░░     │ │ │ ● app     app               running 17m · ready ✓… ◂ logs │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch amd64   │ │ ● odoo-7575bf6… ys-odoo        1  98 A ██████░     │ │ │           last      Error · exit 1 · 17m ago (2026-10-16… │ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀                 │ │ ○ qiandao-1605… xcx            0  59 F Completed   │ │ │           last msg  panic: runtime error: invalid memory… │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                │ │ ○ lingqu-16054… xcx            0  50 F Completed   │ │ │           ↳ P logs anteriores · C troca container · E ev… │ │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀               │ │ ⠙ lingqu-16054… xcx            0 100 A Init:0/1    │ │ │ ● app     log-shipper       running 119d · ready ✓ · sta… │ │ 
+ │                                   │ │ ● coredns-6799… kube-system    0  98 A █░░░░░░     │ │ │                                                           │ │ 
+ │                                   │ │ ● metrics-serv… kube-system    0  59 F ready 0/1   │ │ │ Name              bilibili-live-7f6b8d9c5-mn4tz           │ │ 
+ ╰───────────────────────────────────╯ │ ● traefik-f456… kube-system    0  50 F ░░░░░░░     │ │ │ Namespace         bilibili-raffle                         │ │ 
+ ╭─ Namespaces ──────────────────────╮ │ ● local-path-p… kube-system    0 100 A ImagePullB… │ │ │ Node              demo-node-01/192.168.0.12               │ │ 
+ │                                   │ │ ● svclb-traefi… kube-system    7  98 A CrashLoopB… │ │ │ Status            Running                                 │ │ 
  │ default                 ·····   0 │ ╰────────────────────────────────────────────────────╯ │ │ Ready             2/2                                     │ │ 
  │ kube-system             █████   5 │ ╭─ CPU heatmap · last 2 min ─────────────────────────╮ │ │ IP                10.42.0.24                              │ │ 
  │ kube-public             ·····   0 │ │                                                    │ │ │ Controlled By     ReplicaSet/bilibili-live-7f6b8d9c5      │ │ 
