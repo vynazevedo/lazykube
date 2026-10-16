@@ -4,6 +4,7 @@ import (
 	"charm.land/bubbles/v2/key"
 	tea "charm.land/bubbletea/v2"
 
+	"github.com/vynazevedo/lazykube/internal/data"
 	"github.com/vynazevedo/lazykube/internal/draw"
 	"github.com/vynazevedo/lazykube/internal/ui"
 )
@@ -14,11 +15,27 @@ func (dashboardScreen) ID() ScreenID {
 	return ScreenDashboard
 }
 
+func (dashboardScreen) Title() string {
+	return "Dashboard"
+}
+
+func (dashboardScreen) Help(Model) []ui.KeyHelp {
+	return ui.ShortHelp()
+}
+
+func (dashboardScreen) FullHelp(Model) []ui.KeyHelp {
+	return ui.FullHelp()
+}
+
 func (dashboardScreen) Init(Model) tea.Cmd {
 	return nil
 }
 
 func (dashboardScreen) Update(m Model, msg tea.Msg) (Model, tea.Cmd) {
+	return updateBody(m, msg)
+}
+
+func updateBody(m Model, msg tea.Msg) (Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.setLayout(msg.Width, msg.Height)
@@ -101,7 +118,11 @@ func (dashboardScreen) View(m Model, body draw.Region, ctx ui.Ctx) {
 		Reason:    m.metrics.Reason,
 	}, ctx)
 
-	ui.DetailsPanel(region(body, m.layout.Details), ui.DetailsState{
+	ui.DetailsPanel(region(body, m.layout.Details), m.detailsState(pod), ctx)
+}
+
+func (m Model) detailsState(pod *data.Pod) ui.DetailsState {
+	return ui.DetailsState{
 		Security:       m.securityView,
 		SecurityAlerts: len(m.securitySession.Alerts),
 		Tab:            m.tab,
@@ -121,5 +142,5 @@ func (dashboardScreen) View(m Model, body draw.Region, ctx ui.Ctx) {
 		Wrap:           m.wrap,
 		MemBar:         m.motion.memBar.Pos,
 		Slide:          m.slideOffset(),
-	}, ctx)
+	}
 }

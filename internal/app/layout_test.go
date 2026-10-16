@@ -7,13 +7,16 @@ func TestComputeReference(t *testing.T) {
 	if l.TooSmall || !l.ShowLeft {
 		t.Fatal("160x48 must show every column")
 	}
-	if l.Node != (Rect{1, 2, 37, 16}) || l.Namespaces != (Rect{1, 18, 37, 12}) || l.Deployments != (Rect{1, 30, 37, 16}) {
+	if l.Menu != (Rect{1, 1, 158, 1}) || l.Crumbs != (Rect{1, 2, 158, 1}) || l.Body != (Rect{1, 3, 158, 43}) {
+		t.Fatalf("shell rows mismatch: %+v %+v %+v", l.Menu, l.Crumbs, l.Body)
+	}
+	if l.Node != (Rect{1, 3, 37, 16}) || l.Namespaces != (Rect{1, 19, 37, 11}) || l.Deployments != (Rect{1, 30, 37, 16}) {
 		t.Fatalf("left column mismatch: %+v %+v %+v", l.Node, l.Namespaces, l.Deployments)
 	}
-	if l.Pods != (Rect{39, 2, 54, 19}) || l.Heatmap != (Rect{39, 21, 54, 25}) {
+	if l.Pods != (Rect{39, 3, 54, 19}) || l.Heatmap != (Rect{39, 22, 54, 24}) {
 		t.Fatalf("center column mismatch: %+v %+v", l.Pods, l.Heatmap)
 	}
-	if l.Details != (Rect{94, 2, 65, 44}) {
+	if l.Details != (Rect{94, 3, 65, 43}) {
 		t.Fatalf("details mismatch: %+v", l.Details)
 	}
 	if l.DividerY != 46 || l.FooterY != 47 {
@@ -62,7 +65,7 @@ func TestComputeSizes(t *testing.T) {
 		if l.ShowLeft && l.Node.W < minLeftWidth {
 			t.Fatalf("%dx%d: left too narrow", tt.w, tt.h)
 		}
-		if l.Details.H != tt.h-4 || l.Heatmap.Y+l.Heatmap.H != tt.h-2 {
+		if l.Details.H != tt.h-5 || l.Details.Y != 3 || l.Heatmap.Y+l.Heatmap.H != tt.h-2 || l.Deployments.H > 0 && l.Deployments.H < 4 {
 			t.Fatalf("%dx%d: heights mismatch", tt.w, tt.h)
 		}
 	}
@@ -77,6 +80,8 @@ func TestHit(t *testing.T) {
 		{50, 10}: AreaPods,
 		{50, 30}: AreaHeatmap,
 		{120, 3}: AreaDetails,
+		{10, 1}:  AreaMenu,
+		{10, 2}:  AreaCrumbs,
 		{0, 0}:   AreaNone,
 		{38, 10}: AreaNone,
 	}
@@ -87,5 +92,23 @@ func TestHit(t *testing.T) {
 	}
 	if Compute(100, 30, LeftAuto).Hit(5, 5) != AreaNone {
 		t.Fatal("too small layout has no areas")
+	}
+}
+
+func TestComputeDetailUsesWholeBody(t *testing.T) {
+	for _, size := range [][2]int{{160, 48}, {130, 40}} {
+		l := ComputeDetail(size[0], size[1])
+		if l.TooSmall || l.Details != l.Body || l.Body != (Rect{1, 3, size[0] - 2, size[1] - 5}) {
+			t.Fatalf("%v: detail layout %+v", size, l)
+		}
+		if !l.Pods.Empty() || !l.Node.Empty() || !l.Heatmap.Empty() || l.ShowLeft {
+			t.Fatalf("%v: detail layout must not keep dashboard panels", size)
+		}
+		if l.Hit(10, 1) != AreaMenu || l.Hit(10, 2) != AreaCrumbs || l.Hit(10, 10) != AreaDetails {
+			t.Fatalf("%v: detail hit areas", size)
+		}
+	}
+	if !ComputeDetail(100, 30).TooSmall {
+		t.Fatal("detail keeps the global minimum")
 	}
 }

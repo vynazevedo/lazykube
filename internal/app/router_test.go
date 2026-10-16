@@ -11,9 +11,9 @@ import (
 	"github.com/vynazevedo/lazykube/internal/ui"
 )
 
-func TestRouterHasSingleDashboardRoute(t *testing.T) {
+func TestRouterRegistersOnlyFunctionalDestinations(t *testing.T) {
 	r := newRouter()
-	if r.Active() != (Route{Screen: ScreenDashboard}) {
+	if r.Active() != (Route{Kind: RouteScreen, Screen: ScreenDashboard}) || r.Depth() != 0 {
 		t.Fatalf("initial route = %+v", r.Active())
 	}
 	if got := registeredScreens(); !reflect.DeepEqual(got, []ScreenID{ScreenDashboard}) {
@@ -23,12 +23,18 @@ func TestRouterHasSingleDashboardRoute(t *testing.T) {
 	if !ok || s.ID() != ScreenDashboard {
 		t.Fatalf("dashboard screen = %v %v", s, ok)
 	}
-	if _, ok := screenFor(ScreenDashboard + 1); ok {
-		t.Fatal("no other route may be registered yet")
+	if s, ok := screenFor(ScreenPodDetail); !ok || s.ID() != ScreenPodDetail {
+		t.Fatal("pod detail is a child route")
+	}
+	if _, ok := screenFor(ScreenPodDetail + 1); ok {
+		t.Fatal("no other screen may be registered before it works")
 	}
 	m := demoModel(t, 160, 48)
 	if m.nav.Active().Screen != ScreenDashboard || m.screen().ID() != ScreenDashboard {
 		t.Fatalf("model route = %+v", m.nav.Active())
+	}
+	if got := m.menuItems(); !reflect.DeepEqual(got, []ui.MenuItem{{Key: "2", Title: "Dashboard"}}) {
+		t.Fatalf("menu lists only functional destinations: %+v", got)
 	}
 }
 
@@ -49,8 +55,10 @@ func routerHoldsReferences(t reflect.Type) bool {
 }
 
 func TestRouterAndScreenDoNotAliasModelState(t *testing.T) {
-	if n := reflect.TypeOf(dashboardScreen{}).NumField(); n != 0 {
-		t.Fatalf("dashboard adapter must not hold state, fields = %d", n)
+	for _, s := range []any{dashboardScreen{}, podScreen{}} {
+		if n := reflect.TypeOf(s).NumField(); n != 0 {
+			t.Fatalf("%T must not hold state, fields = %d", s, n)
+		}
 	}
 	if routerHoldsReferences(reflect.TypeOf(router{})) {
 		t.Fatal("router must be a plain value without references into the model")
@@ -92,6 +100,7 @@ func TestRootDelegatesToDashboard(t *testing.T) {
 			{"key-filter", base, keyPress("/")},
 			{"key-security", base, keyPress("S")},
 			{"key-help", base, keyPress("?")},
+			{"key-enter", base, keyPress("enter")},
 			{"filter-typing", filtering, keyPress("o")},
 			{"filter-paste", filtering, tea.PasteMsg{Content: "odoo"}},
 			{"mouse-click", base, tea.MouseClickMsg{X: podX, Y: podY, Button: tea.MouseLeft}},
@@ -228,9 +237,14 @@ func TestDashboardKeysMatchKeyMap(t *testing.T) {
 			seen[k] = true
 		}
 	}
-	for _, k := range []string{"m", "2", "3", "4", "5", "6"} {
+	for _, k := range []string{"m", "2", "left", "right"} {
+		if !seen[k] {
+			t.Fatalf("navigation key %q must be bound", k)
+		}
+	}
+	for _, k := range []string{"3", "4", "5", "6"} {
 		if seen[k] {
-			t.Fatalf("navigation key %q belongs to a later PR", k)
+			t.Fatalf("screen key %q belongs to a later PR", k)
 		}
 	}
 }

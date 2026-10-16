@@ -7,11 +7,12 @@ const (
 	MinHeight      = 36
 	wideThreshold  = 140
 	nodeHeight     = 16
-	nsHeight       = 12
+	nsHeight       = 11
 	podsHeight     = 19
 	minLeftWidth   = 32
 	minCenterWidth = 46
 	minRightWidth  = 50
+	bodyTop        = 3
 )
 
 type Rect struct {
@@ -39,6 +40,9 @@ type Layout struct {
 	TooSmall    bool
 	ShowLeft    bool
 	Header      Rect
+	Menu        Rect
+	Crumbs      Rect
+	Body        Rect
 	Node        Rect
 	Namespaces  Rect
 	Deployments Rect
@@ -67,13 +71,8 @@ func Compute(w, h int, mode LeftMode) Layout {
 		return l
 	}
 	l.ShowLeft = LeftVisible(w, mode)
-	l.Header = Rect{X: 1, Y: 0, W: w - 2, H: 1}
-	l.DividerY = h - 2
-	l.FooterY = h - 1
-
-	top := 2
-	m := h - 4
-	u := w - 2
+	l.shell(w, h)
+	top, m, u := l.Body.Y, l.Body.H, l.Body.W
 
 	var left, center, right int
 	if l.ShowLeft {
@@ -107,6 +106,26 @@ func Compute(w, h int, mode LeftMode) Layout {
 	return l
 }
 
+func ComputeDetail(w, h int) Layout {
+	l := Layout{W: w, H: h}
+	if w < MinWidth || h < MinHeight {
+		l.TooSmall = true
+		return l
+	}
+	l.shell(w, h)
+	l.Details = l.Body
+	return l
+}
+
+func (l *Layout) shell(w, h int) {
+	l.Header = Rect{X: 1, Y: 0, W: w - 2, H: 1}
+	l.Menu = Rect{X: 1, Y: 1, W: w - 2, H: 1}
+	l.Crumbs = Rect{X: 1, Y: 2, W: w - 2, H: 1}
+	l.Body = Rect{X: 1, Y: bodyTop, W: w - 2, H: h - bodyTop - 2}
+	l.DividerY = h - 2
+	l.FooterY = h - 1
+}
+
 func round(v float64) int {
 	return int(math.Round(v))
 }
@@ -121,6 +140,8 @@ const (
 	AreaPods
 	AreaHeatmap
 	AreaDetails
+	AreaMenu
+	AreaCrumbs
 )
 
 func (l Layout) Hit(x, y int) Area {
@@ -137,6 +158,8 @@ func (l Layout) Hit(x, y int) Area {
 		{l.Pods, AreaPods},
 		{l.Heatmap, AreaHeatmap},
 		{l.Details, AreaDetails},
+		{l.Menu, AreaMenu},
+		{l.Crumbs, AreaCrumbs},
 	} {
 		if !c.r.Empty() && c.r.Contains(x, y) {
 			return c.a

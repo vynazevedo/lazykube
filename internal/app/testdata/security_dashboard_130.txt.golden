@@ -1,5 +1,6 @@
  lazykube [DEMO]  v2.0   ◎ context demo   k8s demo  nodes 1  ns 8  pods 13  uptime 119d ! 1 high new   ⠙ metrics every 5s ● live  
-                                                                                                                                  
+ [2 Dashboard]                                                                                                            m menu  
+ Dashboard                                                                                                                        
  ╭─ Pods · focus ────────────────────────────────────────╮ ╭────────────────────────────────────────────────────────────────────╮ 
  │                                                       │ │  Log   Config   Top   Describe   Events   Security 1               │ 
  │ / filter pods…▌                              13 items │ │ ────────────────────────────────────────────────────────────────── │ 
@@ -33,8 +34,7 @@
  │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ ys-odoo            99 ████████ | 1 finding                     │ │ 
  │ coredns-6799… ███████████████████████████████████████ │ │ │ More namespaces: use the namespace filter.                     │ │ 
  │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Score: 100 - (25*high + 8*medium + 2*info)/evaluated pods;     │ │ 
- │                                                       │ │ │ floor 0, rounded.                                              │ │ 
  │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
  ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                     bubbletea · 0 fps 
+  ↑↓  move   tab  panel   /  filter   enter  open   m  menu   l  logs   d  describe   e  events   ?  help       bubbletea · 0 fps 

@@ -43,9 +43,23 @@ func TestHelpIsHonest(t *testing.T) {
 			keys[k] = true
 		}
 	}
-	for _, k := range []string{"C", "P", "n", "N", "E", "S", "w", "g", "G"} {
+	for _, k := range []string{"C", "P", "n", "N", "E", "S", "w", "g", "G", "m", "2", "enter", "esc"} {
 		if !keys[k] {
 			t.Fatalf("implemented key %q missing from help", k)
+		}
+	}
+	for _, list := range [][]ui.KeyHelp{ui.FullHelp(), ui.ShortHelp(), ui.PodDetailHelp(), ui.MenuHelp()} {
+		for _, h := range list {
+			for _, k := range strings.Fields(h.Key) {
+				if k == "3" || k == "4" || k == "5" || k == "6" {
+					t.Fatalf("screen key %q is announced before its screen exists", k)
+				}
+			}
+		}
+	}
+	for _, h := range ui.PodDetailHelp() {
+		if h.Key == "tab" || h.Key == "1" || h.Key == "/" {
+			t.Fatalf("detail help must not announce %q, it has no effect there", h.Key)
 		}
 	}
 	m := demoModel(t, 160, 48)
@@ -53,6 +67,24 @@ func TestHelpIsHonest(t *testing.T) {
 	m = press(t, m, "s")
 	if m.tab != before {
 		t.Fatal("unbound keys must not change state")
+	}
+	if !press(t, m, "m").menu.open {
+		t.Fatal("m opens the screens menu")
+	}
+	detail := press(t, m, "enter")
+	if !detail.inDetail() {
+		t.Fatal("enter on a pod opens its detail")
+	}
+	if back := press(t, detail, "2"); back.inDetail() || back.nav.Active().Screen != ScreenDashboard {
+		t.Fatal("2 activates the Dashboard")
+	}
+	if back := press(t, detail, "esc"); back.inDetail() {
+		t.Fatal("esc goes back")
+	}
+	for _, k := range []string{"3", "4", "5", "6"} {
+		if got := press(t, m, k); got.nav != m.nav || got.menu.open {
+			t.Fatalf("%s must stay unbound until its screen exists", k)
+		}
 	}
 }
 
@@ -361,6 +393,51 @@ func TestEmptySelectionCancelsLogSubscription(t *testing.T) {
 			}
 			if len(m.logs) != 0 || m.dg.logView.Container != "" {
 				t.Fatal("empty selection clears the log view")
+			}
+		})
+	}
+}
+
+func helpTokens(k string) []string {
+	return strings.FieldsFunc(k, func(r rune) bool { return r == ' ' || r == '/' && len(k) > 1 })
+}
+
+func TestHelpOverlayMatchesActiveRoute(t *testing.T) {
+	dash := demoModel(t, 160, 48)
+	scope := press(t, dash, "tab", "tab", "j", "enter")
+	detail := press(t, dash, "enter")
+	for _, c := range []struct {
+		name   string
+		m      Model
+		absent []string
+	}{
+		{"dashboard", dash, nil},
+		{"namespace", scope, nil},
+		{"detail", detail, []string{"next panel", "previous panel", "toggle left column", "filter pods", "open pod"}},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			bound := map[string]bool{}
+			for _, b := range c.m.screen().Keys(c.m) {
+				for _, k := range append(b.Keys(), helpTokens(b.Help().Key)...) {
+					bound[k] = true
+				}
+			}
+			bound["/"] = bound["/"] || bound["slash"]
+			overlay := press(t, c.m, "?").Render().Plain()
+			for _, h := range c.m.screen().FullHelp(c.m) {
+				for _, tok := range helpTokens(h.Key) {
+					if !bound[tok] {
+						t.Fatalf("overlay announces %q (%s) but the route does not bind %q", h.Key, h.Desc, tok)
+					}
+				}
+				if !strings.Contains(overlay, h.Desc[:min(len(h.Desc), 12)]) {
+					t.Fatalf("overlay must show %q", h.Desc)
+				}
+			}
+			for _, gone := range c.absent {
+				if strings.Contains(overlay, gone) {
+					t.Fatalf("%s overlay announces %q without effect", c.name, gone)
+				}
 			}
 		})
 	}

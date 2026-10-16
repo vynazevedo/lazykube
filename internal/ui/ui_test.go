@@ -114,7 +114,7 @@ func TestPanelGoldens(t *testing.T) {
 	check(t, "footer", canvas(160, 2, func(r draw.Region) {
 		Footer(r.Sub(0, 0, 160, 1), r.Sub(0, 1, 160, 1), FooterState{FPS: 30})
 	}))
-	check(t, "help", canvas(160, 48, func(r draw.Region) { HelpOverlay(r, ctx) }))
+	check(t, "help", canvas(160, 48, func(r draw.Region) { HelpOverlay(r, FullHelp(), ctx) }))
 	check(t, "too_small", canvas(100, 30, func(r draw.Region) { TooSmall(r, 100, 30) }))
 }
 

@@ -31,29 +31,24 @@ func (m Model) handleKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 		return m, tea.Quit
 	case key.Matches(msg, k.Help):
 		m.helpOpen = true
-	case key.Matches(msg, k.NextPanel):
+	case key.Matches(msg, k.NextPanel) && !m.inDetail():
 		m.cycleFocus(1)
-	case key.Matches(msg, k.PrevPanel):
+	case key.Matches(msg, k.PrevPanel) && !m.inDetail():
 		m.cycleFocus(-1)
 	case key.Matches(msg, k.Filter) && m.searchActive():
 		cmd := m.startSearch()
 		return m, cmd
-	case key.Matches(msg, k.Filter):
+	case key.Matches(msg, k.Filter) && !m.inDetail():
 		m.focus = FocusPods
 		m.filtering = true
 		cmd := m.filter.Focus()
 		return m, cmd
-	case key.Matches(msg, k.Esc) && m.tab == ui.TabLog && m.dg.search.Value() != "":
-		m.dg.search.SetValue("")
-		m.updateMatches()
-	case key.Matches(msg, k.Esc):
-		m.nsFilter = ""
-		m.filter.SetValue("")
-		m.syncSelection()
-	case key.Matches(msg, k.Enter):
-		if m.focus == FocusNamespaces && m.nsCursor < len(m.snap.Namespaces) {
-			m.nsFilter = m.snap.Namespaces[m.nsCursor].Name
-			m.syncSelection()
+	case key.Matches(msg, k.Enter) && !m.inDetail():
+		switch {
+		case m.focus == FocusNamespaces && m.nsCursor < len(m.snap.Namespaces):
+			m.openNamespace(m.snap.Namespaces[m.nsCursor].Name)
+		case m.focus == FocusPods:
+			m.openPod()
 		}
 	case key.Matches(msg, k.TabLog):
 		m.setTab(ui.TabLog)
@@ -90,7 +85,7 @@ func (m Model) handleKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 		m.cycleScope()
 	case key.Matches(msg, k.Palette):
 		m.pal = theme.NextPalette(m.pal)
-	case key.Matches(msg, k.ToggleLeft):
+	case key.Matches(msg, k.ToggleLeft) && !m.inDetail():
 		if LeftVisible(m.w, m.leftMode) {
 			m.leftMode = LeftHidden
 		} else {
