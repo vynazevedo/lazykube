@@ -90,10 +90,11 @@ type NamespacePosture struct {
 }
 
 type SecuritySnapshot struct {
-	Revision   uint64
-	Pods       map[string]PodPosture
-	Namespaces map[string]NamespacePosture
-	Coverage   Coverage
+	ListCoverage Coverage
+	Revision     uint64
+	Pods         map[string]PodPosture
+	Namespaces   map[string]NamespacePosture
+	Coverage     Coverage
 }
 
 type SecuritySource interface {
