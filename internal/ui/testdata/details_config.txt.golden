@@ -1,0 +1,44 @@
+╭───────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events     tab ⇥ / shift+tab │
+│ ───────────────────────────────────────────────────────────── │
+│ ● bilibili-live-7f6b8d9c5-mn4tz                     [Running] │
+│   bilibili-raffle · Running · node huawei-k3s-01 · 10.42.0.24 │
+│                                                               │
+│ ╭───────────────────────────────────────────────────────────╮ │
+│ │  1  apiVersion: v1                                        │ │
+│ │  2  kind: Pod                                             │ │
+│ │  3  metadata:                                             │ │
+│ │  4    name: bilibili-live-7f6b8d9c5-mn4tz                 │ │
+│ │  5    namespace: bilibili-raffle                          │ │
+│ │  6    labels:                                             │ │
+│ │  7      app: bilibili-live                                │ │
+│ │  8  spec:                                                 │ │
+│ │  9    containers:                                         │ │
+│ │ 10    - name: app                                         │ │
+│ │ 11      image: registry.local/bilibili-raffle:1.4.2       │ │
+│ │ 12      resources:                                        │ │
+│ │ 13        requests: { cpu: 10m, memory: 64Mi }            │ │
+│ │ 14        limits: { cpu: 50m, memory: 128Mi }             │ │
+│ │ 15      env:                                              │ │
+│ │ 16      - name: LOG_LEVEL                                 │ │
+│ │ 17        value: info                                     │ │
+│ │ 18    restartPolicy: Always                               │ │
+│ │ 19    nodeName: huawei-k3s-01                             │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ ╰───────────────────────────────────────────────────────────╯ │
+╰───────────────────────────────────────────────────────────────╯

@@ -1,0 +1,44 @@
+╭───────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events     tab ⇥ / shift+tab │
+│ ───────────────────────────────────────────────────────────── │
+│ ● bilibili-live-7f6b8d9c5-mn4tz                     [Running] │
+│   bilibili-raffle · Running · node huawei-k3s-01 · 10.42.0.24 │
+│                                                               │
+│ ╭───────────────────────────────────────────────────────────╮ │
+│ │ 20:14:00  INFO  ws connected room=21452505 shard=3        │ │
+│ │ 20:14:03  DEBUG heartbeat ok rtt=42ms                     │ │
+│ │ 20:14:06  INFO  danmaku batch received count=38           │ │
+│ │ 20:14:09  INFO  raffle detected id=883104 type=gift       │ │
+│ │ 20:14:12  INFO  join raffle ok id=883104 latency=118ms    │ │
+│ │ 20:14:15  WARN  rate limited by upstream, backoff 2s      │ │
+│ │ 20:14:18  DEBUG heartbeat ok rtt=39ms                     │ │
+│ │ 20:14:21  INFO  danmaku batch received count=51           │ │
+│ │ 20:14:24  INFO  raffle detected id=883117 type=guard      │ │
+│ │ 20:14:27  ERROR join raffle failed id=883117: already en… │ │
+│ │ 20:14:30  INFO  reconnecting ws in 1s                     │ │
+│ │ 20:14:33  INFO  ws connected room=21452505 shard=3        │ │
+│ │ 20:14:36  INFO  ws connected room=21452505 shard=3        │ │
+│ │ 20:14:39  DEBUG heartbeat ok rtt=42ms                     │ │
+│ │ 20:14:42  INFO  danmaku batch received count=38           │ │
+│ │ 20:14:45  INFO  raffle detected id=883104 type=gift       │ │
+│ │ 20:14:48  INFO  join raffle ok id=883104 latency=118ms    │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │ ❯ ▌                                                       │ │
+│ ╰───────────────────────────────────────────────────────────╯ │
+╰───────────────────────────────────────────────────────────────╯

@@ -3,7 +3,6 @@ package config
 import (
 	"testing"
 
-	"github.com/jesseduffield/gocui"
 	"gopkg.in/yaml.v3"
 )
 
@@ -61,18 +60,6 @@ func TestColorRoundTrip(t *testing.T) {
 	}
 	if cfg.FgColor != ColorWhite || cfg.SelFgColor != ColorGreen {
 		t.Fatalf("round trip lost colors: %+v", cfg)
-	}
-}
-
-func TestColorAttribute(t *testing.T) {
-	if ColorGreen.Attribute() != gocui.ColorGreen {
-		t.Fatal("green must map to gocui.ColorGreen")
-	}
-	if Color("unknown").Attribute() != gocui.ColorDefault {
-		t.Fatal("unknown color must map to gocui.ColorDefault")
-	}
-	if Color("").Attribute() != gocui.ColorDefault {
-		t.Fatal("empty color must map to gocui.ColorDefault")
 	}
 }
 

@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/jesseduffield/gocui"
 	"gopkg.in/yaml.v3"
 )
 
@@ -34,16 +33,16 @@ var legacyTermboxColors = []Color{
 	ColorWhite,
 }
 
-var colorAttributes = map[Color]gocui.Attribute{
-	ColorDefault: gocui.ColorDefault,
-	ColorBlack:   gocui.ColorBlack,
-	ColorRed:     gocui.ColorRed,
-	ColorGreen:   gocui.ColorGreen,
-	ColorYellow:  gocui.ColorYellow,
-	ColorBlue:    gocui.ColorBlue,
-	ColorMagenta: gocui.ColorMagenta,
-	ColorCyan:    gocui.ColorCyan,
-	ColorWhite:   gocui.ColorWhite,
+var knownColors = map[Color]struct{}{
+	ColorDefault: {},
+	ColorBlack:   {},
+	ColorRed:     {},
+	ColorGreen:   {},
+	ColorYellow:  {},
+	ColorBlue:    {},
+	ColorMagenta: {},
+	ColorCyan:    {},
+	ColorWhite:   {},
 }
 
 func ParseColor(value string) (Color, error) {
@@ -51,7 +50,7 @@ func ParseColor(value string) (Color, error) {
 	if normalized == "" {
 		return ColorDefault, nil
 	}
-	if _, ok := colorAttributes[normalized]; !ok {
+	if _, ok := knownColors[normalized]; !ok {
 		return ColorDefault, fmt.Errorf("unknown color %q", value)
 	}
 	return normalized, nil
@@ -62,13 +61,6 @@ func colorFromLegacyIndex(index int) (Color, error) {
 		return ColorDefault, fmt.Errorf("unknown legacy color index %d", index)
 	}
 	return legacyTermboxColors[index], nil
-}
-
-func (c Color) Attribute() gocui.Attribute {
-	if attr, ok := colorAttributes[c]; ok {
-		return attr
-	}
-	return gocui.ColorDefault
 }
 
 func (c *Color) UnmarshalYAML(node *yaml.Node) error {

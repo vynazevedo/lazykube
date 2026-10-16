@@ -1,0 +1,146 @@
+package app
+
+import "math"
+
+const (
+	MinWidth       = 120
+	MinHeight      = 36
+	wideThreshold  = 140
+	nodeHeight     = 16
+	nsHeight       = 12
+	podsHeight     = 19
+	minLeftWidth   = 32
+	minCenterWidth = 46
+	minRightWidth  = 50
+)
+
+type Rect struct {
+	X, Y, W, H int
+}
+
+func (r Rect) Contains(x, y int) bool {
+	return x >= r.X && y >= r.Y && x < r.X+r.W && y < r.Y+r.H
+}
+
+func (r Rect) Empty() bool {
+	return r.W <= 0 || r.H <= 0
+}
+
+type LeftMode int
+
+const (
+	LeftAuto LeftMode = iota
+	LeftShown
+	LeftHidden
+)
+
+type Layout struct {
+	W, H        int
+	TooSmall    bool
+	ShowLeft    bool
+	Header      Rect
+	Node        Rect
+	Namespaces  Rect
+	Deployments Rect
+	Pods        Rect
+	Heatmap     Rect
+	Details     Rect
+	DividerY    int
+	FooterY     int
+}
+
+func LeftVisible(w int, mode LeftMode) bool {
+	switch mode {
+	case LeftShown:
+		return true
+	case LeftHidden:
+		return false
+	default:
+		return w >= wideThreshold
+	}
+}
+
+func Compute(w, h int, mode LeftMode) Layout {
+	l := Layout{W: w, H: h}
+	if w < MinWidth || h < MinHeight {
+		l.TooSmall = true
+		return l
+	}
+	l.ShowLeft = LeftVisible(w, mode)
+	l.Header = Rect{X: 1, Y: 0, W: w - 2, H: 1}
+	l.DividerY = h - 2
+	l.FooterY = h - 1
+
+	top := 2
+	m := h - 4
+	u := w - 2
+
+	var left, center, right int
+	if l.ShowLeft {
+		left = max(minLeftWidth, round(float64(u)*0.234))
+		center = max(minCenterWidth, round(float64(u)*0.341))
+		right = u - left - center - 2
+		if right < minRightWidth {
+			deficit := minRightWidth - right
+			take := min(deficit, center-minCenterWidth)
+			center -= take
+			deficit -= take
+			left -= min(deficit, left-minLeftWidth)
+			right = u - left - center - 2
+		}
+	} else {
+		center = round(float64(u-1) * 0.45)
+		right = u - 1 - center
+	}
+
+	x := 1
+	if l.ShowLeft {
+		l.Node = Rect{X: x, Y: top, W: left, H: nodeHeight}
+		l.Namespaces = Rect{X: x, Y: top + nodeHeight, W: left, H: nsHeight}
+		l.Deployments = Rect{X: x, Y: top + nodeHeight + nsHeight, W: left, H: m - nodeHeight - nsHeight}
+		x += left + 1
+	}
+	l.Pods = Rect{X: x, Y: top, W: center, H: podsHeight}
+	l.Heatmap = Rect{X: x, Y: top + podsHeight, W: center, H: m - podsHeight}
+	x += center + 1
+	l.Details = Rect{X: x, Y: top, W: right, H: m}
+	return l
+}
+
+func round(v float64) int {
+	return int(math.Round(v))
+}
+
+type Area int
+
+const (
+	AreaNone Area = iota
+	AreaNode
+	AreaNamespaces
+	AreaDeployments
+	AreaPods
+	AreaHeatmap
+	AreaDetails
+)
+
+func (l Layout) Hit(x, y int) Area {
+	if l.TooSmall {
+		return AreaNone
+	}
+	for _, c := range []struct {
+		r Rect
+		a Area
+	}{
+		{l.Node, AreaNode},
+		{l.Namespaces, AreaNamespaces},
+		{l.Deployments, AreaDeployments},
+		{l.Pods, AreaPods},
+		{l.Heatmap, AreaHeatmap},
+		{l.Details, AreaDetails},
+	} {
+		if !c.r.Empty() && c.r.Contains(x, y) {
+			return c.a
+		}
+	}
+	return AreaNone
+}
