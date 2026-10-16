@@ -38,6 +38,7 @@ type Options struct {
 
 type Model struct {
 	security          data.SecuritySnapshot
+	securitySession   data.SecuritySession
 	securityKey       string
 	securityNamespace bool
 	securityView      ui.SecurityView
@@ -180,6 +181,9 @@ func (m *Model) heatCols() int {
 }
 
 func (m *Model) refresh() {
+	if demo, ok := m.src.(*data.Demo); ok && demo.AdvanceSecurity(m.clock.T) {
+		m.loadSecurity()
+	}
 	m.refreshSecurity()
 	name := m.activeName()
 	m.metrics = m.src.Metrics(m.clock.T, name, m.heatCols())

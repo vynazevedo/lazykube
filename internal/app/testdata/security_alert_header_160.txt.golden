@@ -1,0 +1,48 @@
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d                        ! 1 high new   ⠙ metrics every 5s ● live  
+                                                                                                                                                                
+ ╭─ Node ────────────────────────────╮ ╭─ Pods · focus ─────────────────────────────────────╮ ╭───────────────────────────────────────────────────────────────╮ 
+ │                                   │ │                                                    │ │  Log   Config   Top   Describe   Events   Security 1          │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  huawei-k3s-01│ │ / filter pods…▌                           13 items │ │ ───────────────────────────────────────────────────────────── │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready      │ │                                                    │ │ ● bilibili-live-7f6b8d9c5-mn4tz                     [Running] │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 21%      │ │   NAME          NAMESPACE    RST   AGE CPU/STATUS  │ │   bilibili-raffle · Running · ready 2/2 · node huawei-k3s-01… │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   █████████████│ │ ● bilibili-raf… bilibili-r…    0  119d █░░░░░░     │ │                                                               │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4/3.8Gi│ │ ● bilibili-liv… bilibili-r…    2  119d ████░░░     │ │ CPU 11m req 10m · lim 50m            streamline · braille 2×4 │ 
+ │    ▀    ▀▀▀▀▀▀▀▀▀    █████████████│ │ ● lgo-7c5d9758… lgo            0   87d ██░░░░░     │ │  20m │                                                        │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13 / 110│ │ ● psql-6bc7744… ys-odoo        0   64d ████░░░     │ │      │          ⡄                                             │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch amd64   │ │ ● odoo-7575bf6… ys-odoo        1   64d ██████░     │ │  15m │─────────⢰⣿⡄─⢀⡆─────────────────⢀────────────────────⣼⡄ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀                 │ │ ○ qiandao-1605… xcx            0    2h Completed   │ │      │         ⣼⣿⣿⣄⣼⣿             ⢀   ⣾⣧⣠⣦ ⡀      request 10m │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                │ │ ○ lingqu-16054… xcx            0   41m Completed   │ │  10m │╌╌⡀⢠⣤⣾⣿⣶⣽⣿⣿⣿⣿⣿⣿⣿⣦⡀╌╌╌╌╌╌╌╌╌⢀⣾⣷⣶⣾⣿⣿⣿⣿⣿⣿⣷⣼⡄╌⣠⣀╌╌╌╌╌╌⣄⣸⣿⣿⣿ │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀               │ │ ⠙ lingqu-16054… xcx            0    8s Init:0/1    │ │      │ ⣰⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⡄⢀⣧ ⢀⣤⣤⣤⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣽⣿⣿⣆⣼⣦ ⢀⣼⣿⣿⣿⣿⣿ │ 
+ │                                   │ │ ● coredns-6799… kube-system    0  119d ░░░░░░░     │ │   5m │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣯⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣯⣿⣿⣿⣿⣿⣿⣿ │ 
+ │                                   │ │ ● metrics-serv… kube-system    0  119d ready 0/1   │ │      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ ╰───────────────────────────────────╯ │ ● traefik-f456… kube-system    0  119d ░░░░░░░     │ │    0 │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ ╭─ Namespaces ──────────────────────╮ │ ● local-path-p… kube-system    0  119d ImagePullB… │ │      └─────────────────────────────────────────────────────── │ 
+ │                                   │ │ ● svclb-traefi… kube-system    7  119d CrashLoopB… │ │                                                               │ 
+ │ default                 ·····   0 │ ╰────────────────────────────────────────────────────╯ │ ╭────────────────────────────╮ ╭────────────────────────────╮ │ 
+ │ kube-system             █████   5 │ ╭─ CPU heatmap · last 2 min ─────────────────────────╮ │ │ Memory 71Mi / 128Mi        │ │ Net ↓0.5 kB/s ↑5.5 kB/s    │ │ 
+ │ kube-public             ·····   0 │ │                                                    │ │ │ ██████████████████████████ │ │ ▆▁▂▇▄▇▇▆▇███▄▁▄▇▃▁▇▅▄▃▂▄▆▁ │ │ 
+ │ kube-node-lease         ·····   0 │ │ bilibili-raf… ████████████████████████████████████ │ │ │ ▇█▇▇▇▇▇▇▆▆▇▆▆▆▆▆▅▅▅▄▅▅▄▄▄▄ │ │ ▇▃▂▅▅▅▁▅▄▅▅▆▆▄▅▂▇▆▄▇█▄█▆▇▇ │ │ 
+ │ bilibili-raffle         ██░░░   2 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ ╰────────────────────────────╯ ╰────────────────────────────╯ │ 
+ │ lgo                     █░░░░   1 │ │ bilibili-live ████████████████████████████████████ │ │                                                               │ 
+ │ xcx                     ███░░   3 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ ╭ logs · tail -f ──────────────────────────────── viewport ─╮ │ 
+ │ ys-odoo                 ██░░░   2 │ │ lgo-7c5d97584 ████████████████████████████████████ │ │ │ 20:15:15  DEBUG heartbeat ok rtt=42ms                     │ │ 
+ │                                   │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:15:18  INFO  danmaku batch received count=38           │ │ 
+ ╰───────────────────────────────────╯ │ psql-6bc7744… ████████████████████████████████████ │ │ │ 20:15:21  INFO  raffle detected id=883104 type=gift       │ │ 
+ ╭─ Deployments ─────────────────────╮ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:15:24  INFO  join raffle ok id=883104 latency=118ms    │ │ 
+ │                                   │ │ odoo-7575bf6… ████████████████████████████████████ │ │ │ 20:15:27  WARN  rate limited by upstream, backoff 2s      │ │ 
+ │ bilibili-raffle/bilibili-l… ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:15:30  DEBUG heartbeat ok rtt=39ms                     │ │ 
+ │ bilibili-raffle/bilibili-r… ● 1/1 │ │ coredns-6799… ████████████████████████████████████ │ │ │ 20:15:33  INFO  danmaku batch received count=51           │ │ 
+ │ ys-odoo/psql                ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:15:36  INFO  raffle detected id=883117 type=guard      │ │ 
+ │ ys-odoo/odoo                ● 1/1 │ │ metrics-serv… ████████████████████████████████████ │ │ │ 20:15:39  ERROR join raffle failed id=883117: already en… │ │ 
+ │ lgo/lgo                     ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:15:42  INFO  reconnecting ws in 1s                     │ │ 
+ │ kube-system/coredns         ● 1/1 │ │ traefik-f456… ████████████████████████████████████ │ │ │ 20:15:45  INFO  ws connected room=21452505 shard=3        │ │ 
+ │ kube-system/metrics-server  ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:15:48  INFO  ws connected room=21452505 shard=3        │ │ 
+ │ kube-system/traefik         ● 1/1 │ │                                                    │ │ │ 20:15:51  DEBUG heartbeat ok rtt=42ms                     │ │ 
+ │                                   │ │                                                    │ │ │ 20:15:54  INFO  danmaku batch received count=38           │ │ 
+ │                                   │ │                                                    │ │ │ 20:15:57  INFO  raffle detected id=883104 type=gift       │ │ 
+ │                                   │ │                                                    │ │ │ 20:16:00  INFO  join raffle ok id=883104 latency=118ms    │ │ 
+ │                                   │ │                                                    │ │ │ 20:16:03  WARN  rate limited by upstream, backoff 2s      │ │ 
+ │                                   │ │               -2m ████████████████████████████ now │ │ ╰───────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────╯ ╰────────────────────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                                                   bubbletea · 0 fps 

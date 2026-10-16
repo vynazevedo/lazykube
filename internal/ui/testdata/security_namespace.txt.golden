@@ -31,14 +31,14 @@
 │ │ Observed 2026-10-16 12:00:00Z | UID                       │ │
 │ │ demo-bilibili-raffle/bilibili-raffle-5d8f9c7b4-x2kqp |    │ │
 │ │ RV 1                                                      │ │
+│ │ [info] serviceAccountToken | finding | container: app     │ │
+│ │ Field: spec.automountServiceAccountToken                  │ │
+│ │ Evidence: default token mount enabled                     │ │
+│ │ Credentials available to workload. Disable automatic      │ │
+│ │ mount when unused                                         │ │
+│ │ Source: demo fixture v1 | configuration observed          │ │
 │ │ [info] runAsRoot | unknown | container: app               │ │
 │ │ Field: spec.containers[0].securityContext.runAsUser       │ │
 │ │ Evidence: UID unspecified; runtime user unknown           │ │
-│ │ Image user is not inspected. Require a non-root user      │ │
-│ │ Source: demo fixture v1 | runtime unknown                 │ │
-│ │                                                           │ │
-│ │                                                           │ │
-│ │                                                           │ │
-│ │                                                           │ │
 │ ╰───────────────────────────────────────────────────────────╯ │
 ╰───────────────────────────────────────────────────────────────╯

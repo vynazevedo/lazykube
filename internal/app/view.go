@@ -22,7 +22,7 @@ func (m Model) Render() *draw.Canvas {
 	ctx := ui.Ctx{Pal: m.pal, Clock: m.clock}
 	pod := m.selectedPod()
 
-	ui.Header(region(screen, m.layout.Header), ui.HeaderState{Cluster: m.snap.Cluster, MetricsOK: m.metrics.Available}, ctx)
+	ui.Header(region(screen, m.layout.Header), ui.HeaderState{Cluster: m.snap.Cluster, MetricsOK: m.metrics.Available, SecurityAlerts: len(m.securitySession.Alerts)}, ctx)
 
 	if m.layout.ShowLeft {
 		ui.NodePanel(region(screen, m.layout.Node), ui.NodeState{
@@ -74,24 +74,25 @@ func (m Model) Render() *draw.Canvas {
 	}, ctx)
 
 	ui.DetailsPanel(region(screen, m.layout.Details), ui.DetailsState{
-		Security: m.securityView,
-		Tab:      m.tab,
-		HoverTab: m.hoverTab,
-		Pod:      pod,
-		Metrics:  m.metrics,
-		Logs:     m.logs,
-		Events:   m.events,
-		Manifest: m.manifest,
-		Describe: m.describe,
-		Diag:     ui.Diagnosis{Containers: m.dg.containers, LogContainer: m.dg.logView.Container},
-		LogInfo:  m.logInfo(),
-		Focused:  m.focus == FocusDetails,
-		Scroll:   m.scroll,
-		Follow:   m.follow,
-		NewLines: m.newLines,
-		Wrap:     m.wrap,
-		MemBar:   m.motion.memBar.Pos,
-		Slide:    m.slideOffset(),
+		Security:       m.securityView,
+		SecurityAlerts: len(m.securitySession.Alerts),
+		Tab:            m.tab,
+		HoverTab:       m.hoverTab,
+		Pod:            pod,
+		Metrics:        m.metrics,
+		Logs:           m.logs,
+		Events:         m.events,
+		Manifest:       m.manifest,
+		Describe:       m.describe,
+		Diag:           ui.Diagnosis{Containers: m.dg.containers, LogContainer: m.dg.logView.Container},
+		LogInfo:        m.logInfo(),
+		Focused:        m.focus == FocusDetails,
+		Scroll:         m.scroll,
+		Follow:         m.follow,
+		NewLines:       m.newLines,
+		Wrap:           m.wrap,
+		MemBar:         m.motion.memBar.Pos,
+		Slide:          m.slideOffset(),
 	}, ctx)
 
 	ui.Footer(screen.Sub(0, m.layout.DividerY, m.w, 1), screen.Sub(0, m.layout.FooterY, m.w, 1), ui.FooterState{FPS: m.displayFPS()})

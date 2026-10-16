@@ -73,6 +73,8 @@ func (m Model) handleKey(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		m.setTab(ui.TabSecurity)
 		m.scroll = 0
 		m.refreshSecurity()
+	case key.Matches(msg, k.SecurityAck):
+		m.acknowledgeSecurity()
 	case key.Matches(msg, k.TabEvents):
 		m.setTab(ui.TabEvents)
 	case key.Matches(msg, k.TabPrev):
@@ -185,7 +187,7 @@ func (m Model) tabAt(x, y int) (ui.Tab, bool) {
 	if d.Empty() || y != d.Y+1+ui.DetailsTabsRow {
 		return 0, false
 	}
-	return ui.TabAt(x - (d.X + 2))
+	return ui.TabAt(x-(d.X+2), len(m.securitySession.Alerts))
 }
 
 func (m Model) handleClick(ms tea.Mouse) (tea.Model, tea.Cmd) {

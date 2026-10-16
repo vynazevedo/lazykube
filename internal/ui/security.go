@@ -101,6 +101,21 @@ func SecurityTab(r draw.Region, view SecurityView, scroll int) {
 		c.Text(0, 2+i, draw.Truncate(line, c.W), draw.Fg(theme.Warn))
 	}
 	for i := 0; i < c.H-securityHeaderRows && scroll+i < len(view.Rows); i++ {
-		c.Text(0, securityHeaderRows+i, draw.Truncate(view.Rows[scroll+i], c.W), draw.Fg(theme.TextSoft))
+		row := draw.Truncate(view.Rows[scroll+i], c.W)
+		style := draw.Fg(theme.TextSoft)
+		if strings.HasPrefix(row, "! ") || strings.HasPrefix(row, "high ") {
+			style = draw.Fg(theme.Err).WithBold()
+		}
+		if strings.HasPrefix(row, "POSTURE") || strings.HasPrefix(row, "ALERTS") {
+			style = draw.Fg(theme.Warn).WithBold()
+		}
+		c.Text(0, securityHeaderRows+i, row, style)
+		if strings.HasPrefix(row, "Score ") {
+			for x, ch := range []rune(row) {
+				if x >= 6 && ch == '█' {
+					c.Put(x, securityHeaderRows+i, ch, draw.Fg(theme.Mix(theme.Warn, theme.OK, float64(x-6)/float64(max(1, draw.Width(row)-7)))))
+				}
+			}
+		}
 	}
 }

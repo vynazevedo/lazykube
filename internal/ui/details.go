@@ -43,19 +43,22 @@ type TabSpan struct {
 	X, W int
 }
 
-func TabSpans() []TabSpan {
+func TabSpans(alerts ...int) []TabSpan {
 	out := make([]TabSpan, 0, len(tabNames))
 	x := 0
 	for i, name := range tabNames {
 		w := len(name) + 2
+		if Tab(i) == TabSecurity && len(alerts) > 0 && alerts[0] > 0 {
+			w += len(fmt.Sprint(alerts[0])) + 1
+		}
 		out = append(out, TabSpan{Tab: Tab(i), X: x, W: w})
 		x += w + 1
 	}
 	return out
 }
 
-func TabAt(x int) (Tab, bool) {
-	for _, s := range TabSpans() {
+func TabAt(x int, alerts ...int) (Tab, bool) {
+	for _, s := range TabSpans(alerts...) {
 		if x >= s.X && x < s.X+s.W {
 			return s.Tab, true
 		}
@@ -69,24 +72,25 @@ const (
 )
 
 type DetailsState struct {
-	Security SecurityView
-	Tab      Tab
-	HoverTab int
-	Pod      *data.Pod
-	Metrics  data.Metrics
-	Logs     []data.LogLine
-	Events   data.EventFeed
-	Manifest []string
-	Describe []data.Field
-	Diag     Diagnosis
-	LogInfo  LogInfo
-	Focused  bool
-	Scroll   int
-	Follow   bool
-	NewLines int
-	Wrap     bool
-	MemBar   float64
-	Slide    int
+	SecurityAlerts int
+	Security       SecurityView
+	Tab            Tab
+	HoverTab       int
+	Pod            *data.Pod
+	Metrics        data.Metrics
+	Logs           []data.LogLine
+	Events         data.EventFeed
+	Manifest       []string
+	Describe       []data.Field
+	Diag           Diagnosis
+	LogInfo        LogInfo
+	Focused        bool
+	Scroll         int
+	Follow         bool
+	NewLines       int
+	Wrap           bool
+	MemBar         float64
+	Slide          int
 }
 
 func DetailsPanel(r draw.Region, st DetailsState, ctx Ctx) {
@@ -126,8 +130,11 @@ func DetailsPanel(r draw.Region, st DetailsState, ctx Ctx) {
 }
 
 func tabBar(r draw.Region, st DetailsState, ctx Ctx) {
-	for _, s := range TabSpans() {
+	for _, s := range TabSpans(st.SecurityAlerts) {
 		label := " " + s.Tab.String() + " "
+		if s.Tab == TabSecurity && st.SecurityAlerts > 0 {
+			label = fmt.Sprintf(" Security %d ", st.SecurityAlerts)
+		}
 		style := draw.Fg(theme.Muted)
 		switch {
 		case s.Tab == st.Tab:
@@ -137,7 +144,7 @@ func tabBar(r draw.Region, st DetailsState, ctx Ctx) {
 		}
 		r.Text(s.X, 0, label, style)
 	}
-	last := TabSpans()[len(tabNames)-1]
+	last := TabSpans(st.SecurityAlerts)[len(tabNames)-1]
 	hint := draw.Line{muted("tab ⇥ / shift+tab")}
 	if r.W-hint.Width() > last.X+last.W+1 {
 		r.LineRight(0, hint)

@@ -15,6 +15,7 @@ func (m *Model) loadSecurity() {
 	if src, ok := m.src.(data.SecuritySource); ok {
 		m.security = src.Security()
 	}
+	m.securitySession.Update(m.security)
 	m.securityKey = ""
 }
 
@@ -24,10 +25,18 @@ func (m *Model) refreshSecurity() {
 		namespace = p.Namespace
 	}
 	width, _ := ui.DetailsBody(m.layout.Details.W, m.layout.Details.H)
-	key := fmt.Sprintf("%s|%s|%t|%d", pod, namespace, m.securityNamespace, width)
+	key := fmt.Sprintf("%s|%s|%s|%t|%d", pod, namespace, m.nsFilter, m.securityNamespace, width)
 	if m.securityKey == key {
 		return
 	}
 	m.securityKey = key
 	m.securityView = ui.BuildSecurityView(m.security, pod, namespace, m.securityNamespace || pod == "", max(1, width-4))
+	m.securityView = ui.DashboardSecurityView(m.securityView, m.securitySession, m.nsFilter, pod, max(1, width-4))
+}
+
+func (m *Model) acknowledgeSecurity() {
+	m.securitySession.Acknowledge()
+	m.securityKey = ""
+	m.refreshSecurity()
+	m.clampScroll()
 }

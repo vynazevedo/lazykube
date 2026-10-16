@@ -11,8 +11,9 @@ import (
 const Version = "v2.0"
 
 type HeaderState struct {
-	Cluster   data.Cluster
-	MetricsOK bool
+	Cluster        data.Cluster
+	MetricsOK      bool
+	SecurityAlerts int
 }
 
 func Header(r draw.Region, st HeaderState, ctx Ctx) {
@@ -27,6 +28,9 @@ func Header(r draw.Region, st HeaderState, ctx Ctx) {
 	x += r.Line(x, 0, draw.Line{muted("  " + Version + "  ")})
 
 	pill := statusPill(st, ctx)
+	if st.SecurityAlerts > 0 {
+		pill = append(draw.Line{draw.S(fmt.Sprintf("! %d high new  ", st.SecurityAlerts), draw.Fg(theme.Err).WithBold())}, pill...)
+	}
 	right := r.W - pill.Width()
 
 	chip := theme.BgChip

@@ -5,27 +5,27 @@
  │ / filter pods…▌                   ns:default  0 items │ │ ────────────────────────────────────────────────────────────────── │ 
  │                                                       │ │ ╭────────────────────────────────────────────────────────────────╮ │ 
  │   NAME             NAMESPACE    RST   AGE CPU/STATUS  │ │ │ S: pod | Namespace: default                                    │ │ 
- │   no pods match the filter                            │ │ │ Coverage: complete in scope | pods evaluated 0/0               │ │ 
+ │   no pods match the filter                            │ │ │ Dashboard coverage: complete in scope | pods 0/0               │ │ 
  │                                                       │ │ │ No findings does not mean safe                                 │ │ 
  │                                                       │ │ │ Local checks only; not PSS compliance.                         │ │ 
- │                                                       │ │ │ No pod observations in this scope.                             │ │ 
- │                                                       │ │ │                                                                │ │ 
- │                                                       │ │ │                                                                │ │ 
- │                                                       │ │ │                                                                │ │ 
- │                                                       │ │ │                                                                │ │ 
- │                                                       │ │ │                                                                │ │ 
- │                                                       │ │ │                                                                │ │ 
- │                                                       │ │ │                                                                │ │ 
- │                                                       │ │ │                                                                │ │ 
- │                                                       │ │ │                                                                │ │ 
- ╰───────────────────────────────────────────────────────╯ │ │                                                                │ │ 
- ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │                                                                │ │ 
- │                                                       │ │ │                                                                │ │ 
- │ bilibili-raf… ███████████████████████████████████████ │ │ │                                                                │ │ 
- │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
- │ bilibili-live ███████████████████████████████████████ │ │ │                                                                │ │ 
- │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
- │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │                                                                │ │ 
+ │                                                       │ │ │ POSTURE | Namespace: default | not rated | complete in scope;  │ │ 
+ │                                                       │ │ │ no evaluated pods                                              │ │ 
+ │                                                       │ │ │ high      0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ │                                                       │ │ │ medium    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ │                                                       │ │ │ info      0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ │                                                       │ │ │ Unknown checks: 0 | confirmed findings only in score           │ │ 
+ │                                                       │ │ │ Trend: paused until coverage is evaluable                      │ │ 
+ │                                                       │ │ │ ALERTS | new high since baseline / last ack | A: ack all       │ │ 
+ │                                                       │ │ │ No unacknowledged high alerts.                                 │ │ 
+ │                                                       │ │ │ TOP RULES | confirmed findings                                 │ │ 
+ ╰───────────────────────────────────────────────────────╯ │ │ No confirmed findings in observed checks.                      │ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ NAMESPACES | lowest scores first                               │ │ 
+ │                                                       │ │ │ default | not rated | complete in scope; no evaluated pods     │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │ Score: 100 - (25*high + 8*medium + 2*info)/evaluated pods;     │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ floor 0, rounded.                                              │ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │ │ Grades: A >=90, B >=80, C >=70, D >=60, F <60. Not a safety    │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ rating.                                                        │ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │ No pod observations in this scope.                             │ │ 
  │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
  │ psql-6bc7744… ███████████████████████████████████████ │ │ │                                                                │ │ 
  │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                                │ │ 
