@@ -13,20 +13,20 @@
                                                                                                                                                                 
                                    ╭─ Help ────────────────────────────────────────────────────────────────────────────────╮                                    
                                    │                                                                                       │                                    
-                                   │  ↑/↓ k/j    move selection                 home/end   top / bottom                    │                                    
-                                   │  tab        next panel                     g G        top / bottom (details)          │                                    
-                                   │  shift+tab  previous panel                 f          toggle follow (Log)             │                                    
-                                   │  /          filter pods                    w          toggle wrap (Log)               │                                    
-                                   │  enter      open pod / namespace scope     C          next log container              │                                    
-                                   │  esc        clear search/filter, back      P          current / previous logs         │                                    
-                                   │  m          screens menu ← → enter         / n N      search Log (details focus)      │                                    
-                                   │  2          Dashboard screen               E          events pod / ns / cluster       │                                    
-                                   │  3          Workloads screen               p          cycle palette                   │                                    
+                                   │  ↑/↓ k/j    move selection                 pgup/pgdn  scroll viewport                 │                                    
+                                   │  tab        next panel                     home/end   top / bottom                    │                                    
+                                   │  shift+tab  previous panel                 g G        top / bottom (details)          │                                    
+                                   │  /          filter pods                    f          toggle follow (Log)             │                                    
+                                   │  enter      open pod / namespace scope     w          toggle wrap (Log)               │                                    
+                                   │  esc        clear search/filter, back      C          next log container              │                                    
+                                   │  m          screens menu ← → enter         P          current / previous logs         │                                    
+                                   │  2          Dashboard screen               / n N      search Log (details focus)      │                                    
+                                   │  3          Workloads screen               E          events pod / ns / cluster       │                                    
+                                   │  4          Nodes screen                   p          cycle palette                   │                                    
                                    │  l c t d e  Log Config Top Describe Events 1          toggle left column              │                                    
                                    │  S          Security / namespace posture   ctrl+p     pause animations                │                                    
                                    │  A          ack all Security alerts        ?          toggle help                     │                                    
                                    │  [ ]        previous / next tab            q ctrl+c   quit                            │                                    
-                                   │  pgup/pgdn  scroll viewport                                                           │                                    
                                    │  Security score v2: max(0,100-40H-6M-I), per pod and dimension.                       │                                    
                                    │  Each rule once at worst severity; Security and Hygiene are separate.                 │                                    
                                    │  Scope: mean, median, lowest ceil(N/10) mean. SEC = Security; p = partial.            │                                    

@@ -105,6 +105,7 @@ func (d *Demo) Snapshot() Snapshot {
 			Pods:        len(pods),
 			PodCapacity: 110,
 			Arch:        "amd64",
+			Coverage:    Coverage{State: CoverageComplete},
 		},
 		Pods: pods,
 		Deployments: []Deployment{
@@ -157,9 +158,10 @@ func txV(i float64) float64 { return theme.Noise(4.1*i+5) * 6 }
 func (d *Demo) Metrics(tick int, pod string, heatCols int) Metrics {
 	step := tick / 2
 	m := Metrics{
-		Available: true,
-		NodeCPU:   int(math.Round(18 + theme.Noise(float64(step))*8)),
-		PodCPU:    make(map[string]int, len(d.pods)),
+		Available:    true,
+		NodeCPU:      int(math.Round(18 + theme.Noise(float64(step))*8)),
+		NodeCPUKnown: true,
+		PodCPU:       make(map[string]int, len(d.pods)),
 	}
 	for i, p := range d.pods {
 		if p.pod.Status != StatusRunning {

@@ -89,7 +89,7 @@ func TestPanelGoldens(t *testing.T) {
 		Header(r, HeaderState{Synthetic: snap.Synthetic, Cluster: snap.Cluster, MetricsOK: false}, ctx)
 	}))
 	check(t, "node", canvas(37, 16, func(r draw.Region) {
-		NodePanel(r, NodeState{Node: snap.Node, CPU: m.NodeCPU, CPUFrac: float64(m.NodeCPU) / 100, MemFrac: snap.Node.MemFraction}, ctx)
+		NodePanel(r, NodeState{Node: snap.Node, CPU: m.NodeCPU, CPUKnown: m.NodeCPUKnown, CPUFrac: float64(m.NodeCPU) / 100, MemFrac: snap.Node.MemFraction}, ctx)
 	}))
 	check(t, "namespaces", canvas(37, 12, func(r draw.Region) {
 		NamespacesPanel(r, NamespacesState{Items: snap.Namespaces, Highlight: "bilibili-raffle"}, ctx)

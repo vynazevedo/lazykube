@@ -123,6 +123,19 @@ func ComputeWorkloads(w, h int) Layout {
 	return l
 }
 
+func ComputeNodes(w, h int) Layout {
+	l := Layout{W: w, H: h}
+	if w < MinWidth || h < MinHeight {
+		l.TooSmall = true
+		return l
+	}
+	l.shell(w, h)
+	summary := round(float64(l.Body.W)*0.4 - 9.2)
+	l.Node = Rect{X: l.Body.X, Y: l.Body.Y, W: summary, H: l.Body.H}
+	l.Pods = Rect{X: l.Body.X + summary + 1, Y: l.Body.Y, W: l.Body.W - summary - 1, H: l.Body.H}
+	return l
+}
+
 func ComputeDetail(w, h int) Layout {
 	l := Layout{W: w, H: h}
 	if w < MinWidth || h < MinHeight {

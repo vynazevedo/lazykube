@@ -69,6 +69,7 @@ type Node struct {
 	Pods        int
 	PodCapacity int
 	Arch        string
+	Coverage    Coverage
 }
 
 type Pod struct {
@@ -144,27 +145,28 @@ type Snapshot struct {
 }
 
 type Metrics struct {
-	Available  bool
-	NodeCPU    int
-	PodCPU     map[string]int
-	CPU        []float64
-	CPUNow     int
-	Mem        []float64
-	MemNow     int
-	RX         []float64
-	TX         []float64
-	RXNow      float64
-	TXNow      float64
-	HeatLabels []string
-	Heat       [][]float64
-	MemMax     float64
-	RXMax      float64
-	TXMax      float64
-	Samples    int
-	Window     int
-	Reason     string
-	NetReason  string
-	NetStale   bool
+	Available    bool
+	NodeCPU      int
+	NodeCPUKnown bool
+	PodCPU       map[string]int
+	CPU          []float64
+	CPUNow       int
+	Mem          []float64
+	MemNow       int
+	RX           []float64
+	TX           []float64
+	RXNow        float64
+	TXNow        float64
+	HeatLabels   []string
+	Heat         [][]float64
+	MemMax       float64
+	RXMax        float64
+	TXMax        float64
+	Samples      int
+	Window       int
+	Reason       string
+	NetReason    string
+	NetStale     bool
 }
 
 type Source interface {

@@ -143,10 +143,13 @@ func (m *Model) activateScreen(id ScreenID) {
 	if !slices.Contains(registeredScreens(), id) {
 		return
 	}
-	ns, from := m.scopeNamespace(), m.mainScreen()
-	m.navigate(Route{Kind: RouteScreen, Screen: id})
+	ns, from, node := m.scopeNamespace(), m.mainScreen(), ""
+	if id == ScreenNodes {
+		node = m.selectedNode()
+	}
+	m.navigate(Route{Kind: RouteScreen, Screen: id, Node: node})
 	if ns != "" && from != id {
-		m.navigate(Route{Kind: RouteNamespace, Screen: id, Namespace: ns})
+		m.navigate(Route{Kind: RouteNamespace, Screen: id, Namespace: ns, Node: node})
 	}
 }
 
@@ -182,6 +185,8 @@ func menuKey(id ScreenID) string {
 		return "2"
 	case ScreenWorkloads:
 		return "3"
+	case ScreenNodes:
+		return "4"
 	}
 	return ""
 }
@@ -223,6 +228,9 @@ func (m Model) handleMenuKey(msg tea.KeyPressMsg) Model {
 	case key.Matches(msg, k.Workloads):
 		m.menu.open = false
 		m.activateScreen(ScreenWorkloads)
+	case key.Matches(msg, k.Nodes):
+		m.menu.open = false
+		m.activateScreen(ScreenNodes)
 	case key.Matches(msg, k.Esc), key.Matches(msg, k.Menu), key.Matches(msg, k.NextPanel), key.Matches(msg, k.PrevPanel):
 		m.menu.open = false
 	}
@@ -247,6 +255,9 @@ func (m Model) routeKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 			return m, nil
 		case key.Matches(msg, k.Workloads):
 			m.activateScreen(ScreenWorkloads)
+			return m, nil
+		case key.Matches(msg, k.Nodes):
+			m.activateScreen(ScreenNodes)
 			return m, nil
 		case key.Matches(msg, k.Esc):
 			m.handleEsc()

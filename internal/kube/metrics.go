@@ -35,6 +35,8 @@ const (
 	reasonDown         = "metrics-server fora do ar"
 	reasonMetricsDeny  = "sem permissão: pods.metrics.k8s.io"
 	reasonNodesDeny    = "sem permissão: nodes"
+	reasonNoNode       = "nenhum pod com node no escopo"
+	reasonNodeUnseen   = "node não observado"
 	reasonProxyDeny    = "sem permissão: nodes/proxy"
 	reasonNoStats      = "kubelet sem stats/summary"
 	reasonKubeletDown  = "kubelet indisponível"
@@ -401,7 +403,9 @@ func (s *Source) Metrics(_ int, key string, heatCols int) data.Metrics {
 	node := s.displayNodeLocked()
 	if n := s.nodes[node]; n != nil {
 		if alloc := n.Status.Allocatable.Cpu().MilliValue(); alloc > 0 {
-			m.NodeCPU = int(math.Round(float64(u.nodeCPU[node]) * 100 / float64(alloc)))
+			used, ok := u.nodeCPU[node]
+			m.NodeCPU = int(math.Round(float64(used) * 100 / float64(alloc)))
+			m.NodeCPUKnown = ok
 		}
 	}
 	p := s.byKey[key]

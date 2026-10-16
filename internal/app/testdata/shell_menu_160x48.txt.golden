@@ -1,5 +1,5 @@
  lazykube [DEMO]  v2.0   ◎ context demo   k8s demo  nodes 1  ns 8  pods 13  uptime 119d                                              ⠙ metrics every 5s ● live  
- [2 Dashboard] |  3 Workloads                                                                                       ← → move  home end  enter open  esc cancel  
+ [2 Dashboard] |  3 Workloads  |  4 Nodes                                                                           ← → move  home end  enter open  esc cancel  
  Dashboard > kube-system                                                                                                                                        
  ╭─ Node ────────────────────────────╮ ╭─ Pods ─────────────────────────────────────────────╮ ╭───────────────────────────────────────────────────────────────╮ 
  │                                   │ │                                                    │ │  Log   Config   Top   Describe   Events   Security            │ 
@@ -45,4 +45,4 @@
  │                                   │ │               -2m ████████████████████████████ now │ │ ╰───────────────────────────────────────────────────────────╯ │ 
  ╰───────────────────────────────────╯ ╰────────────────────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────╯ 
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  ←→  move   home end  first / last   enter  open   2 3  Dashboard / Workloads   esc m  cancel                                                bubbletea · 0 fps 
+  ←→  move   home end  first / last   enter  open   2 3 4  Dashboard / Workloads / Nodes   esc m  cancel                                      bubbletea · 0 fps 

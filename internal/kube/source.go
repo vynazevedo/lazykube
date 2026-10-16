@@ -578,7 +578,7 @@ func (s *Source) displayNodeLocked() string {
 
 func (s *Source) nodeLocked(name string) data.Node {
 	if name == "" {
-		return data.Node{Name: "-", Address: "-", MemUsed: "n/a", MemTotal: "n/a", Arch: "-"}
+		return data.Node{Name: "-", Address: "-", MemUsed: "n/a", MemTotal: "n/a", Arch: "-", Coverage: data.Coverage{State: data.CoverageUnavailable, Reason: reasonNoNode}}
 	}
 	pods := 0
 	for _, p := range s.byKey {
@@ -588,10 +588,16 @@ func (s *Source) nodeLocked(name string) data.Node {
 	}
 	n := s.nodes[name]
 	if n == nil {
-		return data.Node{Name: name, Address: "-", MemUsed: "n/a", MemTotal: "n/a", Pods: pods, Arch: "-", Ready: true}
+		cov := data.Coverage{State: data.CoverageUnavailable, Reason: reasonNodeUnseen}
+		if s.nodeInf == nil {
+			cov = data.Coverage{State: data.CoverageDenied, Reason: reasonNodesDeny}
+		}
+		return data.Node{Name: name, Address: "-", MemUsed: "n/a", MemTotal: "n/a", Pods: pods, Arch: "-", Ready: true, Coverage: cov}
 	}
 	mem, ok := s.usage.nodeMem[name]
-	return toNode(n, pods, mem, ok)
+	out := toNode(n, pods, mem, ok)
+	out.Coverage = data.Coverage{State: data.CoverageComplete}
+	return out
 }
 
 func (s *Source) setActive(key string) {

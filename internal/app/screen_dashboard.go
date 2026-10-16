@@ -71,10 +71,11 @@ func (dashboardScreen) View(m Model, body draw.Region, ctx ui.Ctx) {
 	pod := m.selectedPod()
 	if m.layout.ShowLeft {
 		ui.NodePanel(region(body, m.layout.Node), ui.NodeState{
-			Node:    m.snap.Node,
-			CPU:     m.metrics.NodeCPU,
-			CPUFrac: m.motion.nodeCPU.Pos,
-			MemFrac: m.motion.nodeMem.Pos,
+			Node:     m.snap.Node,
+			CPU:      m.metrics.NodeCPU,
+			CPUKnown: m.metrics.NodeCPUKnown,
+			CPUFrac:  m.motion.nodeCPU.Pos,
+			MemFrac:  m.motion.nodeMem.Pos,
 		}, ctx)
 		highlight := ""
 		if pod != nil {
