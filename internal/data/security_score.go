@@ -6,7 +6,7 @@ import (
 )
 
 const SecurityScoreVersion = "2"
-const SecurityRuleVersion = "2"
+const SecurityRuleVersion = "3"
 
 type SecurityDimension string
 

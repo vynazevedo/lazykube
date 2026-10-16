@@ -105,3 +105,56 @@ func TestSecurityPluralCounts(t *testing.T) {
 		}
 	}
 }
+
+func TestSecurityDashboardReservesAggregateBudget(t *testing.T) {
+	snapshot := data.NewDemo().Security()
+	p := snapshot.Pods[selectedPod]
+	p.Findings = make([]data.Finding, 1000)
+	for i := range p.Findings {
+		p.Findings[i] = data.Finding{Rule: "privileged", Severity: data.SeverityHigh, Result: data.ResultFinding, Evidence: "selected evidence", Target: p.Target}
+	}
+	snapshot.Pods[selectedPod] = p
+	var session data.SecuritySession
+	session.Update(snapshot)
+	session.Alerts = []data.Finding{{Rule: "new-high", Target: p.Target}}
+	detail := BuildSecurityView(snapshot, selectedPod, p.Target.Namespace, true, 80)
+	if len(detail.Rows) != maxSecurityRows {
+		t.Fatalf("fixture has %d rows", len(detail.Rows))
+	}
+	view := DashboardSecurityView(detail, session, p.Target.Namespace, selectedPod, 80)
+	text := strings.Join(view.Rows, "\n")
+	for _, want := range []string{"POSTURE", "median", "ALERTS", "new-high", "TOP RULES", "NAMESPACES"} {
+		if !strings.Contains(text, want) {
+			t.Errorf("missing %s", want)
+		}
+	}
+	if len(view.Rows) > maxSecurityRows {
+		t.Fatal("row budget exceeded")
+	}
+}
+
+func TestSecurityDashboardOtherPodsAfterSummary(t *testing.T) {
+	snapshot := data.NewDemo().Security()
+	selected := snapshot.Pods[selectedPod]
+	other := selected
+	other.Target.Name = "other-pod"
+	other.Findings = make([]data.Finding, 1000)
+	for i := range other.Findings {
+		other.Findings[i] = data.Finding{Rule: "privileged", Severity: data.SeverityHigh, Result: data.ResultFinding, Target: other.Target}
+	}
+	snapshot.Pods[other.Target.Namespace+"/"+other.Target.Name] = other
+	var session data.SecuritySession
+	session.Update(snapshot)
+	detail := BuildSecurityView(snapshot, selectedPod, selected.Target.Namespace, true, 80)
+	if len(detail.Rows) != maxSecurityRows {
+		t.Fatal("fixture must exhaust budget")
+	}
+	view := DashboardSecurityView(detail, session, selected.Target.Namespace, selectedPod, 80)
+	text := strings.Join(view.Rows, "\n")
+	selectedAt := strings.Index(text, "Pod "+selectedPod+" |")
+	summaryAt := strings.Index(text, "POSTURE")
+	otherAt := strings.Index(text, "Pod "+other.Target.Namespace+"/other-pod |")
+	if selectedAt < 0 || summaryAt <= selectedAt || otherAt <= summaryAt {
+		t.Fatal("pod evidence ordering incorrect")
+	}
+}

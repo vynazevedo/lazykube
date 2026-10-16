@@ -14,26 +14,26 @@
  │                                                       │ │ │ Namespace mean (0 pods) | Cluster mean (13 pods)               │ │ 
  │                                                       │ │ │ Selected pod security: not rated | ; no evaluated pods         │ │ 
  │                                                       │ │ │ Synthetic data (demo)                                          │ │ 
- │                                                       │ │ │ No pod observations in this scope.                             │ │ 
  │                                                       │ │ │ POSTURE | Namespace: default | not rated | complete in scope;  │ │ 
  │                                                       │ │ │ no evaluated pods                                              │ │ 
  │                                                       │ │ │ SEC column: Security; p = partial. Hygiene scored separately.  │ │ 
  │                                                       │ │ │ Security: not rated | complete in scope; no evaluated pods     │ │ 
- ╰───────────────────────────────────────────────────────╯ │ │ Hygiene: not rated | complete in scope; no evaluated pods      │ │ 
- ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ Worst decile = mean of lowest ceil(N/10) pod scores.           │ │ 
- │                                                       │ │ │ high      0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
- │ bilibili-raf… ███████████████████████████████████████ │ │ │ medium    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
- │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ info      0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
- │ bilibili-live ███████████████████████████████████████ │ │ │ Unknown checks: 0 | confirmed findings only in score           │ │ 
- │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Trend: paused until coverage is evaluable                      │ │ 
- │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │ ALERTS | new high since baseline / last ack | A: ack all       │ │ 
- │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ No unacknowledged high alerts.                                 │ │ 
- │ psql-6bc7744… ███████████████████████████████████████ │ │ │ TOP RULES | affected pods, both dimensions                     │ │ 
- │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ No confirmed findings in observed checks.                      │ │ 
- │ odoo-7575bf6… ███████████████████████████████████████ │ │ │ NAMESPACES | lowest scores first                               │ │ 
- │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ default | not rated | complete in scope; no evaluated pods     │ │ 
- │ coredns-6799… ███████████████████████████████████████ │ │ │ Score: v2 per pod/dimension: max(0, 100 - 40H - 6M - I); each  │ │ 
- │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ rule once, worst severity.                                     │ │ 
+ │                                                       │ │ │ Hygiene: not rated | complete in scope; no evaluated pods      │ │ 
+ ╰───────────────────────────────────────────────────────╯ │ │ Worst decile = mean of lowest ceil(N/10) pod scores.           │ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ high      0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ │                                                       │ │ │ medium    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │ info      0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Unknown checks: 0 | confirmed findings only in score           │ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │ │ Trend: paused until coverage is evaluable                      │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ ALERTS | new high since baseline / last ack | A: ack all       │ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │ No unacknowledged high alerts.                                 │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ TOP RULES | affected pods, both dimensions                     │ │ 
+ │ psql-6bc7744… ███████████████████████████████████████ │ │ │ No confirmed findings in observed checks.                      │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ NAMESPACES | lowest scores first                               │ │ 
+ │ odoo-7575bf6… ███████████████████████████████████████ │ │ │ default | not rated | complete in scope; no evaluated pods     │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Score: v2 per pod/dimension: max(0, 100 - 40H - 6M - I); each  │ │ 
+ │ coredns-6799… ███████████████████████████████████████ │ │ │ rule once, worst severity.                                     │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Grades: A >=90, B >=80, C >=70, D >=60, E >=50, F <50. Not a   │ │ 
  │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
  ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────

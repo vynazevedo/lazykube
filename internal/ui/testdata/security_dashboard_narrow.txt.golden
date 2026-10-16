@@ -30,7 +30,7 @@
 │ │ Evidence: forced by privileged        │ │
 │ │ Additional privileges possible.       │ │
 │ │ Disable privileged mode               │ │
-│ │ Source: demo fixture v2 |             │ │
+│ │ Source: demo fixture v3 |             │ │
 │ │ configuration observed                │ │
 │ │ [high] privileged | finding |         │ │
 │ │ container: init-permissions           │ │
@@ -40,7 +40,7 @@
 │ │ Evidence: true                        │ │
 │ │ Privileged init container             │ │
 │ │ configured. Disable privileged mode   │ │
-│ │ Source: demo fixture v2 |             │ │
+│ │ Source: demo fixture v3 |             │ │
 │ │ configuration observed                │ │
 │ │ MEDIUM findings                       │ │
 │ │ [medium] imageLatest | finding |      │ │

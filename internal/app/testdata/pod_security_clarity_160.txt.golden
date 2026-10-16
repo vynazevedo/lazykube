@@ -21,12 +21,12 @@
  │ │ Field: spec.hostNetwork                                                                                                                                │ │ 
  │ │ Evidence: true                                                                                                                                         │ │ 
  │ │ Shares host networking. Disable host network unless required                                                                                           │ │ 
- │ │ Source: demo fixture v2 | configuration observed                                                                                                       │ │ 
+ │ │ Source: demo fixture v3 | configuration observed                                                                                                       │ │ 
  │ │ [high] capabilitiesAdded | finding | container: debugger                                                                                               │ │ 
  │ │ Field: spec.ephemeralContainers[0].securityContext.capabilities.add                                                                                    │ │ 
  │ │ Evidence: SYS_ADMIN                                                                                                                                    │ │ 
  │ │ Additional Linux capability configured. Remove unnecessary capabilities                                                                                │ │ 
- │ │ Source: demo fixture v2 | configuration observed                                                                                                       │ │ 
+ │ │ Source: demo fixture v3 | configuration observed                                                                                                       │ │ 
  │ │ POSTURE | Cluster | 55/100 (E) | 13/13 pods                                                                                                            │ │ 
  │ │ Score ████████████████████░░░░░░░░░░░░░░░░                                                                                                             │ │ 
  │ │ SEC column: Security; p = partial. Hygiene scored separately.                                                                                          │ │ 

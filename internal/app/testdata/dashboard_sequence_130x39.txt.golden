@@ -554,7 +554,7 @@
 │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
 │               -2m ███████████████████████████████ now │
 ╰───────────────────────────────────────────────────────╯
-== security-namespace details 70x35 cells=497e30bc4fd69ad674253accd809ed5c023fe5168ab65e281b2993cbc82a7400
+== security-namespace details 70x35 cells=ad24c208844a2a76a77b4a41ae3dd5fea7ba910088f960e5d588c2752ba78566
 ╭────────────────────────────────────────────────────────────────────╮
 │  Log   Config   Top   Describe   Events   Security                 │
 │ ────────────────────────────────────────────────────────────────── │
@@ -572,22 +572,22 @@
 │ │ Observed 2026-10-16 12:00:00Z | UID                            │ │
 │ │ demo-ys-odoo/psql-6bc7744f9-r7zlc | RV 1                       │ │
 │ │ No findings in evaluated local checks.                         │ │
-│ │ Pod ys-odoo/odoo-7575bf6d8-9wjvk | complete in scope           │ │
-│ │ Observed 2026-10-16 12:00:00Z | UID                            │ │
-│ │ demo-ys-odoo/odoo-7575bf6d8-9wjvk | RV 1                       │ │
-│ │ MEDIUM findings                                                │ │
-│ │ [medium] allowPrivilegeEscalation | finding | container: app   │ │
-│ │ Field: spec.containers[0].securityContext                      │ │
-│ │ Evidence: unspecified                                          │ │
-│ │ Protection not explicitly configured. Review and configure     │ │
-│ │ this control                                                   │ │
-│ │ Source: demo fixture v2 | configuration observed               │ │
-│ │ [medium] runAsNonRoot | finding | container: app               │ │
-│ │ Field: spec.containers[0].securityContext                      │ │
-│ │ Evidence: unspecified                                          │ │
-│ │ Protection not explicitly configured. Review and configure     │ │
-│ │ this control                                                   │ │
-│ │ Source: demo fixture v2 | configuration observed               │ │
+│ │ POSTURE | Cluster | 55/100 (E) | 13/13 pods                    │ │
+│ │ Score ████████████████████░░░░░░░░░░░░░░░░                     │ │
+│ │ SEC column: Security; p = partial. Hygiene scored separately.  │ │
+│ │ Security mean 55 | median 75 | worst decile 20                 │ │
+│ │ A    3 ██████░░░░░░░░░░░░░░░░░░                                │ │
+│ │ B    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                │ │
+│ │ C    4 ███████░░░░░░░░░░░░░░░░░                                │ │
+│ │ D    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                │ │
+│ │ E    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                │ │
+│ │ F    6 ███████████░░░░░░░░░░░░░                                │ │
+│ │ Hygiene mean 97 | median 100 | worst decile 88                 │ │
+│ │ A   10 ██████████████████░░░░░░                                │ │
+│ │ B    3 ██████░░░░░░░░░░░░░░░░░░                                │ │
+│ │ C    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                │ │
+│ │ D    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                │ │
+│ │ E    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                │ │
 │ ╰────────────────────────────────────────────────────────────────╯ │
 ╰────────────────────────────────────────────────────────────────────╯
 == tab-events node hidden

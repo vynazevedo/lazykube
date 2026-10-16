@@ -151,25 +151,25 @@ func (e *podEvaluator) checkPrivileges(sc *corev1.SecurityContext, path string) 
 	if sc.Privileged != nil && *sc.Privileged {
 		e.add("privileged", path+".securityContext.privileged", "true", data.SeverityHigh, data.ResultFinding, "Privileged container configured", "Disable privileged mode")
 	}
-	if sc.AllowPrivilegeEscalation == nil || *sc.AllowPrivilegeEscalation || (sc.Privileged != nil && *sc.Privileged) || hasCapability(sc.Capabilities, "SYS_ADMIN", false) {
+	if sc.AllowPrivilegeEscalation == nil || *sc.AllowPrivilegeEscalation || (sc.Privileged != nil && *sc.Privileged) || effectiveCapability(sc.Capabilities, "SYS_ADMIN") {
 		severity, state := data.SeverityHigh, data.AssessmentUnsafe
 		evidence := "true or forced by privileged/SYS_ADMIN"
-		if sc.AllowPrivilegeEscalation == nil && (sc.Privileged == nil || !*sc.Privileged) && !hasCapability(sc.Capabilities, "SYS_ADMIN", false) {
+		if sc.AllowPrivilegeEscalation == nil && (sc.Privileged == nil || !*sc.Privileged) && !effectiveCapability(sc.Capabilities, "SYS_ADMIN") {
 			severity, state = data.SeverityMedium, data.AssessmentUnspecified
 			evidence = "unspecified; privilege escalation not explicitly disabled"
 		}
 		e.add("allowPrivilegeEscalation", path+".securityContext.allowPrivilegeEscalation", evidence, severity, data.ResultFinding, "Processes may gain additional privileges", "Disable escalation and remove privileged/SYS_ADMIN", state)
 	}
-	if sc.Capabilities != nil && len(sc.Capabilities.Add) > 0 {
+	if hasEffectiveCapabilityAdd(sc.Capabilities) {
 		caps := make([]string, len(sc.Capabilities.Add))
 		for i, c := range sc.Capabilities.Add {
 			caps[i] = string(c)
 		}
 		severity := data.SeverityMedium
-		if hasCapability(sc.Capabilities, "SYS_ADMIN", false) {
+		if effectiveCapability(sc.Capabilities, "SYS_ADMIN") || effectiveCapability(sc.Capabilities, "ALL") {
 			severity = data.SeverityHigh
 		}
-		e.add("capabilitiesAdded", path+".securityContext.capabilities.add", strings.Join(caps, ", "), severity, data.ResultFinding, "Additional Linux capabilities configured", "Remove capabilities that are not required")
+		e.add("capabilitiesAdded", path+".securityContext.capabilities.add", strings.Join(caps, ", ")+"; drop: "+capabilityDropEvidence(sc.Capabilities), severity, data.ResultFinding, "Additional Linux capabilities configured", "Remove capabilities that are not required")
 	}
 	if !hasCapability(sc.Capabilities, "ALL", true) {
 		state := data.AssessmentUnspecified
@@ -189,7 +189,7 @@ func hasCapability(c *corev1.Capabilities, want corev1.Capability, drop bool) bo
 		values = c.Drop
 	}
 	for _, v := range values {
-		if v == want {
+		if normalizeCapability(v) == normalizeCapability(want) {
 			return true
 		}
 	}
@@ -258,4 +258,42 @@ func validImageDigest(digest string) bool {
 		}
 	}
 	return true
+}
+
+func normalizeCapability(c corev1.Capability) string {
+	return strings.TrimPrefix(strings.ToUpper(string(c)), "CAP_")
+}
+
+func effectiveCapability(c *corev1.Capabilities, want corev1.Capability) bool {
+	if c == nil {
+		return false
+	}
+	all := hasCapability(c, "ALL", false) && !hasCapability(c, "ALL", true)
+	if normalizeCapability(want) == "ALL" {
+		return all
+	}
+	return (all || hasCapability(c, want, false)) && !hasCapability(c, want, true)
+}
+
+func hasEffectiveCapabilityAdd(c *corev1.Capabilities) bool {
+	if c == nil {
+		return false
+	}
+	for _, capability := range c.Add {
+		if effectiveCapability(c, capability) {
+			return true
+		}
+	}
+	return false
+}
+
+func capabilityDropEvidence(c *corev1.Capabilities) string {
+	if len(c.Drop) == 0 {
+		return "none"
+	}
+	values := make([]string, len(c.Drop))
+	for i, capability := range c.Drop {
+		values[i] = string(capability)
+	}
+	return strings.Join(values, ", ")
 }

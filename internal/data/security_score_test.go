@@ -52,19 +52,19 @@ func TestSecurityV2Distribution(t *testing.T) {
 
 func TestSecurityRuleVersionBaseline(t *testing.T) {
 	snapshot := securityDashboardFixture()
-	snapshot.RuleVersion = "1"
+	snapshot.RuleVersion = "2"
 	var session SecuritySession
 	session.Update(snapshot)
 	p := snapshot.Pods["a/pod"]
-	p.Findings = append(p.Findings, Finding{Rule: "new-high", Severity: SeverityHigh, Result: ResultFinding, RuleVersion: "2"})
+	p.Findings = append(p.Findings, Finding{Rule: "new-high", Severity: SeverityHigh, Result: ResultFinding, RuleVersion: SecurityRuleVersion})
 	snapshot.Pods["a/pod"] = p
-	snapshot.RuleVersion = "2"
+	snapshot.RuleVersion = SecurityRuleVersion
 	session.Update(snapshot)
 	if len(session.Alerts) != 0 || len(session.History[""]) != 1 {
 		t.Fatal("version transition did not rebaseline")
 	}
 	snapshot.Revision++
-	p.Findings = append(p.Findings, Finding{Rule: "real-change", Severity: SeverityHigh, Result: ResultFinding, RuleVersion: "2"})
+	p.Findings = append(p.Findings, Finding{Rule: "real-change", Severity: SeverityHigh, Result: ResultFinding, RuleVersion: SecurityRuleVersion})
 	snapshot.Pods["a/pod"] = p
 	session.Update(snapshot)
 	if len(session.Alerts) != 1 || session.Alerts[0].Rule != "real-change" {

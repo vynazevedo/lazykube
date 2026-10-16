@@ -59,7 +59,11 @@ func DashboardSecurityView(detail SecurityView, session data.SecuritySession, sc
 	if detail.Synthetic {
 		add("Synthetic data (demo)")
 	}
-	rows = append(rows, detail.Rows...)
+	selectedRows := min(detail.SelectedRows, len(detail.Rows), 128)
+	rows = append(rows, detail.Rows[:selectedRows]...)
+	if selectedRows < detail.SelectedRows {
+		add("More selected pod evidence after the dashboard summary.")
+	}
 	add("POSTURE | " + scopeLabel + " | " + securityScoreLabel(a.Score))
 	if a.Score.Available {
 		add("Score " + securityBar(a.Score.Value, 100, max(1, min(36, width-6))))
@@ -177,6 +181,7 @@ func DashboardSecurityView(detail SecurityView, session data.SecuritySession, sc
 			add("! " + f.Target.Namespace + "/" + f.Target.Name + " | " + f.Rule + " | " + container)
 		}
 	}
+	rows = append(rows, detail.Rows[selectedRows:]...)
 	if len(rows) > maxSecurityRows {
 		rows = rows[:maxSecurityRows]
 		rows[len(rows)-1] = "More results omitted; select a pod for details."

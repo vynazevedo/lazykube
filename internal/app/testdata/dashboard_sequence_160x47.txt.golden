@@ -802,7 +802,7 @@
 │                                                    │
 │               -2m ████████████████████████████ now │
 ╰────────────────────────────────────────────────────╯
-== security-namespace details 65x43 cells=5861c55454d789de837a2be13403212bd82bc4927ca774b78ad4acb90ce885d3
+== security-namespace details 65x43 cells=14f082f3ef6542f579be60c9a4b9323fd2630565aa1251b3ba2e170c5bd70bc8
 ╭───────────────────────────────────────────────────────────────╮
 │  Log   Config   Top   Describe   Events   Security            │
 │ ───────────────────────────────────────────────────────────── │
@@ -820,30 +820,30 @@
 │ │ Observed 2026-10-16 12:00:00Z | UID                       │ │
 │ │ demo-ys-odoo/psql-6bc7744f9-r7zlc | RV 1                  │ │
 │ │ No findings in evaluated local checks.                    │ │
-│ │ Pod ys-odoo/odoo-7575bf6d8-9wjvk | complete in scope      │ │
-│ │ Observed 2026-10-16 12:00:00Z | UID                       │ │
-│ │ demo-ys-odoo/odoo-7575bf6d8-9wjvk | RV 1                  │ │
-│ │ MEDIUM findings                                           │ │
-│ │ [medium] allowPrivilegeEscalation | finding | container:  │ │
-│ │ app                                                       │ │
-│ │ Field: spec.containers[0].securityContext                 │ │
-│ │ Evidence: unspecified                                     │ │
-│ │ Protection not explicitly configured. Review and          │ │
-│ │ configure this control                                    │ │
-│ │ Source: demo fixture v2 | configuration observed          │ │
-│ │ [medium] runAsNonRoot | finding | container: app          │ │
-│ │ Field: spec.containers[0].securityContext                 │ │
-│ │ Evidence: unspecified                                     │ │
-│ │ Protection not explicitly configured. Review and          │ │
-│ │ configure this control                                    │ │
-│ │ Source: demo fixture v2 | configuration observed          │ │
-│ │ [medium] seccomp | finding | container: app               │ │
-│ │ Field: spec.containers[0].securityContext                 │ │
-│ │ Evidence: unspecified                                     │ │
-│ │ Protection not explicitly configured. Review and          │ │
-│ │ configure this control                                    │ │
-│ │ Source: demo fixture v2 | configuration observed          │ │
-│ │ [medium] capabilitiesDrop | finding | container: app      │ │
+│ │ POSTURE | Cluster | 55/100 (E) | 13/13 pods               │ │
+│ │ Score ████████████████████░░░░░░░░░░░░░░░░                │ │
+│ │ SEC column: Security; p = partial. Hygiene scored         │ │
+│ │ separately.                                               │ │
+│ │ Security mean 55 | median 75 | worst decile 20            │ │
+│ │ A    3 ██████░░░░░░░░░░░░░░░░░░                           │ │
+│ │ B    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │
+│ │ C    4 ███████░░░░░░░░░░░░░░░░░                           │ │
+│ │ D    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │
+│ │ E    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │
+│ │ F    6 ███████████░░░░░░░░░░░░░                           │ │
+│ │ Hygiene mean 97 | median 100 | worst decile 88            │ │
+│ │ A   10 ██████████████████░░░░░░                           │ │
+│ │ B    3 ██████░░░░░░░░░░░░░░░░░░                           │ │
+│ │ C    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │
+│ │ D    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │
+│ │ E    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │
+│ │ F    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │
+│ │ Worst decile = mean of lowest ceil(N/10) pod scores.      │ │
+│ │ high     12 █████████████░░░░░░░░░░░                      │ │
+│ │ medium   22 ████████████████████████                      │ │
+│ │ info      4 ████░░░░░░░░░░░░░░░░░░░░                      │ │
+│ │ Unknown checks: 4 | confirmed findings only in score      │ │
+│ │ Trend: ▅ (revision samples)                               │ │
 │ ╰───────────────────────────────────────────────────────────╯ │
 ╰───────────────────────────────────────────────────────────────╯
 == tab-events node 37x16 cells=28423d2b4d7d17564d142f10409a433272e7ea931e24cebc4f9b76d7dd45a9a2
