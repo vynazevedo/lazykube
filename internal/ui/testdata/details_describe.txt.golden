@@ -1,0 +1,44 @@
+╭───────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events     tab ⇥ / shift+tab │
+│ ───────────────────────────────────────────────────────────── │
+│ ● bilibili-live-7f6b8d9c5-mn4tz                     [Running] │
+│   bilibili-raffle · Running · node huawei-k3s-01 · 10.42.0.24 │
+│                                                               │
+│ ╭───────────────────────────────────────────────────────────╮ │
+│ │ Name              bilibili-live-7f6b8d9c5-mn4tz           │ │
+│ │ Namespace         bilibili-raffle                         │ │
+│ │ Node              huawei-k3s-01/192.168.0.12              │ │
+│ │ Status            Running                                 │ │
+│ │ IP                10.42.0.24                              │ │
+│ │ Controlled By     ReplicaSet/bilibili-live-7f6b8d9c5      │ │
+│ │ Image             registry.local/bilibili-raffle:1.4.2    │ │
+│ │ Restart Count     2                                       │ │
+│ │ Requests          cpu: 10m, memory: 64Mi                  │ │
+│ │ Limits            cpu: 50m, memory: 128Mi                 │ │
+│ │ QoS Class         Burstable                               │ │
+│ │ Conditions        Initialized ✓ Ready ✓ ContainersReady … │ │
+│ │ Tolerations       node.kubernetes.io/not-ready:NoExecute… │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ ╰───────────────────────────────────────────────────────────╯ │
+╰───────────────────────────────────────────────────────────────╯

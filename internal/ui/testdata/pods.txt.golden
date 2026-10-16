@@ -1,0 +1,19 @@
+╭─ Pods · focus ─────────────────────────────────────╮
+│                                                    │
+│ / filter pods…▌                           13 items │
+│                                                    │
+│   NAME          NAMESPACE        RST   AGE CPU     │
+│ ● bilibili-raf… bilibili-raffle    0  119d █░░░░░░ │
+│ ● bilibili-liv… bilibili-raffle    2  119d ████░░░ │
+│ ● lgo-7c5d9758… lgo                0   87d ██░░░░░ │
+│ ● psql-6bc7744… ys-odoo            0   64d ████░░░ │
+│ ● odoo-7575bf6… ys-odoo            1   64d ██████░ │
+│ ○ qiandao-1605… xcx                0    2h ░░░░░░░ │
+│ ○ lingqu-16054… xcx                0   41m ░░░░░░░ │
+│ ⠙ lingqu-16054… xcx                0    8s ░░░░░░░ │
+│ ● coredns-6799… kube-system        0  119d █░░░░░░ │
+│ ● metrics-serv… kube-system        0  119d ██░░░░░ │
+│ ● traefik-f456… kube-system        0  119d ░░░░░░░ │
+│ ● local-path-p… kube-system        0  119d ░░░░░░░ │
+│ ● svclb-traefi… kube-system        0  119d ░░░░░░░ │
+╰────────────────────────────────────────────────────╯

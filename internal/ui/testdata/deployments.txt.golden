@@ -1,0 +1,16 @@
+╭─ Deployments ─────────────────────╮
+│                                   │
+│ bilibili-raffle/bilibili-l… ● 1/1 │
+│ bilibili-raffle/bilibili-r… ● 1/1 │
+│ ys-odoo/psql                ● 1/1 │
+│ ys-odoo/odoo                ● 1/1 │
+│ lgo/lgo                     ● 1/1 │
+│ kube-system/coredns         ● 1/1 │
+│ kube-system/metrics-server  ● 1/1 │
+│ kube-system/traefik         ● 1/1 │
+│                                   │
+│                                   │
+│                                   │
+│                                   │
+│                                   │
+╰───────────────────────────────────╯
