@@ -1,9 +1,12 @@
 package app
 
 import (
+	"context"
 	"reflect"
 	"strings"
 	"testing"
+
+	tea "charm.land/bubbletea/v2"
 
 	"github.com/TNK-Studio/lazykube/internal/data"
 	"github.com/TNK-Studio/lazykube/internal/ui"
@@ -288,5 +291,77 @@ func TestBasicSourceFallsBack(t *testing.T) {
 	m = press(t, m, "P", "E", "E")
 	if m.dg.logView.State != data.FeedUnavailable || m.events.State != data.FeedUnavailable {
 		t.Fatalf("sources without diagnostics degrade explicitly: %+v %+v", m.dg.logView, m.events)
+	}
+}
+
+type subscriptionSource struct {
+	*data.Demo
+	cancel  context.CancelFunc
+	current context.Context
+	calls   []string
+	empty   bool
+}
+
+func (s *subscriptionSource) Snapshot() data.Snapshot {
+	snap := s.Demo.Snapshot()
+	if s.empty {
+		snap.Pods = nil
+	}
+	return snap
+}
+
+func (s *subscriptionSource) PodLogs(req data.LogRequest, tick, n int) data.LogView {
+	s.calls = append(s.calls, req.Pod)
+	if s.cancel != nil {
+		s.cancel()
+		s.cancel = nil
+	}
+	if req.Pod == "" {
+		return data.LogView{}
+	}
+	s.current, s.cancel = context.WithCancel(context.Background())
+	return s.Demo.PodLogs(req, tick, n)
+}
+
+func TestEmptySelectionCancelsLogSubscription(t *testing.T) {
+	cases := []struct {
+		name  string
+		clear func(*testing.T, Model) Model
+	}{
+		{"filter matches nothing", func(t *testing.T, m Model) Model {
+			m = press(t, m, "/", "z", "z", "z", "q")
+			return m
+		}},
+		{"empty namespace", func(t *testing.T, m Model) Model {
+			m.nsFilter = "default"
+			m.syncSelection()
+			return m
+		}},
+		{"last pod removed", func(t *testing.T, m Model) Model {
+			m.src.(*subscriptionSource).empty = true
+			next, _ := m.Update(dataMsg{})
+			return next.(Model)
+		}},
+	}
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			src := &subscriptionSource{Demo: data.NewDemo()}
+			m := New(Options{Source: src, NoAnim: true, InitialPod: 1})
+			next, _ := m.Update(tea.WindowSizeMsg{Width: 160, Height: 48})
+			m = next.(Model)
+			if src.current == nil || src.current.Err() != nil {
+				t.Fatal("selected pod must hold a subscription")
+			}
+			m = c.clear(t, m)
+			if m.selectedPod() != nil {
+				t.Fatal("selection should be empty")
+			}
+			if src.current.Err() == nil {
+				t.Fatalf("previous subscription still active after empty selection; calls=%v", src.calls)
+			}
+			if len(m.logs) != 0 || m.dg.logView.Container != "" {
+				t.Fatal("empty selection clears the log view")
+			}
+		})
 	}
 }

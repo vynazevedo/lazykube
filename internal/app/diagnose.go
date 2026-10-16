@@ -40,6 +40,9 @@ func (m *Model) resetLogTarget() {
 
 func (m *Model) refreshLogs(pod string) {
 	if pod == "" {
+		if m.dg.diag != nil {
+			m.dg.diag.PodLogs(data.LogRequest{}, m.clock.T, 0)
+		}
 		m.dg.logView = data.LogView{}
 		m.applyLogs(nil)
 		return
