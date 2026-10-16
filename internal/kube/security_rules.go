@@ -171,6 +171,14 @@ func (e *podEvaluator) checkPrivileges(sc *corev1.SecurityContext, path string) 
 		}
 		e.add("capabilitiesAdded", path+".securityContext.capabilities.add", strings.Join(caps, ", ")+"; drop: "+capabilityDropEvidence(sc.Capabilities), severity, data.ResultFinding, "Additional Linux capabilities configured", "Remove capabilities that are not required")
 	}
+	if sc.Capabilities != nil {
+		unknownAdd := e.checkUnsupportedCapabilities(sc.Capabilities.Add, "capabilitiesAdded", path+".securityContext.capabilities.add")
+		e.checkUnsupportedCapabilities(sc.Capabilities.Drop, "capabilitiesDrop", path+".securityContext.capabilities.drop")
+		if unknownAdd && sc.AllowPrivilegeEscalation != nil && !*sc.AllowPrivilegeEscalation && (sc.Privileged == nil || !*sc.Privileged) && !effectiveCapability(sc.Capabilities, "SYS_ADMIN") {
+			e.add("allowPrivilegeEscalation", path+".securityContext.capabilities.add", "unsupported capability name; escalation effect unknown", data.SeverityInfo, data.ResultUnknown, "Capability semantics cannot be established", "Use canonical capability names without CAP_", data.AssessmentUnknown)
+		}
+	}
+
 	if !hasCapability(sc.Capabilities, "ALL", true) {
 		state := data.AssessmentUnspecified
 		if sc.Capabilities != nil && len(sc.Capabilities.Drop) > 0 {
@@ -189,7 +197,7 @@ func hasCapability(c *corev1.Capabilities, want corev1.Capability, drop bool) bo
 		values = c.Drop
 	}
 	for _, v := range values {
-		if normalizeCapability(v) == normalizeCapability(want) {
+		if normalized := normalizeCapability(v); normalized != "" && normalized == normalizeCapability(want) {
 			return true
 		}
 	}
@@ -261,11 +269,20 @@ func validImageDigest(digest string) bool {
 }
 
 func normalizeCapability(c corev1.Capability) string {
-	return strings.TrimPrefix(strings.ToUpper(string(c)), "CAP_")
+	if c == "ALL" {
+		return "ALL"
+	}
+	name := strings.ToUpper(string(c))
+	switch name {
+	case "CHOWN", "DAC_OVERRIDE", "DAC_READ_SEARCH", "FOWNER", "FSETID", "KILL", "SETGID", "SETUID", "SETPCAP", "LINUX_IMMUTABLE", "NET_BIND_SERVICE", "NET_BROADCAST", "NET_ADMIN", "NET_RAW", "IPC_LOCK", "IPC_OWNER", "SYS_MODULE", "SYS_RAWIO", "SYS_CHROOT", "SYS_PTRACE", "SYS_PACCT", "SYS_ADMIN", "SYS_BOOT", "SYS_NICE", "SYS_RESOURCE", "SYS_TIME", "SYS_TTY_CONFIG", "MKNOD", "LEASE", "AUDIT_WRITE", "AUDIT_CONTROL", "SETFCAP", "MAC_OVERRIDE", "MAC_ADMIN", "SYSLOG", "WAKE_ALARM", "BLOCK_SUSPEND", "AUDIT_READ", "PERFMON", "BPF", "CHECKPOINT_RESTORE":
+		return name
+	default:
+		return ""
+	}
 }
 
 func effectiveCapability(c *corev1.Capabilities, want corev1.Capability) bool {
-	if c == nil {
+	if c == nil || normalizeCapability(want) == "" {
 		return false
 	}
 	all := hasCapability(c, "ALL", false) && !hasCapability(c, "ALL", true)
@@ -296,4 +313,18 @@ func capabilityDropEvidence(c *corev1.Capabilities) string {
 		values[i] = string(capability)
 	}
 	return strings.Join(values, ", ")
+}
+
+func (e *podEvaluator) checkUnsupportedCapabilities(values []corev1.Capability, rule, field string) bool {
+	var unsupported []string
+	for _, value := range values {
+		if normalizeCapability(value) == "" {
+			unsupported = append(unsupported, string(value))
+		}
+	}
+	if len(unsupported) == 0 {
+		return false
+	}
+	e.add(rule, field, strings.Join(unsupported, ", "), data.SeverityInfo, data.ResultUnknown, "Unsupported capability names; no mitigation inferred", "Use canonical capability names without CAP_ and uppercase ALL", data.AssessmentUnknown)
+	return true
 }

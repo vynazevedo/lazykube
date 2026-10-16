@@ -26,12 +26,12 @@
  │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ n                                                              │ │ 
  │ bilibili-live ███████████████████████████████████████ │ │ │ Evidence: forced by privileged                                 │ │ 
  │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Additional privileges possible. Disable privileged mode        │ │ 
- │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │ Source: demo fixture v3 | configuration observed               │ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │ Source: demo fixture v4 | configuration observed               │ │ 
  │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ [high] privileged | finding | container: init-permissions      │ │ 
  │ psql-6bc7744… ███████████████████████████████████████ │ │ │ Field: spec.initContainers[0].securityContext.privileged       │ │ 
  │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Evidence: true                                                 │ │ 
  │ odoo-7575bf6… ███████████████████████████████████████ │ │ │ Privileged init container configured. Disable privileged mode  │ │ 
- │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Source: demo fixture v3 | configuration observed               │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Source: demo fixture v4 | configuration observed               │ │ 
  │ coredns-6799… ███████████████████████████████████████ │ │ │ MEDIUM findings                                                │ │ 
  │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ [medium] imageLatest | finding | container: app                │ │ 
  │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
