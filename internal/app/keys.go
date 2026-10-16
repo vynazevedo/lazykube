@@ -15,6 +15,7 @@ type KeyMap struct {
 	TabTop      key.Binding
 	TabDescribe key.Binding
 	TabEvents   key.Binding
+	TabSecurity key.Binding
 	TabPrev     key.Binding
 	TabNext     key.Binding
 	Container   key.Binding
@@ -53,6 +54,7 @@ func DefaultKeyMap() KeyMap {
 		TabConfig:   b("c", "config", "c"),
 		TabTop:      b("t", "top", "t"),
 		TabDescribe: b("d", "describe", "d"),
+		TabSecurity: b("S", "security / namespace posture", "S"),
 		TabEvents:   b("e", "events", "e"),
 		TabPrev:     b("[", "previous tab", "["),
 		TabNext:     b("]", "next tab", "]"),

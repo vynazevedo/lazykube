@@ -24,7 +24,8 @@ type demoPod struct {
 }
 
 type Demo struct {
-	pods []demoPod
+	security SecuritySnapshot
+	pods     []demoPod
 }
 
 func NewDemo() *Demo {
@@ -75,6 +76,7 @@ func NewDemo() *Demo {
 		d.pods[i].pod.Reason, d.pods[i].pod.Ready, d.pods[i].pod.Containers = demoSummary(r.status, d.pods[i].containers)
 		d.pods[i].events = demoPodEvents(d.pods[i].pod)
 	}
+	d.security = d.buildSecurity()
 	return d
 }
 

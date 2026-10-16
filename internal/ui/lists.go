@@ -55,9 +55,10 @@ func NamespacesPanel(r draw.Region, st NamespacesState, ctx Ctx) {
 }
 
 type DeploymentsState struct {
-	Items   []data.Deployment
-	Cursor  int
-	Focused bool
+	Coverage data.Coverage
+	Items    []data.Deployment
+	Cursor   int
+	Focused  bool
 }
 
 func DeploymentsPanel(r draw.Region, st DeploymentsState, ctx Ctx) {
@@ -65,6 +66,10 @@ func DeploymentsPanel(r draw.Region, st DeploymentsState, ctx Ctx) {
 	top, rows := DeploymentsRows(r.H)
 	padY := top - 1
 	c := inner.Sub(1, padY, inner.W-2, rows)
+	if st.Coverage.State != "" && st.Coverage.State != data.CoverageComplete {
+		c.Text(0, 0, draw.Truncate("Deployments: "+string(st.Coverage.State), c.W), draw.Fg(theme.Warn))
+		return
+	}
 	offset := ScrollOffset(st.Cursor, len(st.Items), c.H)
 	for row := 0; row < c.H && offset+row < len(st.Items); row++ {
 		i := offset + row

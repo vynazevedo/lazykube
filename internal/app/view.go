@@ -43,9 +43,10 @@ func (m Model) Render() *draw.Canvas {
 			Focused:   m.focus == FocusNamespaces,
 		}, ctx)
 		ui.DeploymentsPanel(region(screen, m.layout.Deployments), ui.DeploymentsState{
-			Items:   m.snap.Deployments,
-			Cursor:  m.depCursor,
-			Focused: m.focus == FocusDeployments,
+			Coverage: m.snap.DeploymentCoverage,
+			Items:    m.snap.Deployments,
+			Cursor:   m.depCursor,
+			Focused:  m.focus == FocusDeployments,
 		}, ctx)
 	}
 
@@ -73,6 +74,7 @@ func (m Model) Render() *draw.Canvas {
 	}, ctx)
 
 	ui.DetailsPanel(region(screen, m.layout.Details), ui.DetailsState{
+		Security: m.securityView,
 		Tab:      m.tab,
 		HoverTab: m.hoverTab,
 		Pod:      pod,

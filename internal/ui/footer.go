@@ -35,6 +35,7 @@ func FullHelp() []KeyHelp {
 		{"enter", "confirm / filter namespace"},
 		{"esc", "leave filter / clear"},
 		{"l c t d e", "Log Config Top Describe Events"},
+		{"S", "Security / namespace posture"},
 		{"[ ]", "previous / next tab"},
 		{"pgup/pgdn", "scroll viewport"},
 		{"home/end", "top / bottom"},

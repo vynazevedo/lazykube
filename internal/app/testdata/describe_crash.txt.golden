@@ -1,7 +1,7 @@
  lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d                                       ⠙ metrics every 5s ● live  
                                                                                                                                                                 
  ╭─ Node ────────────────────────────╮ ╭─ Pods ─────────────────────────────────────────────╮ ╭───────────────────────────────────────────────────────────────╮ 
- │                                   │ │                                                    │ │  Log   Config   Top   Describe   Events     tab ⇥ / shift+tab │ 
+ │                                   │ │                                                    │ │  Log   Config   Top   Describe   Events   Security            │ 
  │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  huawei-k3s-01│ │ / filter pods…                            13 items │ │ ───────────────────────────────────────────────────────────── │ 
  │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready      │ │                                                    │ │ ● svclb-traefik-8c2f1-6n2vb                [CrashLoopBackOff] │ 
  │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25%      │ │   NAME          NAMESPACE    RST   AGE CPU/STATUS  │ │   kube-system · CrashLoopBackOff · ready 0/1 · node huawei-k… │ 

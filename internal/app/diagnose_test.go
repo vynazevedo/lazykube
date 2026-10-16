@@ -40,16 +40,14 @@ func TestHelpIsHonest(t *testing.T) {
 			keys[k] = true
 		}
 	}
-	for _, k := range []string{"C", "P", "n", "N", "E", "w", "g", "G"} {
+	for _, k := range []string{"C", "P", "n", "N", "E", "S", "w", "g", "G"} {
 		if !keys[k] {
 			t.Fatalf("implemented key %q missing from help", k)
 		}
 	}
 	m := demoModel(t, 160, 48)
 	before := m.tab
-	for _, k := range []string{"s", "S"} {
-		m = press(t, m, k)
-	}
+	m = press(t, m, "s")
 	if m.tab != before {
 		t.Fatal("unbound keys must not change state")
 	}

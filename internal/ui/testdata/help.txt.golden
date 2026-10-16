@@ -23,13 +23,13 @@
                                    │  enter      confirm / filter namespace     / n N      search Log (details focus)      │                                    
                                    │  esc        leave filter / clear           E          events pod / ns / cluster       │                                    
                                    │  l c t d e  Log Config Top Describe Events p          cycle palette                   │                                    
-                                   │  [ ]        previous / next tab            1          toggle left column              │                                    
-                                   │  pgup/pgdn  scroll viewport                ctrl+p     pause animations                │                                    
-                                   │  home/end   top / bottom                   ?          toggle help                     │                                    
-                                   │  g G        top / bottom (details)         q ctrl+c   quit                            │                                    
+                                   │  S          Security / namespace posture   1          toggle left column              │                                    
+                                   │  [ ]        previous / next tab            ctrl+p     pause animations                │                                    
+                                   │  pgup/pgdn  scroll viewport                ?          toggle help                     │                                    
+                                   │  home/end   top / bottom                   q ctrl+c   quit                            │                                    
+                                   │  g G        top / bottom (details)                                                    │                                    
                                    │                                                                                       │                                    
                                    ╰───────────────────────────────────────────────────────────────────────────────────────╯                                    
-                                                                                                                                                                
                                                                                                                                                                 
                                                                                                                                                                 
                                                                                                                                                                 

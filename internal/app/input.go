@@ -66,6 +66,13 @@ func (m Model) handleKey(msg tea.KeyPressMsg) (tea.Model, tea.Cmd) {
 		m.setTab(ui.TabTop)
 	case key.Matches(msg, k.TabDescribe):
 		m.setTab(ui.TabDescribe)
+	case key.Matches(msg, k.TabSecurity):
+		if m.tab == ui.TabSecurity {
+			m.securityNamespace = !m.securityNamespace
+		}
+		m.setTab(ui.TabSecurity)
+		m.scroll = 0
+		m.refreshSecurity()
 	case key.Matches(msg, k.TabEvents):
 		m.setTab(ui.TabEvents)
 	case key.Matches(msg, k.TabPrev):

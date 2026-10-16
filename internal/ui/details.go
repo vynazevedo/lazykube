@@ -17,9 +17,10 @@ const (
 	TabTop
 	TabDescribe
 	TabEvents
+	TabSecurity
 )
 
-var tabNames = []string{"Log", "Config", "Top", "Describe", "Events"}
+var tabNames = []string{"Log", "Config", "Top", "Describe", "Events", "Security"}
 
 func (t Tab) String() string {
 	if t < 0 || int(t) >= len(tabNames) {
@@ -29,7 +30,7 @@ func (t Tab) String() string {
 }
 
 func Tabs() []Tab {
-	return []Tab{TabLog, TabConfig, TabTop, TabDescribe, TabEvents}
+	return []Tab{TabLog, TabConfig, TabTop, TabDescribe, TabEvents, TabSecurity}
 }
 
 func (t Tab) Next(delta int) Tab {
@@ -68,6 +69,7 @@ const (
 )
 
 type DetailsState struct {
+	Security SecurityView
 	Tab      Tab
 	HoverTab int
 	Pod      *data.Pod
@@ -95,6 +97,10 @@ func DetailsPanel(r draw.Region, st DetailsState, ctx Ctx) {
 	}
 	tabBar(c.Sub(0, DetailsTabsRow, c.W, 1), st, ctx)
 	c.HLine(0, 1, c.W, '─', draw.Fg(theme.BorderSoft))
+	if st.Tab == TabSecurity {
+		SecurityTab(c.Sub(0, 2, c.W, c.H-2), st.Security, st.Scroll)
+		return
+	}
 	if st.Pod == nil {
 		if st.Tab == TabEvents && st.Events.Scope != data.ScopePod {
 			EventsTab(c.Sub(st.Slide, 2, c.W, c.H-2), st)
@@ -188,6 +194,8 @@ func LogWidth(panelW int) int {
 func ScrollRows(tab Tab, panelH int) int {
 	_, h := DetailsBody(0, panelH)
 	switch tab {
+	case TabSecurity:
+		return max(0, panelH-10)
 	case TabLog, TabEvents:
 		return max(0, h-3)
 	case TabConfig, TabDescribe:
