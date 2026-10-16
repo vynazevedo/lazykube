@@ -27,13 +27,13 @@
 │ │ bilibili-raffle    66 █████░░░ | 5 findings               │ │
 │ │ xcx                70 ██████░░ | 5 findings               │ │
 │ │ kube-system        81 ██████░░ | 7 findings               │ │
-│ │ ys-odoo            99 ████████ | 1 findings               │ │
+│ │ ys-odoo            99 ████████ | 1 finding                │ │
 │ │ More namespaces: use the namespace filter.                │ │
 │ │ Score: 100 - (25*high + 8*medium + 2*info)/evaluated      │ │
 │ │ pods; floor 0, rounded.                                   │ │
 │ │ Grades: A >=90, B >=80, C >=70, D >=60, F <60. Not a      │ │
 │ │ safety rating.                                            │ │
-│ │ SELECTED POD | 59/100 (F) | 1/1 pods                      │ │
+│ │ SELECTED POD | 59/100 (F) | 1/1 pod                       │ │
 │ │ Pod bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz |       │ │
 │ │ complete in scope                                         │ │
 │ │ Observed 2026-10-16 12:00:00Z | UID                       │ │

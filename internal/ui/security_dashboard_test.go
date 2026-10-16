@@ -72,3 +72,24 @@ func TestSecurityDashboardAlertOverflow(t *testing.T) {
 		t.Fatal("overflow alerts inaccessible")
 	}
 }
+
+func TestSecurityDashboardSingularFinding(t *testing.T) {
+	var session data.SecuritySession
+	session.Update(data.NewDemo().Security())
+	view := DashboardSecurityView(SecurityView{}, session, "ys-odoo", "", 80)
+	text := strings.Join(view.Rows, " ")
+	if strings.Contains(text, "1 findings") || !strings.Contains(text, "1 finding") {
+		t.Fatalf("singular missing: %s", text)
+	}
+}
+
+func TestSecurityPluralCounts(t *testing.T) {
+	for _, tc := range []struct {
+		n          int
+		word, want string
+	}{{0, "finding", "findings"}, {1, "finding", "finding"}, {2, "finding", "findings"}, {1, "alert", "alert"}, {2, "alert", "alerts"}, {1, "pod", "pod"}, {2, "pod", "pods"}} {
+		if got := securityPlural(tc.n, tc.word); got != tc.want {
+			t.Fatalf("plural %d %s = %s", tc.n, tc.word, got)
+		}
+	}
+}

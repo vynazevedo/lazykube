@@ -28,13 +28,13 @@
  │ ys-odoo                 ██░░░   2 │ │ lgo-7c5d97584 ████████████████████████████████████ │ │ │ xcx                70 ██████░░ | 5 findings               │ │ 
  │                                   │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ bilibili-raffle    79 ██████░░ | 4 findings               │ │ 
  ╰───────────────────────────────────╯ │ psql-6bc7744… ████████████████████████████████████ │ │ │ kube-system        81 ██████░░ | 7 findings               │ │ 
- ╭─ Deployments ─────────────────────╮ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ ys-odoo            99 ████████ | 1 findings               │ │ 
+ ╭─ Deployments ─────────────────────╮ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ ys-odoo            99 ████████ | 1 finding                │ │ 
  │                                   │ │ odoo-7575bf6… ████████████████████████████████████ │ │ │ More namespaces: use the namespace filter.                │ │ 
  │ bilibili-raffle/bilibili-l… ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Score: 100 - (25*high + 8*medium + 2*info)/evaluated      │ │ 
  │ bilibili-raffle/bilibili-r… ● 1/1 │ │ coredns-6799… ████████████████████████████████████ │ │ │ pods; floor 0, rounded.                                   │ │ 
  │ ys-odoo/psql                ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Grades: A >=90, B >=80, C >=70, D >=60, F <60. Not a      │ │ 
  │ ys-odoo/odoo                ● 1/1 │ │ metrics-serv… ████████████████████████████████████ │ │ │ safety rating.                                            │ │ 
- │ lgo/lgo                     ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ SELECTED POD | 59/100 (F) | 1/1 pods                      │ │ 
+ │ lgo/lgo                     ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ SELECTED POD | 59/100 (F) | 1/1 pod                       │ │ 
  │ kube-system/coredns         ● 1/1 │ │ traefik-f456… ████████████████████████████████████ │ │ │ Pod bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz |       │ │ 
  │ kube-system/metrics-server  ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ complete in scope                                         │ │ 
  │ kube-system/traefik         ● 1/1 │ │                                                    │ │ │ Observed 2026-10-16 12:00:00Z | UID                       │ │ 

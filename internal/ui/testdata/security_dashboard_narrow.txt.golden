@@ -36,7 +36,7 @@
 │ │ kube-system        81 ██████░░ | 7    │ │
 │ │ findings                              │ │
 │ │ ys-odoo            99 ████████ | 1    │ │
-│ │ findings                              │ │
+│ │ finding                               │ │
 │ │ More namespaces: use the namespace    │ │
 │ │ filter.                               │ │
 │ │ Score: 100 - (25*high + 8*medium +    │ │
