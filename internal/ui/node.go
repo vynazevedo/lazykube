@@ -25,10 +25,11 @@ var (
 )
 
 type NodeState struct {
-	Node    data.Node
-	CPU     int
-	CPUFrac float64
-	MemFrac float64
+	Node     data.Node
+	CPU      int
+	CPUKnown bool
+	CPUFrac  float64
+	MemFrac  float64
 }
 
 func Sprite(pal theme.Palette, t int, transparent func(y int) theme.RGB) draw.Pixels {
@@ -138,7 +139,7 @@ func NodePanel(r draw.Region, st NodeState, ctx Ctx) {
 	lines := []draw.Line{
 		draw.Fit(w, draw.Line{bold(n.Name, theme.Text)}),
 		{colored("●", ctx.Pulse(readyColor)), colored(" "+ready, readyColor)},
-		draw.Fit(w, draw.Line{muted("cpu "), text(fmt.Sprintf("%d%%", st.CPU))}),
+		nodeCPULine(w, st),
 		nil,
 		draw.Fit(w,
 			draw.Line{muted("mem "), text(n.MemUsed + " / " + n.MemTotal)},
@@ -155,8 +156,21 @@ func NodePanel(r draw.Region, st NodeState, ctx Ctx) {
 	for y, l := range lines {
 		info.Line(0, y, l)
 	}
-	Bar(info, 0, 3, w, st.CPUFrac, ctx.Pal.C, ctx.Pal.B)
+	if st.CPUKnown {
+		Bar(info, 0, 3, w, st.CPUFrac, ctx.Pal.C, ctx.Pal.B)
+	}
 	Bar(info, 0, 5, w, st.MemFrac, ctx.Pal.B, ctx.Pal.A)
+}
+
+func nodeCPULine(w int, st NodeState) draw.Line {
+	if !st.CPUKnown {
+		return draw.Fit(w,
+			draw.Line{muted("cpu "), faint("indisponível")},
+			draw.Line{muted("cpu "), faint("indisp.")},
+			draw.Line{muted("cpu "), faint("n/a")},
+		)
+	}
+	return draw.Fit(w, draw.Line{muted("cpu "), text(fmt.Sprintf("%d%%", st.CPU))})
 }
 
 func trimUnit(s string) string {

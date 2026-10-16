@@ -203,7 +203,15 @@ func TestNodesCoverageIsHonest(t *testing.T) {
 	if p := nodes(t, nodeModel(t, hostile, 160, 48)).Render().String(); strings.Contains(p, "\x1b[31m") {
 		t.Fatal("coverage reason must be sanitized")
 	}
-	dash := nodeModel(t, src, 160, 48).Render().Plain()
+	dashModel := nodeModel(t, src, 160, 48)
+	dash := dashModel.Render().Plain()
+	if strings.Contains(dash, "cpu 0%") || !strings.Contains(dash, "cpu indisp") {
+		t.Fatal("the dashboard node panel must show unavailable CPU instead of 0% when NodeCPUKnown is false")
+	}
+	golden(t, "dashboard_node_denied_160x48.txt", dash)
+	if measured := demoModel(t, 160, 48).Render().Plain(); !strings.Contains(measured, "cpu 25%") {
+		t.Fatal("measured node CPU keeps its value on the dashboard")
+	}
 	if !strings.Contains(dash, "● Unknown") || strings.Contains(dash, "● Ready") {
 		t.Fatal("the dashboard node panel must not invent Ready for a node it cannot observe")
 	}
