@@ -19,7 +19,7 @@ import (
 	k8stesting "k8s.io/client-go/testing"
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/TNK-Studio/lazykube/internal/data"
+	"github.com/vynazevedo/lazykube/internal/data"
 )
 
 func TestSecurityRecoversAfterRelist(t *testing.T) {

@@ -1,6 +1,6 @@
 package draw
 
-import "github.com/TNK-Studio/lazykube/internal/theme"
+import "github.com/vynazevedo/lazykube/internal/theme"
 
 var brailleBits = [2][4]uint8{
 	{0x01, 0x02, 0x04, 0x40},

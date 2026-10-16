@@ -8,10 +8,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/TNK-Studio/lazykube/internal/anim"
-	"github.com/TNK-Studio/lazykube/internal/data"
-	"github.com/TNK-Studio/lazykube/internal/draw"
-	"github.com/TNK-Studio/lazykube/internal/theme"
+	"github.com/vynazevedo/lazykube/internal/anim"
+	"github.com/vynazevedo/lazykube/internal/data"
+	"github.com/vynazevedo/lazykube/internal/draw"
+	"github.com/vynazevedo/lazykube/internal/theme"
 )
 
 var update = flag.Bool("update", false, "update golden files")

@@ -6,7 +6,7 @@ import (
 
 	tea "charm.land/bubbletea/v2"
 
-	"github.com/TNK-Studio/lazykube/internal/app"
+	"github.com/vynazevedo/lazykube/internal/app"
 )
 
 func TestSecurityRealSourceIsNotDemo(t *testing.T) {

@@ -1,6 +1,6 @@
 package draw
 
-import "github.com/TNK-Studio/lazykube/internal/theme"
+import "github.com/vynazevedo/lazykube/internal/theme"
 
 type Pixels [][]theme.RGB
 

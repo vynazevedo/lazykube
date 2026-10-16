@@ -4,8 +4,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/TNK-Studio/lazykube/internal/data"
-	"github.com/TNK-Studio/lazykube/internal/ui"
+	"github.com/vynazevedo/lazykube/internal/data"
+	"github.com/vynazevedo/lazykube/internal/ui"
 )
 
 func TestDemoLabelEveryTabAndSize(t *testing.T) {

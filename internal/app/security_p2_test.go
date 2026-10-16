@@ -2,7 +2,7 @@ package app
 
 import (
 	"fmt"
-	"github.com/TNK-Studio/lazykube/internal/data"
+	"github.com/vynazevedo/lazykube/internal/data"
 	"testing"
 )
 

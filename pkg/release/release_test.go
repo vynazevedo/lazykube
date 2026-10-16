@@ -16,9 +16,9 @@ func TestParseRepositoryURL(t *testing.T) {
 		repo    string
 		wantErr bool
 	}{
-		{name: "plain", url: "https://github.com/TNK-Studio/lazykube", owner: "TNK-Studio", repo: "lazykube"},
-		{name: "trailing slash", url: "https://github.com/TNK-Studio/lazykube/", owner: "TNK-Studio", repo: "lazykube"},
-		{name: "git suffix", url: "https://github.com/TNK-Studio/lazykube.git", owner: "TNK-Studio", repo: "lazykube"},
+		{name: "plain", url: "https://github.com/vynazevedo/lazykube", owner: "vynazevedo", repo: "lazykube"},
+		{name: "trailing slash", url: "https://github.com/vynazevedo/lazykube/", owner: "vynazevedo", repo: "lazykube"},
+		{name: "git suffix", url: "https://github.com/vynazevedo/lazykube.git", owner: "vynazevedo", repo: "lazykube"},
 		{name: "other host", url: "https://gitlab.com/a/b", wantErr: true},
 		{name: "missing repo", url: "https://github.com/TNK-Studio", wantErr: true},
 		{name: "extra path", url: "https://github.com/a/b/c", wantErr: true},
@@ -71,14 +71,14 @@ func newTestChecker(t *testing.T, handler http.HandlerFunc) *Checker {
 
 func TestCheckerCheck(t *testing.T) {
 	checker := newTestChecker(t, func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != "/repos/TNK-Studio/lazykube/releases/latest" {
+		if r.URL.Path != "/repos/vynazevedo/lazykube/releases/latest" {
 			http.NotFound(w, r)
 			return
 		}
 		_, _ = w.Write([]byte(`{"tag_name":"v0.11.0"}`))
 	})
 
-	result, err := checker.Check(context.Background(), "v0.10.0", "https://github.com/TNK-Studio/lazykube")
+	result, err := checker.Check(context.Background(), "v0.10.0", "https://github.com/vynazevedo/lazykube")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -90,7 +90,7 @@ func TestCheckerCheck(t *testing.T) {
 func TestCheckerCheckNotFound(t *testing.T) {
 	checker := newTestChecker(t, http.NotFound)
 
-	_, err := checker.Check(context.Background(), "v0.10.0", "https://github.com/TNK-Studio/lazykube")
+	_, err := checker.Check(context.Background(), "v0.10.0", "https://github.com/vynazevedo/lazykube")
 	if !errors.Is(err, ErrReleaseNotFound) {
 		t.Fatalf("expected ErrReleaseNotFound, got %v", err)
 	}
@@ -101,7 +101,7 @@ func TestCheckerCheckServerError(t *testing.T) {
 		w.WriteHeader(http.StatusInternalServerError)
 	})
 
-	if _, err := checker.Check(context.Background(), "v0.10.0", "https://github.com/TNK-Studio/lazykube"); err == nil {
+	if _, err := checker.Check(context.Background(), "v0.10.0", "https://github.com/vynazevedo/lazykube"); err == nil {
 		t.Fatal("expected error")
 	}
 }
@@ -111,7 +111,7 @@ func TestCheckerCheckEmptyTag(t *testing.T) {
 		_, _ = w.Write([]byte(`{"tag_name":""}`))
 	})
 
-	_, err := checker.Check(context.Background(), "v0.10.0", "https://github.com/TNK-Studio/lazykube")
+	_, err := checker.Check(context.Background(), "v0.10.0", "https://github.com/vynazevedo/lazykube")
 	if !errors.Is(err, ErrReleaseNotFound) {
 		t.Fatalf("expected ErrReleaseNotFound, got %v", err)
 	}

@@ -3,9 +3,9 @@ package app
 import (
 	tea "charm.land/bubbletea/v2"
 
-	"github.com/TNK-Studio/lazykube/internal/draw"
-	"github.com/TNK-Studio/lazykube/internal/theme"
-	"github.com/TNK-Studio/lazykube/internal/ui"
+	"github.com/vynazevedo/lazykube/internal/draw"
+	"github.com/vynazevedo/lazykube/internal/theme"
+	"github.com/vynazevedo/lazykube/internal/ui"
 )
 
 func region(c draw.Region, r Rect) draw.Region {

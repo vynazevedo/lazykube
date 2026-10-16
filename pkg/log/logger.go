@@ -1,9 +1,9 @@
 package log
 
 import (
-	"github.com/TNK-Studio/lazykube/pkg/config"
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	"github.com/sirupsen/logrus"
+	"github.com/vynazevedo/lazykube/pkg/config"
 	"path"
 	"time"
 )

@@ -4,8 +4,8 @@ import (
 	"charm.land/bubbles/v2/key"
 	tea "charm.land/bubbletea/v2"
 
-	"github.com/TNK-Studio/lazykube/internal/theme"
-	"github.com/TNK-Studio/lazykube/internal/ui"
+	"github.com/vynazevedo/lazykube/internal/theme"
+	"github.com/vynazevedo/lazykube/internal/ui"
 )
 
 func (m Model) handleKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {

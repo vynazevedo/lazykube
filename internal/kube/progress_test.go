@@ -16,7 +16,7 @@ import (
 	"k8s.io/client-go/rest"
 	restfake "k8s.io/client-go/rest/fake"
 
-	"github.com/TNK-Studio/lazykube/internal/data"
+	"github.com/vynazevedo/lazykube/internal/data"
 )
 
 func TestStartReportsProgress(t *testing.T) {

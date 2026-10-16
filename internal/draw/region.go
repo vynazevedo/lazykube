@@ -3,7 +3,7 @@ package draw
 import (
 	"unicode/utf8"
 
-	"github.com/TNK-Studio/lazykube/internal/theme"
+	"github.com/vynazevedo/lazykube/internal/theme"
 )
 
 type Region struct {
