@@ -1,0 +1,48 @@
+ lazykube [DEMO]  v2.0   ◎ context demo   k8s demo  nodes 1  ns 8  pods 13  uptime 119d                                              ⠙ metrics every 5s ● live  
+ [2 Dashboard] |  3 Workloads                                                                                                                           m menu  
+ Dashboard                                                                                                                                                      
+ ╭─ Node ────────────────────────────╮ ╭─ Pods · focus ─────────────────────────────────────╮ ╭───────────────────────────────────────────────────────────────╮ 
+ │                                   │ │                                                    │ │  Log   Config   Top   Describe   Events   Security            │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  demo-node-01 │ │ / filter pods…▌                           13 items │ │ ───────────────────────────────────────────────────────────── │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready      │ │                                                    │ │ ╭───────────────────────────────────────────────────────────╮ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25%      │ │   NAME          NAMESPACE    RST   SEC CPU/STATUS  │ │ │ S: namespace | Pod: bilibili-raffle/bilibili-live-7f6b8d… │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   █████████████│ │ ● bilibili-raf… bilibili-r…    0  75 C █░░░░░░     │ │ │ Dashboard coverage: complete in scope | pods 13/13        │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4/3.8Gi│ │ ● bilibili-liv… bilibili-r…    2  20 F ████░░░     │ │ │ No findings does not mean safe                            │ │ 
+ │    ▀    ▀▀▀▀▀▀▀▀▀    █████████████│ │ ● lgo-7c5d9758… lgo            0  20 F ██░░░░░     │ │ │ Local checks only; not PSS compliance.                    │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13 / 110│ │ ● psql-6bc7744… ys-odoo        0 100 A ████░░░     │ │ │ POSTURE | Cluster | 55/100 (E) | 13/13 pods               │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch amd64   │ │ ● odoo-7575bf6… ys-odoo        1  75 C ██████░     │ │ │ Score ████████████████████░░░░░░░░░░░░░░░░                │ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀                 │ │ ○ qiandao-1605… xcx            0  20 F Completed   │ │ │ SEC column: Security; p = partial. Hygiene scored         │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                │ │ ○ lingqu-16054… xcx            0  20 F Completed   │ │ │ separately.                                               │ │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀               │ │ ⠙ lingqu-16054… xcx            0 100 A Init:0/1    │ │ │ Security mean 55 | median 75 | worst decile 20            │ │ 
+ │                                   │ │ ● coredns-6799… kube-system    0  75 C █░░░░░░     │ │ │ A    3 ██████░░░░░░░░░░░░░░░░░░                           │ │ 
+ │                                   │ │ ● metrics-serv… kube-system    0  20 F ready 0/1   │ │ │ B    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ ╰───────────────────────────────────╯ │ ● traefik-f456… kube-system    0  20 F ░░░░░░░     │ │ │ C    4 ███████░░░░░░░░░░░░░░░░░                           │ │ 
+ ╭─ Namespaces ──────────────────────╮ │ ● local-path-p… kube-system    0 100 A ImagePullB… │ │ │ D    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ │                                   │ │ ● svclb-traefi… kube-system    7  75 C CrashLoopB… │ │ │ E    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ │ default                 ·····   0 │ ╰────────────────────────────────────────────────────╯ │ │ F    6 ███████████░░░░░░░░░░░░░                           │ │ 
+ │ kube-system             █████   5 │ ╭─ CPU heatmap · last 2 min ─────────────────────────╮ │ │ Hygiene mean 97 | median 100 | worst decile 88            │ │ 
+ │ kube-public             ·····   0 │ │                                                    │ │ │ A   10 ██████████████████░░░░░░                           │ │ 
+ │ kube-node-lease         ·····   0 │ │ bilibili-raf… ████████████████████████████████████ │ │ │ B    3 ██████░░░░░░░░░░░░░░░░░░                           │ │ 
+ │ bilibili-raffle         ██░░░   2 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ C    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ │ lgo                     █░░░░   1 │ │ bilibili-live ████████████████████████████████████ │ │ │ D    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ │ xcx                     ███░░   3 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ E    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ │                                   │ │ lgo-7c5d97584 ████████████████████████████████████ │ │ │ F    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ ╰───────────────────────────────────╯ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Worst decile = mean of lowest ceil(N/10) pod scores.      │ │ 
+ ╭─ Deployments ─────────────────────╮ │ psql-6bc7744… ████████████████████████████████████ │ │ │ high     12 █████████████░░░░░░░░░░░                      │ │ 
+ │                                   │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ medium   22 ████████████████████████                      │ │ 
+ │ bilibili-raffle/bilibili-l… ● 1/1 │ │ odoo-7575bf6… ████████████████████████████████████ │ │ │ info      4 ████░░░░░░░░░░░░░░░░░░░░                      │ │ 
+ │ bilibili-raffle/bilibili-r… ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Unknown checks: 4 | confirmed findings only in score      │ │ 
+ │ ys-odoo/psql                ● 1/1 │ │ coredns-6799… ████████████████████████████████████ │ │ │ Trend: ▅ (revision samples)                               │ │ 
+ │ ys-odoo/odoo                ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ ALERTS | new high since baseline / last ack | A: ack all  │ │ 
+ │ lgo/lgo                     ● 1/1 │ │ metrics-serv… ████████████████████████████████████ │ │ │ No unacknowledged high alerts.                            │ │ 
+ │ kube-system/coredns         ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ TOP RULES | affected pods, both dimensions                │ │ 
+ │ kube-system/metrics-server  ● 1/1 │ │ traefik-f456… ████████████████████████████████████ │ │ │ allowPrivilegeEscalat…    7 ██████████████████            │ │ 
+ │ kube-system/traefik         ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ capabilitiesDrop          4 ██████████░░░░░░░░            │ │ 
+ │                                   │ │                                                    │ │ │ runAsNonRoot              4 ██████████░░░░░░░░            │ │ 
+ │                                   │ │                                                    │ │ │ seccomp                   4 ██████████░░░░░░░░            │ │ 
+ │                                   │ │                                                    │ │ │ serviceAccountToken       4 ██████████░░░░░░░░            │ │ 
+ │                                   │ │                                                    │ │ │ NAMESPACES | lowest scores first                          │ │ 
+ │                                   │ │               -2m ████████████████████████████ now │ │ ╰───────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────╯ ╰────────────────────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   enter  open   m  menu   l  logs   d  describe   e  events   ?  help   q  quit                           bubbletea · 0 fps 

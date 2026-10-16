@@ -5,20 +5,20 @@
  │                                                                                            │ │  Log   Config   Top   Describe   Events   Security          │ 
  │ / filter pods…▌                                                                   13 items │ │ ─────────────────────────────────────────────────────────── │ 
  │                                                                                            │ │ ● bilibili-live-7f6b8d9c5-mn4tz                   [Running] │ 
- │   NAME                                                  NAMESPACE    RST   AGE CPU/STATUS  │ │   bilibili-raffle · Running · ready 2/2 · node demo-node-0… │ 
- │ ● bilibili-raffle-5d8f9c7b4-x2kqp                       bilibili-r…    0  119d █░░░░░░     │ │                                                             │ 
- │ ● bilibili-live-7f6b8d9c5-mn4tz                         bilibili-r…    2  119d ████░░░     │ │ CPU 11m req 10m · lim 50m          streamline · braille 2×4 │ 
- │ ● lgo-7c5d97584-hq8wd                                   lgo            0   87d ██░░░░░     │ │  20m │                                                      │ 
- │ ● psql-6bc7744f9-r7zlc                                  ys-odoo        0   64d ████░░░     │ │      │                                ⡄                     │ 
- │ ● odoo-7575bf6d8-9wjvk                                  ys-odoo        1   64d ██████░     │ │  15m │────────────────⡀──────────────⣼⣿──────────────────── │ 
- │ ○ qiandao-1605400800-k8f2m                              xcx            0    2h Completed   │ │      │  ⡀  ⢀⢀⣦⢀⣠⣦⣤⣤⡀⡠⣼⣧            ⢀⢀⣿⣿⣗⣦⣀ ⣠⣀⣆  request 10m │ 
- │ ○ lingqu-1605486000-4tq8n                               xcx            0   41m Completed   │ │  10m │╌⣰⣧⣴⣄⣾⣾⣿⣷⣿⣿⣿⣿⣷⣿⣿⣿⡀⣀╌╌╌╌╌╌⢀⣾⣶⣶⣿⣿⣿⣿⣿⣿⣿⣷⣿⣿⣿⡄╌⡀╌╌╌╌╌⣄⣀⣾⣿● │ 
- │ ⠙ lingqu-1605489600-b7xsd                               xcx            0    8s Init:0/1    │ │      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡄⢀⣶⣦⢠⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣰⣷⣀⢤⣤⣤⣸⣿⣿⣿⣿⣿ │ 
- │ ● coredns-6799fbcd5-w9t4p                               kube-system    0  119d █░░░░░░     │ │   5m │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
- │ ● metrics-server-67c658944b-lm2x                        kube-system    0  119d ready 0/1   │ │      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
- │ ● traefik-f4564c4f4-zq7rn                               kube-system    0  119d ░░░░░░░     │ │    0 │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
- │ ● local-path-provisioner-84db5d-h4                      kube-system    0  119d ImagePullB… │ │      └───────────────────────────────────────────────────── │ 
- │ ● svclb-traefik-8c2f1-6n2vb                             kube-system    7  119d CrashLoopB… │ │                                                             │ 
+ │   NAME                                                  NAMESPACE    RST   SEC CPU/STATUS  │ │   bilibili-raffle · Running · ready 2/2 · node demo-node-0… │ 
+ │ ● bilibili-raffle-5d8f9c7b4-x2kqp                       bilibili-r…    0  75 C █░░░░░░     │ │                                                             │ 
+ │ ● bilibili-live-7f6b8d9c5-mn4tz                         bilibili-r…    2  20 F ████░░░     │ │ CPU 11m req 10m · lim 50m          streamline · braille 2×4 │ 
+ │ ● lgo-7c5d97584-hq8wd                                   lgo            0  20 F ██░░░░░     │ │  20m │                                                      │ 
+ │ ● psql-6bc7744f9-r7zlc                                  ys-odoo        0 100 A ████░░░     │ │      │                                ⡄                     │ 
+ │ ● odoo-7575bf6d8-9wjvk                                  ys-odoo        1  75 C ██████░     │ │  15m │────────────────⡀──────────────⣼⣿──────────────────── │ 
+ │ ○ qiandao-1605400800-k8f2m                              xcx            0  20 F Completed   │ │      │  ⡀  ⢀⢀⣦⢀⣠⣦⣤⣤⡀⡠⣼⣧            ⢀⢀⣿⣿⣗⣦⣀ ⣠⣀⣆  request 10m │ 
+ │ ○ lingqu-1605486000-4tq8n                               xcx            0  20 F Completed   │ │  10m │╌⣰⣧⣴⣄⣾⣾⣿⣷⣿⣿⣿⣿⣷⣿⣿⣿⡀⣀╌╌╌╌╌╌⢀⣾⣶⣶⣿⣿⣿⣿⣿⣿⣿⣷⣿⣿⣿⡄╌⡀╌╌╌╌╌⣄⣀⣾⣿● │ 
+ │ ⠙ lingqu-1605489600-b7xsd                               xcx            0 100 A Init:0/1    │ │      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡄⢀⣶⣦⢠⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣰⣷⣀⢤⣤⣤⣸⣿⣿⣿⣿⣿ │ 
+ │ ● coredns-6799fbcd5-w9t4p                               kube-system    0  75 C █░░░░░░     │ │   5m │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● metrics-server-67c658944b-lm2x                        kube-system    0  20 F ready 0/1   │ │      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● traefik-f4564c4f4-zq7rn                               kube-system    0  20 F ░░░░░░░     │ │    0 │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● local-path-provisioner-84db5d-h4                      kube-system    0 100 A ImagePullB… │ │      └───────────────────────────────────────────────────── │ 
+ │ ● svclb-traefik-8c2f1-6n2vb                             kube-system    7  75 C CrashLoopB… │ │                                                             │ 
  │                                                                                            │ │ ╭───────────────────────────╮ ╭───────────────────────────╮ │ 
  │                                                                                            │ │ │ Memory 73Mi / 128Mi       │ │ Net ↓7.1 kB/s ↑2.7 kB/s   │ │ 
  │                                                                                            │ │ │ █████████████████████████ │ │ ▆▄▆▁▃▅▄▇▆█▄█▆▆▃██▄▂▇▄█▄▇▆ │ │ 

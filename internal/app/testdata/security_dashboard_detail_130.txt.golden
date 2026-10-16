@@ -5,35 +5,35 @@
  │                                                       │ │  Log   Config   Top   Describe   Events   Security 1               │ 
  │ / filter pods…▌                              13 items │ │ ────────────────────────────────────────────────────────────────── │ 
  │                                                       │ │ ╭────────────────────────────────────────────────────────────────╮ │ 
- │   NAME             NAMESPACE    RST   AGE CPU/STATUS  │ │ │ S: namespace | Pod: bilibili-raffle/bilibili-live-7f6b8d9c5-m… │ │ 
- │ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │ │ │ Dashboard coverage: complete in scope | pods 13/13             │ │ 
- │ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │ │ │ No findings does not mean safe                                 │ │ 
- │ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │ │ │ Local checks only; not PSS compliance.                         │ │ 
- │ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │ │ │ More namespaces: use the namespace filter.                     │ │ 
- │ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │ │ │ Score: 100 - (25*high + 8*medium + 2*info)/evaluated pods;     │ │ 
- │ ○ qiandao-1605400… xcx            0    2h Completed   │ │ │ floor 0, rounded.                                              │ │ 
- │ ○ lingqu-16054860… xcx            0   41m Completed   │ │ │ Grades: A >=90, B >=80, C >=70, D >=60, F <60. Not a safety    │ │ 
- │ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │ │ │ rating.                                                        │ │ 
- │ ● coredns-6799fbc… kube-system    0  119d ░░░░░░░     │ │ │ SELECTED POD | 59/100 (F) | 1/1 pod                            │ │ 
- │ ● metrics-server-… kube-system    0  119d ready 0/1   │ │ │ Pod bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz | complete   │ │ 
- │ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │ │ │ in scope                                                       │ │ 
- │ ● local-path-prov… kube-system    0  119d ImagePullB… │ │ │ Observed 2026-10-16 12:00:00Z | UID                            │ │ 
- │ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │ │ │ demo-bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz | RV 1      │ │ 
- ╰───────────────────────────────────────────────────────╯ │ │ [high] privileged | finding | container: init-permissions      │ │ 
- ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ Field: spec.initContainers[0].securityContext.privileged       │ │ 
- │                                                       │ │ │ Evidence: true                                                 │ │ 
- │ bilibili-raf… ███████████████████████████████████████ │ │ │ Privileged init container configured. Disable privileged mode  │ │ 
- │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Source: demo fixture v1 | configuration observed               │ │ 
- │ bilibili-live ███████████████████████████████████████ │ │ │ [medium] imageLatest | finding | container: app                │ │ 
- │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Field: spec.containers[0].image                                │ │ 
- │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │ Evidence: latest tag without digest                            │ │ 
- │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Image reference is mutable. Pin a verified digest              │ │ 
- │ psql-6bc7744… ███████████████████████████████████████ │ │ │ Source: demo fixture v1 | configuration observed               │ │ 
- │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ [medium] limit-memory | finding | container: app               │ │ 
- │ odoo-7575bf6… ███████████████████████████████████████ │ │ │ Field: spec.containers[0].resources.limits.memory              │ │ 
- │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Evidence: absent at container and pod levels                   │ │ 
- │ coredns-6799… ███████████████████████████████████████ │ │ │ Availability risk. Set a suitable memory limit                 │ │ 
- │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Source: demo fixture v1 | configuration observed               │ │ 
+ │   NAME             NAMESPACE    RST   SEC CPU/STATUS  │ │ │ S: namespace | Pod: bilibili-raffle/bilibili-live-7f6b8d9c5-m… │ │ 
+ │ ● bilibili-raffle… bilibili-r…    0  35 F █░░░░░░     │ │ │ Dashboard coverage: complete in scope | pods 13/13             │ │ 
+ │ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │ │ │ No findings does not mean safe                                 │ │ 
+ │ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │ │ │ Local checks only; not PSS compliance.                         │ │ 
+ │ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │ │ │ high     13 ██████████████░░░░░░░░░░                           │ │ 
+ │ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │ │ │ medium   22 ████████████████████████                           │ │ 
+ │ ○ qiandao-1605400… xcx            0  20 F Completed   │ │ │ info      4 ████░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ │ ○ lingqu-16054860… xcx            0  20 F Completed   │ │ │ Unknown checks: 4 | confirmed findings only in score           │ │ 
+ │ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │ │ │ Trend: ▅▅ (revision samples)                                   │ │ 
+ │ ● coredns-6799fbc… kube-system    0  75 C ░░░░░░░     │ │ │ ALERTS | new high since baseline / last ack | A: ack all       │ │ 
+ │ ● metrics-server-… kube-system    0  20 F ready 0/1   │ │ │ ! bilibili-raffle/bilibili-raffle-5d8f9c7b4-x2kqp | hostPID |  │ │ 
+ │ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │ │ │ pod                                                            │ │ 
+ │ ● local-path-prov… kube-system    0 100 A ImagePullB… │ │ │ TOP RULES | affected pods, both dimensions                     │ │ 
+ │ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │ │ │ allowPrivilegeEscalat…    7 ██████████████████                 │ │ 
+ ╰───────────────────────────────────────────────────────╯ │ │ capabilitiesDrop          4 ██████████░░░░░░░░                 │ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ runAsNonRoot              4 ██████████░░░░░░░░                 │ │ 
+ │                                                       │ │ │ seccomp                   4 ██████████░░░░░░░░                 │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │ serviceAccountToken       4 ██████████░░░░░░░░                 │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ NAMESPACES | lowest scores first                               │ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │ │ lgo                20 ██░░░░░░ | 2 findings                    │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ bilibili-raffle    28 ██░░░░░░ | 10 findings                   │ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │ xcx                47 ████░░░░ | 6 findings                    │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ kube-system        58 █████░░░ | 16 findings                   │ │ 
+ │ psql-6bc7744… ███████████████████████████████████████ │ │ │ ys-odoo            88 ███████░ | 5 findings                    │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ More namespaces: use the namespace filter.                     │ │ 
+ │ odoo-7575bf6… ███████████████████████████████████████ │ │ │ Score: v2 per pod/dimension: max(0, 100 - 40H - 6M - I); each  │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ rule once, worst severity.                                     │ │ 
+ │ coredns-6799… ███████████████████████████████████████ │ │ │ Grades: A >=90, B >=80, C >=70, D >=60, E >=50, F <50. Not a   │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ safety rating.                                                 │ │ 
  │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
  ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────

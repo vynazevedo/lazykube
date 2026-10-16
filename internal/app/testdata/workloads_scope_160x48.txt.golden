@@ -5,12 +5,12 @@
  │                                                                                            │ │  Log   Config   Top   Describe   Events   Security          │ 
  │ / filter pods…▌                                                    ns:kube-system  5 items │ │ ─────────────────────────────────────────────────────────── │ 
  │                                                                                            │ │ ● coredns-6799fbcd5-w9t4p                         [Running] │ 
- │   NAME                                                  NAMESPACE    RST   AGE CPU/STATUS  │ │   kube-system · Running · ready 1/1 · node demo-node-01 · … │ 
- │ ● coredns-6799fbcd5-w9t4p                               kube-system    0  119d █░░░░░░     │ │                                                             │ 
- │ ● metrics-server-67c658944b-lm2x                        kube-system    0  119d ready 0/1   │ │ CPU 10m req 10m · lim 50m          streamline · braille 2×4 │ 
- │ ● traefik-f4564c4f4-zq7rn                               kube-system    0  119d ░░░░░░░     │ │  20m │                                                      │ 
- │ ● local-path-provisioner-84db5d-h4                      kube-system    0  119d ImagePullB… │ │      │     ⣸                 ⣇                              │ 
- │ ● svclb-traefik-8c2f1-6n2vb                             kube-system    7  119d CrashLoopB… │ │  15m │──⡀─⢀⣿⡇───────────────⢸⣿⡀─⣀────────────────────────── │ 
+ │   NAME                                                  NAMESPACE    RST   SEC CPU/STATUS  │ │   kube-system · Running · ready 1/1 · node demo-node-01 · … │ 
+ │ ● coredns-6799fbcd5-w9t4p                               kube-system    0  75 C █░░░░░░     │ │                                                             │ 
+ │ ● metrics-server-67c658944b-lm2x                        kube-system    0  20 F ready 0/1   │ │ CPU 10m req 10m · lim 50m          streamline · braille 2×4 │ 
+ │ ● traefik-f4564c4f4-zq7rn                               kube-system    0  20 F ░░░░░░░     │ │  20m │                                                      │ 
+ │ ● local-path-provisioner-84db5d-h4                      kube-system    0 100 A ImagePullB… │ │      │     ⣸                 ⣇                              │ 
+ │ ● svclb-traefik-8c2f1-6n2vb                             kube-system    7  75 C CrashLoopB… │ │  15m │──⡀─⢀⣿⡇───────────────⢸⣿⡀─⣀────────────────────────── │ 
  │                                                                                            │ │      │⡠⣼⣷⡀⣼⣿⣷⡀      ⡄       ⣼⣿⣧⣰⣿⣷⡄             request 10m │ 
  │                                                                                            │ │  10m │⣿⣿⣿⣿⣿⣿⣿⣿⣄⡠⣤⡀╌╌⣿╌╌╌⢀⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣤⣀⣶⣶⣆╌╌╌╌╌╌╌╌⣼⣿⣿⣿⣿⣿⣿⣿⣿⣤● │ 
  │                                                                                            │ │      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣄⢸⣿⣇⢠⣷⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣾⣿⡄⣠⣀⢀⣔⣮⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 

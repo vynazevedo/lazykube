@@ -5,20 +5,20 @@
  │                                   │ │                                                    │ │  Log   Config   Top   Describe   Events   Security            │ 
  │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  demo-node-01 │ │ / filter pods…▌                           13 items │ │ ───────────────────────────────────────────────────────────── │ 
  │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready      │ │                                                    │ │ ● bilibili-live-7f6b8d9c5-mn4tz                     [Running] │ 
- │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25%      │ │   NAME          NAMESPACE    RST   AGE CPU/STATUS  │ │   bilibili-raffle · Running · ready 2/2 · node demo-node-01 … │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   █████████████│ │ ● bilibili-raf… bilibili-r…    0  119d █░░░░░░     │ │                                                               │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4/3.8Gi│ │ ● bilibili-liv… bilibili-r…    2  119d ████░░░     │ │ ╭───────────────────────────────────────────────────────────╮ │ 
- │    ▀    ▀▀▀▀▀▀▀▀▀    █████████████│ │ ● lgo-7c5d9758… lgo            0   87d ██░░░░░     │ │ │  1  apiVersion: v1                                        │ │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13 / 110│ │ ● psql-6bc7744… ys-odoo        0   64d ████░░░     │ │ │  2  kind: Pod                                             │ │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch amd64   │ │ ● odoo-7575bf6… ys-odoo        1   64d ██████░     │ │ │  3  metadata:                                             │ │ 
- │    ▀ ▀  ▀▀▀▀▀▀▀▀▀                 │ │ ○ qiandao-1605… xcx            0    2h Completed   │ │ │  4    name: bilibili-live-7f6b8d9c5-mn4tz                 │ │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                │ │ ○ lingqu-16054… xcx            0   41m Completed   │ │ │  5    namespace: bilibili-raffle                          │ │ 
- │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀               │ │ ⠙ lingqu-16054… xcx            0    8s Init:0/1    │ │ │  6    labels:                                             │ │ 
- │                                   │ │ ● coredns-6799… kube-system    0  119d █░░░░░░     │ │ │  7      app: bilibili-live                                │ │ 
- │                                   │ │ ● metrics-serv… kube-system    0  119d ready 0/1   │ │ │  8  spec:                                                 │ │ 
- ╰───────────────────────────────────╯ │ ● traefik-f456… kube-system    0  119d ░░░░░░░     │ │ │  9    containers:                                         │ │ 
- ╭─ Namespaces ──────────────────────╮ │ ● local-path-p… kube-system    0  119d ImagePullB… │ │ │ 10    - name: app                                         │ │ 
- │                                   │ │ ● svclb-traefi… kube-system    7  119d CrashLoopB… │ │ │ 11      image: registry.local/bilibili-raffle:1.4.2       │ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25%      │ │   NAME          NAMESPACE    RST   SEC CPU/STATUS  │ │   bilibili-raffle · Running · ready 2/2 · node demo-node-01 … │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   █████████████│ │ ● bilibili-raf… bilibili-r…    0  75 C █░░░░░░     │ │                                                               │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4/3.8Gi│ │ ● bilibili-liv… bilibili-r…    2  20 F ████░░░     │ │ ╭───────────────────────────────────────────────────────────╮ │ 
+ │    ▀    ▀▀▀▀▀▀▀▀▀    █████████████│ │ ● lgo-7c5d9758… lgo            0  20 F ██░░░░░     │ │ │  1  apiVersion: v1                                        │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13 / 110│ │ ● psql-6bc7744… ys-odoo        0 100 A ████░░░     │ │ │  2  kind: Pod                                             │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch amd64   │ │ ● odoo-7575bf6… ys-odoo        1  75 C ██████░     │ │ │  3  metadata:                                             │ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀                 │ │ ○ qiandao-1605… xcx            0  20 F Completed   │ │ │  4    name: bilibili-live-7f6b8d9c5-mn4tz                 │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                │ │ ○ lingqu-16054… xcx            0  20 F Completed   │ │ │  5    namespace: bilibili-raffle                          │ │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀               │ │ ⠙ lingqu-16054… xcx            0 100 A Init:0/1    │ │ │  6    labels:                                             │ │ 
+ │                                   │ │ ● coredns-6799… kube-system    0  75 C █░░░░░░     │ │ │  7      app: bilibili-live                                │ │ 
+ │                                   │ │ ● metrics-serv… kube-system    0  20 F ready 0/1   │ │ │  8  spec:                                                 │ │ 
+ ╰───────────────────────────────────╯ │ ● traefik-f456… kube-system    0  20 F ░░░░░░░     │ │ │  9    containers:                                         │ │ 
+ ╭─ Namespaces ──────────────────────╮ │ ● local-path-p… kube-system    0 100 A ImagePullB… │ │ │ 10    - name: app                                         │ │ 
+ │                                   │ │ ● svclb-traefi… kube-system    7  75 C CrashLoopB… │ │ │ 11      image: registry.local/bilibili-raffle:1.4.2       │ │ 
  │ default                 ·····   0 │ ╰────────────────────────────────────────────────────╯ │ │ 12      resources:                                        │ │ 
  │ kube-system             █████   5 │ ╭─ CPU heatmap · last 2 min ─────────────────────────╮ │ │ 13        requests: { cpu: 10m, memory: 64Mi }            │ │ 
  │ kube-public             ·····   0 │ │                                                    │ │ │ 14        limits: { cpu: 50m, memory: 128Mi }             │ │ 

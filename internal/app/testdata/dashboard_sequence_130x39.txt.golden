@@ -1,23 +1,23 @@
 == initial node hidden
-== initial pods 57x19 cells=bbf1444c0c9524998aae6fca0ff23494299ecb4119b938535b78f38436885753
+== initial pods 57x19 cells=fb5a3e1c5f0b5ebbe4ef698f085bfab69328bb3761300940fccdd39112297086
 ╭─ Pods · focus ────────────────────────────────────────╮
 │                                                       │
 │ / filter pods…▌                              13 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
-│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
-│ ○ qiandao-1605400… xcx            0    2h Completed   │
-│ ○ lingqu-16054860… xcx            0   41m Completed   │
-│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
-│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
-│ ● metrics-server-… kube-system    0  119d ready 0/1   │
-│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
-│ ● local-path-prov… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │
+│ ○ qiandao-1605400… xcx            0  20 F Completed   │
+│ ○ lingqu-16054860… xcx            0  20 F Completed   │
+│ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  75 C █░░░░░░     │
+│ ● metrics-server-… kube-system    0  20 F ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │
+│ ● local-path-prov… kube-system    0 100 A ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 ╰───────────────────────────────────────────────────────╯
 == initial heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
 ╭─ CPU heatmap · last 2 min ────────────────────────────╮
@@ -73,25 +73,25 @@
 │ ╰────────────────────────────────────────────────────────────────╯ │
 ╰────────────────────────────────────────────────────────────────────╯
 == down node hidden
-== down pods 57x19 cells=e0679b355ecfff09401591e50d6f04c858b2a6d9d0aa004e3523fc13ae1e6f64
+== down pods 57x19 cells=45161cd023bddeeb85b5e92fb135b51ec46cdacfe2390b6eb9059cf93971eadf
 ╭─ Pods · focus ────────────────────────────────────────╮
 │                                                       │
 │ / filter pods…▌                              13 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
-│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
-│ ○ qiandao-1605400… xcx            0    2h Completed   │
-│ ○ lingqu-16054860… xcx            0   41m Completed   │
-│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
-│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
-│ ● metrics-server-… kube-system    0  119d ready 0/1   │
-│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
-│ ● local-path-prov… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │
+│ ○ qiandao-1605400… xcx            0  20 F Completed   │
+│ ○ lingqu-16054860… xcx            0  20 F Completed   │
+│ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  75 C █░░░░░░     │
+│ ● metrics-server-… kube-system    0  20 F ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │
+│ ● local-path-prov… kube-system    0 100 A ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 ╰───────────────────────────────────────────────────────╯
 == down heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
 ╭─ CPU heatmap · last 2 min ────────────────────────────╮
@@ -147,25 +147,25 @@
 │ ╰────────────────────────────────────────────────────────────────╯ │
 ╰────────────────────────────────────────────────────────────────────╯
 == down-again node hidden
-== down-again pods 57x19 cells=92acb96e362077471b841fe39694b0c2f29f0b35669bd7c27143b5cb82a2b8af
+== down-again pods 57x19 cells=c244335b51c9700313c90d527414f38223a92223a44d9c25a0cb26c931a087e6
 ╭─ Pods · focus ────────────────────────────────────────╮
 │                                                       │
 │ / filter pods…▌                              13 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
-│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
-│ ○ qiandao-1605400… xcx            0    2h Completed   │
-│ ○ lingqu-16054860… xcx            0   41m Completed   │
-│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
-│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
-│ ● metrics-server-… kube-system    0  119d ready 0/1   │
-│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
-│ ● local-path-prov… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │
+│ ○ qiandao-1605400… xcx            0  20 F Completed   │
+│ ○ lingqu-16054860… xcx            0  20 F Completed   │
+│ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  75 C █░░░░░░     │
+│ ● metrics-server-… kube-system    0  20 F ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │
+│ ● local-path-prov… kube-system    0 100 A ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 ╰───────────────────────────────────────────────────────╯
 == down-again heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
 ╭─ CPU heatmap · last 2 min ────────────────────────────╮
@@ -221,25 +221,25 @@
 │ ╰────────────────────────────────────────────────────────────────╯ │
 ╰────────────────────────────────────────────────────────────────────╯
 == tab-focus node hidden
-== tab-focus pods 57x19 cells=187e4c63e41d6ac87abf7be291b18dcecada94dcb426e88fa870f46e1efefb15
+== tab-focus pods 57x19 cells=4489b10ea78834805b9c165d43da272775c590855ea1c0c0952daa92df957bf4
 ╭─ Pods ────────────────────────────────────────────────╮
 │                                                       │
 │ / filter pods…                               13 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
-│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
-│ ○ qiandao-1605400… xcx            0    2h Completed   │
-│ ○ lingqu-16054860… xcx            0   41m Completed   │
-│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
-│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
-│ ● metrics-server-… kube-system    0  119d ready 0/1   │
-│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
-│ ● local-path-prov… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │
+│ ○ qiandao-1605400… xcx            0  20 F Completed   │
+│ ○ lingqu-16054860… xcx            0  20 F Completed   │
+│ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  75 C █░░░░░░     │
+│ ● metrics-server-… kube-system    0  20 F ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │
+│ ● local-path-prov… kube-system    0 100 A ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 ╰───────────────────────────────────────────────────────╯
 == tab-focus heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
 ╭─ CPU heatmap · last 2 min ────────────────────────────╮
@@ -295,25 +295,25 @@
 │ ╰────────────────────────────────────────────────────────────────╯ │
 ╰────────────────────────────────────────────────────────────────────╯
 == tab-log node hidden
-== tab-log pods 57x19 cells=187e4c63e41d6ac87abf7be291b18dcecada94dcb426e88fa870f46e1efefb15
+== tab-log pods 57x19 cells=4489b10ea78834805b9c165d43da272775c590855ea1c0c0952daa92df957bf4
 ╭─ Pods ────────────────────────────────────────────────╮
 │                                                       │
 │ / filter pods…                               13 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
-│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
-│ ○ qiandao-1605400… xcx            0    2h Completed   │
-│ ○ lingqu-16054860… xcx            0   41m Completed   │
-│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
-│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
-│ ● metrics-server-… kube-system    0  119d ready 0/1   │
-│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
-│ ● local-path-prov… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │
+│ ○ qiandao-1605400… xcx            0  20 F Completed   │
+│ ○ lingqu-16054860… xcx            0  20 F Completed   │
+│ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  75 C █░░░░░░     │
+│ ● metrics-server-… kube-system    0  20 F ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │
+│ ● local-path-prov… kube-system    0 100 A ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 ╰───────────────────────────────────────────────────────╯
 == tab-log heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
 ╭─ CPU heatmap · last 2 min ────────────────────────────╮
@@ -369,25 +369,25 @@
 │ ╰────────────────────────────────────────────────────────────────╯ │
 ╰────────────────────────────────────────────────────────────────────╯
 == tab-next node hidden
-== tab-next pods 57x19 cells=187e4c63e41d6ac87abf7be291b18dcecada94dcb426e88fa870f46e1efefb15
+== tab-next pods 57x19 cells=4489b10ea78834805b9c165d43da272775c590855ea1c0c0952daa92df957bf4
 ╭─ Pods ────────────────────────────────────────────────╮
 │                                                       │
 │ / filter pods…                               13 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
-│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
-│ ○ qiandao-1605400… xcx            0    2h Completed   │
-│ ○ lingqu-16054860… xcx            0   41m Completed   │
-│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
-│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
-│ ● metrics-server-… kube-system    0  119d ready 0/1   │
-│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
-│ ● local-path-prov… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │
+│ ○ qiandao-1605400… xcx            0  20 F Completed   │
+│ ○ lingqu-16054860… xcx            0  20 F Completed   │
+│ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  75 C █░░░░░░     │
+│ ● metrics-server-… kube-system    0  20 F ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │
+│ ● local-path-prov… kube-system    0 100 A ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 ╰───────────────────────────────────────────────────────╯
 == tab-next heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
 ╭─ CPU heatmap · last 2 min ────────────────────────────╮
@@ -443,25 +443,25 @@
 │ ╰────────────────────────────────────────────────────────────────╯ │
 ╰────────────────────────────────────────────────────────────────────╯
 == tab-security node hidden
-== tab-security pods 57x19 cells=187e4c63e41d6ac87abf7be291b18dcecada94dcb426e88fa870f46e1efefb15
+== tab-security pods 57x19 cells=4489b10ea78834805b9c165d43da272775c590855ea1c0c0952daa92df957bf4
 ╭─ Pods ────────────────────────────────────────────────╮
 │                                                       │
 │ / filter pods…                               13 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
-│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
-│ ○ qiandao-1605400… xcx            0    2h Completed   │
-│ ○ lingqu-16054860… xcx            0   41m Completed   │
-│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
-│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
-│ ● metrics-server-… kube-system    0  119d ready 0/1   │
-│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
-│ ● local-path-prov… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │
+│ ○ qiandao-1605400… xcx            0  20 F Completed   │
+│ ○ lingqu-16054860… xcx            0  20 F Completed   │
+│ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  75 C █░░░░░░     │
+│ ● metrics-server-… kube-system    0  20 F ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │
+│ ● local-path-prov… kube-system    0 100 A ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 ╰───────────────────────────────────────────────────────╯
 == tab-security heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
 ╭─ CPU heatmap · last 2 min ────────────────────────────╮
@@ -480,7 +480,7 @@
 │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
 │               -2m ███████████████████████████████ now │
 ╰───────────────────────────────────────────────────────╯
-== tab-security details 70x35 cells=30c164ba27e59a9dace606abf5c5b7c81d4dc2e119d5bd71c2f256a9f04b878a
+== tab-security details 70x35 cells=8e4b72ecb26b0388f2dbdb42cdd7c22c4f7126417b60ee86a20d98715e98a7c1
 ╭────────────────────────────────────────────────────────────────────╮
 │  Log   Config   Top   Describe   Events   Security                 │
 │ ────────────────────────────────────────────────────────────────── │
@@ -489,53 +489,53 @@
 │ │ Dashboard coverage: complete in scope | pods 13/13             │ │
 │ │ No findings does not mean safe                                 │ │
 │ │ Local checks only; not PSS compliance.                         │ │
-│ │ POSTURE | Cluster | 78/100 (C) | 13/13 pods                    │ │
+│ │ Security /100: Pod 100 A | Namespace 88 B | Cluster 55 E       │ │
+│ │ Hygiene /100: Pod 100 A | Namespace 100 A | Cluster 97 A       │ │
+│ │ Namespace mean (2 pods) | Cluster mean (13 pods)               │ │
+│ │ Selected pod security: 100/100 (A) | 1/1 pod                   │ │
 │ │ Synthetic data (demo)                                          │ │
-│ │ Score ████████████████████████████░░░░░░░░                     │ │
-│ │ high      9 ████████████████████████                           │ │
-│ │ medium    6 ████████████████░░░░░░░░                           │ │
-│ │ info      4 ███████████░░░░░░░░░░░░░                           │ │
-│ │ Unknown checks: 4 | confirmed findings only in score           │ │
-│ │ Trend: ▆ (revision samples)                                    │ │
-│ │ ALERTS | new high since baseline / last ack | A: ack all       │ │
-│ │ No unacknowledged high alerts.                                 │ │
-│ │ TOP RULES | confirmed findings                                 │ │
-│ │ serviceAccountToken       4 ██████████████████                 │ │
-│ │ capabilitiesAdded         3 ██████████████░░░░                 │ │
-│ │ hostNetwork               3 ██████████████░░░░                 │ │
-│ │ imageLatest               3 ██████████████░░░░                 │ │
-│ │ limit-memory              3 ██████████████░░░░                 │ │
-│ │ NAMESPACES | lowest scores first                               │ │
-│ │ lgo                50 ████░░░░ | 2 findings                    │ │
-│ │ xcx                70 ██████░░ | 5 findings                    │ │
-│ │ bilibili-raffle    79 ██████░░ | 4 findings                    │ │
-│ │ kube-system        81 ██████░░ | 7 findings                    │ │
-│ │ ys-odoo            99 ████████ | 1 finding                     │ │
-│ │ More namespaces: use the namespace filter.                     │ │
-│ │ Score: 100 - (25*high + 8*medium + 2*info)/evaluated pods;     │ │
-│ │ floor 0, rounded.                                              │ │
+│ │ Pod ys-odoo/psql-6bc7744f9-r7zlc | complete in scope           │ │
+│ │ Observed 2026-10-16 12:00:00Z | UID                            │ │
+│ │ demo-ys-odoo/psql-6bc7744f9-r7zlc | RV 1                       │ │
+│ │ No findings in evaluated local checks.                         │ │
+│ │ POSTURE | Cluster | 55/100 (E) | 13/13 pods                    │ │
+│ │ Score ████████████████████░░░░░░░░░░░░░░░░                     │ │
+│ │ SEC column: Security; p = partial. Hygiene scored separately.  │ │
+│ │ Security mean 55 | median 75 | worst decile 20                 │ │
+│ │ A    3 ██████░░░░░░░░░░░░░░░░░░                                │ │
+│ │ B    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                │ │
+│ │ C    4 ███████░░░░░░░░░░░░░░░░░                                │ │
+│ │ D    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                │ │
+│ │ E    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                │ │
+│ │ F    6 ███████████░░░░░░░░░░░░░                                │ │
+│ │ Hygiene mean 97 | median 100 | worst decile 88                 │ │
+│ │ A   10 ██████████████████░░░░░░                                │ │
+│ │ B    3 ██████░░░░░░░░░░░░░░░░░░                                │ │
+│ │ C    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                │ │
+│ │ D    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                │ │
+│ │ E    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                │ │
 │ ╰────────────────────────────────────────────────────────────────╯ │
 ╰────────────────────────────────────────────────────────────────────╯
 == security-namespace node hidden
-== security-namespace pods 57x19 cells=187e4c63e41d6ac87abf7be291b18dcecada94dcb426e88fa870f46e1efefb15
+== security-namespace pods 57x19 cells=4489b10ea78834805b9c165d43da272775c590855ea1c0c0952daa92df957bf4
 ╭─ Pods ────────────────────────────────────────────────╮
 │                                                       │
 │ / filter pods…                               13 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
-│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
-│ ○ qiandao-1605400… xcx            0    2h Completed   │
-│ ○ lingqu-16054860… xcx            0   41m Completed   │
-│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
-│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
-│ ● metrics-server-… kube-system    0  119d ready 0/1   │
-│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
-│ ● local-path-prov… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │
+│ ○ qiandao-1605400… xcx            0  20 F Completed   │
+│ ○ lingqu-16054860… xcx            0  20 F Completed   │
+│ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  75 C █░░░░░░     │
+│ ● metrics-server-… kube-system    0  20 F ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │
+│ ● local-path-prov… kube-system    0 100 A ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 ╰───────────────────────────────────────────────────────╯
 == security-namespace heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
 ╭─ CPU heatmap · last 2 min ────────────────────────────╮
@@ -554,7 +554,7 @@
 │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
 │               -2m ███████████████████████████████ now │
 ╰───────────────────────────────────────────────────────╯
-== security-namespace details 70x35 cells=1f64a63051e73d698e003d0c5af5695a3242b1cb9f8fc98fbc831fe09b1a389c
+== security-namespace details 70x35 cells=ad24c208844a2a76a77b4a41ae3dd5fea7ba910088f960e5d588c2752ba78566
 ╭────────────────────────────────────────────────────────────────────╮
 │  Log   Config   Top   Describe   Events   Security                 │
 │ ────────────────────────────────────────────────────────────────── │
@@ -563,53 +563,53 @@
 │ │ Dashboard coverage: complete in scope | pods 13/13             │ │
 │ │ No findings does not mean safe                                 │ │
 │ │ Local checks only; not PSS compliance.                         │ │
-│ │ POSTURE | Cluster | 78/100 (C) | 13/13 pods                    │ │
+│ │ Security /100: Pod 100 A | Namespace 88 B | Cluster 55 E       │ │
+│ │ Hygiene /100: Pod 100 A | Namespace 100 A | Cluster 97 A       │ │
+│ │ Namespace mean (2 pods) | Cluster mean (13 pods)               │ │
+│ │ Selected pod security: 100/100 (A) | 1/1 pod                   │ │
 │ │ Synthetic data (demo)                                          │ │
-│ │ Score ████████████████████████████░░░░░░░░                     │ │
-│ │ high      9 ████████████████████████                           │ │
-│ │ medium    6 ████████████████░░░░░░░░                           │ │
-│ │ info      4 ███████████░░░░░░░░░░░░░                           │ │
-│ │ Unknown checks: 4 | confirmed findings only in score           │ │
-│ │ Trend: ▆ (revision samples)                                    │ │
-│ │ ALERTS | new high since baseline / last ack | A: ack all       │ │
-│ │ No unacknowledged high alerts.                                 │ │
-│ │ TOP RULES | confirmed findings                                 │ │
-│ │ serviceAccountToken       4 ██████████████████                 │ │
-│ │ capabilitiesAdded         3 ██████████████░░░░                 │ │
-│ │ hostNetwork               3 ██████████████░░░░                 │ │
-│ │ imageLatest               3 ██████████████░░░░                 │ │
-│ │ limit-memory              3 ██████████████░░░░                 │ │
-│ │ NAMESPACES | lowest scores first                               │ │
-│ │ lgo                50 ████░░░░ | 2 findings                    │ │
-│ │ xcx                70 ██████░░ | 5 findings                    │ │
-│ │ bilibili-raffle    79 ██████░░ | 4 findings                    │ │
-│ │ kube-system        81 ██████░░ | 7 findings                    │ │
-│ │ ys-odoo            99 ████████ | 1 finding                     │ │
-│ │ More namespaces: use the namespace filter.                     │ │
-│ │ Score: 100 - (25*high + 8*medium + 2*info)/evaluated pods;     │ │
-│ │ floor 0, rounded.                                              │ │
+│ │ Pod ys-odoo/psql-6bc7744f9-r7zlc | complete in scope           │ │
+│ │ Observed 2026-10-16 12:00:00Z | UID                            │ │
+│ │ demo-ys-odoo/psql-6bc7744f9-r7zlc | RV 1                       │ │
+│ │ No findings in evaluated local checks.                         │ │
+│ │ POSTURE | Cluster | 55/100 (E) | 13/13 pods                    │ │
+│ │ Score ████████████████████░░░░░░░░░░░░░░░░                     │ │
+│ │ SEC column: Security; p = partial. Hygiene scored separately.  │ │
+│ │ Security mean 55 | median 75 | worst decile 20                 │ │
+│ │ A    3 ██████░░░░░░░░░░░░░░░░░░                                │ │
+│ │ B    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                │ │
+│ │ C    4 ███████░░░░░░░░░░░░░░░░░                                │ │
+│ │ D    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                │ │
+│ │ E    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                │ │
+│ │ F    6 ███████████░░░░░░░░░░░░░                                │ │
+│ │ Hygiene mean 97 | median 100 | worst decile 88                 │ │
+│ │ A   10 ██████████████████░░░░░░                                │ │
+│ │ B    3 ██████░░░░░░░░░░░░░░░░░░                                │ │
+│ │ C    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                │ │
+│ │ D    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                │ │
+│ │ E    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                │ │
 │ ╰────────────────────────────────────────────────────────────────╯ │
 ╰────────────────────────────────────────────────────────────────────╯
 == tab-events node hidden
-== tab-events pods 57x19 cells=187e4c63e41d6ac87abf7be291b18dcecada94dcb426e88fa870f46e1efefb15
+== tab-events pods 57x19 cells=4489b10ea78834805b9c165d43da272775c590855ea1c0c0952daa92df957bf4
 ╭─ Pods ────────────────────────────────────────────────╮
 │                                                       │
 │ / filter pods…                               13 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
-│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
-│ ○ qiandao-1605400… xcx            0    2h Completed   │
-│ ○ lingqu-16054860… xcx            0   41m Completed   │
-│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
-│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
-│ ● metrics-server-… kube-system    0  119d ready 0/1   │
-│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
-│ ● local-path-prov… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │
+│ ○ qiandao-1605400… xcx            0  20 F Completed   │
+│ ○ lingqu-16054860… xcx            0  20 F Completed   │
+│ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  75 C █░░░░░░     │
+│ ● metrics-server-… kube-system    0  20 F ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │
+│ ● local-path-prov… kube-system    0 100 A ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 ╰───────────────────────────────────────────────────────╯
 == tab-events heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
 ╭─ CPU heatmap · last 2 min ────────────────────────────╮
@@ -665,25 +665,25 @@
 │ ╰────────────────────────────────────────────────────────────────╯ │
 ╰────────────────────────────────────────────────────────────────────╯
 == events-scope node hidden
-== events-scope pods 57x19 cells=187e4c63e41d6ac87abf7be291b18dcecada94dcb426e88fa870f46e1efefb15
+== events-scope pods 57x19 cells=4489b10ea78834805b9c165d43da272775c590855ea1c0c0952daa92df957bf4
 ╭─ Pods ────────────────────────────────────────────────╮
 │                                                       │
 │ / filter pods…                               13 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
-│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
-│ ○ qiandao-1605400… xcx            0    2h Completed   │
-│ ○ lingqu-16054860… xcx            0   41m Completed   │
-│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
-│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
-│ ● metrics-server-… kube-system    0  119d ready 0/1   │
-│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
-│ ● local-path-prov… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │
+│ ○ qiandao-1605400… xcx            0  20 F Completed   │
+│ ○ lingqu-16054860… xcx            0  20 F Completed   │
+│ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  75 C █░░░░░░     │
+│ ● metrics-server-… kube-system    0  20 F ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │
+│ ● local-path-prov… kube-system    0 100 A ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 ╰───────────────────────────────────────────────────────╯
 == events-scope heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
 ╭─ CPU heatmap · last 2 min ────────────────────────────╮
@@ -739,25 +739,25 @@
 │ ╰────────────────────────────────────────────────────────────────╯ │
 ╰────────────────────────────────────────────────────────────────────╯
 == tab-describe node hidden
-== tab-describe pods 57x19 cells=187e4c63e41d6ac87abf7be291b18dcecada94dcb426e88fa870f46e1efefb15
+== tab-describe pods 57x19 cells=4489b10ea78834805b9c165d43da272775c590855ea1c0c0952daa92df957bf4
 ╭─ Pods ────────────────────────────────────────────────╮
 │                                                       │
 │ / filter pods…                               13 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
-│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
-│ ○ qiandao-1605400… xcx            0    2h Completed   │
-│ ○ lingqu-16054860… xcx            0   41m Completed   │
-│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
-│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
-│ ● metrics-server-… kube-system    0  119d ready 0/1   │
-│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
-│ ● local-path-prov… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │
+│ ○ qiandao-1605400… xcx            0  20 F Completed   │
+│ ○ lingqu-16054860… xcx            0  20 F Completed   │
+│ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  75 C █░░░░░░     │
+│ ● metrics-server-… kube-system    0  20 F ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │
+│ ● local-path-prov… kube-system    0 100 A ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 ╰───────────────────────────────────────────────────────╯
 == tab-describe heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
 ╭─ CPU heatmap · last 2 min ────────────────────────────╮
@@ -813,25 +813,25 @@
 │ ╰────────────────────────────────────────────────────────────────╯ │
 ╰────────────────────────────────────────────────────────────────────╯
 == page-down node hidden
-== page-down pods 57x19 cells=187e4c63e41d6ac87abf7be291b18dcecada94dcb426e88fa870f46e1efefb15
+== page-down pods 57x19 cells=4489b10ea78834805b9c165d43da272775c590855ea1c0c0952daa92df957bf4
 ╭─ Pods ────────────────────────────────────────────────╮
 │                                                       │
 │ / filter pods…                               13 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
-│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
-│ ○ qiandao-1605400… xcx            0    2h Completed   │
-│ ○ lingqu-16054860… xcx            0   41m Completed   │
-│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
-│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
-│ ● metrics-server-… kube-system    0  119d ready 0/1   │
-│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
-│ ● local-path-prov… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │
+│ ○ qiandao-1605400… xcx            0  20 F Completed   │
+│ ○ lingqu-16054860… xcx            0  20 F Completed   │
+│ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  75 C █░░░░░░     │
+│ ● metrics-server-… kube-system    0  20 F ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │
+│ ● local-path-prov… kube-system    0 100 A ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 ╰───────────────────────────────────────────────────────╯
 == page-down heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
 ╭─ CPU heatmap · last 2 min ────────────────────────────╮
@@ -887,25 +887,25 @@
 │ ╰────────────────────────────────────────────────────────────────╯ │
 ╰────────────────────────────────────────────────────────────────────╯
 == filter-open node hidden
-== filter-open pods 57x19 cells=5d08644c007ff6a934badcdb590c8a0f855edaebe17d174a69148aec566ae8c0
+== filter-open pods 57x19 cells=28bab67df71933eb563cc3fc278159bb59d0f666c8fc46cc4da7ab2fd0707ec9
 ╭─ Pods · focus ────────────────────────────────────────╮
 │                                                       │
 │ / ▌                                          13 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
-│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
-│ ○ qiandao-1605400… xcx            0    2h Completed   │
-│ ○ lingqu-16054860… xcx            0   41m Completed   │
-│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
-│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
-│ ● metrics-server-… kube-system    0  119d ready 0/1   │
-│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
-│ ● local-path-prov… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │
+│ ○ qiandao-1605400… xcx            0  20 F Completed   │
+│ ○ lingqu-16054860… xcx            0  20 F Completed   │
+│ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  75 C █░░░░░░     │
+│ ● metrics-server-… kube-system    0  20 F ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │
+│ ● local-path-prov… kube-system    0 100 A ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 ╰───────────────────────────────────────────────────────╯
 == filter-open heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
 ╭─ CPU heatmap · last 2 min ────────────────────────────╮
@@ -961,22 +961,22 @@
 │ ╰────────────────────────────────────────────────────────────────╯ │
 ╰────────────────────────────────────────────────────────────────────╯
 == filter-b node hidden
-== filter-b pods 57x19 cells=be91b7394c2d02a67490ad4a755e8490cdba545276b6405e021ce388f6cbbfb3
+== filter-b pods 57x19 cells=9d39c6e56a1e703daf9138e5151c2bd303e4bcf5a9dc61d727c1bf3397e6f30f
 ╭─ Pods · focus ────────────────────────────────────────╮
 │                                                       │
 │ / b▌                                         10 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
-│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
-│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
-│ ● metrics-server-… kube-system    0  119d ready 0/1   │
-│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
-│ ● local-path-prov… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │
+│ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  75 C █░░░░░░     │
+│ ● metrics-server-… kube-system    0  20 F ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │
+│ ● local-path-prov… kube-system    0 100 A ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 │                                                       │
 │                                                       │
 │                                                       │
@@ -1035,15 +1035,15 @@
 │ ╰────────────────────────────────────────────────────────────────╯ │
 ╰────────────────────────────────────────────────────────────────────╯
 == filter-i node hidden
-== filter-i pods 57x19 cells=8e08a3e9a65b31bdd76f8b70ea9697077c72e14409437ec12657040be46d1097
+== filter-i pods 57x19 cells=9b67ffa81e1d3053609f96c5dca944731364b865f5bfe5070e1fe462fc1935f9
 ╭─ Pods · focus ────────────────────────────────────────╮
 │                                                       │
 │ / bi▌                                         3 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 │                                                       │
 │                                                       │
 │                                                       │
@@ -1109,15 +1109,15 @@
 │ ╰────────────────────────────────────────────────────────────────╯ │
 ╰────────────────────────────────────────────────────────────────────╯
 == filter-confirm node hidden
-== filter-confirm pods 57x19 cells=8e08a3e9a65b31bdd76f8b70ea9697077c72e14409437ec12657040be46d1097
+== filter-confirm pods 57x19 cells=9b67ffa81e1d3053609f96c5dca944731364b865f5bfe5070e1fe462fc1935f9
 ╭─ Pods · focus ────────────────────────────────────────╮
 │                                                       │
 │ / bi▌                                         3 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 │                                                       │
 │                                                       │
 │                                                       │
@@ -1183,25 +1183,25 @@
 │ ╰────────────────────────────────────────────────────────────────╯ │
 ╰────────────────────────────────────────────────────────────────────╯
 == filter-clear node hidden
-== filter-clear pods 57x19 cells=51ad33d30c4ac03c4a1e5c1061d1e4b8a784a158958b36460f54c29c70a28f1a
+== filter-clear pods 57x19 cells=f5fe14952f112ef736e848c8a92c34184b38f32db3f7a5ef9d0090b9c7d8fdf5
 ╭─ Pods · focus ────────────────────────────────────────╮
 │                                                       │
 │ / filter pods…▌                              13 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
-│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
-│ ○ qiandao-1605400… xcx            0    2h Completed   │
-│ ○ lingqu-16054860… xcx            0   41m Completed   │
-│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
-│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
-│ ● metrics-server-… kube-system    0  119d ready 0/1   │
-│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
-│ ● local-path-prov… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │
+│ ○ qiandao-1605400… xcx            0  20 F Completed   │
+│ ○ lingqu-16054860… xcx            0  20 F Completed   │
+│ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  75 C █░░░░░░     │
+│ ● metrics-server-… kube-system    0  20 F ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │
+│ ● local-path-prov… kube-system    0 100 A ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 ╰───────────────────────────────────────────────────────╯
 == filter-clear heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
 ╭─ CPU heatmap · last 2 min ────────────────────────────╮
@@ -1257,25 +1257,25 @@
 │ ╰────────────────────────────────────────────────────────────────╯ │
 ╰────────────────────────────────────────────────────────────────────╯
 == click-pod node hidden
-== click-pod pods 57x19 cells=92acb96e362077471b841fe39694b0c2f29f0b35669bd7c27143b5cb82a2b8af
+== click-pod pods 57x19 cells=c244335b51c9700313c90d527414f38223a92223a44d9c25a0cb26c931a087e6
 ╭─ Pods · focus ────────────────────────────────────────╮
 │                                                       │
 │ / filter pods…▌                              13 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
-│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
-│ ○ qiandao-1605400… xcx            0    2h Completed   │
-│ ○ lingqu-16054860… xcx            0   41m Completed   │
-│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
-│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
-│ ● metrics-server-… kube-system    0  119d ready 0/1   │
-│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
-│ ● local-path-prov… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │
+│ ○ qiandao-1605400… xcx            0  20 F Completed   │
+│ ○ lingqu-16054860… xcx            0  20 F Completed   │
+│ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  75 C █░░░░░░     │
+│ ● metrics-server-… kube-system    0  20 F ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │
+│ ● local-path-prov… kube-system    0 100 A ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 ╰───────────────────────────────────────────────────────╯
 == click-pod heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
 ╭─ CPU heatmap · last 2 min ────────────────────────────╮
@@ -1331,25 +1331,25 @@
 │ ╰────────────────────────────────────────────────────────────────╯ │
 ╰────────────────────────────────────────────────────────────────────╯
 == wheel-pod node hidden
-== wheel-pod pods 57x19 cells=8d108cdbe7a5dc31368e1f3db4a2dc878265c18d19aff697f62e0c7b50281bf4
+== wheel-pod pods 57x19 cells=39144c09930af331c155712c0c2cd8aa0c45e04075beba63d219a07fd07b1fd1
 ╭─ Pods · focus ────────────────────────────────────────╮
 │                                                       │
 │ / filter pods…▌                              13 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
-│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
-│ ○ qiandao-1605400… xcx            0    2h Completed   │
-│ ○ lingqu-16054860… xcx            0   41m Completed   │
-│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
-│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
-│ ● metrics-server-… kube-system    0  119d ready 0/1   │
-│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
-│ ● local-path-prov… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │
+│ ○ qiandao-1605400… xcx            0  20 F Completed   │
+│ ○ lingqu-16054860… xcx            0  20 F Completed   │
+│ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  75 C █░░░░░░     │
+│ ● metrics-server-… kube-system    0  20 F ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │
+│ ● local-path-prov… kube-system    0 100 A ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 ╰───────────────────────────────────────────────────────╯
 == wheel-pod heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
 ╭─ CPU heatmap · last 2 min ────────────────────────────╮
@@ -1405,25 +1405,25 @@
 │ ╰────────────────────────────────────────────────────────────────╯ │
 ╰────────────────────────────────────────────────────────────────────╯
 == hover-pod node hidden
-== hover-pod pods 57x19 cells=914b815bd057071259b44deb77fa4900c970b653b5bb688412914c62244d1954
+== hover-pod pods 57x19 cells=732a60f442550483aeb6dbb236a8587db33e4ede676d4fc1ac99c4259741629a
 ╭─ Pods · focus ────────────────────────────────────────╮
 │                                                       │
 │ / filter pods…▌                              13 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
-│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
-│ ○ qiandao-1605400… xcx            0    2h Completed   │
-│ ○ lingqu-16054860… xcx            0   41m Completed   │
-│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
-│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
-│ ● metrics-server-… kube-system    0  119d ready 0/1   │
-│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
-│ ● local-path-prov… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │
+│ ○ qiandao-1605400… xcx            0  20 F Completed   │
+│ ○ lingqu-16054860… xcx            0  20 F Completed   │
+│ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  75 C █░░░░░░     │
+│ ● metrics-server-… kube-system    0  20 F ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │
+│ ● local-path-prov… kube-system    0 100 A ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 ╰───────────────────────────────────────────────────────╯
 == hover-pod heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
 ╭─ CPU heatmap · last 2 min ────────────────────────────╮
@@ -1479,25 +1479,25 @@
 │ ╰────────────────────────────────────────────────────────────────╯ │
 ╰────────────────────────────────────────────────────────────────────╯
 == click-tab node hidden
-== click-tab pods 57x19 cells=8d9aed175a0494ee37376a130f6630a34b69e6d37b2bf6b298c1e08e6ca95252
+== click-tab pods 57x19 cells=9cc2d068d3a0f5356272db57702f1ba5236a0600e479c2cb71a81d7c566f50e6
 ╭─ Pods ────────────────────────────────────────────────╮
 │                                                       │
 │ / filter pods…                               13 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
-│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
-│ ○ qiandao-1605400… xcx            0    2h Completed   │
-│ ○ lingqu-16054860… xcx            0   41m Completed   │
-│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
-│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
-│ ● metrics-server-… kube-system    0  119d ready 0/1   │
-│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
-│ ● local-path-prov… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │
+│ ○ qiandao-1605400… xcx            0  20 F Completed   │
+│ ○ lingqu-16054860… xcx            0  20 F Completed   │
+│ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  75 C █░░░░░░     │
+│ ● metrics-server-… kube-system    0  20 F ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │
+│ ● local-path-prov… kube-system    0 100 A ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 ╰───────────────────────────────────────────────────────╯
 == click-tab heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
 ╭─ CPU heatmap · last 2 min ────────────────────────────╮
@@ -1569,25 +1569,25 @@
 │                              │
 │                              │
 ╰──────────────────────────────╯
-== toggle-left pods 46x19 cells=886b2ab67624cf4194259a14b3758456494264d7c2f1c0cd899ba69eba69b40a
+== toggle-left pods 46x19 cells=b1c32f225863abfa521634e3c18f777ad6199fd8120b81e9183cc4d182d9f034
 ╭─ Pods ─────────────────────────────────────╮
 │                                            │
 │ / filter pods…                    13 items │
 │                                            │
-│   NAME  NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bili… bilibili-r…    0  119d █░░░░░░     │
-│ ● bili… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-… lgo            0   87d ██░░░░░     │
-│ ● psql… ys-odoo        0   64d ████░░░     │
-│ ● odoo… ys-odoo        1   64d ██████░     │
-│ ○ qian… xcx            0    2h Completed   │
-│ ○ ling… xcx            0   41m Completed   │
-│ ⠙ ling… xcx            0    8s Init:0/1    │
-│ ● core… kube-system    0  119d █░░░░░░     │
-│ ● metr… kube-system    0  119d ready 0/1   │
-│ ● trae… kube-system    0  119d ░░░░░░░     │
-│ ● loca… kube-system    0  119d ImagePullB… │
-│ ● svcl… kube-system    7  119d CrashLoopB… │
+│   NAME  NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bili… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bili… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-… lgo            0  20 F ██░░░░░     │
+│ ● psql… ys-odoo        0 100 A ████░░░     │
+│ ● odoo… ys-odoo        1  75 C ██████░     │
+│ ○ qian… xcx            0  20 F Completed   │
+│ ○ ling… xcx            0  20 F Completed   │
+│ ⠙ ling… xcx            0 100 A Init:0/1    │
+│ ● core… kube-system    0  75 C █░░░░░░     │
+│ ● metr… kube-system    0  20 F ready 0/1   │
+│ ● trae… kube-system    0  20 F ░░░░░░░     │
+│ ● loca… kube-system    0 100 A ImagePullB… │
+│ ● svcl… kube-system    7  75 C CrashLoopB… │
 ╰────────────────────────────────────────────╯
 == toggle-left heatmap 46x16 cells=8cafa9949be4d694d33a048986f116ef1060328306732707509fbb32ec83b643
 ╭─ CPU heatmap · last 2 min ─────────────────╮
@@ -1643,25 +1643,25 @@
 │ ╰──────────────────────────────────────────╯ │
 ╰──────────────────────────────────────────────╯
 == toggle-left-again node hidden
-== toggle-left-again pods 57x19 cells=8d9aed175a0494ee37376a130f6630a34b69e6d37b2bf6b298c1e08e6ca95252
+== toggle-left-again pods 57x19 cells=9cc2d068d3a0f5356272db57702f1ba5236a0600e479c2cb71a81d7c566f50e6
 ╭─ Pods ────────────────────────────────────────────────╮
 │                                                       │
 │ / filter pods…                               13 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
-│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
-│ ○ qiandao-1605400… xcx            0    2h Completed   │
-│ ○ lingqu-16054860… xcx            0   41m Completed   │
-│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
-│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
-│ ● metrics-server-… kube-system    0  119d ready 0/1   │
-│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
-│ ● local-path-prov… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │
+│ ○ qiandao-1605400… xcx            0  20 F Completed   │
+│ ○ lingqu-16054860… xcx            0  20 F Completed   │
+│ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  75 C █░░░░░░     │
+│ ● metrics-server-… kube-system    0  20 F ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │
+│ ● local-path-prov… kube-system    0 100 A ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 ╰───────────────────────────────────────────────────────╯
 == toggle-left-again heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
 ╭─ CPU heatmap · last 2 min ────────────────────────────╮
@@ -1717,25 +1717,25 @@
 │ ╰────────────────────────────────────────────────────────────────╯ │
 ╰────────────────────────────────────────────────────────────────────╯
 == palette node hidden
-== palette pods 57x19 cells=78b4239ae45160c9210b9e82625c1fa8aaa27fc9c3b28855cef7bcd58548e3d6
+== palette pods 57x19 cells=f16a3d0459e2cbae92bcc72eef043377ddd9b497d09674a24c85a1ad79fce946
 ╭─ Pods ────────────────────────────────────────────────╮
 │                                                       │
 │ / filter pods…                               13 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
-│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
-│ ○ qiandao-1605400… xcx            0    2h Completed   │
-│ ○ lingqu-16054860… xcx            0   41m Completed   │
-│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
-│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
-│ ● metrics-server-… kube-system    0  119d ready 0/1   │
-│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
-│ ● local-path-prov… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │
+│ ○ qiandao-1605400… xcx            0  20 F Completed   │
+│ ○ lingqu-16054860… xcx            0  20 F Completed   │
+│ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  75 C █░░░░░░     │
+│ ● metrics-server-… kube-system    0  20 F ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │
+│ ● local-path-prov… kube-system    0 100 A ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 ╰───────────────────────────────────────────────────────╯
 == palette heatmap 57x16 cells=9873acb221566b44b0e41fbcf2d065107e1cbad4bee55c05c8fa7ef077957ed5
 ╭─ CPU heatmap · last 2 min ────────────────────────────╮
@@ -1791,25 +1791,25 @@
 │ ╰────────────────────────────────────────────────────────────────╯ │
 ╰────────────────────────────────────────────────────────────────────╯
 == data node hidden
-== data pods 57x19 cells=78b4239ae45160c9210b9e82625c1fa8aaa27fc9c3b28855cef7bcd58548e3d6
+== data pods 57x19 cells=f16a3d0459e2cbae92bcc72eef043377ddd9b497d09674a24c85a1ad79fce946
 ╭─ Pods ────────────────────────────────────────────────╮
 │                                                       │
 │ / filter pods…                               13 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
-│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
-│ ○ qiandao-1605400… xcx            0    2h Completed   │
-│ ○ lingqu-16054860… xcx            0   41m Completed   │
-│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
-│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
-│ ● metrics-server-… kube-system    0  119d ready 0/1   │
-│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
-│ ● local-path-prov… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │
+│ ○ qiandao-1605400… xcx            0  20 F Completed   │
+│ ○ lingqu-16054860… xcx            0  20 F Completed   │
+│ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  75 C █░░░░░░     │
+│ ● metrics-server-… kube-system    0  20 F ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │
+│ ● local-path-prov… kube-system    0 100 A ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 ╰───────────────────────────────────────────────────────╯
 == data heatmap 57x16 cells=9873acb221566b44b0e41fbcf2d065107e1cbad4bee55c05c8fa7ef077957ed5
 ╭─ CPU heatmap · last 2 min ────────────────────────────╮
@@ -1865,25 +1865,25 @@
 │ ╰────────────────────────────────────────────────────────────────╯ │
 ╰────────────────────────────────────────────────────────────────────╯
 == resize-other node hidden
-== resize-other pods 71x19 cells=16749811fa49d865f9c732e5ed7005c6e1d47bffd944d072ac4ccffbee59aa59
+== resize-other pods 71x19 cells=9a6f69b3bad8531306e757c1650007c4630fb60195de7681807d6d3075ec1f84
 ╭─ Pods ──────────────────────────────────────────────────────────────╮
 │                                                                     │
 │ / filter pods…                                             13 items │
 │                                                                     │
-│   NAME                           NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle-5d8f9c7b4-x2k… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7f6b8d9c5-mn4tz  bilibili-r…    2  119d ████░░░     │
-│ ● lgo-7c5d97584-hq8wd            lgo            0   87d ██░░░░░     │
-│ ● psql-6bc7744f9-r7zlc           ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6d8-9wjvk           ys-odoo        1   64d ██████░     │
-│ ○ qiandao-1605400800-k8f2m       xcx            0    2h Completed   │
-│ ○ lingqu-1605486000-4tq8n        xcx            0   41m Completed   │
-│ ⠙ lingqu-1605489600-b7xsd        xcx            0    8s Init:0/1    │
-│ ● coredns-6799fbcd5-w9t4p        kube-system    0  119d █░░░░░░     │
-│ ● metrics-server-67c658944b-lm2x kube-system    0  119d ready 0/1   │
-│ ● traefik-f4564c4f4-zq7rn        kube-system    0  119d ░░░░░░░     │
-│ ● local-path-provisioner-84db5d… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefik-8c2f1-6n2vb      kube-system    7  119d CrashLoopB… │
+│   NAME                           NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle-5d8f9c7b4-x2k… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7f6b8d9c5-mn4tz  bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-7c5d97584-hq8wd            lgo            0  20 F ██░░░░░     │
+│ ● psql-6bc7744f9-r7zlc           ys-odoo        0 100 A ████░░░     │
+│ ● odoo-7575bf6d8-9wjvk           ys-odoo        1  75 C ██████░     │
+│ ○ qiandao-1605400800-k8f2m       xcx            0  20 F Completed   │
+│ ○ lingqu-1605486000-4tq8n        xcx            0  20 F Completed   │
+│ ⠙ lingqu-1605489600-b7xsd        xcx            0 100 A Init:0/1    │
+│ ● coredns-6799fbcd5-w9t4p        kube-system    0  75 C █░░░░░░     │
+│ ● metrics-server-67c658944b-lm2x kube-system    0  20 F ready 0/1   │
+│ ● traefik-f4564c4f4-zq7rn        kube-system    0  20 F ░░░░░░░     │
+│ ● local-path-provisioner-84db5d… kube-system    0 100 A ImagePullB… │
+│ ● svclb-traefik-8c2f1-6n2vb      kube-system    7  75 C CrashLoopB… │
 ╰─────────────────────────────────────────────────────────────────────╯
 == resize-other heatmap 71x24 cells=792c353c0875d93f56f994d6e2f755ebaa692c82aa3face3120b5d7cd1514b77
 ╭─ CPU heatmap · last 2 min ──────────────────────────────────────────╮
@@ -1955,25 +1955,25 @@
 │ ╰────────────────────────────────────────────────────────────────────────────────╯ │
 ╰────────────────────────────────────────────────────────────────────────────────────╯
 == resize-back node hidden
-== resize-back pods 57x19 cells=78b4239ae45160c9210b9e82625c1fa8aaa27fc9c3b28855cef7bcd58548e3d6
+== resize-back pods 57x19 cells=f16a3d0459e2cbae92bcc72eef043377ddd9b497d09674a24c85a1ad79fce946
 ╭─ Pods ────────────────────────────────────────────────╮
 │                                                       │
 │ / filter pods…                               13 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
-│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
-│ ○ qiandao-1605400… xcx            0    2h Completed   │
-│ ○ lingqu-16054860… xcx            0   41m Completed   │
-│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
-│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
-│ ● metrics-server-… kube-system    0  119d ready 0/1   │
-│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
-│ ● local-path-prov… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │
+│ ○ qiandao-1605400… xcx            0  20 F Completed   │
+│ ○ lingqu-16054860… xcx            0  20 F Completed   │
+│ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  75 C █░░░░░░     │
+│ ● metrics-server-… kube-system    0  20 F ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │
+│ ● local-path-prov… kube-system    0 100 A ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 ╰───────────────────────────────────────────────────────╯
 == resize-back heatmap 57x16 cells=9873acb221566b44b0e41fbcf2d065107e1cbad4bee55c05c8fa7ef077957ed5
 ╭─ CPU heatmap · last 2 min ────────────────────────────╮
@@ -2030,25 +2030,25 @@
 ╰────────────────────────────────────────────────────────────────────╯
 == help-open overlay
 == help-close node hidden
-== help-close pods 57x19 cells=78b4239ae45160c9210b9e82625c1fa8aaa27fc9c3b28855cef7bcd58548e3d6
+== help-close pods 57x19 cells=f16a3d0459e2cbae92bcc72eef043377ddd9b497d09674a24c85a1ad79fce946
 ╭─ Pods ────────────────────────────────────────────────╮
 │                                                       │
 │ / filter pods…                               13 items │
 │                                                       │
-│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
-│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
-│ ○ qiandao-1605400… xcx            0    2h Completed   │
-│ ○ lingqu-16054860… xcx            0   41m Completed   │
-│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
-│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
-│ ● metrics-server-… kube-system    0  119d ready 0/1   │
-│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
-│ ● local-path-prov… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│   NAME             NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │
+│ ○ qiandao-1605400… xcx            0  20 F Completed   │
+│ ○ lingqu-16054860… xcx            0  20 F Completed   │
+│ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  75 C █░░░░░░     │
+│ ● metrics-server-… kube-system    0  20 F ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │
+│ ● local-path-prov… kube-system    0 100 A ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │
 ╰───────────────────────────────────────────────────────╯
 == help-close heatmap 57x16 cells=9873acb221566b44b0e41fbcf2d065107e1cbad4bee55c05c8fa7ef077957ed5
 ╭─ CPU heatmap · last 2 min ────────────────────────────╮
@@ -2120,25 +2120,25 @@
 │                              │
 │                              │
 ╰──────────────────────────────╯
-== show-left pods 46x19 cells=9e0401085bab9626a395728a00de179b8d6a6205004e27bb5acba1ada5580ee7
+== show-left pods 46x19 cells=99ffcc144c69d3c615849ab530d38644e368f41b02700c367b59372bb5cd3a6f
 ╭─ Pods ─────────────────────────────────────╮
 │                                            │
 │ / filter pods…                    13 items │
 │                                            │
-│   NAME  NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bili… bilibili-r…    0  119d █░░░░░░     │
-│ ● bili… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-… lgo            0   87d ██░░░░░     │
-│ ● psql… ys-odoo        0   64d ████░░░     │
-│ ● odoo… ys-odoo        1   64d ██████░     │
-│ ○ qian… xcx            0    2h Completed   │
-│ ○ ling… xcx            0   41m Completed   │
-│ ⠙ ling… xcx            0    8s Init:0/1    │
-│ ● core… kube-system    0  119d █░░░░░░     │
-│ ● metr… kube-system    0  119d ready 0/1   │
-│ ● trae… kube-system    0  119d ░░░░░░░     │
-│ ● loca… kube-system    0  119d ImagePullB… │
-│ ● svcl… kube-system    7  119d CrashLoopB… │
+│   NAME  NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bili… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bili… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-… lgo            0  20 F ██░░░░░     │
+│ ● psql… ys-odoo        0 100 A ████░░░     │
+│ ● odoo… ys-odoo        1  75 C ██████░     │
+│ ○ qian… xcx            0  20 F Completed   │
+│ ○ ling… xcx            0  20 F Completed   │
+│ ⠙ ling… xcx            0 100 A Init:0/1    │
+│ ● core… kube-system    0  75 C █░░░░░░     │
+│ ● metr… kube-system    0  20 F ready 0/1   │
+│ ● trae… kube-system    0  20 F ░░░░░░░     │
+│ ● loca… kube-system    0 100 A ImagePullB… │
+│ ● svcl… kube-system    7  75 C CrashLoopB… │
 ╰────────────────────────────────────────────╯
 == show-left heatmap 46x16 cells=001d0743f3e0d17428ded46b236e72935b1f8b43ee4e2253ddb09b4bfd18ce4e
 ╭─ CPU heatmap · last 2 min ─────────────────╮
@@ -2210,25 +2210,25 @@
 │                              │
 │                              │
 ╰──────────────────────────────╯
-== focus-namespaces pods 46x19 cells=9e0401085bab9626a395728a00de179b8d6a6205004e27bb5acba1ada5580ee7
+== focus-namespaces pods 46x19 cells=99ffcc144c69d3c615849ab530d38644e368f41b02700c367b59372bb5cd3a6f
 ╭─ Pods ─────────────────────────────────────╮
 │                                            │
 │ / filter pods…                    13 items │
 │                                            │
-│   NAME  NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bili… bilibili-r…    0  119d █░░░░░░     │
-│ ● bili… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-… lgo            0   87d ██░░░░░     │
-│ ● psql… ys-odoo        0   64d ████░░░     │
-│ ● odoo… ys-odoo        1   64d ██████░     │
-│ ○ qian… xcx            0    2h Completed   │
-│ ○ ling… xcx            0   41m Completed   │
-│ ⠙ ling… xcx            0    8s Init:0/1    │
-│ ● core… kube-system    0  119d █░░░░░░     │
-│ ● metr… kube-system    0  119d ready 0/1   │
-│ ● trae… kube-system    0  119d ░░░░░░░     │
-│ ● loca… kube-system    0  119d ImagePullB… │
-│ ● svcl… kube-system    7  119d CrashLoopB… │
+│   NAME  NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bili… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bili… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-… lgo            0  20 F ██░░░░░     │
+│ ● psql… ys-odoo        0 100 A ████░░░     │
+│ ● odoo… ys-odoo        1  75 C ██████░     │
+│ ○ qian… xcx            0  20 F Completed   │
+│ ○ ling… xcx            0  20 F Completed   │
+│ ⠙ ling… xcx            0 100 A Init:0/1    │
+│ ● core… kube-system    0  75 C █░░░░░░     │
+│ ● metr… kube-system    0  20 F ready 0/1   │
+│ ● trae… kube-system    0  20 F ░░░░░░░     │
+│ ● loca… kube-system    0 100 A ImagePullB… │
+│ ● svcl… kube-system    7  75 C CrashLoopB… │
 ╰────────────────────────────────────────────╯
 == focus-namespaces heatmap 46x16 cells=001d0743f3e0d17428ded46b236e72935b1f8b43ee4e2253ddb09b4bfd18ce4e
 ╭─ CPU heatmap · last 2 min ─────────────────╮
@@ -2300,25 +2300,25 @@
 │                              │
 │                              │
 ╰──────────────────────────────╯
-== namespace-down pods 46x19 cells=9e0401085bab9626a395728a00de179b8d6a6205004e27bb5acba1ada5580ee7
+== namespace-down pods 46x19 cells=99ffcc144c69d3c615849ab530d38644e368f41b02700c367b59372bb5cd3a6f
 ╭─ Pods ─────────────────────────────────────╮
 │                                            │
 │ / filter pods…                    13 items │
 │                                            │
-│   NAME  NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bili… bilibili-r…    0  119d █░░░░░░     │
-│ ● bili… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-… lgo            0   87d ██░░░░░     │
-│ ● psql… ys-odoo        0   64d ████░░░     │
-│ ● odoo… ys-odoo        1   64d ██████░     │
-│ ○ qian… xcx            0    2h Completed   │
-│ ○ ling… xcx            0   41m Completed   │
-│ ⠙ ling… xcx            0    8s Init:0/1    │
-│ ● core… kube-system    0  119d █░░░░░░     │
-│ ● metr… kube-system    0  119d ready 0/1   │
-│ ● trae… kube-system    0  119d ░░░░░░░     │
-│ ● loca… kube-system    0  119d ImagePullB… │
-│ ● svcl… kube-system    7  119d CrashLoopB… │
+│   NAME  NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bili… bilibili-r…    0  75 C █░░░░░░     │
+│ ● bili… bilibili-r…    2  20 F ████░░░     │
+│ ● lgo-… lgo            0  20 F ██░░░░░     │
+│ ● psql… ys-odoo        0 100 A ████░░░     │
+│ ● odoo… ys-odoo        1  75 C ██████░     │
+│ ○ qian… xcx            0  20 F Completed   │
+│ ○ ling… xcx            0  20 F Completed   │
+│ ⠙ ling… xcx            0 100 A Init:0/1    │
+│ ● core… kube-system    0  75 C █░░░░░░     │
+│ ● metr… kube-system    0  20 F ready 0/1   │
+│ ● trae… kube-system    0  20 F ░░░░░░░     │
+│ ● loca… kube-system    0 100 A ImagePullB… │
+│ ● svcl… kube-system    7  75 C CrashLoopB… │
 ╰────────────────────────────────────────────╯
 == namespace-down heatmap 46x16 cells=001d0743f3e0d17428ded46b236e72935b1f8b43ee4e2253ddb09b4bfd18ce4e
 ╭─ CPU heatmap · last 2 min ─────────────────╮
@@ -2390,17 +2390,17 @@
 │                              │
 │                              │
 ╰──────────────────────────────╯
-== namespace-enter pods 46x19 cells=b5f46eac54b226eb79309669b6f70656252b339eed587b2d5ace5ef758012b05
+== namespace-enter pods 46x19 cells=3878fa8e97ca40c4c4bc4a39078a24d7b1a4e7e38af416dbd70f54ac89ea76ee
 ╭─ Pods ─────────────────────────────────────╮
 │                                            │
 │ / filter pods…     ns:kube-system  5 items │
 │                                            │
-│   NAME  NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● core… kube-system    0  119d █░░░░░░     │
-│ ● metr… kube-system    0  119d ready 0/1   │
-│ ● trae… kube-system    0  119d ░░░░░░░     │
-│ ● loca… kube-system    0  119d ImagePullB… │
-│ ● svcl… kube-system    7  119d CrashLoopB… │
+│   NAME  NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● core… kube-system    0  75 C █░░░░░░     │
+│ ● metr… kube-system    0  20 F ready 0/1   │
+│ ● trae… kube-system    0  20 F ░░░░░░░     │
+│ ● loca… kube-system    0 100 A ImagePullB… │
+│ ● svcl… kube-system    7  75 C CrashLoopB… │
 │                                            │
 │                                            │
 │                                            │

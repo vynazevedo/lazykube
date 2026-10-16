@@ -21,6 +21,7 @@ const (
 )
 
 type PodsState struct {
+	Security   map[string]data.PostureScore
 	Pods       []data.Pod
 	Selected   int
 	Offset     int
@@ -107,7 +108,7 @@ func PodsPanel(r draw.Region, st PodsState, ctx Ctx) {
 	c.Text(2, 2, "NAME", hdr)
 	c.Text(nsX, 2, "NAMESPACE", hdr)
 	c.Text(rstX, 2, draw.PadLeft("RST", podsRSTW), hdr)
-	c.Text(ageX, 2, draw.PadLeft("AGE", podsAgeW), hdr)
+	c.Text(ageX, 2, draw.PadLeft("SEC", podsAgeW), hdr)
 	c.Text(cpuX, 2, "CPU/STATUS", hdr)
 
 	rows := c.H - 3
@@ -141,7 +142,14 @@ func PodsPanel(r draw.Region, st PodsState, ctx Ctx) {
 			rstColor = theme.Warn
 		}
 		c.Text(rstX, y, draw.PadLeft(fmt.Sprint(p.Restarts), podsRSTW), draw.Fg(rstColor))
-		c.Text(ageX, y, draw.PadLeft(p.Age, podsAgeW), draw.Fg(theme.Muted))
+		score := "-"
+		if s := st.Security[p.Key()]; s.Available {
+			score = fmt.Sprintf("%d %s", s.Value, s.Grade)
+			if s.Partial {
+				score = fmt.Sprintf("%d%sp", s.Value, s.Grade)
+			}
+		}
+		c.Text(ageX, y, draw.PadLeft(score, podsAgeW), draw.Fg(theme.Muted))
 		if label, color, ok := PodStateLabel(p); ok {
 			c.Text(cpuX, y, draw.Truncate(label, podsStateW), draw.Fg(color))
 			continue

@@ -1,0 +1,40 @@
+ lazykube [DEMO]  v2.0   ◎ context demo   k8s demo  nodes 1  ns 8  pods 13  uptime 119d                ⠙ metrics every 5s ● live  
+ [2 Dashboard] |  3 Workloads                                                                                             m menu  
+ Dashboard                                                                                                                        
+ ╭─ Pods · focus ────────────────────────────────────────╮ ╭────────────────────────────────────────────────────────────────────╮ 
+ │                                                       │ │  Log   Config   Top   Describe   Events   Security                 │ 
+ │ / filter pods…▌                              13 items │ │ ────────────────────────────────────────────────────────────────── │ 
+ │                                                       │ │ ╭────────────────────────────────────────────────────────────────╮ │ 
+ │   NAME             NAMESPACE    RST   SEC CPU/STATUS  │ │ │ S: namespace | Pod: bilibili-raffle/bilibili-live-7f6b8d9c5-m… │ │ 
+ │ ● bilibili-raffle… bilibili-r…    0  75 C █░░░░░░     │ │ │ Dashboard coverage: complete in scope | pods 13/13             │ │ 
+ │ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │ │ │ No findings does not mean safe                                 │ │ 
+ │ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │ │ │ Local checks only; not PSS compliance.                         │ │ 
+ │ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │ │ │ POSTURE | Cluster | 55/100 (E) | 13/13 pods                    │ │ 
+ │ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │ │ │ Score ████████████████████░░░░░░░░░░░░░░░░                     │ │ 
+ │ ○ qiandao-1605400… xcx            0  20 F Completed   │ │ │ SEC column: Security; p = partial. Hygiene scored separately.  │ │ 
+ │ ○ lingqu-16054860… xcx            0  20 F Completed   │ │ │ Security mean 55 | median 75 | worst decile 20                 │ │ 
+ │ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │ │ │ A    3 ██████░░░░░░░░░░░░░░░░░░                                │ │ 
+ │ ● coredns-6799fbc… kube-system    0  75 C █░░░░░░     │ │ │ B    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                │ │ 
+ │ ● metrics-server-… kube-system    0  20 F ready 0/1   │ │ │ C    4 ███████░░░░░░░░░░░░░░░░░                                │ │ 
+ │ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │ │ │ D    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                │ │ 
+ │ ● local-path-prov… kube-system    0 100 A ImagePullB… │ │ │ E    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                │ │ 
+ │ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │ │ │ F    6 ███████████░░░░░░░░░░░░░                                │ │ 
+ ╰───────────────────────────────────────────────────────╯ │ │ Hygiene mean 97 | median 100 | worst decile 88                 │ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ A   10 ██████████████████░░░░░░                                │ │ 
+ │                                                       │ │ │ B    3 ██████░░░░░░░░░░░░░░░░░░                                │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │ C    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ D    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                │ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │ │ E    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ F    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                │ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │ Worst decile = mean of lowest ceil(N/10) pod scores.           │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ high     12 █████████████░░░░░░░░░░░                           │ │ 
+ │ psql-6bc7744… ███████████████████████████████████████ │ │ │ medium   22 ████████████████████████                           │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ info      4 ████░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ │ odoo-7575bf6… ███████████████████████████████████████ │ │ │ Unknown checks: 4 | confirmed findings only in score           │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Trend: ▅ (revision samples)                                    │ │ 
+ │ coredns-6799… ███████████████████████████████████████ │ │ │ ALERTS | new high since baseline / last ack | A: ack all       │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ No unacknowledged high alerts.                                 │ │ 
+ │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   enter  open   m  menu   l  logs   d  describe   e  events   ?  help       bubbletea · 0 fps 

@@ -7,6 +7,7 @@ import (
 
 func (m Model) podsPanelState(pods []data.Pod) ui.PodsState {
 	return ui.PodsState{
+		Security:   m.securitySession.Dashboard.Pods,
 		Pods:       pods,
 		Selected:   m.selectedIndex(pods),
 		Offset:     m.podOffset,

@@ -6,43 +6,43 @@
 │ │ Dashboard coverage: complete in scop… │ │
 │ │ No findings does not mean safe        │ │
 │ │ Local checks only; not PSS complianc… │ │
-│ │ POSTURE | Cluster | 76/100 (C) |      │ │
-│ │ 13/13 pods                            │ │
+│ │ Security /100: Pod 20 F | Namespace   │ │
+│ │ 28 F | Cluster 52 E                   │ │
+│ │ Hygiene /100: Pod 88 B | Namespace    │ │
+│ │ 94 A | Cluster 97 A                   │ │
+│ │ Namespace mean (2 pods) | Cluster     │ │
+│ │ mean (13 pods)                        │ │
+│ │ Selected pod security: 20/100 (F) |   │ │
+│ │ 1/1 pod                               │ │
 │ │ Synthetic data (demo)                 │ │
-│ │ Score ████████████████████████░░░░░░░ │ │
-│ │ high     10 ████████████████████████  │ │
-│ │ medium    6 ██████████████░░░░░░░░░░  │ │
-│ │ info      4 ██████████░░░░░░░░░░░░░░  │ │
-│ │ Unknown checks: 4 | confirmed         │ │
-│ │ findings only in score                │ │
-│ │ Trend: ▆▆ (revision samples)          │ │
-│ │ ALERTS | new high since baseline /    │ │
-│ │ last ack | A: ack all                 │ │
-│ │ !                                     │ │
-│ │ bilibili-raffle/bilibili-raffle-5d8f9 │ │
-│ │ c7b4-x2kqp | hostPID | pod            │ │
-│ │ TOP RULES | confirmed findings        │ │
-│ │ serviceAccountToken       4 █████████ │ │
-│ │ capabilitiesAdded         3 ███████░░ │ │
-│ │ hostNetwork               3 ███████░░ │ │
-│ │ imageLatest               3 ███████░░ │ │
-│ │ limit-memory              3 ███████░░ │ │
-│ │ NAMESPACES | lowest scores first      │ │
-│ │ lgo                50 ████░░░░ | 2    │ │
-│ │ findings                              │ │
-│ │ bilibili-raffle    66 █████░░░ | 5    │ │
-│ │ findings                              │ │
-│ │ xcx                70 ██████░░ | 5    │ │
-│ │ findings                              │ │
-│ │ kube-system        81 ██████░░ | 7    │ │
-│ │ findings                              │ │
-│ │ ys-odoo            99 ████████ | 1    │ │
-│ │ finding                               │ │
-│ │ More namespaces: use the namespace    │ │
-│ │ filter.                               │ │
-│ │ Score: 100 - (25*high + 8*medium +    │ │
-│ │ 2*info)/evaluated pods; floor 0,      │ │
-│ │ rounded.                              │ │
-│ │ Grades: A >=90, B >=80, C >=70, D     │ │
+│ │ Pod                                   │ │
+│ │ bilibili-raffle/bilibili-live-7f6b8d9 │ │
+│ │ c5-mn4tz | complete in scope          │ │
+│ │ Observed 2026-10-16 12:00:00Z | UID   │ │
+│ │ demo-bilibili-raffle/bilibili-live-7f │ │
+│ │ 6b8d9c5-mn4tz | RV 1                  │ │
+│ │ HIGH findings                         │ │
+│ │ [high] allowPrivilegeEscalation |     │ │
+│ │ finding | container: init-permissions │ │
+│ │ Field:                                │ │
+│ │ spec.initContainers[0].securityContex │ │
+│ │ t.allowPrivilegeEscalation            │ │
+│ │ Evidence: forced by privileged        │ │
+│ │ Additional privileges possible.       │ │
+│ │ Disable privileged mode               │ │
+│ │ Source: demo fixture v3 |             │ │
+│ │ configuration observed                │ │
+│ │ [high] privileged | finding |         │ │
+│ │ container: init-permissions           │ │
+│ │ Field:                                │ │
+│ │ spec.initContainers[0].securityContex │ │
+│ │ t.privileged                          │ │
+│ │ Evidence: true                        │ │
+│ │ Privileged init container             │ │
+│ │ configured. Disable privileged mode   │ │
+│ │ Source: demo fixture v3 |             │ │
+│ │ configuration observed                │ │
+│ │ MEDIUM findings                       │ │
+│ │ [medium] imageLatest | finding |      │ │
 │ ╰───────────────────────────────────────╯ │
 ╰───────────────────────────────────────────╯

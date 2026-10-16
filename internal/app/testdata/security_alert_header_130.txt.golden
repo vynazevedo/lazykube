@@ -5,20 +5,20 @@
  │                                                       │ │  Log   Config   Top   Describe   Events   Security 1               │ 
  │ / filter pods…▌                              13 items │ │ ────────────────────────────────────────────────────────────────── │ 
  │                                                       │ │ ● bilibili-live-7f6b8d9c5-mn4tz                          [Running] │ 
- │   NAME             NAMESPACE    RST   AGE CPU/STATUS  │ │   bilibili-raffle · Running · ready 2/2 · node demo-node-01 · 10.… │ 
- │ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │ │                                                                    │ 
- │ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │ │ CPU 11m req 10m · lim 50m                 streamline · braille 2×4 │ 
- │ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │ │  20m │                                                             │ 
- │ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │ │      │           ⡄                                                 │ 
- │ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │ │  15m │──────────⢰⣿⡄─⢀⡆───────────────────⢀──────────────────────⣼⡄ │ 
- │ ○ qiandao-1605400… xcx            0    2h Completed   │ │      │          ⣼⣿⣿⣄⣼⣿               ⢀   ⣾⣧⣀⣴⡄⢀        request 10m │ 
- │ ○ lingqu-16054860… xcx            0   41m Completed   │ │  10m │╌╌⡀⢀⣤⣴⣿⣷⣮⣿⣿⣿⣿⣿⣿⣿⣷⣷⣄╌╌╌╌╌╌╌╌╌╌╌⢀⣾⣷⣶⣾⣿⣿⣿⣿⣿⣿⣿⣆⣾⡄╌⣠⣀╌╌╌╌╌╌⢠⡀⣼⣿⣿⣿ │ 
- │ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │ │      │ ⣰⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣦ ⢠⣧ ⢀⣤⣤⣤⣴⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣽⣿⣿⣆⣼⣶⡄ ⣠⣿⣿⣿⣿⣿⣿ │ 
- │ ● coredns-6799fbc… kube-system    0  119d ░░░░░░░     │ │   5m │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣯⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣽⣿⣿⣿⣿⣿⣿⣿ │ 
- │ ● metrics-server-… kube-system    0  119d ready 0/1   │ │      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
- │ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │ │    0 │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
- │ ● local-path-prov… kube-system    0  119d ImagePullB… │ │      └──────────────────────────────────────────────────────────── │ 
- │ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │ │                                                                    │ 
+ │   NAME             NAMESPACE    RST   SEC CPU/STATUS  │ │   bilibili-raffle · Running · ready 2/2 · node demo-node-01 · 10.… │ 
+ │ ● bilibili-raffle… bilibili-r…    0  35 F █░░░░░░     │ │                                                                    │ 
+ │ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │ │ CPU 11m req 10m · lim 50m                 streamline · braille 2×4 │ 
+ │ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │ │  20m │                                                             │ 
+ │ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │ │      │           ⡄                                                 │ 
+ │ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │ │  15m │──────────⢰⣿⡄─⢀⡆───────────────────⢀──────────────────────⣼⡄ │ 
+ │ ○ qiandao-1605400… xcx            0  20 F Completed   │ │      │          ⣼⣿⣿⣄⣼⣿               ⢀   ⣾⣧⣀⣴⡄⢀        request 10m │ 
+ │ ○ lingqu-16054860… xcx            0  20 F Completed   │ │  10m │╌╌⡀⢀⣤⣴⣿⣷⣮⣿⣿⣿⣿⣿⣿⣿⣷⣷⣄╌╌╌╌╌╌╌╌╌╌╌⢀⣾⣷⣶⣾⣿⣿⣿⣿⣿⣿⣿⣆⣾⡄╌⣠⣀╌╌╌╌╌╌⢠⡀⣼⣿⣿⣿ │ 
+ │ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │ │      │ ⣰⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣦ ⢠⣧ ⢀⣤⣤⣤⣴⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣽⣿⣿⣆⣼⣶⡄ ⣠⣿⣿⣿⣿⣿⣿ │ 
+ │ ● coredns-6799fbc… kube-system    0  75 C ░░░░░░░     │ │   5m │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣯⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣽⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● metrics-server-… kube-system    0  20 F ready 0/1   │ │      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │ │    0 │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● local-path-prov… kube-system    0 100 A ImagePullB… │ │      └──────────────────────────────────────────────────────────── │ 
+ │ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │ │                                                                    │ 
  ╰───────────────────────────────────────────────────────╯ │ ╭──────────────────────────────╮ ╭───────────────────────────────╮ │ 
  ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ Memory 71Mi / 128Mi          │ │ Network ↓ 0.5 kB/s ↑ 5.5 kB/s │ │ 
  │                                                       │ │ │ ████████████████████████████ │ │ ▃▆▇▆▁▂▇▄▇▇▆▇███▄▁▄▇▃▁▇▅▄▃▂▄▆▁ │ │ 

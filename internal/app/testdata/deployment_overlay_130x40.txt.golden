@@ -5,13 +5,13 @@
  │                                                                    │ │  Log   Config   Top   Describe   Events   Security    │ 
  │ / filter pods…                                            13 items │ │ ───────────────────────────────────────────────────── │ 
  │                                                                    │ │ ● bilibili-live-7f6b8d9c5-mn4tz             [Running] │ 
- │   NAME                          NAMESPACE    RST   AGE CPU/STATUS  │ │   bilibili-raffle · Running · ready 2/2 · node demo-… │ 
- │ ● bilibili-raffle-5d8f9c7b4-x2… bilibili-r…    0  119d █░░░░░░     │ │                                                       │ 
- │ ● bilibili-live-7f6b8d9c5-mn4tz bilibili-r…    2  119d ████░░░     │ │ CPU 11m req 10m · lim 50m    streamline · braille 2×4 │ 
- │ ● lgo-7c5d97584-hq8wd           lgo            0   87d ██░░░░░     │ │  20m │                                                │ 
- │ ● psql-6bc7744f9-r7zlc          ys-odoo        0   64d ████░░░     │ │      │                            ⢠                   │ 
- │ ● odoo-7575bf6d8-9wjvk          ys-odoo        1   64d ██████░     │ │  15m │──────────────⡀────────────⢠⣿⡄───────────────── │ 
- │ ○ qiandao-1605400800-k8f2m      xcx            0    2h Completed   │ │      │ ⢀  ⢀ ⣰⣀⣰⣤⣤⣄⢀⢴⣧           ⡀⣸⣿⣗⣦⣀ ⣄⣰⡀request 10m │ 
+ │   NAME                          NAMESPACE    RST   SEC CPU/STATUS  │ │   bilibili-raffle · Running · ready 2/2 · node demo-… │ 
+ │ ● bilibili-raffle-5d8f9c7b4-x2… bilibili-r…    0  75 C █░░░░░░     │ │                                                       │ 
+ │ ● bilibili-live-7f6b8d9c5-mn4tz bilibili-r…    2  20 F ████░░░     │ │ CPU 11m req 10m · lim 50m    streamline · braille 2×4 │ 
+ │ ● lgo-7c5d97584-hq8wd           lgo            0  20 F ██░░░░░     │ │  20m │                                                │ 
+ │ ● psql-6bc7744f9-r7zlc          ys-odoo        0 100 A ████░░░     │ │      │                            ⢠                   │ 
+ │ ● odoo-7575bf6d8-9wjvk          ys-odoo        1  75 C ██████░     │ │  15m │──────────────⡀────────────⢠⣿⡄───────────────── │ 
+ │ ○ qiandao-1605400800-k8f2m      xcx            0  20 F Completed   │ │      │ ⢀  ⢀ ⣰⣀⣰⣤⣤⣄⢀⢴⣧           ⡀⣸⣿⣗⣦⣀ ⣄⣰⡀request 10m │ 
  │ ○ lingqu-1605486000-4tq8n ╭─ Deployment bilibili-raffle/bilibili-raffle ─────────────────────────╮╌⢀⣾⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧╌⡀╌╌╌╌⢠⣀⣼⣿● │ 
  │ ⠙ lingqu-1605489600-b7xsd │                                                                      │⣄⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⣿⣄⢤⣤⣄⣼⣿⣿⣿⣿ │ 
  │ ● coredns-6799fbcd5-w9t4p │  Namespace      bilibili-raffle                                      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
