@@ -43,6 +43,7 @@ func (m Model) frame() Frame {
 		Scroll:      m.scroll,
 		Follow:      m.follow,
 		Tab:         m.tab,
+		Events:      m.ev.eventsFrame,
 	}
 }
 
@@ -59,9 +60,12 @@ func (m *Model) endEditing() {
 	}
 }
 
-func (m *Model) navigate(to Route) bool {
+func (m *Model) navigate(to Route, setup ...func(*Model)) bool {
 	if !m.nav.push(m.frame(), to) {
 		return false
+	}
+	for _, f := range setup {
+		f(m)
 	}
 	m.endEditing()
 	m.dep.open = false
@@ -93,6 +97,7 @@ func (m *Model) restore(f Frame) {
 	m.nsFilter = f.NSFilter
 	m.podOffset, m.nsCursor, m.depCursor = f.PodOffset, f.NSCursor, f.DepCursor
 	m.tab, m.scroll, m.follow = f.Tab, f.Scroll, f.Follow
+	m.restoreEvents(f.Events)
 	m.relayout()
 	m.fixSelection()
 	m.refresh()
@@ -144,10 +149,15 @@ func (m *Model) activateScreen(id ScreenID) {
 		return
 	}
 	ns, from, node := m.scopeNamespace(), m.mainScreen(), ""
-	if id == ScreenNodes {
+	var setup []func(*Model)
+	switch id {
+	case ScreenNodes:
 		node = m.selectedNode()
+	case ScreenEvents:
+		anchor := m.eventsAnchor()
+		setup = append(setup, func(m *Model) { m.ev = eventsView{eventsFrame: anchor} })
 	}
-	m.navigate(Route{Kind: RouteScreen, Screen: id, Node: node})
+	m.navigate(Route{Kind: RouteScreen, Screen: id, Node: node}, setup...)
 	if ns != "" && from != id {
 		m.navigate(Route{Kind: RouteNamespace, Screen: id, Namespace: ns, Node: node})
 	}
@@ -155,6 +165,8 @@ func (m *Model) activateScreen(id ScreenID) {
 
 func (m *Model) handleEsc() {
 	switch {
+	case m.onScreen(ScreenEvents) && m.ev.reading:
+		m.ev.reading = false
 	case m.tab == ui.TabLog && m.dg.search.Value() != "":
 		m.dg.search.SetValue("")
 		m.updateMatches()
@@ -187,6 +199,8 @@ func menuKey(id ScreenID) string {
 		return "3"
 	case ScreenNodes:
 		return "4"
+	case ScreenEvents:
+		return "6"
 	}
 	return ""
 }
@@ -231,6 +245,9 @@ func (m Model) handleMenuKey(msg tea.KeyPressMsg) Model {
 	case key.Matches(msg, k.Nodes):
 		m.menu.open = false
 		m.activateScreen(ScreenNodes)
+	case key.Matches(msg, k.Events):
+		m.menu.open = false
+		m.activateScreen(ScreenEvents)
 	case key.Matches(msg, k.Esc), key.Matches(msg, k.Menu), key.Matches(msg, k.NextPanel), key.Matches(msg, k.PrevPanel):
 		m.menu.open = false
 	}
@@ -258,6 +275,9 @@ func (m Model) routeKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 			return m, nil
 		case key.Matches(msg, k.Nodes):
 			m.activateScreen(ScreenNodes)
+			return m, nil
+		case key.Matches(msg, k.Events):
+			m.activateScreen(ScreenEvents)
 			return m, nil
 		case key.Matches(msg, k.Esc):
 			m.handleEsc()

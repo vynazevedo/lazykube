@@ -536,6 +536,7 @@ func (s *Source) rebuild() {
 			Namespaces: len(outNS),
 			Pods:       len(outPods),
 			Uptime:     uptime,
+			Namespace:  s.opts.Namespace,
 		},
 		Pods:        outPods,
 		Deployments: outDeploys,

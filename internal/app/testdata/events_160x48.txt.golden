@@ -1,0 +1,48 @@
+ lazykube [DEMO]  v2.0   ◎ context demo   k8s demo  nodes 1  ns 8  pods 13  uptime 119d                                              ⠙ metrics every 5s ● live  
+  2 Dashboard  |  3 Workloads  |  4 Nodes  | [6 Events]                                                                                                 m menu  
+ Events                                                                                                                                                         
+ ╭─ Escopo e cobertura ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ │ Escopo: namespace bilibili-raffle | estado: disponível                                                                                                     │ 
+ │ Conexão: todos os namespaces                                                                                                                               │ 
+ │ Escolha explícita: E  pod   ns   cluster                                                                                                                   │ 
+ │ Feed limitado: até 200 eventos de namespace/cluster; não é histórico durável                                                                               │ 
+ │ Acesso negado e feed vazio são estados diferentes                                                                                                          │ 
+ │                                                                                                                                                            │ 
+ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+ ╭─ Eventos · focus ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ │   MENSAGEM                                                                          NAMESPACE        TIPO     OBJETO                         COUNT  IDADE  │ 
+ │   Back-off restarting failed container app in pod bilibili-live-7f6b8d9c5-mn4tz     bilibili-raffle  Warning  Pod/bilibili-live-7f6b8d9c5-m…     3    17m  │ 
+ │ › Container image "registry.local/bilibili-raffle:1.4.2" already present on machine bilibili-raffle  Normal   Pod/bilibili-live-7f6b8d9c5-m…     2    17m  │ 
+ │   Started container app                                                             bilibili-raffle  Normal   Pod/bilibili-live-7f6b8d9c5-m…     2    17m  │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │ 3 eventos · enter abre a mensagem completa, sem resolver o objeto pelo texto                                                                               │ 
+ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+ ╭─ Mensagem completa ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ │ Evento: Normal Pulled · Pod/bilibili-live-7f6b8d9c5-mn4tz                                                                                                  │ 
+ │ Namespace: bilibili-raffle · count 2 · idade 17m                                                                                                           │ 
+ │                                                                                                                                                            │ 
+ │ Container image "registry.local/bilibili-raffle:1.4.2" already present on machine                                                                          │ 
+ │                                                                                                                                                            │ 
+ │ Navegação ao recurso por referência tipada: fase futura                                                                                                    │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   E  scope   enter  full message   esc  back   m  menu   ?  help   q  quit                                                         bubbletea · 0 fps 

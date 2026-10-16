@@ -15,6 +15,7 @@ type diagState struct {
 	logContainer string
 	previous     bool
 	scope        data.EventScope
+	full         bool
 	search       textinput.Model
 	searching    bool
 	matches      []int
@@ -28,6 +29,7 @@ func newDiagState(src data.Source) diagState {
 	d := diagState{search: ti}
 	if src != nil {
 		d.diag = data.DiagnosticsFor(src)
+		_, d.full = src.(data.Diagnostics)
 	}
 	return d
 }

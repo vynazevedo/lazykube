@@ -16,7 +16,7 @@ func TestRouterRegistersOnlyFunctionalDestinations(t *testing.T) {
 	if r.Active() != (Route{Kind: RouteScreen, Screen: ScreenDashboard}) || r.Depth() != 0 {
 		t.Fatalf("initial route = %+v", r.Active())
 	}
-	if got := registeredScreens(); !reflect.DeepEqual(got, []ScreenID{ScreenDashboard, ScreenWorkloads, ScreenNodes}) {
+	if got := registeredScreens(); !reflect.DeepEqual(got, []ScreenID{ScreenDashboard, ScreenWorkloads, ScreenNodes, ScreenEvents}) {
 		t.Fatalf("registered screens = %v", got)
 	}
 	s, ok := screenFor(ScreenDashboard)
@@ -32,14 +32,17 @@ func TestRouterRegistersOnlyFunctionalDestinations(t *testing.T) {
 	if s, ok := screenFor(ScreenNodes); !ok || s.ID() != ScreenNodes {
 		t.Fatal("nodes is a functional destination")
 	}
-	if _, ok := screenFor(ScreenNodes + 1); ok {
+	if s, ok := screenFor(ScreenEvents); !ok || s.ID() != ScreenEvents {
+		t.Fatal("events is a functional destination")
+	}
+	if _, ok := screenFor(ScreenEvents + 1); ok {
 		t.Fatal("no other screen may be registered before it works")
 	}
 	m := demoModel(t, 160, 48)
 	if m.nav.Active().Screen != ScreenDashboard || m.screen().ID() != ScreenDashboard {
 		t.Fatalf("model route = %+v", m.nav.Active())
 	}
-	if got := m.menuItems(); !reflect.DeepEqual(got, []ui.MenuItem{{Key: "2", Title: "Dashboard"}, {Key: "3", Title: "Workloads"}, {Key: "4", Title: "Nodes"}}) {
+	if got := m.menuItems(); !reflect.DeepEqual(got, []ui.MenuItem{{Key: "2", Title: "Dashboard"}, {Key: "3", Title: "Workloads"}, {Key: "4", Title: "Nodes"}, {Key: "6", Title: "Events"}}) {
 		t.Fatalf("menu lists only functional destinations: %+v", got)
 	}
 }
@@ -61,7 +64,7 @@ func routerHoldsReferences(t reflect.Type) bool {
 }
 
 func TestRouterAndScreenDoNotAliasModelState(t *testing.T) {
-	for _, s := range []any{dashboardScreen{}, podScreen{}, workloadsScreen{}, nodesScreen{}} {
+	for _, s := range []any{dashboardScreen{}, podScreen{}, workloadsScreen{}, nodesScreen{}, eventsScreen{}} {
 		if n := reflect.TypeOf(s).NumField(); n != 0 {
 			t.Fatalf("%T must not hold state, fields = %d", s, n)
 		}
@@ -243,12 +246,12 @@ func TestDashboardKeysMatchKeyMap(t *testing.T) {
 			seen[k] = true
 		}
 	}
-	for _, k := range []string{"m", "2", "3", "4", "left", "right"} {
+	for _, k := range []string{"m", "2", "3", "4", "6", "left", "right"} {
 		if !seen[k] {
 			t.Fatalf("navigation key %q must be bound", k)
 		}
 	}
-	for _, k := range []string{"5", "6"} {
+	for _, k := range []string{"5"} {
 		if seen[k] {
 			t.Fatalf("screen key %q belongs to a later PR", k)
 		}

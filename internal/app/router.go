@@ -33,6 +33,7 @@ type Frame struct {
 	Scroll      int
 	Follow      bool
 	Tab         ui.Tab
+	Events      eventsFrame
 }
 
 type router struct {
@@ -113,5 +114,5 @@ func (r router) crumbStart() int {
 }
 
 func registeredScreens() []ScreenID {
-	return []ScreenID{ScreenDashboard, ScreenWorkloads, ScreenNodes}
+	return []ScreenID{ScreenDashboard, ScreenWorkloads, ScreenNodes, ScreenEvents}
 }

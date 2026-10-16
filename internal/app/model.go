@@ -75,6 +75,7 @@ type Model struct {
 	logs     []data.LogLine
 	events   data.EventFeed
 	dg       diagState
+	ev       eventsView
 	manifest []string
 	describe []data.Field
 
@@ -189,6 +190,8 @@ func (m *Model) setLayout(w, h int) {
 		m.layout = ComputeWorkloads(w, h)
 	case m.onScreen(ScreenNodes):
 		m.layout = ComputeNodes(w, h)
+	case m.onScreen(ScreenEvents):
+		m.layout = ComputeEvents(w, h)
 	default:
 		m.layout = Compute(w, h, m.leftMode)
 	}
@@ -220,6 +223,7 @@ func (m *Model) refresh() {
 		m.describe = m.src.Describe(name)
 		m.dg.containers = m.dg.diag.Containers(name)
 	}
+	m.refreshEventsScreen()
 	m.updateMatches()
 	m.clampScroll()
 	m.setBarTargets()

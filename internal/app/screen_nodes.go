@@ -47,7 +47,7 @@ func (nodesScreen) Keys(m Model) []key.Binding {
 	return []key.Binding{
 		k.Up, k.Down, k.Filter, k.Enter, k.Esc, k.SecurityAck,
 		k.Palette, k.Pause, k.Help, k.Quit,
-		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads, k.Nodes,
+		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads, k.Nodes, k.Events,
 	}
 }
 
