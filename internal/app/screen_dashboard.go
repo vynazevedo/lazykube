@@ -23,6 +23,10 @@ func (dashboardScreen) Help(Model) []ui.KeyHelp {
 	return ui.ShortHelp()
 }
 
+func (dashboardScreen) FullHelp(Model) []ui.KeyHelp {
+	return ui.FullHelp()
+}
+
 func (dashboardScreen) Init(Model) tea.Cmd {
 	return nil
 }

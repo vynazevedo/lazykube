@@ -40,10 +40,24 @@ func (m Model) frame() Frame {
 	}
 }
 
+func (m *Model) endEditing() {
+	if m.filtering {
+		m.filtering = false
+		m.filter.Blur()
+	}
+	if m.dg.searching {
+		m.dg.searching = false
+		m.dg.search.Blur()
+		m.dg.search.SetValue("")
+		m.updateMatches()
+	}
+}
+
 func (m *Model) navigate(to Route) bool {
 	if !m.nav.push(m.frame(), to) {
 		return false
 	}
+	m.endEditing()
 	m.nav.entryFilter = m.filter.Value()
 	switch to.Kind {
 	case RouteNamespace:
@@ -59,6 +73,7 @@ func (m *Model) navigate(to Route) bool {
 }
 
 func (m *Model) restore(f Frame) {
+	m.endEditing()
 	if f.Selected != m.selName {
 		m.selName = f.Selected
 		m.newLines, m.logs = 0, nil
@@ -159,6 +174,7 @@ func (m Model) menuActive() int {
 }
 
 func (m *Model) openMenu() {
+	m.endEditing()
 	m.menu.open = true
 	m.menu.cursor = max(0, m.menuActive())
 }
@@ -245,12 +261,14 @@ func (m Model) handleShellClick(ms tea.Mouse) (Model, bool) {
 	}
 	switch m.layout.Hit(ms.X, ms.Y) {
 	case AreaMenu:
+		m.endEditing()
 		m.menu.open = false
 		if i, ok := ui.MenuItemAt(m.menuItems(), ms.X-m.layout.Menu.X); ok {
 			m.activateScreen(registeredScreens()[i])
 		}
 		return m, true
 	case AreaCrumbs:
+		m.endEditing()
 		m.menu.open = false
 		cs := m.crumbs()
 		if i, ok := ui.CrumbAt(crumbLabels(cs), ms.X-m.layout.Crumbs.X, m.layout.Crumbs.W); ok && cs[i].depth < m.nav.Depth() {

@@ -35,7 +35,7 @@ func (m Model) Render() *draw.Canvas {
 	ui.Footer(screen.Sub(0, m.layout.DividerY, m.w, 1), screen.Sub(0, m.layout.FooterY, m.w, 1), ui.FooterState{FPS: m.displayFPS(), Keys: keys})
 
 	if m.helpOpen {
-		ui.HelpOverlay(screen, ctx)
+		ui.HelpOverlay(screen, active.FullHelp(m), ctx)
 	}
 	return c
 }

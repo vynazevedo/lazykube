@@ -331,6 +331,7 @@ type navSource struct {
 	open    map[context.Context]context.CancelFunc
 	current context.Context
 	wide    int
+	calls   int
 }
 
 func newNavSource() *navSource {
@@ -355,9 +356,17 @@ func (s *navSource) Snapshot() data.Snapshot {
 	return snap
 }
 
+func (s *navSource) Metrics(tick int, pod string, cols int) data.Metrics {
+	s.mu.Lock()
+	s.calls++
+	s.mu.Unlock()
+	return s.Demo.Metrics(tick, pod, cols)
+}
+
 func (s *navSource) PodLogs(req data.LogRequest, tick, n int) data.LogView {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	s.calls++
 	if s.current != nil {
 		s.open[s.current]()
 		delete(s.open, s.current)
@@ -448,4 +457,145 @@ func TestNavigationCyclesDoNotAccumulateConsumers(t *testing.T) {
 	if n := runtime.NumGoroutine(); n > baseline+2 {
 		t.Fatalf("goroutines grew from %d to %d", baseline, n)
 	}
+}
+
+func (s *navSource) callCount() int {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.calls
+}
+
+func TestWheelIsConsumedByOpenMenu(t *testing.T) {
+	src := newNavSource()
+	m := press(t, navStart(t, src), "tab", "S", "shift+tab", "m")
+	if !m.menu.open {
+		t.Fatal("menu must be open")
+	}
+	sel, scroll, offset, calls := m.selName, m.scroll, m.podOffset, src.callCount()
+	targets := [][2]int{
+		{m.layout.Pods.X + 5, m.layout.Pods.Y + 1 + ui.PodsRowsTop + 2},
+		{m.layout.Details.X + 5, m.layout.Details.Y + 10},
+		{m.layout.Namespaces.X + 3, m.layout.Namespaces.Y + 3},
+	}
+	for _, p := range targets {
+		for _, button := range []tea.MouseButton{tea.MouseWheelDown, tea.MouseWheelUp, tea.MouseWheelDown} {
+			next, _ := m.Update(tea.MouseWheelMsg{X: p[0], Y: p[1], Button: button})
+			m = next.(Model)
+		}
+	}
+	if !m.menu.open || m.selName != sel || m.scroll != scroll || m.podOffset != offset || m.nsCursor != 0 {
+		t.Fatalf("wheel with the menu open must not reach the body: sel %s scroll %d", m.selName, m.scroll)
+	}
+	if got := src.callCount(); got != calls {
+		t.Fatalf("wheel with the menu open must not query the source, calls %d -> %d", calls, got)
+	}
+	closed := press(t, m, "esc")
+	next, _ := closed.Update(tea.MouseWheelMsg{X: targets[0][0], Y: targets[0][1], Button: tea.MouseWheelDown})
+	if next.(Model).selName == sel {
+		t.Fatal("wheel works again once the menu is closed")
+	}
+}
+
+func navClick(m Model, x, y int) Model {
+	next, _ := m.Update(tea.MouseClickMsg{X: x, Y: y, Button: tea.MouseLeft})
+	return next.(Model)
+}
+
+func navCrumbX(m Model, i int) int {
+	return m.layout.Crumbs.X + ui.CrumbSpans(crumbLabels(m.crumbs()), m.layout.Crumbs.W)[i].X
+}
+
+func navMenuX(m Model) int {
+	return m.layout.Menu.X + ui.MenuSpans(m.menuItems())[0].X + 1
+}
+
+func navAssertKeysWork(t *testing.T, m Model) {
+	t.Helper()
+	if m.filtering || m.dg.searching || m.filter.Focused() || m.dg.search.Focused() {
+		t.Fatalf("navigation must end the edition, filtering %v searching %v", m.filtering, m.dg.searching)
+	}
+	if !press(t, m, "m").menu.open {
+		t.Fatal("m must open the menu after the navigation")
+	}
+	scoped := navNamespace(t, m)
+	if back := press(t, scoped, "2"); back.nav.Active().Kind != RouteScreen || back.nav.Depth() != scoped.nav.Depth()+1 {
+		t.Fatal("2 must navigate after the navigation")
+	}
+	_, cmd := m.Update(keyPress("q"))
+	if cmd == nil {
+		t.Fatal("q must quit after the navigation")
+	}
+	if _, ok := cmd().(tea.QuitMsg); !ok {
+		t.Fatal("q must quit after the navigation")
+	}
+}
+
+func TestNavigationEndsActiveInputs(t *testing.T) {
+	searching := func(t *testing.T) Model {
+		m := press(t, navNamespace(t, demoModel(t, 160, 48)), "tab", "tab", "enter", "l", "/", "w", "s")
+		if !m.dg.searching || m.dg.search.Value() != "ws" {
+			t.Fatal("log search must be in edition")
+		}
+		return m
+	}
+	filtering := func(t *testing.T) Model {
+		m := press(t, navNamespace(t, demoModel(t, 160, 48)), "/", "x", "m", "2")
+		if !m.filtering || m.filter.Value() != "xm2" || m.menu.open || m.nav.Depth() != 1 {
+			t.Fatal("keyboard navigation keys are text while the filter is in edition")
+		}
+		return m
+	}
+	t.Run("search then root crumb", func(t *testing.T) {
+		m := navClick(searching(t), navCrumbX(searching(t), 0), searching(t).layout.Crumbs.Y)
+		if m.nav.Depth() != 0 || m.tab != ui.TabTop || m.focus != FocusNamespaces {
+			t.Fatalf("root crumb restores the dashboard, depth %d tab %v focus %d", m.nav.Depth(), m.tab, m.focus)
+		}
+		if m.dg.search.Value() != "" {
+			t.Fatal("an unconfirmed search belongs to the left target and is discarded")
+		}
+		navAssertKeysWork(t, m)
+	})
+	t.Run("search then namespace crumb", func(t *testing.T) {
+		s := searching(t)
+		m := navClick(s, navCrumbX(s, 1), s.layout.Crumbs.Y)
+		if m.nav.Active().Kind != RouteNamespace {
+			t.Fatal("namespace crumb pops to the scope")
+		}
+		navAssertKeysWork(t, m)
+	})
+	t.Run("search then menu title", func(t *testing.T) {
+		s := searching(t)
+		m := navClick(s, navMenuX(s), s.layout.Menu.Y)
+		if m.nav.Active() != (Route{Kind: RouteScreen, Screen: ScreenDashboard}) {
+			t.Fatal("menu title activates the Dashboard")
+		}
+		navAssertKeysWork(t, m)
+	})
+	t.Run("filter then root crumb", func(t *testing.T) {
+		f := filtering(t)
+		m := navClick(f, navCrumbX(f, 0), f.layout.Crumbs.Y)
+		if m.nav.Depth() != 0 || m.filter.Value() != "" || m.nsFilter != "" {
+			t.Fatalf("root crumb restores the saved filter, got %q", m.filter.Value())
+		}
+		navAssertKeysWork(t, m)
+	})
+	t.Run("filter then menu title", func(t *testing.T) {
+		f := filtering(t)
+		m := navClick(f, navMenuX(f), f.layout.Menu.Y)
+		if m.nav.Active() != (Route{Kind: RouteScreen, Screen: ScreenDashboard}) || m.nav.Depth() != 2 {
+			t.Fatal("menu title activates the Dashboard")
+		}
+		if back := press(t, m, "esc"); back.filter.Value() != "xm2" || back.filtering {
+			t.Fatal("the typed filter is kept in the saved frame without reopening the edition")
+		}
+		navAssertKeysWork(t, m)
+	})
+	t.Run("filter then current crumb", func(t *testing.T) {
+		f := filtering(t)
+		m := navClick(f, navCrumbX(f, 1), f.layout.Crumbs.Y)
+		if m.nav != f.nav || m.filter.Value() != "xm2" {
+			t.Fatal("clicking the current crumb keeps the route and the typed filter")
+		}
+		navAssertKeysWork(t, m)
+	})
 }

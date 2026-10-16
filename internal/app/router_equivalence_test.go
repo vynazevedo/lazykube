@@ -144,7 +144,7 @@ func dashboardBodyTranscript(t *testing.T, w, h, ow, oh int) (string, map[string
 	return b.String(), crops
 }
 
-func TestDashboardBodyMatchesLegacy(t *testing.T) {
+func TestDashboardNodePodsHeatmapDetailsMatchLegacy(t *testing.T) {
 	for _, size := range []struct{ w, h, ow, oh int }{{130, 40, 160, 48}, {160, 48, 130, 40}} {
 		name := fmt.Sprintf("dashboard_body_legacy_%dx%d.txt.golden", size.w, size.h-1)
 		t.Run(name, func(t *testing.T) {
@@ -164,7 +164,7 @@ func TestDashboardBodyMatchesLegacy(t *testing.T) {
 			gl, wl := strings.Split(got, "\n"), strings.Split(string(want), "\n")
 			for i := range min(len(gl), len(wl)) {
 				if gl[i] != wl[i] {
-					t.Fatalf("dashboard body diverges from the legacy render at line %d:\n got %q\nwant %q", i+1, gl[i], wl[i])
+					t.Fatalf("node, pods, heatmap or details diverge from the legacy render at line %d (namespaces and deployments changed height on purpose and are covered by the screen goldens):\n got %q\nwant %q", i+1, gl[i], wl[i])
 				}
 			}
 			t.Fatalf("dashboard body transcript length differs: got %d lines want %d", len(gl), len(wl))

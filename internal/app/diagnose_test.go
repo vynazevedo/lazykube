@@ -397,3 +397,48 @@ func TestEmptySelectionCancelsLogSubscription(t *testing.T) {
 		})
 	}
 }
+
+func helpTokens(k string) []string {
+	return strings.FieldsFunc(k, func(r rune) bool { return r == ' ' || r == '/' && len(k) > 1 })
+}
+
+func TestHelpOverlayMatchesActiveRoute(t *testing.T) {
+	dash := demoModel(t, 160, 48)
+	scope := press(t, dash, "tab", "tab", "j", "enter")
+	detail := press(t, dash, "enter")
+	for _, c := range []struct {
+		name   string
+		m      Model
+		absent []string
+	}{
+		{"dashboard", dash, nil},
+		{"namespace", scope, nil},
+		{"detail", detail, []string{"next panel", "previous panel", "toggle left column", "filter pods", "open pod"}},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			bound := map[string]bool{}
+			for _, b := range c.m.screen().Keys(c.m) {
+				for _, k := range append(b.Keys(), helpTokens(b.Help().Key)...) {
+					bound[k] = true
+				}
+			}
+			bound["/"] = bound["/"] || bound["slash"]
+			overlay := press(t, c.m, "?").Render().Plain()
+			for _, h := range c.m.screen().FullHelp(c.m) {
+				for _, tok := range helpTokens(h.Key) {
+					if !bound[tok] {
+						t.Fatalf("overlay announces %q (%s) but the route does not bind %q", h.Key, h.Desc, tok)
+					}
+				}
+				if !strings.Contains(overlay, h.Desc[:min(len(h.Desc), 12)]) {
+					t.Fatalf("overlay must show %q", h.Desc)
+				}
+			}
+			for _, gone := range c.absent {
+				if strings.Contains(overlay, gone) {
+					t.Fatalf("%s overlay announces %q without effect", c.name, gone)
+				}
+			}
+		})
+	}
+}

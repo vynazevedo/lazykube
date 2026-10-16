@@ -18,6 +18,10 @@ func (podScreen) Title() string {
 	return "Pod"
 }
 
+func (podScreen) FullHelp(Model) []ui.KeyHelp {
+	return ui.FullHelpDetail()
+}
+
 func (podScreen) Init(Model) tea.Cmd {
 	return nil
 }

@@ -23,6 +23,7 @@ type Screen interface {
 	View(m Model, body draw.Region, ctx ui.Ctx)
 	Keys(m Model) []key.Binding
 	Help(m Model) []ui.KeyHelp
+	FullHelp(m Model) []ui.KeyHelp
 }
 
 func screenFor(id ScreenID) (Screen, bool) {

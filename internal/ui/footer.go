@@ -91,8 +91,22 @@ func Footer(divider, help draw.Region, st FooterState) {
 	help.Sub(0, 0, help.W-1, 1).LineRight(0, right)
 }
 
-func HelpOverlay(screen draw.Region, ctx Ctx) {
-	items := FullHelp()
+func FullHelpDetail() []KeyHelp {
+	dashboardOnly := map[string]bool{"tab": true, "shift+tab": true, "/": true, "enter": true, "1": true}
+	var out []KeyHelp
+	for _, h := range FullHelp() {
+		if dashboardOnly[h.Key] {
+			continue
+		}
+		if h.Key == "esc" {
+			h.Desc = "clear search, back"
+		}
+		out = append(out, h)
+	}
+	return out
+}
+
+func HelpOverlay(screen draw.Region, items []KeyHelp, ctx Ctx) {
 	half := (len(items) + 1) / 2
 	const keyW, descW = 11, 30
 	w := min(screen.W-4, 2*(keyW+descW)+7)
