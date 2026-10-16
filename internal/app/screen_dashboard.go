@@ -27,6 +27,10 @@ func (dashboardScreen) FullHelp(Model) []ui.KeyHelp {
 	return ui.FullHelp()
 }
 
+func (dashboardScreen) ShowsDetails() bool {
+	return true
+}
+
 func (dashboardScreen) Init(Model) tea.Cmd {
 	return nil
 }

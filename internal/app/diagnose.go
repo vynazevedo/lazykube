@@ -65,7 +65,7 @@ func (m Model) eventNamespace() string {
 }
 
 func (m *Model) refreshEvents(pod string) {
-	if m.tab != ui.TabEvents || m.dg.diag == nil {
+	if m.tab != ui.TabEvents || m.dg.diag == nil || !m.screen().ShowsDetails() {
 		m.events = data.EventFeed{Scope: m.dg.scope}
 		return
 	}
@@ -215,7 +215,7 @@ func (m *Model) cycleScope() {
 	}
 	m.dg.scope = m.dg.scope.Next()
 	m.scroll = 0
-	m.refreshEvents(m.activeName())
+	m.refreshEvents(m.detailTarget())
 }
 
 func (m Model) searchActive() bool {

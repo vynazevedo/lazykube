@@ -22,6 +22,10 @@ func (podScreen) FullHelp(Model) []ui.KeyHelp {
 	return ui.FullHelpDetail()
 }
 
+func (podScreen) ShowsDetails() bool {
+	return true
+}
+
 func (podScreen) Init(Model) tea.Cmd {
 	return nil
 }

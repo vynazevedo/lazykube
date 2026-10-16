@@ -210,8 +210,8 @@ func (m *Model) refresh() {
 		m.loadSecurity()
 	}
 	m.refreshSecurity()
-	name := m.activeName()
-	m.metrics = m.src.Metrics(m.clock.T, name, m.heatCols())
+	m.metrics = m.src.Metrics(m.clock.T, m.activeName(), m.heatCols())
+	name := m.detailTarget()
 	m.refreshLogs(name)
 	m.refreshEvents(name)
 	m.manifest, m.describe, m.dg.containers = nil, nil, nil
