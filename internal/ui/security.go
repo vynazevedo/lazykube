@@ -15,9 +15,10 @@ const securityHeaderRows = 4
 const maxSecurityRows = 4096
 
 type SecurityView struct {
-	Scope    string
-	Coverage string
-	Rows     []string
+	Synthetic bool
+	Scope     string
+	Coverage  string
+	Rows      []string
 }
 
 func BuildSecurityView(s data.SecuritySnapshot, key, namespace string, namespaceView bool, width int) SecurityView {

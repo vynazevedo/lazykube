@@ -2,7 +2,7 @@
 │  Log   Config   Top   Describe   Events   Security            │
 │ ───────────────────────────────────────────────────────────── │
 │ ● bilibili-live-7f6b8d9c5-mn4tz                     [Running] │
-│   bilibili-raffle · Running · ready 2/2 · node huawei-k3s-01… │
+│   bilibili-raffle · Running · ready 2/2 · node demo-node-01 … │
 │                                                               │
 │ ╭───────────────────────────────────────────────────────────╮ │
 │ │ Containers  2 · ready 2/2                                 │ │
@@ -14,7 +14,7 @@
 │ │                                                           │ │
 │ │ Name              bilibili-live-7f6b8d9c5-mn4tz           │ │
 │ │ Namespace         bilibili-raffle                         │ │
-│ │ Node              huawei-k3s-01/192.168.0.12              │ │
+│ │ Node              demo-node-01/192.168.0.12               │ │
 │ │ Status            Running                                 │ │
 │ │ Ready             2/2                                     │ │
 │ │ IP                10.42.0.24                              │ │

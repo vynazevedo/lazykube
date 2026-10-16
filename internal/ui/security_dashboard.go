@@ -46,6 +46,9 @@ func DashboardSecurityView(detail SecurityView, session data.SecuritySession, sc
 	rows := make([]string, 0, 64+len(detail.Rows))
 	add := func(s string) { rows = append(rows, draw.Wrap(s, max(1, width))...) }
 	add("POSTURE | " + scopeLabel + " | " + securityScoreLabel(a.Score))
+	if detail.Synthetic {
+		add("Synthetic data (demo)")
+	}
 	if a.Score.Available {
 		add("Score " + securityBar(a.Score.Value, 100, max(1, min(36, width-6))))
 	}

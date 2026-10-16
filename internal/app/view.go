@@ -22,7 +22,7 @@ func (m Model) Render() *draw.Canvas {
 	ctx := ui.Ctx{Pal: m.pal, Clock: m.clock}
 	pod := m.selectedPod()
 
-	ui.Header(region(screen, m.layout.Header), ui.HeaderState{Cluster: m.snap.Cluster, MetricsOK: m.metrics.Available, SecurityAlerts: len(m.securitySession.Alerts)}, ctx)
+	ui.Header(region(screen, m.layout.Header), ui.HeaderState{Synthetic: m.snap.Synthetic, Cluster: m.snap.Cluster, MetricsOK: m.metrics.Available, SecurityAlerts: len(m.securitySession.Alerts)}, ctx)
 
 	if m.layout.ShowLeft {
 		ui.NodePanel(region(screen, m.layout.Node), ui.NodeState{

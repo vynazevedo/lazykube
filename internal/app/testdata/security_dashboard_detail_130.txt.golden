@@ -1,4 +1,4 @@
- lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13       ! 1 high new   ⠙ metrics every 5s ● live  
+ lazykube [DEMO]  v2.0   ◎ context demo   k8s demo  nodes 1  ns 8  pods 13  uptime 119d ! 1 high new   ⠙ metrics every 5s ● live  
                                                                                                                                   
  ╭─ Pods · focus ────────────────────────────────────────╮ ╭────────────────────────────────────────────────────────────────────╮ 
  │                                                       │ │  Log   Config   Top   Describe   Events   Security 1               │ 

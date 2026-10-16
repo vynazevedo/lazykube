@@ -1,8 +1,8 @@
- lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d                        ! 1 high new   ⠙ metrics every 5s ● live  
+ lazykube [DEMO]  v2.0   ◎ context demo   k8s demo  nodes 1  ns 8  pods 13  uptime 119d                               ! 1 high new   ⠙ metrics every 5s ● live  
                                                                                                                                                                 
  ╭─ Node ────────────────────────────╮ ╭─ Pods · focus ─────────────────────────────────────╮ ╭───────────────────────────────────────────────────────────────╮ 
  │                                   │ │                                                    │ │  Log   Config   Top   Describe   Events   Security 1          │ 
- │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  huawei-k3s-01│ │ / filter pods…▌                           13 items │ │ ───────────────────────────────────────────────────────────── │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  demo-node-01 │ │ / filter pods…▌                           13 items │ │ ───────────────────────────────────────────────────────────── │ 
  │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready      │ │                                                    │ │ ╭───────────────────────────────────────────────────────────╮ │ 
  │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 21%      │ │   NAME          NAMESPACE    RST   AGE CPU/STATUS  │ │ │ S: namespace | Pod: bilibili-raffle/bilibili-live-7f6b8d… │ │ 
  │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   █████████████│ │ ● bilibili-raf… bilibili-r…    0  119d █░░░░░░     │ │ │ Dashboard coverage: complete in scope | pods 13/13        │ │ 

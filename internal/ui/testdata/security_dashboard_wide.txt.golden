@@ -7,6 +7,7 @@
 │ │ No findings does not mean safe                            │ │
 │ │ Local checks only; not PSS compliance.                    │ │
 │ │ POSTURE | Cluster | 76/100 (C) | 13/13 pods               │ │
+│ │ Synthetic data (demo)                                     │ │
 │ │ Score ███████████████████████████░░░░░░░░░                │ │
 │ │ high     10 ████████████████████████                      │ │
 │ │ medium    6 ██████████████░░░░░░░░░░                      │ │
@@ -43,6 +44,5 @@
 │ │ Evidence: true                                            │ │
 │ │ Privileged init container configured. Disable privileged  │ │
 │ │ mode                                                      │ │
-│ │ Source: demo fixture v1 | configuration observed          │ │
 │ ╰───────────────────────────────────────────────────────────╯ │
 ╰───────────────────────────────────────────────────────────────╯

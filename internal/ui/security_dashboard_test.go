@@ -38,7 +38,9 @@ func TestSecurityDashboardVisualGolden(t *testing.T) {
 	demo.AdvanceSecurity(240)
 	session.Update(demo.Security())
 	for _, width := range []int{45, 65} {
-		view := DashboardSecurityView(BuildSecurityView(demo.Security(), selectedPod, "bilibili-raffle", false, width-8), session, "", selectedPod, width-8)
+		detail := BuildSecurityView(demo.Security(), selectedPod, "bilibili-raffle", false, width-8)
+		detail.Synthetic = demo.Snapshot().Synthetic
+		view := DashboardSecurityView(detail, session, "", selectedPod, width-8)
 		name := "security_dashboard_narrow"
 		if width == 65 {
 			name = "security_dashboard_wide"

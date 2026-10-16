@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	demoNode        = "huawei-k3s-01"
+	demoNode        = "demo-node-01"
 	demoNodeAddress = "192.168.0.12"
 	cpuWindow       = 60
 	sparkWindow     = 34
@@ -86,9 +86,10 @@ func (d *Demo) Snapshot() Snapshot {
 		pods[i] = p.pod
 	}
 	return Snapshot{
+		Synthetic: true,
 		Cluster: Cluster{
-			Context:    "huawei_k3s",
-			Version:    "v1.28.4+k3s2",
+			Context:    "demo",
+			Version:    "demo",
 			Nodes:      1,
 			Namespaces: 8,
 			Pods:       len(pods),
