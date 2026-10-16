@@ -59,6 +59,7 @@ type Source struct {
 	generation         uint64
 	podCoverage        data.Coverage
 	deploymentCoverage data.Coverage
+	nodeHealth         data.Coverage
 
 	client  kubernetes.Interface
 	metrics metricsclient.Interface
@@ -177,7 +178,10 @@ func (s *Source) start(ctx context.Context) error {
 		resources = append(resources, "namespaces")
 	}
 	if s.caps.nodes {
-		s.nodeInf = cluster.Core().V1().Nodes().Informer()
+		s.nodeInf = s.newNodeInformer(cluster)
+		if err := s.nodeInf.SetWatchErrorHandler(s.watchNodeError); err != nil {
+			return err
+		}
 		synced = append(synced, s.nodeInf.HasSynced)
 		resources = append(resources, "nodes")
 	}
@@ -497,6 +501,7 @@ func (s *Source) rebuild() {
 	}
 	sort.Slice(outNS, func(i, j int) bool { return outNS[i].Name < outNS[j].Name })
 
+	s.recoverNodeCoverage()
 	nodes := map[string]*corev1.Node{}
 	var nodeList []string
 	for _, n := range listOf[corev1.Node](s.nodeInf) {
@@ -588,8 +593,11 @@ func (s *Source) nodeLocked(name string) data.Node {
 		return data.Node{Name: name, Address: "-", MemUsed: "n/a", MemTotal: "n/a", Pods: pods, Arch: "-", Ready: true, Coverage: cov}
 	}
 	mem, ok := s.usage.nodeMem[name]
-	out := toNode(n, pods, mem, ok)
+	out := toNode(n, pods, mem, ok && s.usage.ok)
 	out.Coverage = data.Coverage{State: data.CoverageComplete}
+	if s.nodeHealth.State != "" {
+		out.Coverage = s.nodeHealth
+	}
 	return out
 }
 
