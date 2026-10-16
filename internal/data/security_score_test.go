@@ -52,7 +52,7 @@ func TestSecurityV2Distribution(t *testing.T) {
 
 func TestSecurityRuleVersionBaseline(t *testing.T) {
 	snapshot := securityDashboardFixture()
-	snapshot.RuleVersion = "2"
+	snapshot.RuleVersion = "3"
 	var session SecuritySession
 	session.Update(snapshot)
 	p := snapshot.Pods["a/pod"]
