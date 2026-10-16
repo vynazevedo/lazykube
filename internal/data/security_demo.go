@@ -7,7 +7,7 @@ func (d *Demo) buildSecurity() SecuritySnapshot {
 	pods := make(map[string]PodPosture, len(d.pods))
 	for i, row := range d.pods {
 		p := row.pod
-		ref := ResourceRef{Context: "huawei_k3s", Generation: 1, Version: "v1", Resource: "pods", Namespace: p.Namespace, Name: p.Name, UID: "demo-" + p.Key(), ResourceVersion: "1"}
+		ref := ResourceRef{Context: "demo", Generation: 1, Version: "v1", Resource: "pods", Namespace: p.Namespace, Name: p.Name, UID: "demo-" + p.Key(), ResourceVersion: "1"}
 		posture := PodPosture{Target: ref, Coverage: Coverage{State: CoverageComplete, Evaluated: 1, Total: 1, ObservedAt: at}}
 		add := func(rule, container, field, evidence, why, recommendation string, severity Severity, result RuleResult) {
 			confidence := ConfidenceObserved
@@ -47,7 +47,7 @@ func (d *Demo) AdvanceSecurity(tick int) bool {
 	key := d.pods[0].pod.Key()
 	p := d.security.Pods[key]
 	p.Target.ResourceVersion = "2"
-	p.Findings = append(p.Findings, Finding{Rule: "hostPID", RuleVersion: "1", Origin: "demo simulated change", Severity: SeverityHigh, Result: ResultFinding, Confidence: ConfidenceObserved, Target: p.Target, Field: "spec.hostPID", Evidence: "true", Explanation: "Simulated host PID access", Recommendation: "Disable host PID sharing", ObservedAt: p.Coverage.ObservedAt})
+	p.Findings = append(p.Findings, Finding{Rule: "hostPID", RuleVersion: "1", Origin: "demo fixture", Severity: SeverityHigh, Result: ResultFinding, Confidence: ConfidenceObserved, Target: p.Target, Field: "spec.hostPID", Evidence: "true", Explanation: "Simulated host PID access", Recommendation: "Disable host PID sharing", ObservedAt: p.Coverage.ObservedAt})
 	d.security.Pods[key] = p
 	names := make([]string, 0, len(d.security.Namespaces))
 	for name := range d.security.Namespaces {

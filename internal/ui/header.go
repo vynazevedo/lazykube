@@ -11,6 +11,7 @@ import (
 const Version = "v2.0"
 
 type HeaderState struct {
+	Synthetic      bool
 	Cluster        data.Cluster
 	MetricsOK      bool
 	SecurityAlerts int
@@ -25,6 +26,9 @@ func Header(r draw.Region, st HeaderState, ctx Ctx) {
 		r.Put(x+i, 0, ch, draw.Fg(colors[i]).WithBold())
 	}
 	x += len(logo)
+	if st.Synthetic {
+		x += r.Text(x, 0, " [DEMO]", draw.Fg(theme.Warn).WithBold())
+	}
 	x += r.Line(x, 0, draw.Line{muted("  " + Version + "  ")})
 
 	pill := statusPill(st, ctx)

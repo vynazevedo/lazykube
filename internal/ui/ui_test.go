@@ -83,10 +83,10 @@ func TestPanelGoldens(t *testing.T) {
 	m := d.Metrics(40, selectedPod, 36)
 
 	check(t, "header", canvas(158, 1, func(r draw.Region) {
-		Header(r, HeaderState{Cluster: snap.Cluster, MetricsOK: true}, ctx)
+		Header(r, HeaderState{Synthetic: snap.Synthetic, Cluster: snap.Cluster, MetricsOK: true}, ctx)
 	}))
 	check(t, "header_stale", canvas(158, 1, func(r draw.Region) {
-		Header(r, HeaderState{Cluster: snap.Cluster, MetricsOK: false}, ctx)
+		Header(r, HeaderState{Synthetic: snap.Synthetic, Cluster: snap.Cluster, MetricsOK: false}, ctx)
 	}))
 	check(t, "node", canvas(37, 16, func(r draw.Region) {
 		NodePanel(r, NodeState{Node: snap.Node, CPU: m.NodeCPU, CPUFrac: float64(m.NodeCPU) / 100, MemFrac: snap.Node.MemFraction}, ctx)

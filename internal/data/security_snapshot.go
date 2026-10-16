@@ -3,7 +3,7 @@ package data
 import "slices"
 
 func SummarizeSecurity(pods map[string]PodPosture, namespaces []string, coverage Coverage) SecuritySnapshot {
-	s := SecuritySnapshot{Pods: pods, Namespaces: make(map[string]NamespacePosture), Coverage: coverage}
+	s := SecuritySnapshot{ListCoverage: coverage, Pods: pods, Namespaces: make(map[string]NamespacePosture), Coverage: coverage}
 	for _, ns := range namespaces {
 		c := coverage
 		c.Evaluated, c.Total = 0, 0
@@ -37,7 +37,7 @@ func SummarizeSecurity(pods map[string]PodPosture, namespaces []string, coverage
 }
 
 func (s SecuritySnapshot) Clone() SecuritySnapshot {
-	out := SecuritySnapshot{Revision: s.Revision, Coverage: s.Coverage, Pods: make(map[string]PodPosture, len(s.Pods)), Namespaces: make(map[string]NamespacePosture, len(s.Namespaces))}
+	out := SecuritySnapshot{ListCoverage: s.ListCoverage, Revision: s.Revision, Coverage: s.Coverage, Pods: make(map[string]PodPosture, len(s.Pods)), Namespaces: make(map[string]NamespacePosture, len(s.Namespaces))}
 	for k, p := range s.Pods {
 		p.Findings = slices.Clone(p.Findings)
 		out.Pods[k] = p

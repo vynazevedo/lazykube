@@ -133,6 +133,7 @@ type Field struct {
 }
 
 type Snapshot struct {
+	Synthetic   bool
 	Cluster     Cluster
 	Node        Node
 	Pods        []Pod

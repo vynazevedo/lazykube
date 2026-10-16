@@ -20,7 +20,7 @@ func (m Model) Render() *draw.Canvas {
 		return c
 	}
 	ctx := ui.Ctx{Pal: m.pal, Clock: m.clock}
-	ui.Header(region(screen, m.layout.Header), ui.HeaderState{Cluster: m.snap.Cluster, MetricsOK: m.metrics.Available, SecurityAlerts: len(m.securitySession.Alerts)}, ctx)
+	ui.Header(region(screen, m.layout.Header), ui.HeaderState{Synthetic: m.snap.Synthetic, Cluster: m.snap.Cluster, MetricsOK: m.metrics.Available, SecurityAlerts: len(m.securitySession.Alerts)}, ctx)
 
 	m.screen().View(m, screen, ctx)
 

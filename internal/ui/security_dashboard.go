@@ -23,7 +23,7 @@ func securityScoreLabel(s data.PostureScore) string {
 	if s.Partial {
 		partial = " partial"
 	}
-	return fmt.Sprintf("%d/100 (%s)%s | %d/%d pods", s.Value, s.Grade, partial, s.Coverage.Evaluated, s.Coverage.Total)
+	return fmt.Sprintf("%d/100 (%s)%s | %d/%d %s", s.Value, s.Grade, partial, s.Coverage.Evaluated, s.Coverage.Total, securityPlural(s.Coverage.Total, "pod"))
 }
 
 func securityBar(value, maximum, width int) string {
@@ -46,6 +46,9 @@ func DashboardSecurityView(detail SecurityView, session data.SecuritySession, sc
 	rows := make([]string, 0, 64+len(detail.Rows))
 	add := func(s string) { rows = append(rows, draw.Wrap(s, max(1, width))...) }
 	add("POSTURE | " + scopeLabel + " | " + securityScoreLabel(a.Score))
+	if detail.Synthetic {
+		add("Synthetic data (demo)")
+	}
 	if a.Score.Available {
 		add("Score " + securityBar(a.Score.Value, 100, max(1, min(36, width-6))))
 	}
@@ -85,7 +88,7 @@ func DashboardSecurityView(detail SecurityView, session data.SecuritySession, sc
 		add("No unacknowledged high alerts.")
 	}
 	if count > 5 {
-		add(fmt.Sprintf("%d more alerts below pod details.", count-5))
+		add(fmt.Sprintf("%d more %s below pod details.", count-5, securityPlural(count-5, "alert")))
 	}
 	add("TOP RULES | confirmed findings")
 	for i, rule := range a.Rules {
@@ -112,7 +115,7 @@ func DashboardSecurityView(detail SecurityView, session data.SecuritySession, sc
 			if ns.Score.Partial {
 				label += " partial"
 			}
-			add(fmt.Sprintf("%-18s %s %s | %d findings", draw.Truncate(ns.Name, 18), label, securityBar(ns.Score.Value, 100, 8), ns.High+ns.Medium+ns.Info))
+			add(fmt.Sprintf("%-18s %s %s | %d %s", draw.Truncate(ns.Name, 18), label, securityBar(ns.Score.Value, 100, 8), ns.High+ns.Medium+ns.Info, securityPlural(ns.High+ns.Medium+ns.Info, "finding")))
 		} else {
 			add(ns.Name + " | " + securityScoreLabel(ns.Score))
 		}
@@ -154,4 +157,11 @@ func DashboardSecurityView(detail SecurityView, session data.SecuritySession, sc
 	}
 	detail.Rows = rows
 	return detail
+}
+
+func securityPlural(count int, singular string) string {
+	if count == 1 {
+		return singular
+	}
+	return singular + "s"
 }

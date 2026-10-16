@@ -7,6 +7,8 @@ import (
 )
 
 const SecurityHistoryLimit = 40
+const SecurityIdentityRetention = 40
+const SecurityUncertainIdentityLimit = 4096
 const SecurityScoreFormula = "100 - (25*high + 8*medium + 2*info)/evaluated pods; floor 0, rounded."
 
 type PostureScore struct {
@@ -149,14 +151,15 @@ type SecurityIdentity struct {
 	UID, Rule, Container string
 }
 type SecuritySession struct {
-	Revision  uint64
-	Dashboard SecurityDashboard
-	Alerts    []Finding
-	History   map[string][]float64
-	baseline  bool
-	loaded    bool
-	previous  map[SecurityIdentity]bool
-	pending   map[SecurityIdentity]Finding
+	Revision    uint64
+	Dashboard   SecurityDashboard
+	Alerts      []Finding
+	History     map[string][]float64
+	baseline    bool
+	loaded      bool
+	previous    map[SecurityIdentity]uint64
+	observation uint64
+	pending     map[SecurityIdentity]Finding
 }
 
 func (s *SecuritySession) Update(snapshot SecuritySnapshot) bool {
@@ -164,7 +167,9 @@ func (s *SecuritySession) Update(snapshot SecuritySnapshot) bool {
 		return false
 	}
 	s.Dashboard = AggregateSecurity(snapshot)
-	current := make(map[SecurityIdentity]bool)
+	s.observation++
+	current := make(map[SecurityIdentity]uint64)
+	usable := snapshot.Coverage.State == CoverageComplete || snapshot.Coverage.State == CoveragePartial
 	if s.pending == nil {
 		s.pending = make(map[SecurityIdentity]Finding)
 	}
@@ -174,22 +179,20 @@ func (s *SecuritySession) Update(snapshot SecuritySnapshot) bool {
 				continue
 			}
 			id := SecurityIdentity{p.Target.Context, p.Target.Generation, p.Target.UID, f.Rule, f.Container}
-			current[id] = true
-			if s.baseline && !s.previous[id] && (p.Coverage.State == CoverageComplete || p.Coverage.State == CoveragePartial) && (snapshot.Coverage.State == CoverageComplete || snapshot.Coverage.State == CoveragePartial) {
+			if usable && (p.Coverage.State == CoverageComplete || p.Coverage.State == CoveragePartial) {
+				current[id] = s.observation
+			}
+			if s.baseline && s.previous[id] == 0 && (p.Coverage.State == CoverageComplete || p.Coverage.State == CoveragePartial) && (snapshot.Coverage.State == CoverageComplete || snapshot.Coverage.State == CoveragePartial) {
 				f.Target = p.Target
 				s.pending[id] = f
 			}
 		}
 	}
-	if snapshot.Coverage.State == CoverageComplete || snapshot.Coverage.State == CoveragePartial {
-		if snapshot.Coverage.State == CoveragePartial || snapshot.Coverage.Evaluated < snapshot.Coverage.Total {
-			for id := range s.previous {
-				current[id] = true
-			}
-		}
-		s.previous = current
+	s.reconcileIdentities(snapshot, current, usable)
+	if usable {
 		s.baseline = true
 	}
+
 	s.Alerts = nil
 	for _, f := range s.pending {
 		s.Alerts = append(s.Alerts, f)
@@ -230,3 +233,53 @@ func (s *SecuritySession) Update(snapshot SecuritySnapshot) bool {
 }
 
 func (s *SecuritySession) Acknowledge() { clear(s.pending); s.Alerts = nil }
+
+type securityPodIdentity struct {
+	Context    string
+	Generation uint64
+	UID        string
+}
+
+func (s *SecuritySession) reconcileIdentities(snapshot SecuritySnapshot, current map[SecurityIdentity]uint64, usable bool) {
+	complete := make(map[securityPodIdentity]bool, len(snapshot.Pods))
+	for _, p := range snapshot.Pods {
+		complete[securityPodIdentity{p.Target.Context, p.Target.Generation, p.Target.UID}] = usable && p.Coverage.State == CoverageComplete && p.Coverage.Evaluated == p.Coverage.Total
+	}
+	listed := usable && (snapshot.ListCoverage.State == CoverageComplete || (snapshot.ListCoverage.State == "" && snapshot.Coverage.State == CoverageComplete)) && len(snapshot.Pods) == snapshot.Coverage.Total
+	uncertain := make([]SecurityIdentity, 0)
+	for id, seen := range s.previous {
+		if current[id] != 0 || s.observation-seen >= SecurityIdentityRetention {
+			continue
+		}
+		observed, exists := complete[securityPodIdentity{id.Context, id.Generation, id.UID}]
+		if observed || (!exists && listed) {
+			continue
+		}
+		uncertain = append(uncertain, id)
+	}
+	if len(uncertain) > SecurityUncertainIdentityLimit {
+		slices.SortFunc(uncertain, func(a, b SecurityIdentity) int {
+			if n := cmp.Compare(s.previous[b], s.previous[a]); n != 0 {
+				return n
+			}
+			if n := cmp.Compare(a.Context, b.Context); n != 0 {
+				return n
+			}
+			if n := cmp.Compare(a.Generation, b.Generation); n != 0 {
+				return n
+			}
+			if n := cmp.Compare(a.UID, b.UID); n != 0 {
+				return n
+			}
+			if n := cmp.Compare(a.Rule, b.Rule); n != 0 {
+				return n
+			}
+			return cmp.Compare(a.Container, b.Container)
+		})
+		uncertain = uncertain[:SecurityUncertainIdentityLimit]
+	}
+	for _, id := range uncertain {
+		current[id] = s.previous[id]
+	}
+	s.previous = current
+}

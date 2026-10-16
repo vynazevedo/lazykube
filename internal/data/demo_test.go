@@ -98,7 +98,7 @@ func TestDemoManifestAndDescribe(t *testing.T) {
 		t.Fatalf("label got %q", m[6])
 	}
 	f := d.Describe(selected)
-	if f[2].Value != "huawei-k3s-01/192.168.0.12" {
+	if f[2].Value != "demo-node-01/192.168.0.12" {
 		t.Fatalf("node got %q", f[2].Value)
 	}
 	if d.Manifest("missing") != nil || d.Describe("missing") != nil {

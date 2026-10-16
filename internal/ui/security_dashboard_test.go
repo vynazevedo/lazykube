@@ -38,7 +38,9 @@ func TestSecurityDashboardVisualGolden(t *testing.T) {
 	demo.AdvanceSecurity(240)
 	session.Update(demo.Security())
 	for _, width := range []int{45, 65} {
-		view := DashboardSecurityView(BuildSecurityView(demo.Security(), selectedPod, "bilibili-raffle", false, width-8), session, "", selectedPod, width-8)
+		detail := BuildSecurityView(demo.Security(), selectedPod, "bilibili-raffle", false, width-8)
+		detail.Synthetic = demo.Snapshot().Synthetic
+		view := DashboardSecurityView(detail, session, "", selectedPod, width-8)
 		name := "security_dashboard_narrow"
 		if width == 65 {
 			name = "security_dashboard_wide"
@@ -70,5 +72,26 @@ func TestSecurityDashboardAlertOverflow(t *testing.T) {
 	text := strings.Join(view.Rows, " ")
 	if !strings.Contains(text, "3 more alerts below pod details") || !strings.Contains(text, "MORE ALERTS") || !strings.Contains(text, "xxxxxxxx") {
 		t.Fatal("overflow alerts inaccessible")
+	}
+}
+
+func TestSecurityDashboardSingularFinding(t *testing.T) {
+	var session data.SecuritySession
+	session.Update(data.NewDemo().Security())
+	view := DashboardSecurityView(SecurityView{}, session, "ys-odoo", "", 80)
+	text := strings.Join(view.Rows, " ")
+	if strings.Contains(text, "1 findings") || !strings.Contains(text, "1 finding") {
+		t.Fatalf("singular missing: %s", text)
+	}
+}
+
+func TestSecurityPluralCounts(t *testing.T) {
+	for _, tc := range []struct {
+		n          int
+		word, want string
+	}{{0, "finding", "findings"}, {1, "finding", "finding"}, {2, "finding", "findings"}, {1, "alert", "alert"}, {2, "alert", "alerts"}, {1, "pod", "pod"}, {2, "pod", "pods"}} {
+		if got := securityPlural(tc.n, tc.word); got != tc.want {
+			t.Fatalf("plural %d %s = %s", tc.n, tc.word, got)
+		}
 	}
 }

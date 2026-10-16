@@ -2,7 +2,7 @@
 │  Log   Config   Top   Describe   Events   Security            │
 │ ───────────────────────────────────────────────────────────── │
 │ ● bilibili-live-7f6b8d9c5-mn4tz                     [Running] │
-│   bilibili-raffle · Running · ready 2/2 · node huawei-k3s-01… │
+│   bilibili-raffle · Running · ready 2/2 · node demo-node-01 … │
 │                                                               │
 │ ╭───────────────────────────────────────────────────────────╮ │
 │ │ 20:14:00  INFO  ws connected room=21452505 shard=3        │ │

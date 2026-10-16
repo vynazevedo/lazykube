@@ -1,8 +1,8 @@
- lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d                        ! 1 high new   ⠙ metrics every 5s ● live  
+ lazykube [DEMO]  v2.0   ◎ context demo   k8s demo  nodes 1  ns 8  pods 13  uptime 119d                               ! 1 high new   ⠙ metrics every 5s ● live  
                                                                                                                                                                 
  ╭─ Node ────────────────────────────╮ ╭─ Pods · focus ─────────────────────────────────────╮ ╭───────────────────────────────────────────────────────────────╮ 
  │                                   │ │                                                    │ │  Log   Config   Top   Describe   Events   Security 1          │ 
- │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  huawei-k3s-01│ │ / filter pods…▌                           13 items │ │ ───────────────────────────────────────────────────────────── │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  demo-node-01 │ │ / filter pods…▌                           13 items │ │ ───────────────────────────────────────────────────────────── │ 
  │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready      │ │                                                    │ │ ╭───────────────────────────────────────────────────────────╮ │ 
  │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 21%      │ │   NAME          NAMESPACE    RST   AGE CPU/STATUS  │ │ │ S: namespace | Pod: bilibili-raffle/bilibili-live-7f6b8d… │ │ 
  │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   █████████████│ │ ● bilibili-raf… bilibili-r…    0  119d █░░░░░░     │ │ │ Dashboard coverage: complete in scope | pods 13/13        │ │ 
@@ -15,13 +15,13 @@
  │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀               │ │ ⠙ lingqu-16054… xcx            0    8s Init:0/1    │ │ │ bilibili-raffle    66 █████░░░ | 5 findings               │ │ 
  │                                   │ │ ● coredns-6799… kube-system    0  119d ░░░░░░░     │ │ │ xcx                70 ██████░░ | 5 findings               │ │ 
  │                                   │ │ ● metrics-serv… kube-system    0  119d ready 0/1   │ │ │ kube-system        81 ██████░░ | 7 findings               │ │ 
- ╰───────────────────────────────────╯ │ ● traefik-f456… kube-system    0  119d ░░░░░░░     │ │ │ ys-odoo            99 ████████ | 1 findings               │ │ 
+ ╰───────────────────────────────────╯ │ ● traefik-f456… kube-system    0  119d ░░░░░░░     │ │ │ ys-odoo            99 ████████ | 1 finding                │ │ 
  ╭─ Namespaces ──────────────────────╮ │ ● local-path-p… kube-system    0  119d ImagePullB… │ │ │ More namespaces: use the namespace filter.                │ │ 
  │                                   │ │ ● svclb-traefi… kube-system    7  119d CrashLoopB… │ │ │ Score: 100 - (25*high + 8*medium + 2*info)/evaluated      │ │ 
  │ default                 ·····   0 │ ╰────────────────────────────────────────────────────╯ │ │ pods; floor 0, rounded.                                   │ │ 
  │ kube-system             █████   5 │ ╭─ CPU heatmap · last 2 min ─────────────────────────╮ │ │ Grades: A >=90, B >=80, C >=70, D >=60, F <60. Not a      │ │ 
  │ kube-public             ·····   0 │ │                                                    │ │ │ safety rating.                                            │ │ 
- │ kube-node-lease         ·····   0 │ │ bilibili-raf… ████████████████████████████████████ │ │ │ SELECTED POD | 59/100 (F) | 1/1 pods                      │ │ 
+ │ kube-node-lease         ·····   0 │ │ bilibili-raf… ████████████████████████████████████ │ │ │ SELECTED POD | 59/100 (F) | 1/1 pod                       │ │ 
  │ bilibili-raffle         ██░░░   2 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Pod bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz |       │ │ 
  │ lgo                     █░░░░   1 │ │ bilibili-live ████████████████████████████████████ │ │ │ complete in scope                                         │ │ 
  │ xcx                     ███░░   3 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Observed 2026-10-16 12:00:00Z | UID                       │ │ 

@@ -31,6 +31,7 @@ func (m *Model) refreshSecurity() {
 	}
 	m.securityKey = key
 	m.securityView = ui.BuildSecurityView(m.security, pod, namespace, m.securityNamespace || pod == "", max(1, width-4))
+	m.securityView.Synthetic = m.snap.Synthetic
 	m.securityView = ui.DashboardSecurityView(m.securityView, m.securitySession, m.nsFilter, pod, max(1, width-4))
 }
 
