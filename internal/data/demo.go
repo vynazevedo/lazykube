@@ -22,7 +22,8 @@ type demoPod struct {
 }
 
 type Demo struct {
-	pods []demoPod
+	security SecuritySnapshot
+	pods     []demoPod
 }
 
 func NewDemo() *Demo {
@@ -70,6 +71,7 @@ func NewDemo() *Demo {
 			},
 		}
 	}
+	d.security = d.buildSecurity()
 	return d
 }
 

@@ -45,13 +45,20 @@ type Options struct {
 }
 
 type caps struct {
-	nodes      bool
-	namespaces bool
-	events     bool
-	metrics    bool
+	deployments bool
+	nodes       bool
+	namespaces  bool
+	events      bool
+	metrics     bool
 }
 
 type Source struct {
+	securityObjects    map[string]*corev1.Pod
+	security           data.SecuritySnapshot
+	generation         uint64
+	podCoverage        data.Coverage
+	deploymentCoverage data.Coverage
+
 	client  kubernetes.Interface
 	metrics metricsclient.Interface
 	rest    rest.Interface
@@ -106,6 +113,10 @@ func newSource(client kubernetes.Interface, mc metricsclient.Interface, opts Opt
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	s := &Source{
+		generation:         securityGeneration.Add(1),
+		podCoverage:        data.Coverage{State: data.CoverageCollecting},
+		deploymentCoverage: data.Coverage{State: data.CoverageCollecting},
+
 		client:     client,
 		metrics:    mc,
 		opts:       opts,
@@ -136,9 +147,18 @@ func (s *Source) start(ctx context.Context) error {
 		informers.WithNamespace(ns),
 		informers.WithTransform(stripManagedFields))
 	s.podInf = s.factory.Core().V1().Pods().Informer()
-	s.deployInf = s.factory.Apps().V1().Deployments().Informer()
-	synced := []cache.InformerSynced{s.podInf.HasSynced, s.deployInf.HasSynced}
-	resources := []string{"pods", "deployments"}
+	if err := s.podInf.SetWatchErrorHandler(s.watchSecurityError(false)); err != nil {
+		return err
+	}
+	synced := []cache.InformerSynced{s.podInf.HasSynced}
+	resources := []string{"pods"}
+	if s.caps.deployments {
+		s.deployInf = s.factory.Apps().V1().Deployments().Informer()
+		if err := s.deployInf.SetWatchErrorHandler(s.watchSecurityError(true)); err != nil {
+			return err
+		}
+		resources = append(resources, "deployments (optional)")
+	}
 	if s.caps.events {
 		s.eventInf = s.factory.Core().V1().Events().Informer()
 		if err := s.eventInf.AddIndexers(cache.Indexers{involvedIndex: involvedPodIndex}); err != nil {
@@ -233,7 +253,12 @@ func (s *Source) probe(ctx context.Context) error {
 		return fmt.Errorf("cannot list pods: %w", err)
 	}
 	if _, err := s.client.AppsV1().Deployments(ns).List(ctx, one); err != nil {
-		return fmt.Errorf("cannot list deployments: %w", err)
+		s.deploymentCoverage = data.Coverage{State: data.CoverageUnavailable, Reason: "deployments unavailable"}
+		if apierrors.IsForbidden(err) {
+			s.deploymentCoverage = data.Coverage{State: data.CoverageDenied, Reason: "no permission to list deployments"}
+		}
+	} else {
+		s.caps.deployments = true
 	}
 	allowed := func(err error) (bool, error) {
 		if err == nil {
@@ -269,6 +294,9 @@ func (s *Source) probe(ctx context.Context) error {
 
 func (c caps) summary(clusterWide, metricsClient bool) string {
 	var missing []string
+	if !c.deployments {
+		missing = append(missing, "deployments")
+	}
 	if !c.events {
 		missing = append(missing, "events")
 	}
@@ -392,6 +420,15 @@ func (s *Source) rebuild() {
 		}
 		return pods[i].Name < pods[j].Name
 	})
+	securityNS := listOf[corev1.Namespace](s.nsInf)
+	names := make([]data.Namespace, 0, len(securityNS)+1)
+	for _, ns := range securityNS {
+		names = append(names, data.Namespace{Name: ns.Name})
+	}
+	if s.opts.Namespace != "" {
+		names = append(names, data.Namespace{Name: s.opts.Namespace})
+	}
+	s.rebuildSecurity(pods, names, now)
 	byKey := make(map[string]*corev1.Pod, len(pods))
 	outPods := make([]data.Pod, 0, len(pods))
 	perNS := map[string]int{}
@@ -467,6 +504,10 @@ func (s *Source) rebuild() {
 	}
 
 	s.mu.Lock()
+	if s.deployInf != nil && s.deployInf.HasSynced() && s.deploymentCoverage.State == data.CoverageCollecting {
+		s.deploymentCoverage.State = data.CoverageComplete
+	}
+	snap.DeploymentCoverage = s.deploymentCoverage
 	s.snap = snap
 	s.byKey = byKey
 	s.nodes = nodes

@@ -47,13 +47,13 @@ func TestStartReportsProgress(t *testing.T) {
 	if got[2].Detail != "acesso completo" {
 		t.Fatalf("permissions detail = %q", got[2].Detail)
 	}
-	if got[3].Detail != "pods, deployments, events, namespaces, nodes" || got[4].Detail != "1 pods, 0 deployments" {
+	if got[3].Detail != "pods, deployments (optional), events, namespaces, nodes" || got[4].Detail != "1 pods, 0 deployments" {
 		t.Fatalf("sync details = %q / %q", got[3].Detail, got[4].Detail)
 	}
 }
 
 func TestCapsSummaryListsMissing(t *testing.T) {
-	c := caps{events: true}
+	c := caps{events: true, deployments: true}
 	if got := c.summary(true, true); got != "sem acesso: nodes, namespaces, metrics" {
 		t.Fatalf("summary = %q", got)
 	}

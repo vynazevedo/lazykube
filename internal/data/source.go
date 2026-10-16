@@ -132,6 +132,8 @@ type Snapshot struct {
 	Pods        []Pod
 	Deployments []Deployment
 	Namespaces  []Namespace
+
+	DeploymentCoverage Coverage
 }
 
 type Metrics struct {

@@ -37,6 +37,11 @@ type Options struct {
 }
 
 type Model struct {
+	security          data.SecuritySnapshot
+	securityKey       string
+	securityNamespace bool
+	securityView      ui.SecurityView
+
 	w, h     int
 	layout   Layout
 	leftMode LeftMode
@@ -118,6 +123,7 @@ func New(opts Options) Model {
 		m.clock = anim.Fixed(0, 0, 0)
 	}
 	m.snap = m.src.Snapshot()
+	m.loadSecurity()
 	if opts.InitialPod >= 0 && opts.InitialPod < len(m.snap.Pods) {
 		m.selName = m.snap.Pods[opts.InitialPod].Key()
 	} else if len(m.snap.Pods) > 0 {
@@ -142,6 +148,7 @@ func (m Model) waitData() tea.Cmd {
 
 func (m *Model) reload() {
 	m.snap = m.src.Snapshot()
+	m.loadSecurity()
 	m.nsCursor = max(0, min(m.nsCursor, len(m.snap.Namespaces)-1))
 	m.depCursor = max(0, min(m.depCursor, len(m.snap.Deployments)-1))
 	pods := m.visiblePods()
@@ -170,6 +177,7 @@ func (m *Model) heatCols() int {
 }
 
 func (m *Model) refresh() {
+	m.refreshSecurity()
 	name := m.activeName()
 	m.metrics = m.src.Metrics(m.clock.T, name, m.heatCols())
 	var logs []data.LogLine

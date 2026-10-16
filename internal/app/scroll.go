@@ -49,6 +49,8 @@ func (m Model) pageSize() int {
 
 func (m Model) scrollTotal() int {
 	switch m.tab {
+	case ui.TabSecurity:
+		return len(m.securityView.Rows)
 	case ui.TabLog:
 		return len(ui.LogRows(m.logs, ui.LogWidth(m.layout.Details.W), m.wrap))
 	case ui.TabConfig:

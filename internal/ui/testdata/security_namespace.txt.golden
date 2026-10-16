@@ -1,0 +1,44 @@
+╭───────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security            │
+│ ───────────────────────────────────────────────────────────── │
+│ ╭───────────────────────────────────────────────────────────╮ │
+│ │ S: pod | Namespace: bilibili-raffle                       │ │
+│ │ Coverage: complete in scope | pods evaluated 2/2          │ │
+│ │ No findings does not mean safe                            │ │
+│ │ Local checks only; not PSS compliance.                    │ │
+│ │ Pod bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz |       │ │
+│ │ complete in scope                                         │ │
+│ │ Observed 2026-10-16 12:00:00Z | UID                       │ │
+│ │ demo-bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz | RV 1 │ │
+│ │ [high] privileged | finding | container: init-permissions │ │
+│ │ Field: spec.initContainers[0].securityContext.privileged  │ │
+│ │ Evidence: true                                            │ │
+│ │ Privileged init container configured. Disable privileged  │ │
+│ │ mode                                                      │ │
+│ │ Source: demo fixture v1 | configuration observed          │ │
+│ │ [medium] imageLatest | finding | container: app           │ │
+│ │ Field: spec.containers[0].image                           │ │
+│ │ Evidence: latest tag without digest                       │ │
+│ │ Image reference is mutable. Pin a verified digest         │ │
+│ │ Source: demo fixture v1 | configuration observed          │ │
+│ │ [medium] limit-memory | finding | container: app          │ │
+│ │ Field: spec.containers[0].resources.limits.memory         │ │
+│ │ Evidence: absent at container and pod levels              │ │
+│ │ Availability risk. Set a suitable memory limit            │ │
+│ │ Source: demo fixture v1 | configuration observed          │ │
+│ │ Pod bilibili-raffle/bilibili-raffle-5d8f9c7b4-x2kqp |     │ │
+│ │ complete in scope                                         │ │
+│ │ Observed 2026-10-16 12:00:00Z | UID                       │ │
+│ │ demo-bilibili-raffle/bilibili-raffle-5d8f9c7b4-x2kqp |    │ │
+│ │ RV 1                                                      │ │
+│ │ [info] runAsRoot | unknown | container: app               │ │
+│ │ Field: spec.containers[0].securityContext.runAsUser       │ │
+│ │ Evidence: UID unspecified; runtime user unknown           │ │
+│ │ Image user is not inspected. Require a non-root user      │ │
+│ │ Source: demo fixture v1 | runtime unknown                 │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ ╰───────────────────────────────────────────────────────────╯ │
+╰───────────────────────────────────────────────────────────────╯

@@ -17,16 +17,16 @@
                                                                                                                                                                 
                                    ╭─ Help ────────────────────────────────────────────────────────────────────────────────╮                                    
                                    │                                                                                       │                                    
-                                   │  ↑/↓ k/j    move selection                 f          toggle follow (Log)             │                                    
-                                   │  tab        next panel                     s          shell in pod                    │                                    
-                                   │  shift+tab  previous panel                 ctrl+d     delete pod                      │                                    
-                                   │  /          filter pods                    ctrl+k     switch context                  │                                    
-                                   │  enter      confirm / filter namespace     p          cycle palette                   │                                    
-                                   │  esc        leave filter / clear           1          toggle left column              │                                    
-                                   │  l c t d e  Log Config Top Describe Events ctrl+p     pause animations                │                                    
+                                   │  ↑/↓ k/j    move selection                 home/end   top / bottom                    │                                    
+                                   │  tab        next panel                     f          toggle follow (Log)             │                                    
+                                   │  shift+tab  previous panel                 s          shell in pod                    │                                    
+                                   │  /          filter pods                    ctrl+d     delete pod                      │                                    
+                                   │  enter      confirm / filter namespace     ctrl+k     switch context                  │                                    
+                                   │  esc        leave filter / clear           p          cycle palette                   │                                    
+                                   │  l c t d e  Log Config Top Describe Events 1          toggle left column              │                                    
+                                   │  S          Security / namespace posture   ctrl+p     pause animations                │                                    
                                    │  [ ]        previous / next tab            ?          toggle help                     │                                    
                                    │  pgup/pgdn  scroll viewport                q ctrl+c   quit                            │                                    
-                                   │  home/end   top / bottom                                                              │                                    
                                    │                                                                                       │                                    
                                    ╰───────────────────────────────────────────────────────────────────────────────────────╯                                    
                                                                                                                                                                 
