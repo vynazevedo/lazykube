@@ -44,3 +44,18 @@ func TestInventoryDiscardedTailIsCollectable(t *testing.T) {
 		})
 	}
 }
+
+func TestInventoryBudgetChangeWithoutResourceVersion(t *testing.T) {
+	inventory := NewInventory(&observationClock{now: time.Unix(1000, 0)})
+	pod := observationFixture("uid", "same")
+	source := SourceIdentity{SessionID: "test"}
+	inventory.Publish(source, "", false, []PodObservation{pod}, Coverage{State: CoverageComplete})
+	previous := inventory.Observations(Cursor{})
+	pod.Containers = nil
+	pod.Omissions.Containers = 1
+	inventory.Publish(source, "", false, []PodObservation{pod}, Coverage{State: CoveragePartial})
+	next := inventory.Observations(previous.Cursor)
+	if next.Unchanged || len(next.Pods[0].Containers) != 0 || next.Omissions.Containers != 1 {
+		t.Fatal("same RV retained evidence outside the new projection budget")
+	}
+}
