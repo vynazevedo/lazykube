@@ -1,0 +1,39 @@
+version: 2
+project_name: lazykube
+
+builds:
+  - id: lazykube
+    main: ./cmd/lazykube
+    binary: lazykube
+    env:
+      - CGO_ENABLED=0
+    goos: [linux, darwin, windows]
+    goarch: [amd64, arm64]
+    flags: [-trimpath]
+    ldflags:
+      - -s -w -X github.com/vynazevedo/lazykube/internal/ui.Version={{ if .IsSnapshot }}{{ .Version }}{{ else }}{{ .Tag }}{{ end }}
+
+archives:
+  - formats: [tar.gz]
+    name_template: 'lazykube_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
+    format_overrides:
+      - goos: windows
+        formats: [zip]
+    files:
+      - README.md
+
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
+
+snapshot:
+  version_template: '{{ .Version }}-next'
+
+changelog:
+  sort: asc
+
+release:
+  github:
+    owner: vynazevedo
+    name: lazykube
+  prerelease: auto

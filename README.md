@@ -18,7 +18,6 @@
 ```
 
 [![CI](https://github.com/vynazevedo/lazykube/actions/workflows/ci.yaml/badge.svg)](https://github.com/vynazevedo/lazykube/actions/workflows/ci.yaml)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/vynazevedo/lazykube?style=social)](https://github.com/vynazevedo/lazykube/stargazers)
 
 [![Go](https://img.shields.io/badge/Go-1.26-00ADD8?style=for-the-badge&logo=go&logoColor=white)](https://go.dev/)
@@ -49,7 +48,7 @@ elegância quando falta permissão ou metrics-server.
  ║                 O F  C O N T E N T S                  ║
  ╠═══════════════════════════════════════════════════════╣
  ║                                                       ║
- ║  [0x01] .... Quick Install                            ║
+ ║  [0x01] .... Instalação                            ║
  ║  [0x02] .... Uso                                      ║
  ║  [0x03] .... Layout                                   ║
  ║  [0x04] .... Atalhos                                  ║
@@ -63,22 +62,112 @@ elegância quando falta permissão ou metrics-server.
 
 ---
 
-## `[0x01]` Quick Install
+## `[0x01]` Instalação
 
-Requer Go 1.26+ e um kubeconfig válido.
+Baixe o instalador completo para um arquivo temporário e execute somente
+se o download terminar com sucesso. Ele instala a última release após
+verificar o SHA-256:
+
+```bash
+(
+  set -euo pipefail
+  instalador=$(mktemp)
+  trap 'rm -f "$instalador"' EXIT
+  curl -fsSL https://raw.githubusercontent.com/vynazevedo/lazykube/main/install.sh -o "$instalador"
+  bash "$instalador"
+)
+```
+
+Alternativa com execução pelo pipe, em Bash. `pipefail` propaga falhas do
+download; prefira o arquivo temporário para aguardar o download completo:
+
+```bash
+(
+  set -o pipefail
+  curl -fsSL https://raw.githubusercontent.com/vynazevedo/lazykube/main/install.sh | bash
+)
+```
+
+Compatível com Linux, macOS e Windows via Git Bash, MSYS ou Cygwin, nas
+arquiteturas amd64 e arm64. Não requer Go. O instalador usa `curl` ou `wget`,
+`sha256sum` ou `shasum`, `tar` no Linux/macOS e `unzip` no Windows.
+
+Por padrão, instala em `/usr/local/bin` quando há permissão de escrita ou
+em `~/.local/bin` caso contrário. Não executa `sudo`. Para escolher a versão
+e o destino (substitua `vX.Y.Z` por uma tag publicada):
+
+```bash
+(
+  set -euo pipefail
+  instalador=$(mktemp)
+  trap 'rm -f "$instalador"' EXIT
+  curl -fsSL https://raw.githubusercontent.com/vynazevedo/lazykube/main/install.sh -o "$instalador"
+  VERSION=vX.Y.Z INSTALL_DIR="$HOME/.local/bin" bash "$instalador"
+)
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+Alternativa com wget:
+
+```bash
+(
+  set -euo pipefail
+  instalador=$(mktemp)
+  trap 'rm -f "$instalador"' EXIT
+  wget -qO "$instalador" https://raw.githubusercontent.com/vynazevedo/lazykube/main/install.sh
+  bash "$instalador"
+)
+```
+
+### Download manual
+
+Na [página de releases](https://github.com/vynazevedo/lazykube/releases/latest),
+baixe `checksums.txt` e o arquivo correspondente. `X.Y.Z` representa a versão
+sem o prefixo `v`.
+
+| Plataforma | amd64 (Intel/AMD) | arm64 (Apple Silicon/ARM) |
+| --- | --- | --- |
+| Linux | `lazykube_X.Y.Z_linux_amd64.tar.gz` | `lazykube_X.Y.Z_linux_arm64.tar.gz` |
+| macOS | `lazykube_X.Y.Z_darwin_amd64.tar.gz` | `lazykube_X.Y.Z_darwin_arm64.tar.gz` |
+| Windows | `lazykube_X.Y.Z_windows_amd64.zip` | `lazykube_X.Y.Z_windows_arm64.zip` |
+
+Antes de extrair, confira somente a linha do arquivo baixado:
+
+```bash
+arquivo=lazykube_X.Y.Z_linux_amd64.tar.gz
+awk -v nome="$arquivo" '$2 == nome {print}' checksums.txt > checksum-selecionado.txt
+test "$(wc -l < checksum-selecionado.txt)" -eq 1
+sha256sum -c checksum-selecionado.txt
+```
+
+No macOS, use `shasum -a 256 -c checksum-selecionado.txt` no lugar de
+`sha256sum -c checksum-selecionado.txt`.
+
+Prossiga apenas se a verificação terminar com sucesso (`OK`). Extraia com
+`tar -xzf "$arquivo"` (Linux/macOS) ou `unzip "$arquivo"` (Git Bash) e copie
+`lazykube` ou `lazykube.exe` para um diretório no `PATH`. No PowerShell,
+compare `(Get-FileHash .\lazykube_X.Y.Z_windows_amd64.zip -Algorithm SHA256).Hash`
+com a entrada correspondente em `checksums.txt` antes de usar `Expand-Archive`.
+
+### Compilar a partir do código
+
+Requer Go 1.26 ou superior:
 
 ```bash
 git clone https://github.com/vynazevedo/lazykube.git
 cd lazykube
 go build -o lazykube ./cmd/lazykube
-sudo install -m 0755 lazykube /usr/local/bin/lazykube
+mkdir -p "$HOME/.local/bin"
+cp lazykube "$HOME/.local/bin/"
 ```
 
-Para ver a interface sem cluster nenhum, use o modo demo:
+Para ver a interface sem acessar nenhum cluster:
 
 ```bash
-lazykube --demo
+lazykube --demo --no-anim
 ```
+
+O uso com um cluster requer um kubeconfig válido.
 
 ---
 
@@ -254,7 +343,7 @@ necessário. Para atualizar os goldens após uma mudança visual intencional:
 
 ```
  ┌──────────────────────────────────────────────────────────────┐
- │   Fork do TNK-Studio/lazykube, reescrito com Bubble Tea v2.  │
+ │           Interface construída com Bubble Tea v2.           │
  └──────────────────────────────────────────────────────────────┘
 ```
 
