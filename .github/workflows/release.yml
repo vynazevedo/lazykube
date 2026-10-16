@@ -28,7 +28,7 @@ jobs:
       - name: Cross build
         env:
           CGO_ENABLED: "0"
-          LDFLAGS: "-s -w -X github.com/TNK-Studio/lazykube/pkg/app.Version=${{ github.ref_name }}"
+          LDFLAGS: "-s -w -X github.com/vynazevedo/lazykube/internal/ui.Version=${{ github.ref_name }}"
         run: |
           goxz -n lazykube -pv "${{ github.ref_name }}" -os darwin,linux,windows -arch amd64,arm64 -d dist -build-ldflags "$LDFLAGS" ./cmd/lazykube
           goxz -n lazykube -pv "${{ github.ref_name }}" -os linux -arch 386,arm -d dist -build-ldflags "$LDFLAGS" ./cmd/lazykube

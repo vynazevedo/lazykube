@@ -8,7 +8,7 @@ import (
 	"github.com/vynazevedo/lazykube/internal/theme"
 )
 
-const Version = "v2.0"
+var Version = "v2.0"
 
 type HeaderState struct {
 	Synthetic      bool
