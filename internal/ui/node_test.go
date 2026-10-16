@@ -28,6 +28,43 @@ func cpuRow(t *testing.T, rows []string) int {
 	return 0
 }
 
+func memRow(t *testing.T, rows []string) int {
+	t.Helper()
+	for i, r := range rows {
+		if strings.Contains(r, "mem ") {
+			return i
+		}
+	}
+	t.Fatal("node panel has no mem line")
+	return 0
+}
+
+func TestNodePanelUnknownMemory(t *testing.T) {
+	for _, w := range []int{36, 40, 54} {
+		known := data.Node{Name: "node-a", Ready: true, MemUsed: "1.0Gi", MemTotal: "4.0Gi", MemFraction: 0.25, Coverage: data.Coverage{State: data.CoverageComplete}}
+		rows := nodePanelRows(NodeState{Node: known, CPU: 25, CPUKnown: true, MemFrac: 0.25}, w)
+		if i := memRow(t, rows); !strings.Contains(rows[i+1], "█") {
+			t.Fatalf("width %d: measured memory keeps its bar", w)
+		}
+		for _, n := range []data.Node{
+			{Name: "node-a", Ready: true, MemUsed: "n/a", MemTotal: "4.0Gi", Coverage: data.Coverage{State: data.CoverageComplete}},
+			{Name: "node-a", Ready: true, MemUsed: "n/a", MemTotal: "n/a", Coverage: data.Coverage{State: data.CoverageDenied}},
+			{Name: "node-a", Ready: true, MemTotal: "4.0Gi", Coverage: data.Coverage{State: data.CoverageComplete}},
+		} {
+			for _, frac := range []float64{0, 0.4} {
+				rows := nodePanelRows(NodeState{Node: n, CPU: 25, CPUKnown: true, MemFrac: frac}, w)
+				i := memRow(t, rows)
+				if !strings.Contains(rows[i], "n/a") {
+					t.Fatalf("width %d: unknown memory must read as n/a, got %q", w, rows[i])
+				}
+				if strings.Contains(rows[i+1], "█") {
+					t.Fatalf("width %d %q: unknown memory must not draw the bar track", w, n.MemUsed)
+				}
+			}
+		}
+	}
+}
+
 func TestNodePanelUnknownCPU(t *testing.T) {
 	node := data.Node{Name: "node-a", Ready: true, MemUsed: "1Gi", MemTotal: "4Gi", Coverage: data.Coverage{State: data.CoverageComplete}}
 	for _, w := range []int{36, 40, 54} {

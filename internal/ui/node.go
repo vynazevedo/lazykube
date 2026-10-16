@@ -141,11 +141,7 @@ func NodePanel(r draw.Region, st NodeState, ctx Ctx) {
 		{colored("●", ctx.Pulse(readyColor)), colored(" "+ready, readyColor)},
 		nodeCPULine(w, st),
 		nil,
-		draw.Fit(w,
-			draw.Line{muted("mem "), text(n.MemUsed + " / " + n.MemTotal)},
-			draw.Line{muted("mem "), text(n.MemUsed + "/" + n.MemTotal)},
-			draw.Line{muted("mem "), text(trimUnit(n.MemUsed) + "/" + n.MemTotal)},
-		),
+		nodeMemLine(w, n),
 		nil,
 		draw.Fit(w,
 			draw.Line{muted("pods "), text(fmt.Sprintf("%d / %d", n.Pods, n.PodCapacity))},
@@ -159,7 +155,28 @@ func NodePanel(r draw.Region, st NodeState, ctx Ctx) {
 	if st.CPUKnown {
 		Bar(info, 0, 3, w, st.CPUFrac, ctx.Pal.C, ctx.Pal.B)
 	}
-	Bar(info, 0, 5, w, st.MemFrac, ctx.Pal.B, ctx.Pal.A)
+	if nodeMemKnown(n) {
+		Bar(info, 0, 5, w, st.MemFrac, ctx.Pal.B, ctx.Pal.A)
+	}
+}
+
+func nodeMemKnown(n data.Node) bool {
+	if n.Coverage.State != "" && n.Coverage.State != data.CoverageComplete {
+		return false
+	}
+	return n.MemUsed != "" && n.MemUsed != "n/a"
+}
+
+func nodeMemLine(w int, n data.Node) draw.Line {
+	used := n.MemUsed
+	if !nodeMemKnown(n) {
+		used = "n/a"
+	}
+	return draw.Fit(w,
+		draw.Line{muted("mem "), text(used + " / " + n.MemTotal)},
+		draw.Line{muted("mem "), text(used + "/" + n.MemTotal)},
+		draw.Line{muted("mem "), text(trimUnit(used) + "/" + n.MemTotal)},
+	)
 }
 
 func nodeCPULine(w int, st NodeState) draw.Line {

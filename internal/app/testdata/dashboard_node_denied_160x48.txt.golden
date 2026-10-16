@@ -8,7 +8,7 @@
  │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu indisp.  │ │   NAME          NAMESPACE    RST   SEC CPU/STATUS  │ │   bilibili-raffle · Running · ready 2/2 · node demo-node-01 … │ 
  │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                │ │ ● bilibili-raf… bilibili-r…    0  75 C █░░░░░░     │ │                                                               │ 
  │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem n/a / n/a│ │ ● bilibili-liv… bilibili-r…    2  20 F ████░░░     │ │ CPU 11m req 10m · lim 50m            streamline · braille 2×4 │ 
- │    ▀    ▀▀▀▀▀▀▀▀▀    █████████████│ │ ● lgo-7c5d9758… lgo            0  20 F ██░░░░░     │ │  20m │                                                        │ 
+ │    ▀    ▀▀▀▀▀▀▀▀▀                 │ │ ● lgo-7c5d9758… lgo            0  20 F ██░░░░░     │ │  20m │                                                        │ 
  │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13 / 0  │ │ ● psql-6bc7744… ys-odoo        0 100 A ████░░░     │ │      │                                 ⢠                      │ 
  │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch -       │ │ ● odoo-7575bf6… ys-odoo        1  75 C ██████░     │ │  15m │────────────────⢀───────────────⢠⣿⡄──────────────────── │ 
  │    ▀ ▀  ▀▀▀▀▀▀▀▀▀                 │ │ ○ qiandao-1605… xcx            0  20 F Completed   │ │      │  ⡀  ⢀ ⣰⡄⣠⣦⣤⣤⣄ ⣠⣿⡄            ⢀ ⣾⣿⣗⣦⣄⡀⢀⣄⣴⡀  request 10m │ 
