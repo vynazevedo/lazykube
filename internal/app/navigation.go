@@ -76,6 +76,7 @@ func (m *Model) navigate(to Route) bool {
 	}
 	m.relayout()
 	m.syncSelection()
+	m.depCursor = max(0, min(m.depCursor, len(m.visibleDeployments())-1))
 	return true
 }
 

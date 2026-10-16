@@ -21,7 +21,7 @@
  │ ● svclb-traefik-8c2f1-6n2vb              │                                                                      │                                          │ 
  │                                          │  deployment não observado neste escopo:                              │──────────╮ ╭───────────────────────────╮ │ 
  │                                          │  bilibili-raffle/bilibili-live                                       │8Mi       │ │ Net ↓3.0 kB/s ↑4.6 kB/s   │ │ 
- │                                          │                                                                      │█████████ │ │ ▇▅▂█▃▃█▃▄▅▃▆▅▄▅▂▃▆▁▆▆▄▆▁▃ │ │ 
+ │                                          │  Cobertura      complete in scope                                    │█████████ │ │ ▇▅▂█▃▃█▃▄▅▃▆▅▄▅▂▃▆▁▆▆▄▆▁▃ │ │ 
  │                                          │  nenhum outro deployment foi selecionado                             │▇▆▅▅▆▅▆▅▄ │ │ ▃▆▃▇▂▇▄▇▂▆▃▂▁▅▆▄▆▅▄▃▇▃█▃▆ │ │ 
  │                                          │                                                                      │──────────╯ ╰───────────────────────────╯ │ 
  │                                          │  enter / esc fechar                                                  │                                          │ 

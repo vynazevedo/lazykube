@@ -51,6 +51,7 @@ func DeploymentOverlay(screen draw.Region, st DeploymentOverlayState, ctx Ctx) {
 	if d == nil {
 		line(1, draw.Line{colored("deployment não observado neste escopo:", theme.Warn)})
 		line(2, draw.Line{text(draw.Sanitize(st.Key))})
+		line(3, draw.Line{muted("Cobertura      "), text(draw.Sanitize(coverageText(st.Coverage)))})
 		line(4, draw.Line{muted("nenhum outro deployment foi selecionado")})
 		line(inner.H-1, draw.Line{faint("enter / esc fechar")})
 		return

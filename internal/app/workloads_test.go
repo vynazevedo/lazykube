@@ -2,11 +2,17 @@ package app
 
 import (
 	"fmt"
+	"go/ast"
+	"go/parser"
+	"go/token"
+	"os"
 	"strings"
 	"testing"
 
 	tea "charm.land/bubbletea/v2"
 
+	"github.com/vynazevedo/lazykube/internal/draw"
+	"github.com/vynazevedo/lazykube/internal/theme"
 	"github.com/vynazevedo/lazykube/internal/ui"
 )
 
@@ -275,4 +281,107 @@ func TestWorkloadsGoldens(t *testing.T) {
 	src.goneDep = m.dep.key
 	next, _ := m.Update(dataMsg{})
 	golden(t, "deployment_missing_160x48.txt", next.(Model).Render().Plain())
+}
+
+func TestWorkloadsScopeClampsDeploymentCursor(t *testing.T) {
+	m := press(t, demoModel(t, 160, 48), "tab", "tab", "tab")
+	if m.focus != FocusDeployments {
+		t.Fatalf("setup focus %d", m.focus)
+	}
+	m = press(t, m, "G", "j", "j", "j", "j", "j", "j", "j", "j", "j")
+	high := m.depCursor
+	if high != len(m.snap.Deployments)-1 {
+		t.Fatalf("setup cursor %d", high)
+	}
+	m = press(t, navNamespace(t, m), "3", "tab")
+	deps := m.visibleDeployments()
+	if m.focus != FocusDeployments || len(deps) == 0 || len(deps) > high {
+		t.Fatalf("setup scope: focus %d deployments %d", m.focus, len(deps))
+	}
+	if m.depCursor < 0 || m.depCursor >= len(deps) {
+		t.Fatalf("entering the scope must clamp the cursor, got %d of %d", m.depCursor, len(deps))
+	}
+	m = press(t, m, "enter")
+	if !m.dep.open || m.dep.key != deploymentKey(deps[m.depCursor]) {
+		t.Fatalf("enter right after the navigation opens a visible deployment, got %+v", m.dep)
+	}
+	m = press(t, m, "esc", "esc", "esc", "esc")
+	if m.nav.Depth() != 0 || m.depCursor != high {
+		t.Fatalf("the return frame keeps the dashboard cursor, depth %d cursor %d want %d", m.nav.Depth(), m.depCursor, high)
+	}
+}
+
+func podsLiterals(t *testing.T) []string {
+	t.Helper()
+	fset := token.NewFileSet()
+	entries, err := os.ReadDir(".")
+	if err != nil {
+		t.Fatal(err)
+	}
+	var out []string
+	for _, e := range entries {
+		name := e.Name()
+		if e.IsDir() || !strings.HasSuffix(name, ".go") || strings.HasSuffix(name, "_test.go") {
+			continue
+		}
+		f, err := parser.ParseFile(fset, name, nil, 0)
+		if err != nil {
+			t.Fatal(err)
+		}
+		ast.Inspect(f, func(n ast.Node) bool {
+			lit, ok := n.(*ast.CompositeLit)
+			if !ok {
+				return true
+			}
+			if sel, ok := lit.Type.(*ast.SelectorExpr); ok && sel.Sel.Name == "PodsState" {
+				out = append(out, fmt.Sprintf("%s:%d", name, fset.Position(lit.Pos()).Line))
+			}
+			return true
+		})
+	}
+	return out
+}
+
+func renderPods(m Model, r Rect) string {
+	c := draw.NewCanvas(r.W, r.H, theme.BgApp)
+	ui.PodsPanel(c.Region(), m.podsPanelState(m.visiblePods()), ui.Ctx{Pal: m.pal, Clock: m.clock})
+	return c.String()
+}
+
+func cropRect(c *draw.Canvas, r Rect) string {
+	out := draw.NewCanvas(r.W, r.H, theme.BgApp)
+	for y := range r.H {
+		for x := range r.W {
+			cell := c.At(r.X+x, r.Y+y)
+			out.Region().Sub(x, y, 1, 1).Put(0, 0, cell.Rune, draw.Fg(cell.Fg).WithBg(cell.Bg))
+		}
+	}
+	return out.Plain()
+}
+
+func TestPodsStateHasSingleConstructor(t *testing.T) {
+	if lits := podsLiterals(t); len(lits) != 1 {
+		t.Fatalf("ui.PodsState must be built in one place, found %v", lits)
+	}
+	dash := press(t, demoModel(t, 160, 48), "/", "o", "enter", "j")
+	next, _ := dash.Update(tea.MouseMotionMsg{X: dash.layout.Pods.X + 5, Y: dash.layout.Pods.Y + 1 + ui.PodsRowsTop})
+	dash = next.(Model)
+	work := press(t, dash, "3")
+	if dash.podsPanelState(dash.visiblePods()).Selected != work.podsPanelState(work.visiblePods()).Selected {
+		t.Fatal("both screens select the same pod")
+	}
+	for _, c := range []struct {
+		name string
+		m    Model
+	}{{"dashboard", dash}, {"workloads", work}} {
+		want := draw.NewCanvas(c.m.layout.Pods.W, c.m.layout.Pods.H, theme.BgApp)
+		ui.PodsPanel(want.Region(), c.m.podsPanelState(c.m.visiblePods()), ui.Ctx{Pal: c.m.pal, Clock: c.m.clock})
+		if got := cropRect(c.m.Render(), c.m.layout.Pods); got != want.Plain() {
+			t.Fatalf("%s pods panel must come from the shared constructor", c.name)
+		}
+	}
+	same := Rect{W: 60, H: 20}
+	if renderPods(dash, same) != renderPods(work, same) {
+		t.Fatal("dashboard and workloads build the same pods state")
+	}
 }
