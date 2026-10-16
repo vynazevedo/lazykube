@@ -5,6 +5,7 @@ go 1.26.0
 require (
 	charm.land/bubbles/v2 v2.2.1
 	charm.land/bubbletea/v2 v2.1.0
+	github.com/charmbracelet/harmonica v0.2.0
 	github.com/go-logr/logr v1.4.4
 	github.com/gookit/color v1.3.2
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
@@ -22,6 +23,7 @@ require (
 	k8s.io/klog/v2 v2.140.0
 	k8s.io/kubectl v0.36.5
 	k8s.io/metrics v0.36.5
+	sigs.k8s.io/yaml v1.6.0
 )
 
 require (
@@ -104,5 +106,4 @@ require (
 	sigs.k8s.io/kustomize/kyaml v0.21.1 // indirect
 	sigs.k8s.io/randfill v1.0.0 // indirect
 	sigs.k8s.io/structured-merge-diff/v6 v6.3.3 // indirect
-	sigs.k8s.io/yaml v1.6.0 // indirect
 )
