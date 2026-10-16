@@ -24,6 +24,7 @@ import (
 	metricsclient "k8s.io/metrics/pkg/client/clientset/versioned"
 
 	"github.com/vynazevedo/lazykube/internal/data"
+	"github.com/vynazevedo/lazykube/internal/insight"
 )
 
 const (
@@ -54,6 +55,8 @@ type caps struct {
 }
 
 type Source struct {
+	observations       *insight.Inventory
+	observationPods    map[string]insight.PodObservation
 	securityObjects    map[string]*corev1.Pod
 	security           data.SecuritySnapshot
 	generation         uint64
@@ -116,6 +119,8 @@ func newSource(client kubernetes.Interface, mc metricsclient.Interface, opts Opt
 	ctx, cancel := context.WithCancel(context.Background())
 	s := &Source{
 		generation:         securityGeneration.Add(1),
+		observations:       insight.NewInventory(insight.ClockFunc(opts.Now)),
+		observationPods:    make(map[string]insight.PodObservation),
 		podCoverage:        data.Coverage{State: data.CoverageCollecting},
 		deploymentCoverage: data.Coverage{State: data.CoverageCollecting},
 
@@ -133,6 +138,7 @@ func newSource(client kubernetes.Interface, mc metricsclient.Interface, opts Opt
 		usage:      newUsage(),
 		netTimeout: requestTimeout,
 	}
+	s.publishObservations(nil)
 	if client != nil {
 		s.rest = client.CoreV1().RESTClient()
 		s.version = client.Discovery()
@@ -533,6 +539,7 @@ func (s *Source) rebuild() {
 	snap.DeploymentCoverage = s.deploymentCoverage
 	s.snap = snap
 	s.byKey = byKey
+	s.publishObservations(pods)
 	s.usage.noteEligibility(pods)
 	s.nodes = nodes
 	s.nodeList = nodeList
