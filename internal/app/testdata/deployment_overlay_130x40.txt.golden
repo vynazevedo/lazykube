@@ -1,0 +1,40 @@
+ lazykube [DEMO]  v2.0   ◎ context demo   k8s demo  nodes 1  ns 8  pods 13  uptime 119d                ⠙ metrics every 5s ● live  
+  2 Dashboard  | [3 Workloads]                                                                                            m menu  
+ Workloads                                                                                                                        
+ ╭─ Pods ─────────────────────────────────────────────────────────────╮ ╭─ Preview ─────────────────────────────────────────────╮ 
+ │                                                                    │ │  Log   Config   Top   Describe   Events   Security    │ 
+ │ / filter pods…                                            13 items │ │ ───────────────────────────────────────────────────── │ 
+ │                                                                    │ │ ● bilibili-live-7f6b8d9c5-mn4tz             [Running] │ 
+ │   NAME                          NAMESPACE    RST   SEC CPU/STATUS  │ │   bilibili-raffle · Running · ready 2/2 · node demo-… │ 
+ │ ● bilibili-raffle-5d8f9c7b4-x2… bilibili-r…    0  75 C █░░░░░░     │ │                                                       │ 
+ │ ● bilibili-live-7f6b8d9c5-mn4tz bilibili-r…    2  20 F ████░░░     │ │ CPU 11m req 10m · lim 50m    streamline · braille 2×4 │ 
+ │ ● lgo-7c5d97584-hq8wd           lgo            0  20 F ██░░░░░     │ │  20m │                                                │ 
+ │ ● psql-6bc7744f9-r7zlc          ys-odoo        0 100 A ████░░░     │ │      │                            ⢠                   │ 
+ │ ● odoo-7575bf6d8-9wjvk          ys-odoo        1  75 C ██████░     │ │  15m │──────────────⡀────────────⢠⣿⡄───────────────── │ 
+ │ ○ qiandao-1605400800-k8f2m      xcx            0  20 F Completed   │ │      │ ⢀  ⢀ ⣰⣀⣰⣤⣤⣄⢀⢴⣧           ⡀⣸⣿⣗⣦⣀ ⣄⣰⡀request 10m │ 
+ │ ○ lingqu-1605486000-4tq8n ╭─ Deployment bilibili-raffle/bilibili-raffle ─────────────────────────╮╌⢀⣾⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧╌⡀╌╌╌╌⢠⣀⣼⣿● │ 
+ │ ⠙ lingqu-1605489600-b7xsd │                                                                      │⣄⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⣿⣄⢤⣤⣄⣼⣿⣿⣿⣿ │ 
+ │ ● coredns-6799fbcd5-w9t4p │  Namespace      bilibili-raffle                                      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● metrics-server-67c658944│  Nome           bilibili-raffle                                      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● traefik-f4564c4f4-zq7rn │  Ready/Desired  1/1                                                  │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● local-path-provisioner-8│  Cobertura      complete in scope                                    │────────────────────────── │ 
+ │ ● svclb-traefik-8c2f1-6n2v│                                                                      │                           │ 
+ │                           │  Sem relação inferida com pods; owners dependem de contrato futuro.  │╭────────────────────────╮ │ 
+ │                           │  enter / esc fechar                                                  ││ Net ↓7.1 kB/s ↑2.7 kB… │ │ 
+ │                           │                                                                      ││ ▁▃▅▄▇▆█▄█▆▆▃██▄▂▇▄█▄▇▆ │ │ 
+ ╰───────────────────────────╰──────────────────────────────────────────────────────────────────────╯│ ▃▆▁▃▆▇▅▅█▆▅▆▄▅▅▂▂▇▂▇▄▄ │ │ 
+ ╭─ Deployments ──────────────────────────────────────────────────────╮ │ ╰────────────────────────╯ ╰────────────────────────╯ │ 
+ │                                                                    │ │                                                       │ 
+ │ bilibili-raffle/bilibili-live                                ● 1/1 │ │ ╭ logs · tail -f ──────────────────────── viewport ─╮ │ 
+ │ bilibili-raffle/bilibili-raffle                              ● 1/1 │ │ │ 20:14:27  ERROR join raffle failed id=883117: al… │ │ 
+ │ ys-odoo/psql                                                 ● 1/1 │ │ │ 20:14:30  INFO  reconnecting ws in 1s             │ │ 
+ │ ys-odoo/odoo                                                 ● 1/1 │ │ │ 20:14:33  INFO  ws connected room=21452505 shard… │ │ 
+ │ lgo/lgo                                                      ● 1/1 │ │ │ 20:14:36  INFO  ws connected room=21452505 shard… │ │ 
+ │ kube-system/coredns                                          ● 1/1 │ │ │ 20:14:39  DEBUG heartbeat ok rtt=42ms             │ │ 
+ │ kube-system/metrics-server                                   ● 1/1 │ │ │ 20:14:42  INFO  danmaku batch received count=38   │ │ 
+ │ kube-system/traefik                                          ● 1/1 │ │ │ 20:14:45  INFO  raffle detected id=883104 type=g… │ │ 
+ │                                                                    │ │ │ 20:14:48  INFO  join raffle ok id=883104 latency… │ │ 
+ │                                                                    │ │ ╰───────────────────────────────────────────────────╯ │ 
+ ╰────────────────────────────────────────────────────────────────────╯ ╰───────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  enter esc  close   q  quit                                                                                    bubbletea · 0 fps 

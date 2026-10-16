@@ -41,6 +41,7 @@ type KeyMap struct {
 	MenuPrev    key.Binding
 	MenuNext    key.Binding
 	Dashboard   key.Binding
+	Workloads   key.Binding
 }
 
 func DefaultKeyMap() KeyMap {
@@ -86,6 +87,7 @@ func DefaultKeyMap() KeyMap {
 		MenuPrev:    b("←", "previous screen in menu", "left"),
 		MenuNext:    b("→", "next screen in menu", "right"),
 		Dashboard:   b("2", "Dashboard screen", "2"),
+		Workloads:   b("3", "Workloads screen", "3"),
 	}
 }
 
@@ -96,6 +98,6 @@ func (k KeyMap) Bindings() []key.Binding {
 		k.TabPrev, k.TabNext, k.Container, k.Previous, k.SearchNext, k.SearchPrev, k.EventScope,
 		k.Palette, k.ToggleLeft, k.Pause, k.Help, k.Quit,
 		k.PageUp, k.PageDown, k.Home, k.End, k.Follow, k.Wrap, k.Top, k.Bottom,
-		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard,
+		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads,
 	}
 }

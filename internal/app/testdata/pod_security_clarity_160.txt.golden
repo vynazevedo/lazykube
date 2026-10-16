@@ -1,0 +1,48 @@
+ lazykube [DEMO]  v2.0   ◎ context demo   k8s demo  nodes 1  ns 8  pods 13  uptime 119d                                              ⠙ metrics every 5s ● live  
+ [2 Dashboard] |  3 Workloads                                                                                                                           m menu  
+ Dashboard > lgo-7c5d97584-hq8wd                                                                                                                                
+ ╭─ Pod lgo/lgo-7c5d97584-hq8wd ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ │  Log   Config   Top   Describe   Events   Security                                                                                                         │ 
+ │ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── │ 
+ │ ╭────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮ │ 
+ │ │ S: pod | Namespace: lgo                                                                                                                                │ │ 
+ │ │ Dashboard coverage: complete in scope | pods 13/13                                                                                                     │ │ 
+ │ │ No findings does not mean safe                                                                                                                         │ │ 
+ │ │ Local checks only; not PSS compliance.                                                                                                                 │ │ 
+ │ │ Security /100: Pod 20 F | Namespace 20 F | Cluster 55 E                                                                                                │ │ 
+ │ │ Hygiene /100: Pod 100 A | Namespace 100 A | Cluster 97 A                                                                                               │ │ 
+ │ │ Namespace mean (1 pods) | Cluster mean (13 pods)                                                                                                       │ │ 
+ │ │ Selected pod security: 20/100 (F) | 1/1 pod                                                                                                            │ │ 
+ │ │ Synthetic data (demo)                                                                                                                                  │ │ 
+ │ │ Pod lgo/lgo-7c5d97584-hq8wd | complete in scope                                                                                                        │ │ 
+ │ │ Observed 2026-10-16 12:00:00Z | UID demo-lgo/lgo-7c5d97584-hq8wd | RV 1                                                                                │ │ 
+ │ │ HIGH findings                                                                                                                                          │ │ 
+ │ │ [high] hostNetwork | finding | container: pod                                                                                                          │ │ 
+ │ │ Field: spec.hostNetwork                                                                                                                                │ │ 
+ │ │ Evidence: true                                                                                                                                         │ │ 
+ │ │ Shares host networking. Disable host network unless required                                                                                           │ │ 
+ │ │ Source: demo fixture v4 | configuration observed                                                                                                       │ │ 
+ │ │ [high] capabilitiesAdded | finding | container: debugger                                                                                               │ │ 
+ │ │ Field: spec.ephemeralContainers[0].securityContext.capabilities.add                                                                                    │ │ 
+ │ │ Evidence: SYS_ADMIN                                                                                                                                    │ │ 
+ │ │ Additional Linux capability configured. Remove unnecessary capabilities                                                                                │ │ 
+ │ │ Source: demo fixture v4 | configuration observed                                                                                                       │ │ 
+ │ │ POSTURE | Cluster | 55/100 (E) | 13/13 pods                                                                                                            │ │ 
+ │ │ Score ████████████████████░░░░░░░░░░░░░░░░                                                                                                             │ │ 
+ │ │ SEC column: Security; p = partial. Hygiene scored separately.                                                                                          │ │ 
+ │ │ Security mean 55 | median 75 | worst decile 20                                                                                                         │ │ 
+ │ │ A    3 ██████░░░░░░░░░░░░░░░░░░                                                                                                                        │ │ 
+ │ │ B    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                                                                                                        │ │ 
+ │ │ C    4 ███████░░░░░░░░░░░░░░░░░                                                                                                                        │ │ 
+ │ │ D    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                                                                                                        │ │ 
+ │ │ E    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                                                                                                        │ │ 
+ │ │ F    6 ███████████░░░░░░░░░░░░░                                                                                                                        │ │ 
+ │ │ Hygiene mean 97 | median 100 | worst decile 88                                                                                                         │ │ 
+ │ │ A   10 ██████████████████░░░░░░                                                                                                                        │ │ 
+ │ │ B    3 ██████░░░░░░░░░░░░░░░░░░                                                                                                                        │ │ 
+ │ │ C    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                                                                                                        │ │ 
+ │ │ D    0 ░░░░░░░░░░░░░░░░░░░░░░░░                                                                                                                        │ │ 
+ │ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │ 
+ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  esc  back   l c t d e  tabs   S  security   [ ]  tab   / n N  search   C  container   P  previous   m  menu   ?  help   q  quit             bubbletea · 0 fps 

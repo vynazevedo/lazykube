@@ -209,10 +209,13 @@ func TestMenuByKeyboard(t *testing.T) {
 	if !m.menu.open || !strings.Contains(m.Render().Plain(), "enter open") {
 		t.Fatal("m focuses the menu and shows its help")
 	}
-	for _, k := range []string{"right", "end", "left", "home", "j", "q", "l", "/"} {
-		m = press(t, m, k)
-		if !m.menu.open || m.menu.cursor != 0 || m.selName != sel || m.tab != ui.TabTop || m.filtering {
-			t.Fatalf("menu consumes %q without touching the content", k)
+	for _, step := range []struct {
+		key    string
+		cursor int
+	}{{"right", 1}, {"right", 1}, {"left", 0}, {"left", 0}, {"end", 1}, {"home", 0}, {"j", 0}, {"q", 0}, {"l", 0}, {"/", 0}} {
+		m = press(t, m, step.key)
+		if !m.menu.open || m.menu.cursor != step.cursor || m.selName != sel || m.tab != ui.TabTop || m.filtering {
+			t.Fatalf("menu consumes %q without touching the content, cursor %d", step.key, m.menu.cursor)
 		}
 	}
 	m = press(t, m, "esc")
@@ -332,6 +335,8 @@ type navSource struct {
 	current context.Context
 	wide    int
 	calls   int
+	goneDep string
+	partial bool
 }
 
 func newNavSource() *navSource {
@@ -343,6 +348,21 @@ func (s *navSource) Snapshot() data.Snapshot {
 	s.mu.Lock()
 	gone := s.gone
 	s.mu.Unlock()
+	s.mu.Lock()
+	goneDep, partial := s.goneDep, s.partial
+	s.mu.Unlock()
+	if goneDep != "" {
+		deps := snap.Deployments[:0:0]
+		for _, d := range snap.Deployments {
+			if deploymentKey(d) != goneDep {
+				deps = append(deps, d)
+			}
+		}
+		snap.Deployments = deps
+	}
+	if partial {
+		snap.DeploymentCoverage = data.Coverage{State: data.CoverageStale, Reason: "watch interrupted"}
+	}
 	if gone == "" {
 		return snap
 	}

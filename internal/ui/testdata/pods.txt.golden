@@ -2,18 +2,18 @@
 │                                                    │
 │ / filter pods…▌                           13 items │
 │                                                    │
-│   NAME          NAMESPACE    RST   AGE CPU/STATUS  │
-│ ● bilibili-raf… bilibili-r…    0  119d █░░░░░░     │
-│ ● bilibili-liv… bilibili-r…    2  119d ████░░░     │
-│ ● lgo-7c5d9758… lgo            0   87d ██░░░░░     │
-│ ● psql-6bc7744… ys-odoo        0   64d ████░░░     │
-│ ● odoo-7575bf6… ys-odoo        1   64d ██████░     │
-│ ○ qiandao-1605… xcx            0    2h Completed   │
-│ ○ lingqu-16054… xcx            0   41m Completed   │
-│ ⠙ lingqu-16054… xcx            0    8s Init:0/1    │
-│ ● coredns-6799… kube-system    0  119d █░░░░░░     │
-│ ● metrics-serv… kube-system    0  119d ready 0/1   │
-│ ● traefik-f456… kube-system    0  119d ░░░░░░░     │
-│ ● local-path-p… kube-system    0  119d ImagePullB… │
-│ ● svclb-traefi… kube-system    7  119d CrashLoopB… │
+│   NAME          NAMESPACE    RST   SEC CPU/STATUS  │
+│ ● bilibili-raf… bilibili-r…    0     - █░░░░░░     │
+│ ● bilibili-liv… bilibili-r…    2     - ████░░░     │
+│ ● lgo-7c5d9758… lgo            0     - ██░░░░░     │
+│ ● psql-6bc7744… ys-odoo        0     - ████░░░     │
+│ ● odoo-7575bf6… ys-odoo        1     - ██████░     │
+│ ○ qiandao-1605… xcx            0     - Completed   │
+│ ○ lingqu-16054… xcx            0     - Completed   │
+│ ⠙ lingqu-16054… xcx            0     - Init:0/1    │
+│ ● coredns-6799… kube-system    0     - █░░░░░░     │
+│ ● metrics-serv… kube-system    0     - ready 0/1   │
+│ ● traefik-f456… kube-system    0     - ░░░░░░░     │
+│ ● local-path-p… kube-system    0     - ImagePullB… │
+│ ● svclb-traefi… kube-system    7     - CrashLoopB… │
 ╰────────────────────────────────────────────────────╯

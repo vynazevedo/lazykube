@@ -95,21 +95,7 @@ func (dashboardScreen) View(m Model, body draw.Region, ctx ui.Ctx) {
 		}, ctx)
 	}
 
-	pods := m.visiblePods()
-	sel := m.selectedIndex(pods)
-	ui.PodsPanel(region(body, m.layout.Pods), ui.PodsState{
-		Pods:       pods,
-		Selected:   sel,
-		Offset:     m.podOffset,
-		Hover:      m.hover,
-		CPU:        m.metrics.PodCPU,
-		Filter:     m.filter.Value(),
-		FilterPos:  m.filter.Position(),
-		Filtering:  m.filtering,
-		Focused:    m.focus == FocusPods,
-		SelectionK: m.selectionKs(pods),
-		NSFilter:   m.nsFilter,
-	}, ctx)
+	ui.PodsPanel(region(body, m.layout.Pods), m.podsPanelState(m.visiblePods()), ctx)
 
 	ui.HeatmapPanel(region(body, m.layout.Heatmap), ui.HeatmapState{
 		Labels:    m.metrics.HeatLabels,

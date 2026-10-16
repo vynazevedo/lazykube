@@ -1,16 +1,16 @@
  lazykube [DEMO]  v2.0   ◎ context demo   k8s demo  nodes 1  ns 8  pods 13  uptime 119d                ⠙ metrics every 5s ● live  
- [2 Dashboard]                                                                        ← → move  home end  enter open  esc cancel  
+ [2 Dashboard] |  3 Workloads                                                         ← → move  home end  enter open  esc cancel  
  Dashboard > kube-system                                                                                                          
  ╭─ Node ───────────────────────╮ ╭─ Pods ─────────────────────────────────────╮ ╭──────────────────────────────────────────────╮ 
  │                              │ │                                            │ │  Log   Config   Top   Describe   Events   Se │ 
  │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  demo-no…│ │ / filter pods…     ns:kube-system  5 items │ │ ──────────────────────────────────────────── │ 
  │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready │ │                                            │ │ ● coredns-6799fbcd5-w9t4p          [Running] │ 
- │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25% │ │   NAME  NAMESPACE    RST   AGE CPU/STATUS  │ │   kube-system · Running · ready 1/1 · node … │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ████████│ │ ● core… kube-system    0  119d █░░░░░░     │ │                                              │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4…│ │ ● metr… kube-system    0  119d ready 0/1   │ │ CPU 10m req 10m · lim 50m                    │ 
- │    ▀    ▀▀▀▀▀▀▀▀▀    ████████│ │ ● trae… kube-system    0  119d ░░░░░░░     │ │  20m │                                       │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13…│ │ ● loca… kube-system    0  119d ImagePullB… │ │      │   ⢀⡇           ⢸                      │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch am…│ │ ● svcl… kube-system    7  119d CrashLoopB… │ │  15m │─⢀─⣸⣿───────────⣸⡆⢀⡀────────────────── │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25% │ │   NAME  NAMESPACE    RST   SEC CPU/STATUS  │ │   kube-system · Running · ready 1/1 · node … │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ████████│ │ ● core… kube-system    0  75 C █░░░░░░     │ │                                              │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4…│ │ ● metr… kube-system    0  20 F ready 0/1   │ │ CPU 10m req 10m · lim 50m                    │ 
+ │    ▀    ▀▀▀▀▀▀▀▀▀    ████████│ │ ● trae… kube-system    0  20 F ░░░░░░░     │ │  20m │                                       │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13…│ │ ● loca… kube-system    0 100 A ImagePullB… │ │      │   ⢀⡇           ⢸                      │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch am…│ │ ● svcl… kube-system    7  75 C CrashLoopB… │ │  15m │─⢀─⣸⣿───────────⣸⡆⢀⡀────────────────── │ 
  │    ▀ ▀  ▀▀▀▀▀▀▀▀▀            │ │                                            │ │      │⣠⣿⣆⣿⣿⡄    ⡄     ⣿⣧⣼⣿⡄      request 10m │ 
  │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀           │ │                                            │ │  10m │⣿⣿⣿⣿⣿⣷⣀⣤⡀╌⣿╌╌⢠⣿⣿⣿⣿⣿⣿⣿⣄⣶⣶╌╌╌╌╌╌⣼⣿⣿⣿⣿⣿⣧● │ 
  │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀          │ │                                            │ │      │⣿⣿⣿⣿⣿⣿⣿⣿⣷⣼⣿⣇⣷⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣿⣠⣀⢠⣮⣿⣿⣿⣿⣿⣿⣿⣿ │ 
@@ -37,4 +37,4 @@
  │                              │ │               -2m ████████████████████ now │ │ ╰──────────────────────────────────────────╯ │ 
  ╰──────────────────────────────╯ ╰────────────────────────────────────────────╯ ╰──────────────────────────────────────────────╯ 
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  ←→  move   home end  first / last   enter  open   2  Dashboard   esc m  cancel                                bubbletea · 0 fps 
+  ←→  move   home end  first / last   enter  open   2 3  Dashboard / Workloads   esc m  cancel                  bubbletea · 0 fps 

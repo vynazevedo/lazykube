@@ -1,6 +1,7 @@
 package app
 
 import (
+	"slices"
 	"time"
 
 	"charm.land/bubbles/v2/textinput"
@@ -39,6 +40,7 @@ type Options struct {
 type Model struct {
 	nav  router
 	menu menuState
+	dep  depOverlay
 
 	security          data.SecuritySnapshot
 	securitySession   data.SecuritySession
@@ -162,7 +164,7 @@ func (m *Model) reload() {
 
 func (m *Model) fixSelection() {
 	m.nsCursor = max(0, min(m.nsCursor, len(m.snap.Namespaces)-1))
-	m.depCursor = max(0, min(m.depCursor, len(m.snap.Deployments)-1))
+	m.depCursor = max(0, min(m.depCursor, len(m.visibleDeployments())-1))
 	if !m.inDetail() {
 		pods := m.visiblePods()
 		if m.selectedIndex(pods) < 0 && len(pods) > 0 {
@@ -180,11 +182,15 @@ func (m *Model) relayout() {
 
 func (m *Model) setLayout(w, h int) {
 	m.w, m.h = w, h
-	m.layout = Compute(w, h, m.leftMode)
-	if m.inDetail() {
+	switch {
+	case m.inDetail():
 		m.layout = ComputeDetail(w, h)
+	case m.onScreen(ScreenWorkloads):
+		m.layout = ComputeWorkloads(w, h)
+	default:
+		m.layout = Compute(w, h, m.leftMode)
 	}
-	if !m.layout.ShowLeft && (m.focus == FocusNamespaces || m.focus == FocusDeployments) {
+	if !slices.Contains(m.focusOrder(), m.focus) {
 		m.focus = FocusPods
 	}
 	m.ensurePodVisible()
@@ -261,13 +267,17 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return wake(idle, next, cmd)
 	case tea.MouseClickMsg:
 		idle := !m.busy()
+		if m.dep.open {
+			m.dep.open = false
+			return wake(idle, m, nil)
+		}
 		if next, ok := m.handleShellClick(tea.Mouse(msg)); ok {
 			return wake(idle, next, nil)
 		}
 		next, cmd := m.screen().Update(m, msg)
 		return wake(idle, next, cmd)
 	case tea.MouseWheelMsg:
-		if m.menu.open {
+		if m.menu.open || m.dep.open {
 			return m, nil
 		}
 		idle := !m.busy()

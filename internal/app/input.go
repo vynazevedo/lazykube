@@ -49,6 +49,8 @@ func (m Model) handleKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 			m.openNamespace(m.snap.Namespaces[m.nsCursor].Name)
 		case m.focus == FocusPods:
 			m.openPod()
+		case m.focus == FocusDeployments && m.onScreen(ScreenWorkloads):
+			m.openDeployment()
 		}
 	case key.Matches(msg, k.TabLog):
 		m.setTab(ui.TabLog)
@@ -85,7 +87,7 @@ func (m Model) handleKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 		m.cycleScope()
 	case key.Matches(msg, k.Palette):
 		m.pal = theme.NextPalette(m.pal)
-	case key.Matches(msg, k.ToggleLeft) && !m.inDetail():
+	case key.Matches(msg, k.ToggleLeft) && m.onScreen(ScreenDashboard):
 		if LeftVisible(m.w, m.leftMode) {
 			m.leftMode = LeftHidden
 		} else {
@@ -153,7 +155,7 @@ func (m *Model) moveSelection(delta int) {
 	case FocusNamespaces:
 		m.nsCursor = max(0, min(len(m.snap.Namespaces)-1, m.nsCursor+delta))
 	case FocusDeployments:
-		m.depCursor = max(0, min(len(m.snap.Deployments)-1, m.depCursor+delta))
+		m.depCursor = max(0, min(len(m.visibleDeployments())-1, m.depCursor+delta))
 	case FocusDetails:
 		m.scrollTo(m.scroll + delta)
 	default:
@@ -200,7 +202,7 @@ func (m Model) handleClick(ms tea.Mouse) (Model, tea.Cmd) {
 	case AreaDeployments:
 		m.focus = FocusDeployments
 		top, rows := ui.DeploymentsRows(m.layout.Deployments.H)
-		if idx, ok := ui.ListRowAt(ms.Y-m.layout.Deployments.Y, top, rows, m.depCursor, len(m.snap.Deployments)); ok {
+		if idx, ok := ui.ListRowAt(ms.Y-m.layout.Deployments.Y, top, rows, m.depCursor, len(m.visibleDeployments())); ok {
 			m.depCursor = idx
 		}
 	case AreaPods:
@@ -233,7 +235,7 @@ func (m Model) handleWheel(ms tea.Mouse) (Model, tea.Cmd) {
 	case AreaNamespaces:
 		m.nsCursor = max(0, min(len(m.snap.Namespaces)-1, m.nsCursor+delta))
 	case AreaDeployments:
-		m.depCursor = max(0, min(len(m.snap.Deployments)-1, m.depCursor+delta))
+		m.depCursor = max(0, min(len(m.visibleDeployments())-1, m.depCursor+delta))
 	case AreaDetails:
 		m.scrollTo(m.scroll + delta*3)
 	}

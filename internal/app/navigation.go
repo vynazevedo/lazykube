@@ -1,6 +1,7 @@
 package app
 
 import (
+	"slices"
 	"strings"
 
 	"charm.land/bubbles/v2/key"
@@ -21,6 +22,11 @@ type crumb struct {
 
 func (m Model) inDetail() bool {
 	return m.nav.Active().Kind == RoutePod
+}
+
+func (m Model) onScreen(id ScreenID) bool {
+	r := m.nav.Active()
+	return r.Kind != RoutePod && r.Screen == id
 }
 
 func (m Model) frame() Frame {
@@ -58,6 +64,7 @@ func (m *Model) navigate(to Route) bool {
 		return false
 	}
 	m.endEditing()
+	m.dep.open = false
 	m.nav.entryFilter = m.filter.Value()
 	switch to.Kind {
 	case RouteNamespace:
@@ -69,11 +76,13 @@ func (m *Model) navigate(to Route) bool {
 	}
 	m.relayout()
 	m.syncSelection()
+	m.depCursor = max(0, min(m.depCursor, len(m.visibleDeployments())-1))
 	return true
 }
 
 func (m *Model) restore(f Frame) {
 	m.endEditing()
+	m.dep.open = false
 	if f.Selected != m.selName {
 		m.selName = f.Selected
 		m.newLines, m.logs = 0, nil
@@ -120,12 +129,24 @@ func (m *Model) openPod() {
 	}
 }
 
-func (m *Model) activateScreen(id ScreenID) {
-	for _, s := range registeredScreens() {
-		if s == id {
-			m.navigate(Route{Kind: RouteScreen, Screen: id})
-			return
+func (m *Model) scopeNamespace() string {
+	trail := m.nav.trail()
+	for i := len(trail) - 1; i >= m.nav.crumbStart(); i-- {
+		if trail[i].Kind == RouteNamespace {
+			return trail[i].Namespace
 		}
+	}
+	return ""
+}
+
+func (m *Model) activateScreen(id ScreenID) {
+	if !slices.Contains(registeredScreens(), id) {
+		return
+	}
+	ns, from := m.scopeNamespace(), m.mainScreen()
+	m.navigate(Route{Kind: RouteScreen, Screen: id})
+	if ns != "" && from != id {
+		m.navigate(Route{Kind: RouteNamespace, Screen: id, Namespace: ns})
 	}
 }
 
@@ -159,6 +180,8 @@ func menuKey(id ScreenID) string {
 	switch id {
 	case ScreenDashboard:
 		return "2"
+	case ScreenWorkloads:
+		return "3"
 	}
 	return ""
 }
@@ -197,6 +220,9 @@ func (m Model) handleMenuKey(msg tea.KeyPressMsg) Model {
 	case key.Matches(msg, k.Dashboard):
 		m.menu.open = false
 		m.activateScreen(ScreenDashboard)
+	case key.Matches(msg, k.Workloads):
+		m.menu.open = false
+		m.activateScreen(ScreenWorkloads)
 	case key.Matches(msg, k.Esc), key.Matches(msg, k.Menu), key.Matches(msg, k.NextPanel), key.Matches(msg, k.PrevPanel):
 		m.menu.open = false
 	}
@@ -207,6 +233,9 @@ func (m Model) routeKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 	if m.menu.open {
 		return m.handleMenuKey(msg), nil
 	}
+	if m.dep.open {
+		return m.handleOverlayKey(msg)
+	}
 	if !m.helpOpen && !m.filtering && !m.dg.searching && !m.layout.TooSmall {
 		k := m.keys
 		switch {
@@ -215,6 +244,9 @@ func (m Model) routeKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 			return m, nil
 		case key.Matches(msg, k.Dashboard):
 			m.activateScreen(ScreenDashboard)
+			return m, nil
+		case key.Matches(msg, k.Workloads):
+			m.activateScreen(ScreenWorkloads)
 			return m, nil
 		case key.Matches(msg, k.Esc):
 			m.handleEsc()

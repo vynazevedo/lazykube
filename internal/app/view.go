@@ -28,9 +28,16 @@ func (m Model) Render() *draw.Canvas {
 	active := m.screen()
 	active.View(m, screen, ctx)
 
+	if m.dep.open {
+		ui.DeploymentOverlay(screen, m.deploymentOverlayState(), ctx)
+	}
+
 	keys := active.Help(m)
-	if m.menu.open {
+	switch {
+	case m.menu.open:
 		keys = ui.MenuHelp()
+	case m.dep.open:
+		keys = ui.OverlayHelp()
 	}
 	ui.Footer(screen.Sub(0, m.layout.DividerY, m.w, 1), screen.Sub(0, m.layout.FooterY, m.w, 1), ui.FooterState{FPS: m.displayFPS(), Keys: keys})
 

@@ -1,39 +1,39 @@
  lazykube [DEMO]  v2.0   ◎ context demo   k8s demo  nodes 1  ns 8  pods 13  uptime 119d ! 1 high new   ⠙ metrics every 5s ● live  
- [2 Dashboard]                                                                                                            m menu  
+ [2 Dashboard] |  3 Workloads                                                                                             m menu  
  Dashboard                                                                                                                        
  ╭─ Pods · focus ────────────────────────────────────────╮ ╭────────────────────────────────────────────────────────────────────╮ 
  │                                                       │ │  Log   Config   Top   Describe   Events   Security 1               │ 
  │ / filter pods…▌                              13 items │ │ ────────────────────────────────────────────────────────────────── │ 
  │                                                       │ │ ╭────────────────────────────────────────────────────────────────╮ │ 
- │   NAME             NAMESPACE    RST   AGE CPU/STATUS  │ │ │ S: namespace | Pod: bilibili-raffle/bilibili-live-7f6b8d9c5-m… │ │ 
- │ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │ │ │ Dashboard coverage: complete in scope | pods 13/13             │ │ 
- │ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │ │ │ No findings does not mean safe                                 │ │ 
- │ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │ │ │ Local checks only; not PSS compliance.                         │ │ 
- │ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │ │ │ POSTURE | Cluster | 76/100 (C) | 13/13 pods                    │ │ 
- │ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │ │ │ Synthetic data (demo)                                          │ │ 
- │ ○ qiandao-1605400… xcx            0    2h Completed   │ │ │ Score ███████████████████████████░░░░░░░░░                     │ │ 
- │ ○ lingqu-16054860… xcx            0   41m Completed   │ │ │ high     10 ████████████████████████                           │ │ 
- │ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │ │ │ medium    6 ██████████████░░░░░░░░░░                           │ │ 
- │ ● coredns-6799fbc… kube-system    0  119d ░░░░░░░     │ │ │ info      4 ██████████░░░░░░░░░░░░░░                           │ │ 
- │ ● metrics-server-… kube-system    0  119d ready 0/1   │ │ │ Unknown checks: 4 | confirmed findings only in score           │ │ 
- │ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │ │ │ Trend: ▆▆ (revision samples)                                   │ │ 
- │ ● local-path-prov… kube-system    0  119d ImagePullB… │ │ │ ALERTS | new high since baseline / last ack | A: ack all       │ │ 
- │ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │ │ │ ! bilibili-raffle/bilibili-raffle-5d8f9c7b4-x2kqp | hostPID |  │ │ 
- ╰───────────────────────────────────────────────────────╯ │ │ pod                                                            │ │ 
- ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ TOP RULES | confirmed findings                                 │ │ 
- │                                                       │ │ │ serviceAccountToken       4 ██████████████████                 │ │ 
- │ bilibili-raf… ███████████████████████████████████████ │ │ │ capabilitiesAdded         3 ██████████████░░░░                 │ │ 
- │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ hostNetwork               3 ██████████████░░░░                 │ │ 
- │ bilibili-live ███████████████████████████████████████ │ │ │ imageLatest               3 ██████████████░░░░                 │ │ 
- │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ limit-memory              3 ██████████████░░░░                 │ │ 
- │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │ NAMESPACES | lowest scores first                               │ │ 
- │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ lgo                50 ████░░░░ | 2 findings                    │ │ 
- │ psql-6bc7744… ███████████████████████████████████████ │ │ │ bilibili-raffle    66 █████░░░ | 5 findings                    │ │ 
- │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ xcx                70 ██████░░ | 5 findings                    │ │ 
- │ odoo-7575bf6… ███████████████████████████████████████ │ │ │ kube-system        81 ██████░░ | 7 findings                    │ │ 
- │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ ys-odoo            99 ████████ | 1 finding                     │ │ 
- │ coredns-6799… ███████████████████████████████████████ │ │ │ More namespaces: use the namespace filter.                     │ │ 
- │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Score: 100 - (25*high + 8*medium + 2*info)/evaluated pods;     │ │ 
+ │   NAME             NAMESPACE    RST   SEC CPU/STATUS  │ │ │ S: namespace | Pod: bilibili-raffle/bilibili-live-7f6b8d9c5-m… │ │ 
+ │ ● bilibili-raffle… bilibili-r…    0  35 F █░░░░░░     │ │ │ Dashboard coverage: complete in scope | pods 13/13             │ │ 
+ │ ● bilibili-live-7… bilibili-r…    2  20 F ████░░░     │ │ │ No findings does not mean safe                                 │ │ 
+ │ ● lgo-7c5d97584-h… lgo            0  20 F ██░░░░░     │ │ │ Local checks only; not PSS compliance.                         │ │ 
+ │ ● psql-6bc7744f9-… ys-odoo        0 100 A ████░░░     │ │ │ Security /100: Pod 20 F | Namespace 28 F | Cluster 52 E        │ │ 
+ │ ● odoo-7575bf6d8-… ys-odoo        1  75 C ██████░     │ │ │ Hygiene /100: Pod 88 B | Namespace 94 A | Cluster 97 A         │ │ 
+ │ ○ qiandao-1605400… xcx            0  20 F Completed   │ │ │ Namespace mean (2 pods) | Cluster mean (13 pods)               │ │ 
+ │ ○ lingqu-16054860… xcx            0  20 F Completed   │ │ │ Selected pod security: 20/100 (F) | 1/1 pod                    │ │ 
+ │ ⠙ lingqu-16054896… xcx            0 100 A Init:0/1    │ │ │ Synthetic data (demo)                                          │ │ 
+ │ ● coredns-6799fbc… kube-system    0  75 C ░░░░░░░     │ │ │ Pod bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz | complete   │ │ 
+ │ ● metrics-server-… kube-system    0  20 F ready 0/1   │ │ │ in scope                                                       │ │ 
+ │ ● traefik-f4564c4… kube-system    0  20 F ░░░░░░░     │ │ │ Observed 2026-10-16 12:00:00Z | UID                            │ │ 
+ │ ● local-path-prov… kube-system    0 100 A ImagePullB… │ │ │ demo-bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz | RV 1      │ │ 
+ │ ● svclb-traefik-8… kube-system    7  75 C CrashLoopB… │ │ │ HIGH findings                                                  │ │ 
+ ╰───────────────────────────────────────────────────────╯ │ │ [high] allowPrivilegeEscalation | finding | container:         │ │ 
+ ╭─ CPU heatmap · last 2 min ────────────────────────────╮ │ │ init-permissions                                               │ │ 
+ │                                                       │ │ │ Field:                                                         │ │ 
+ │ bilibili-raf… ███████████████████████████████████████ │ │ │ spec.initContainers[0].securityContext.allowPrivilegeEscalatio │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ n                                                              │ │ 
+ │ bilibili-live ███████████████████████████████████████ │ │ │ Evidence: forced by privileged                                 │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Additional privileges possible. Disable privileged mode        │ │ 
+ │ lgo-7c5d97584 ███████████████████████████████████████ │ │ │ Source: demo fixture v4 | configuration observed               │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ [high] privileged | finding | container: init-permissions      │ │ 
+ │ psql-6bc7744… ███████████████████████████████████████ │ │ │ Field: spec.initContainers[0].securityContext.privileged       │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Evidence: true                                                 │ │ 
+ │ odoo-7575bf6… ███████████████████████████████████████ │ │ │ Privileged init container configured. Disable privileged mode  │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Source: demo fixture v4 | configuration observed               │ │ 
+ │ coredns-6799… ███████████████████████████████████████ │ │ │ MEDIUM findings                                                │ │ 
+ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ [medium] imageLatest | finding | container: app                │ │ 
  │               -2m ███████████████████████████████ now │ │ ╰────────────────────────────────────────────────────────────────╯ │ 
  ╰───────────────────────────────────────────────────────╯ ╰────────────────────────────────────────────────────────────────────╯ 
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────

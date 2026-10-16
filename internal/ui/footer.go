@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/vynazevedo/lazykube/internal/data"
 	"github.com/vynazevedo/lazykube/internal/draw"
 	"github.com/vynazevedo/lazykube/internal/theme"
 )
@@ -38,6 +39,7 @@ func FullHelp() []KeyHelp {
 		{"esc", "clear search/filter, back"},
 		{"m", "screens menu ← → enter"},
 		{"2", "Dashboard screen"},
+		{"3", "Workloads screen"},
 		{"l c t d e", "Log Config Top Describe Events"},
 		{"S", "Security / namespace posture"},
 		{"A", "ack all Security alerts"},
@@ -106,11 +108,32 @@ func FullHelpDetail() []KeyHelp {
 	return out
 }
 
+func FullHelpWorkloads() []KeyHelp {
+	var out []KeyHelp
+	for _, h := range FullHelp() {
+		switch h.Key {
+		case "1":
+			continue
+		case "enter":
+			h.Desc = "open pod / deployment replicas"
+		}
+		out = append(out, h)
+	}
+	return out
+}
+
 func HelpOverlay(screen draw.Region, items []KeyHelp, ctx Ctx) {
 	half := (len(items) + 1) / 2
 	const keyW, descW = 11, 30
 	w := min(screen.W-4, 2*(keyW+descW)+7)
-	h := min(screen.H-2, half+4)
+	extra := 0
+	for _, item := range items {
+		if item.Key == "S" {
+			extra = 4
+			break
+		}
+	}
+	h := min(screen.H-2, half+4+extra)
 	box := screen.Sub((screen.W-w)/2, (screen.H-h)/2, w, h)
 	inner := Panel(box, "Help", true, ctx).Inset(2, 1, 2, 1)
 	colW := (inner.W - 1) / 2
@@ -122,6 +145,11 @@ func HelpOverlay(screen draw.Region, items []KeyHelp, ctx Ctx) {
 		x := col * (colW + 1)
 		inner.Text(x, row, draw.PadRight(k.Key, keyW), draw.Fg(ctx.Pal.A).WithBold())
 		inner.Text(x+keyW, row, draw.Truncate(k.Desc, colW-keyW), draw.Fg(theme.Muted))
+	}
+	if extra > 0 {
+		for i, line := range []string{"Security score v" + data.SecurityScoreVersion + ": max(0,100-40H-6M-I), per pod and dimension.", "Each rule once at worst severity; Security and Hygiene are separate.", "Scope: mean, median, lowest ceil(N/10) mean. SEC = Security; p = partial.", "Unknown is not a penalty. Score is not safety or PSS compliance."} {
+			inner.Text(0, half+i, draw.Truncate(line, inner.W), draw.Fg(theme.Muted))
+		}
 	}
 }
 
