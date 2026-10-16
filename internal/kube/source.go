@@ -276,6 +276,9 @@ func (s *Source) probe(ctx context.Context) error {
 	cancelDeployments()
 	if err := deploymentErr; err != nil {
 		s.deploymentCoverage = data.Coverage{State: data.CoverageUnavailable, Reason: "deployments unavailable"}
+		if errors.Is(err, context.DeadlineExceeded) || apierrors.IsTimeout(err) {
+			s.deploymentCoverage.Reason = "timeout: deployments"
+		}
 		if apierrors.IsForbidden(err) {
 			s.deploymentCoverage = data.Coverage{State: data.CoverageDenied, Reason: "no permission to list deployments"}
 		}
@@ -527,9 +530,6 @@ func (s *Source) rebuild() {
 	}
 
 	s.mu.Lock()
-	if s.deployInf != nil && s.deployInf.HasSynced() && s.deploymentCoverage.State == data.CoverageCollecting {
-		s.deploymentCoverage.State = data.CoverageComplete
-	}
 	snap.DeploymentCoverage = s.deploymentCoverage
 	s.snap = snap
 	s.byKey = byKey

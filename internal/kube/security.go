@@ -105,21 +105,26 @@ func (s *Source) watchSecurityError(deployments bool) cache.WatchErrorHandler {
 			inf = s.deployInf
 		}
 		if tracked, ok := inf.(*securityInformer); ok {
-			tracked.invalidate()
+			tracked.fail(err)
+			return
 		}
-		state, reason := data.CoverageStale, "watch interrupted; cached observations may be outdated"
-		if apierrors.IsForbidden(err) {
-			state, reason = data.CoverageDenied, "list/watch permission denied; cached observations may be outdated"
-		}
-		s.mu.Lock()
-		if deployments {
-			s.deploymentCoverage.State, s.deploymentCoverage.Reason = state, reason
-		} else {
-			s.podCoverage.State, s.podCoverage.Reason = state, reason
-		}
-		s.mu.Unlock()
-		s.markDirty()
+		s.recordSecurityFailure(deployments, err)
 	}
+}
+
+func (s *Source) recordSecurityFailure(deployments bool, err error) {
+	state, reason := data.CoverageStale, "list/watch interrupted; cached observations may be outdated"
+	if apierrors.IsForbidden(err) {
+		state, reason = data.CoverageDenied, "list/watch permission denied; cached observations may be outdated"
+	}
+	s.mu.Lock()
+	if deployments {
+		s.deploymentCoverage.State, s.deploymentCoverage.Reason = state, reason
+	} else {
+		s.podCoverage.State, s.podCoverage.Reason = state, reason
+	}
+	s.mu.Unlock()
+	s.markDirty()
 }
 
 func securityPodChanged(previous map[string]data.PodPosture, objects map[string]*corev1.Pod, p *corev1.Pod) bool {
@@ -142,6 +147,7 @@ type securityInformer struct {
 	listed, watching bool
 	epoch            uint64
 	dirty            func()
+	reportFailure    func(error)
 }
 
 func (s *Source) newSecurityInformer(deployments bool) cache.SharedIndexInformer {
@@ -150,7 +156,7 @@ func (s *Source) newSecurityInformer(deployments bool) cache.SharedIndexInformer
 		obj = &appsv1.Deployment{}
 	}
 	return s.factory.InformerFor(obj, func(client kubernetes.Interface, resync time.Duration) cache.SharedIndexInformer {
-		tracked := &securityInformer{dirty: s.markDirty}
+		tracked := &securityInformer{dirty: s.markDirty, reportFailure: func(err error) { s.recordSecurityFailure(deployments, err) }}
 		lw := &cache.ListWatch{
 			ListWithContextFunc: func(ctx context.Context, opts metav1.ListOptions) (runtime.Object, error) {
 				var list runtime.Object
@@ -161,7 +167,11 @@ func (s *Source) newSecurityInformer(deployments bool) cache.SharedIndexInformer
 					list, err = client.CoreV1().Pods(s.opts.Namespace).List(ctx, opts)
 				}
 				if err != nil {
-					tracked.invalidate()
+					if ctx.Err() == nil {
+						tracked.fail(err)
+					} else {
+						tracked.invalidate()
+					}
 					return nil, err
 				}
 				tracked.listedPage(list, opts.Continue == "")
@@ -176,7 +186,11 @@ func (s *Source) newSecurityInformer(deployments bool) cache.SharedIndexInformer
 					stream, err = client.CoreV1().Pods(s.opts.Namespace).Watch(ctx, opts)
 				}
 				if err != nil {
-					tracked.invalidate()
+					if ctx.Err() == nil {
+						tracked.fail(err)
+					} else {
+						tracked.invalidate()
+					}
 					return nil, err
 				}
 				return tracked.observe(ctx, stream, opts.SendInitialEvents != nil && *opts.SendInitialEvents), nil
@@ -185,6 +199,20 @@ func (s *Source) newSecurityInformer(deployments bool) cache.SharedIndexInformer
 		tracked.SharedIndexInformer = cache.NewSharedIndexInformer(cache.ToListWatcherWithWatchListSemantics(lw, client), obj, resync, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
 		return tracked
 	})
+}
+
+func (t *securityInformer) fail(err error) {
+	t.mu.Lock()
+	t.failLocked(err)
+	t.mu.Unlock()
+	t.dirty()
+}
+
+func (t *securityInformer) failLocked(err error) {
+	t.watching = false
+	if t.reportFailure != nil {
+		t.reportFailure(err)
+	}
 }
 
 func (t *securityInformer) invalidate() {
@@ -197,12 +225,12 @@ func (t *securityInformer) invalidate() {
 func (t *securityInformer) listedPage(list runtime.Object, first bool) {
 	items, err := meta.ExtractList(list)
 	if err != nil {
-		t.invalidate()
+		t.fail(err)
 		return
 	}
 	metadata, err := meta.ListAccessor(list)
 	if err != nil {
-		t.invalidate()
+		t.fail(err)
 		return
 	}
 	t.mu.Lock()
@@ -282,7 +310,7 @@ func (t *securityInformer) observe(ctx context.Context, upstream watch.Interface
 					case watch.Added, watch.Modified, watch.Deleted:
 						t.record(event.Type, event.Object)
 					case watch.Error:
-						t.watching = false
+						t.failLocked(apierrors.FromObject(event.Object))
 					case watch.Bookmark:
 						m, err := meta.Accessor(event.Object)
 						if err == nil && initial && m.GetAnnotations()["k8s.io/initial-events-end"] == "true" {
