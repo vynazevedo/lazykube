@@ -77,7 +77,15 @@ type ObservationSource interface {
 	Observations(after Cursor) ObservationBatch
 }
 
+type ObservationOmissions struct {
+	Containers int
+	Conditions int
+	Owners     int
+	TextBytes  int
+}
+
 type ObservationBatch struct {
+	Omissions                 ObservationOmissions
 	Cursor                    Cursor
 	ObservedAt                time.Time
 	Namespace                 string
@@ -195,6 +203,7 @@ type OwnerRef struct {
 }
 
 type PodObservation struct {
+	Omissions       ObservationOmissions
 	Entity          EntityRef
 	CreatedAt       time.Time
 	DeletionAt      time.Time

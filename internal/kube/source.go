@@ -57,6 +57,7 @@ type caps struct {
 type Source struct {
 	observations       *insight.Inventory
 	observationPods    map[string]insight.PodObservation
+	observationBudgets map[string]observationBudgetUse
 	securityObjects    map[string]*corev1.Pod
 	security           data.SecuritySnapshot
 	generation         uint64
@@ -121,6 +122,7 @@ func newSource(client kubernetes.Interface, mc metricsclient.Interface, opts Opt
 		generation:         securityGeneration.Add(1),
 		observations:       insight.NewInventory(insight.ClockFunc(opts.Now)),
 		observationPods:    make(map[string]insight.PodObservation),
+		observationBudgets: make(map[string]observationBudgetUse),
 		podCoverage:        data.Coverage{State: data.CoverageCollecting},
 		deploymentCoverage: data.Coverage{State: data.CoverageCollecting},
 

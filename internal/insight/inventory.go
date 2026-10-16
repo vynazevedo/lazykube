@@ -49,11 +49,19 @@ func (i *Inventory) Publish(source SourceIdentity, namespace string, synthetic b
 		p.Entity.Source = source
 		valid = append(valid, p)
 	}
-	pods = valid
+	pods = make([]PodObservation, len(valid))
+	copy(pods, valid)
 	if missingIdentity {
 		coverage.Reason = inventoryCoverageReason(coverage.Reason, "pod identity or resource version missing")
 	}
 	coverage.Observed = len(pods)
+	omissions := ObservationOmissions{}
+	for _, p := range pods {
+		omissions.Containers += p.Omissions.Containers
+		omissions.Conditions += p.Omissions.Conditions
+		omissions.Owners += p.Omissions.Owners
+		omissions.TextBytes += p.Omissions.TextBytes
+	}
 	previous := make(map[EntityKey]PodObservation, len(i.batch.Pods))
 	for _, p := range i.batch.Pods {
 		previous[p.Entity.EntityKey] = p
@@ -61,7 +69,7 @@ func (i *Inventory) Publish(source SourceIdentity, namespace string, synthetic b
 	changed := i.batch.Cursor.Source != source || i.batch.Cursor.Revisions.Inventory == 0 || i.batch.Namespace != namespace || i.batch.Synthetic != synthetic || i.batch.Coverage.Inventory != coverage || len(pods) != len(i.batch.Pods)
 	for n, p := range pods {
 		old, ok := previous[p.Entity.EntityKey]
-		if ok && old.Entity.ResourceVersion == p.Entity.ResourceVersion {
+		if ok && old.Entity.ResourceVersion == p.Entity.ResourceVersion && old.Omissions == p.Omissions {
 			pods[n] = old
 		} else {
 			pods[n] = clonePod(p)
@@ -92,6 +100,7 @@ func (i *Inventory) Publish(source SourceIdentity, namespace string, synthetic b
 	unavailable := Coverage{State: CoverageUnavailable, Reason: "not projected in R1"}
 	i.batch = ObservationBatch{
 		Cursor:    Cursor{Source: source, Revisions: Revisions{Inventory: revision}},
+		Omissions: omissions,
 		Namespace: namespace, Synthetic: synthetic, ObservedAt: now, FullInventory: true,
 		Coverage: SourceCoverage{Inventory: coverage, Metrics: unavailable, Events: unavailable, Security: unavailable, Owners: unavailable, Nodes: unavailable, Network: Coverage{State: CoverageDisabled, Reason: "network disabled"}},
 		Pods:     pods,
