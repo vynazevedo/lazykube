@@ -37,6 +37,10 @@ type KeyMap struct {
 	Wrap        key.Binding
 	Top         key.Binding
 	Bottom      key.Binding
+	Menu        key.Binding
+	MenuPrev    key.Binding
+	MenuNext    key.Binding
+	Dashboard   key.Binding
 }
 
 func DefaultKeyMap() KeyMap {
@@ -78,6 +82,10 @@ func DefaultKeyMap() KeyMap {
 		Wrap:        b("w", "wrap", "w"),
 		Top:         b("g", "top", "g"),
 		Bottom:      b("G", "bottom", "G"),
+		Menu:        b("m", "screens menu", "m"),
+		MenuPrev:    b("←", "previous screen in menu", "left"),
+		MenuNext:    b("→", "next screen in menu", "right"),
+		Dashboard:   b("2", "Dashboard screen", "2"),
 	}
 }
 
@@ -88,5 +96,6 @@ func (k KeyMap) Bindings() []key.Binding {
 		k.TabPrev, k.TabNext, k.Container, k.Previous, k.SearchNext, k.SearchPrev, k.EventScope,
 		k.Palette, k.ToggleLeft, k.Pause, k.Help, k.Quit,
 		k.PageUp, k.PageDown, k.Home, k.End, k.Follow, k.Wrap, k.Top, k.Bottom,
+		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard,
 	}
 }

@@ -45,6 +45,14 @@ func (m Model) selectedIndex(pods []data.Pod) int {
 }
 
 func (m Model) selectedPod() *data.Pod {
+	if r := m.nav.Active(); r.Kind == RoutePod {
+		for _, p := range m.snap.Pods {
+			if p.Key() == r.Pod {
+				return &p
+			}
+		}
+		return nil
+	}
 	for _, p := range m.visiblePods() {
 		if p.Key() == m.selName {
 			return &p
@@ -81,6 +89,10 @@ func (m *Model) selectPod(i int) {
 }
 
 func (m *Model) syncSelection() {
+	if m.inDetail() {
+		m.refresh()
+		return
+	}
 	pods := m.visiblePods()
 	if len(pods) > 0 && m.selectedIndex(pods) < 0 {
 		m.selectPod(0)

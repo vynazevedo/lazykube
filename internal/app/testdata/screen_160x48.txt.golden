@@ -1,5 +1,6 @@
  lazykube [DEMO]  v2.0   ◎ context demo   k8s demo  nodes 1  ns 8  pods 13  uptime 119d                                              ⠙ metrics every 5s ● live  
-                                                                                                                                                                
+ [2 Dashboard]                                                                                                                                          m menu  
+ Dashboard                                                                                                                                                      
  ╭─ Node ────────────────────────────╮ ╭─ Pods · focus ─────────────────────────────────────╮ ╭───────────────────────────────────────────────────────────────╮ 
  │                                   │ │                                                    │ │  Log   Config   Top   Describe   Events   Security            │ 
  │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  demo-node-01 │ │ / filter pods…▌                           13 items │ │ ───────────────────────────────────────────────────────────── │ 
@@ -25,19 +26,18 @@
  │ bilibili-raffle         ██░░░   2 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ ╰────────────────────────────╯ ╰────────────────────────────╯ │ 
  │ lgo                     █░░░░   1 │ │ bilibili-live ████████████████████████████████████ │ │                                                               │ 
  │ xcx                     ███░░   3 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ ╭ logs · tail -f ──────────────────────────────── viewport ─╮ │ 
- │ ys-odoo                 ██░░░   2 │ │ lgo-7c5d97584 ████████████████████████████████████ │ │ │ 20:14:00  INFO  ws connected room=21452505 shard=3        │ │ 
- │                                   │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:03  DEBUG heartbeat ok rtt=42ms                     │ │ 
- ╰───────────────────────────────────╯ │ psql-6bc7744… ████████████████████████████████████ │ │ │ 20:14:06  INFO  danmaku batch received count=38           │ │ 
- ╭─ Deployments ─────────────────────╮ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:09  INFO  raffle detected id=883104 type=gift       │ │ 
- │                                   │ │ odoo-7575bf6… ████████████████████████████████████ │ │ │ 20:14:12  INFO  join raffle ok id=883104 latency=118ms    │ │ 
- │ bilibili-raffle/bilibili-l… ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:15  WARN  rate limited by upstream, backoff 2s      │ │ 
- │ bilibili-raffle/bilibili-r… ● 1/1 │ │ coredns-6799… ████████████████████████████████████ │ │ │ 20:14:18  DEBUG heartbeat ok rtt=39ms                     │ │ 
- │ ys-odoo/psql                ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:21  INFO  danmaku batch received count=51           │ │ 
- │ ys-odoo/odoo                ● 1/1 │ │ metrics-serv… ████████████████████████████████████ │ │ │ 20:14:24  INFO  raffle detected id=883117 type=guard      │ │ 
- │ lgo/lgo                     ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:27  ERROR join raffle failed id=883117: already en… │ │ 
- │ kube-system/coredns         ● 1/1 │ │ traefik-f456… ████████████████████████████████████ │ │ │ 20:14:30  INFO  reconnecting ws in 1s                     │ │ 
- │ kube-system/metrics-server  ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:33  INFO  ws connected room=21452505 shard=3        │ │ 
- │ kube-system/traefik         ● 1/1 │ │                                                    │ │ │ 20:14:36  INFO  ws connected room=21452505 shard=3        │ │ 
+ │                                   │ │ lgo-7c5d97584 ████████████████████████████████████ │ │ │ 20:14:03  DEBUG heartbeat ok rtt=42ms                     │ │ 
+ ╰───────────────────────────────────╯ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:06  INFO  danmaku batch received count=38           │ │ 
+ ╭─ Deployments ─────────────────────╮ │ psql-6bc7744… ████████████████████████████████████ │ │ │ 20:14:09  INFO  raffle detected id=883104 type=gift       │ │ 
+ │                                   │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:12  INFO  join raffle ok id=883104 latency=118ms    │ │ 
+ │ bilibili-raffle/bilibili-l… ● 1/1 │ │ odoo-7575bf6… ████████████████████████████████████ │ │ │ 20:14:15  WARN  rate limited by upstream, backoff 2s      │ │ 
+ │ bilibili-raffle/bilibili-r… ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:18  DEBUG heartbeat ok rtt=39ms                     │ │ 
+ │ ys-odoo/psql                ● 1/1 │ │ coredns-6799… ████████████████████████████████████ │ │ │ 20:14:21  INFO  danmaku batch received count=51           │ │ 
+ │ ys-odoo/odoo                ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:24  INFO  raffle detected id=883117 type=guard      │ │ 
+ │ lgo/lgo                     ● 1/1 │ │ metrics-serv… ████████████████████████████████████ │ │ │ 20:14:27  ERROR join raffle failed id=883117: already en… │ │ 
+ │ kube-system/coredns         ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:30  INFO  reconnecting ws in 1s                     │ │ 
+ │ kube-system/metrics-server  ● 1/1 │ │ traefik-f456… ████████████████████████████████████ │ │ │ 20:14:33  INFO  ws connected room=21452505 shard=3        │ │ 
+ │ kube-system/traefik         ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ 20:14:36  INFO  ws connected room=21452505 shard=3        │ │ 
  │                                   │ │                                                    │ │ │ 20:14:39  DEBUG heartbeat ok rtt=42ms                     │ │ 
  │                                   │ │                                                    │ │ │ 20:14:42  INFO  danmaku batch received count=38           │ │ 
  │                                   │ │                                                    │ │ │ 20:14:45  INFO  raffle detected id=883104 type=gift       │ │ 
@@ -45,4 +45,4 @@
  │                                   │ │               -2m ████████████████████████████ now │ │ ╰───────────────────────────────────────────────────────────╯ │ 
  ╰───────────────────────────────────╯ ╰────────────────────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────╯ 
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                                                   bubbletea · 0 fps 
+  ↑↓  move   tab  panel   /  filter   enter  open   m  menu   l  logs   d  describe   e  events   ?  help   q  quit                           bubbletea · 0 fps 

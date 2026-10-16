@@ -22,9 +22,17 @@ func (m Model) Render() *draw.Canvas {
 	ctx := ui.Ctx{Pal: m.pal, Clock: m.clock}
 	ui.Header(region(screen, m.layout.Header), ui.HeaderState{Synthetic: m.snap.Synthetic, Cluster: m.snap.Cluster, MetricsOK: m.metrics.Available, SecurityAlerts: len(m.securitySession.Alerts)}, ctx)
 
-	m.screen().View(m, screen, ctx)
+	ui.Menu(region(screen, m.layout.Menu), ui.MenuState{Items: m.menuItems(), Active: m.menuActive(), Cursor: m.menu.cursor, Focused: m.menu.open}, ctx)
+	ui.Breadcrumbs(region(screen, m.layout.Crumbs), crumbLabels(m.crumbs()), ctx)
 
-	ui.Footer(screen.Sub(0, m.layout.DividerY, m.w, 1), screen.Sub(0, m.layout.FooterY, m.w, 1), ui.FooterState{FPS: m.displayFPS()})
+	active := m.screen()
+	active.View(m, screen, ctx)
+
+	keys := active.Help(m)
+	if m.menu.open {
+		keys = ui.MenuHelp()
+	}
+	ui.Footer(screen.Sub(0, m.layout.DividerY, m.w, 1), screen.Sub(0, m.layout.FooterY, m.w, 1), ui.FooterState{FPS: m.displayFPS(), Keys: keys})
 
 	if m.helpOpen {
 		ui.HelpOverlay(screen, ctx)

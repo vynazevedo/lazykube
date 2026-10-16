@@ -10,27 +10,41 @@ import (
 
 type ScreenID int
 
-const ScreenDashboard ScreenID = iota
+const (
+	ScreenDashboard ScreenID = iota
+	ScreenPodDetail
+)
 
 type Screen interface {
 	ID() ScreenID
+	Title() string
 	Init(m Model) tea.Cmd
 	Update(m Model, msg tea.Msg) (Model, tea.Cmd)
 	View(m Model, body draw.Region, ctx ui.Ctx)
 	Keys(m Model) []key.Binding
+	Help(m Model) []ui.KeyHelp
 }
 
 func screenFor(id ScreenID) (Screen, bool) {
 	switch id {
 	case ScreenDashboard:
 		return dashboardScreen{}, true
+	case ScreenPodDetail:
+		return podScreen{}, true
 	}
 	return nil, false
 }
 
-func (m Model) screen() Screen {
-	if s, ok := screenFor(m.nav.Active().Screen); ok {
+func (r Route) screen() Screen {
+	if r.Kind == RoutePod {
+		return podScreen{}
+	}
+	if s, ok := screenFor(r.Screen); ok {
 		return s
 	}
 	return dashboardScreen{}
+}
+
+func (m Model) screen() Screen {
+	return m.nav.Active().screen()
 }

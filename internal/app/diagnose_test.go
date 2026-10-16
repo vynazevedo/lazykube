@@ -43,9 +43,23 @@ func TestHelpIsHonest(t *testing.T) {
 			keys[k] = true
 		}
 	}
-	for _, k := range []string{"C", "P", "n", "N", "E", "S", "w", "g", "G"} {
+	for _, k := range []string{"C", "P", "n", "N", "E", "S", "w", "g", "G", "m", "2", "enter", "esc"} {
 		if !keys[k] {
 			t.Fatalf("implemented key %q missing from help", k)
+		}
+	}
+	for _, list := range [][]ui.KeyHelp{ui.FullHelp(), ui.ShortHelp(), ui.PodDetailHelp(), ui.MenuHelp()} {
+		for _, h := range list {
+			for _, k := range strings.Fields(h.Key) {
+				if k == "3" || k == "4" || k == "5" || k == "6" {
+					t.Fatalf("screen key %q is announced before its screen exists", k)
+				}
+			}
+		}
+	}
+	for _, h := range ui.PodDetailHelp() {
+		if h.Key == "tab" || h.Key == "1" || h.Key == "/" {
+			t.Fatalf("detail help must not announce %q, it has no effect there", h.Key)
 		}
 	}
 	m := demoModel(t, 160, 48)
@@ -53,6 +67,24 @@ func TestHelpIsHonest(t *testing.T) {
 	m = press(t, m, "s")
 	if m.tab != before {
 		t.Fatal("unbound keys must not change state")
+	}
+	if !press(t, m, "m").menu.open {
+		t.Fatal("m opens the screens menu")
+	}
+	detail := press(t, m, "enter")
+	if !detail.inDetail() {
+		t.Fatal("enter on a pod opens its detail")
+	}
+	if back := press(t, detail, "2"); back.inDetail() || back.nav.Active().Screen != ScreenDashboard {
+		t.Fatal("2 activates the Dashboard")
+	}
+	if back := press(t, detail, "esc"); back.inDetail() {
+		t.Fatal("esc goes back")
+	}
+	for _, k := range []string{"3", "4", "5", "6"} {
+		if got := press(t, m, k); got.nav != m.nav || got.menu.open {
+			t.Fatalf("%s must stay unbound until its screen exists", k)
+		}
 	}
 }
 

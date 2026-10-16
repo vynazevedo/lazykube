@@ -37,7 +37,8 @@ type Options struct {
 }
 
 type Model struct {
-	nav router
+	nav  router
+	menu menuState
 
 	security          data.SecuritySnapshot
 	securitySession   data.SecuritySession
@@ -155,21 +156,34 @@ func (m Model) waitData() tea.Cmd {
 func (m *Model) reload() {
 	m.snap = m.src.Snapshot()
 	m.loadSecurity()
+	m.fixSelection()
+	m.refresh()
+}
+
+func (m *Model) fixSelection() {
 	m.nsCursor = max(0, min(m.nsCursor, len(m.snap.Namespaces)-1))
 	m.depCursor = max(0, min(m.depCursor, len(m.snap.Deployments)-1))
-	pods := m.visiblePods()
-	if m.selectedIndex(pods) < 0 && len(pods) > 0 {
-		m.selName = pods[0].Key()
-		m.follow, m.newLines, m.logs = true, 0, nil
-		m.resetLogTarget()
+	if !m.inDetail() {
+		pods := m.visiblePods()
+		if m.selectedIndex(pods) < 0 && len(pods) > 0 {
+			m.selName = pods[0].Key()
+			m.follow, m.newLines, m.logs = true, 0, nil
+			m.resetLogTarget()
+		}
 	}
 	m.ensurePodVisible()
-	m.refresh()
+}
+
+func (m *Model) relayout() {
+	m.setLayout(m.w, m.h)
 }
 
 func (m *Model) setLayout(w, h int) {
 	m.w, m.h = w, h
 	m.layout = Compute(w, h, m.leftMode)
+	if m.inDetail() {
+		m.layout = ComputeDetail(w, h)
+	}
 	if !m.layout.ShowLeft && (m.focus == FocusNamespaces || m.focus == FocusDeployments) {
 		m.focus = FocusPods
 	}
@@ -242,17 +256,22 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if msg.String() == "ctrl+c" {
 			return wake(!m.busy(), m, tea.Quit)
 		}
-		return m.delegateInput(msg)
-	case tea.MouseClickMsg, tea.MouseWheelMsg:
-		return m.delegateInput(msg)
+		idle := !m.busy()
+		next, cmd := m.routeKey(msg)
+		return wake(idle, next, cmd)
+	case tea.MouseClickMsg:
+		idle := !m.busy()
+		if next, ok := m.handleShellClick(tea.Mouse(msg)); ok {
+			return wake(idle, next, nil)
+		}
+		next, cmd := m.screen().Update(m, msg)
+		return wake(idle, next, cmd)
+	case tea.MouseWheelMsg:
+		idle := !m.busy()
+		next, cmd := m.screen().Update(m, msg)
+		return wake(idle, next, cmd)
 	}
 	return m.screen().Update(m, msg)
-}
-
-func (m Model) delegateInput(msg tea.Msg) (tea.Model, tea.Cmd) {
-	idle := !m.busy()
-	next, cmd := m.screen().Update(m, msg)
-	return wake(idle, next, cmd)
 }
 
 func wake(wasIdle bool, nm Model, cmd tea.Cmd) (tea.Model, tea.Cmd) {

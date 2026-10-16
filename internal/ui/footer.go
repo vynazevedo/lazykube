@@ -18,6 +18,8 @@ func ShortHelp() []KeyHelp {
 		{"↑↓", "move"},
 		{"tab", "panel"},
 		{"/", "filter"},
+		{"enter", "open"},
+		{"m", "menu"},
 		{"l", "logs"},
 		{"d", "describe"},
 		{"e", "events"},
@@ -32,8 +34,10 @@ func FullHelp() []KeyHelp {
 		{"tab", "next panel"},
 		{"shift+tab", "previous panel"},
 		{"/", "filter pods"},
-		{"enter", "confirm / filter namespace"},
-		{"esc", "leave filter / clear"},
+		{"enter", "open pod / namespace scope"},
+		{"esc", "clear search/filter, back"},
+		{"m", "screens menu ← → enter"},
+		{"2", "Dashboard screen"},
 		{"l c t d e", "Log Config Top Describe Events"},
 		{"S", "Security / namespace posture"},
 		{"A", "ack all Security alerts"},
@@ -56,7 +60,8 @@ func FullHelp() []KeyHelp {
 }
 
 type FooterState struct {
-	FPS float64
+	FPS  float64
+	Keys []KeyHelp
 }
 
 func Footer(divider, help draw.Region, st FooterState) {
@@ -66,7 +71,11 @@ func Footer(divider, help draw.Region, st FooterState) {
 	right := draw.Line{faint(fmt.Sprintf("bubbletea · %d fps", int(math.Round(st.FPS))))}
 	limit := help.W - right.Width() - 2
 	x := 1
-	for i, k := range ShortHelp() {
+	keys := st.Keys
+	if keys == nil {
+		keys = ShortHelp()
+	}
+	for i, k := range keys {
 		pair := draw.Line{
 			draw.S(" "+k.Key+" ", draw.Fg(theme.Text).WithBg(theme.BorderFaint)),
 			muted(" " + k.Desc),

@@ -72,6 +72,8 @@ const (
 )
 
 type DetailsState struct {
+	Title          string
+	Standalone     bool
 	SecurityAlerts int
 	Security       SecurityView
 	Tab            Tab
@@ -94,7 +96,7 @@ type DetailsState struct {
 }
 
 func DetailsPanel(r draw.Region, st DetailsState, ctx Ctx) {
-	inner := Panel(r, "", st.Focused, ctx)
+	inner := Panel(r, draw.Sanitize(st.Title), st.Focused, ctx)
 	c := inner.Inset(1, 0, 1, 0)
 	if c.Empty() {
 		return
@@ -146,7 +148,7 @@ func tabBar(r draw.Region, st DetailsState, ctx Ctx) {
 	}
 	last := TabSpans(st.SecurityAlerts)[len(tabNames)-1]
 	hint := draw.Line{muted("tab ⇥ / shift+tab")}
-	if r.W-hint.Width() > last.X+last.W+1 {
+	if !st.Standalone && r.W-hint.Width() > last.X+last.W+1 {
 		r.LineRight(0, hint)
 	}
 }

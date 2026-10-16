@@ -1,0 +1,2466 @@
+== initial node hidden
+== initial pods 57x19 cells=bbf1444c0c9524998aae6fca0ff23494299ecb4119b938535b78f38436885753
+╭─ Pods · focus ────────────────────────────────────────╮
+│                                                       │
+│ / filter pods…▌                              13 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
+│ ○ qiandao-1605400… xcx            0    2h Completed   │
+│ ○ lingqu-16054860… xcx            0   41m Completed   │
+│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
+│ ● metrics-server-… kube-system    0  119d ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
+│ ● local-path-prov… kube-system    0  119d ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+╰───────────────────────────────────────────────────────╯
+== initial heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== initial details 70x35 cells=81519d39e2566332b5d269e519b61e92b4f73a87456334f5026997b2d4d99fca
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ● bilibili-live-7f6b8d9c5-mn4tz                          [Running] │
+│   bilibili-raffle · Running · ready 2/2 · node demo-node-01 · 10.… │
+│                                                                    │
+│ CPU 11m req 10m · lim 50m                 streamline · braille 2×4 │
+│  20m │                                                             │
+│      │                                    ⢠                        │
+│  15m │──────────────────⡀────────────────⢠⣿⡇────────────────────── │
+│      │  ⡀   ⡀⢀⣦⢀⣠⣦⣤⣤⣄ ⡠⣼⣧              ⢀ ⣾⣿⣿⣲⣤⣀ ⣠⡀⣴⡀   request 10m │
+│  10m │╌⣰⣷⣠⣦⣰⣿⣾⣿⣷⣿⣿⣿⣿⣿⣾⣿⣿⣿⡀⣀⡀╌╌╌╌╌╌⢀⣶⣿⣶⣶⣿⣿⣿⣿⣿⣿⣿⣿⣷⣿⣿⣿⣧╌⢀╌╌╌╌╌╌⢠⣀⣠⣿⣿● │
+│      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦ ⣠⣶⣦⢠⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣆⣾⣧⣀⢤⣤⣤⣀⣿⣿⣿⣿⣿⣿ │
+│   5m │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │
+│      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │
+│    0 │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │
+│      └──────────────────────────────────────────────────────────── │
+│                                                                    │
+│ ╭──────────────────────────────╮ ╭───────────────────────────────╮ │
+│ │ Memory 73Mi / 128Mi          │ │ Network ↓ 7.1 kB/s ↑ 2.7 kB/s │ │
+│ │ ████████████████████████████ │ │ ▃▆▁▆▆▄▆▁▃▅▄▇▆█▄█▆▆▃██▄▂▇▄█▄▇▆ │ │
+│ │ ▆▅▅▆▅▆▅▄▅▅▄▄▄▅▃▄▄▄▄▄▅▄▄▄▅▄▄▅ │ │ ▆▅▄▃▇▃█▃▆▁▃▆▇▅▅█▆▅▆▄▅▅▂▂▇▂▇▄▄ │ │
+│ ╰──────────────────────────────╯ ╰───────────────────────────────╯ │
+│                                                                    │
+│ ╭ logs · tail -f ───────────────────────────────────── viewport ─╮ │
+│ │ 20:14:27  ERROR join raffle failed id=883117: already ended    │ │
+│ │ 20:14:30  INFO  reconnecting ws in 1s                          │ │
+│ │ 20:14:33  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:36  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:39  DEBUG heartbeat ok rtt=42ms                          │ │
+│ │ 20:14:42  INFO  danmaku batch received count=38                │ │
+│ │ 20:14:45  INFO  raffle detected id=883104 type=gift            │ │
+│ │ 20:14:48  INFO  join raffle ok id=883104 latency=118ms         │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== down node hidden
+== down pods 57x19 cells=e0679b355ecfff09401591e50d6f04c858b2a6d9d0aa004e3523fc13ae1e6f64
+╭─ Pods · focus ────────────────────────────────────────╮
+│                                                       │
+│ / filter pods…▌                              13 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
+│ ○ qiandao-1605400… xcx            0    2h Completed   │
+│ ○ lingqu-16054860… xcx            0   41m Completed   │
+│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
+│ ● metrics-server-… kube-system    0  119d ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
+│ ● local-path-prov… kube-system    0  119d ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+╰───────────────────────────────────────────────────────╯
+== down heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== down details 70x35 cells=b8da5c2b51ac4a57dc3de6164319c45bd7f300685503340d346440ce25acfb7f
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ● lgo-7c5d97584-hq8wd                                    [Running] │
+│   lgo · Running · ready 1/1 · node demo-node-01 · 10.42.0.31       │
+│                                                                    │
+│ CPU 9m req 10m · lim 50m                  streamline · braille 2×4 │
+│  20m │                                                ⢀            │
+│      │                        ⡆                       ⣸⣿⡄          │
+│  15m │───────────────────────⢸⣿──────────────────⢰────⣿⣿⣧───────⢰─ │
+│      │⣔⣦⣄⡀⢀⣄⢠⣆            ⣴⣷⡀⣼⣿⣗⣶⣦⣄⡀             ⣾⡇ ⣰⣴⣿request 10m │
+│  10m │⣿⣿⣿⣿⣾⣿⣿⣿⡄╌⡀╌╌╌╌╌╌⣄⣀⣼⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣆⢤⣀╌╌⢀╌╌╌╌╌╌⢀⣿⣧⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣼⣿● │
+│      │⣿⣿⣿⣿⣿⣿⣿⣿⣷⣰⣿⣄⡠⣤⣤⣄⣸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⣀⣾⣧⣤⣾⣆⣾⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │
+│   5m │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │
+│      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │
+│    0 │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │
+│      └──────────────────────────────────────────────────────────── │
+│                                                                    │
+│ ╭──────────────────────────────╮ ╭───────────────────────────────╮ │
+│ │ Memory 72Mi / 128Mi          │ │ Network ↓ 6.4 kB/s ↑ 5.8 kB/s │ │
+│ │ ████████████████████████████ │ │ ▁█▆▆▅▄▅▃▄▆▄▇▅▇█▇▆▅▆▁█▆▆▆▆▁▃▄▅ │ │
+│ │ ▇▇▇█▇▇▇▇▇▇▇▇▇▇▇▇▇▇▆▆▆▅▆▅▆▅▅▄ │ │ ▅▃▃▆▂▄▂▅▅▂▆▂▆▇▇▂▄▇▂▄▄▅▃▄▄▄▅▅█ │ │
+│ ╰──────────────────────────────╯ ╰───────────────────────────────╯ │
+│                                                                    │
+│ ╭ logs · tail -f ───────────────────────────────────── viewport ─╮ │
+│ │ 20:14:27  ERROR join raffle failed id=883117: already ended    │ │
+│ │ 20:14:30  INFO  reconnecting ws in 1s                          │ │
+│ │ 20:14:33  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:36  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:39  DEBUG heartbeat ok rtt=42ms                          │ │
+│ │ 20:14:42  INFO  danmaku batch received count=38                │ │
+│ │ 20:14:45  INFO  raffle detected id=883104 type=gift            │ │
+│ │ 20:14:48  INFO  join raffle ok id=883104 latency=118ms         │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== down-again node hidden
+== down-again pods 57x19 cells=92acb96e362077471b841fe39694b0c2f29f0b35669bd7c27143b5cb82a2b8af
+╭─ Pods · focus ────────────────────────────────────────╮
+│                                                       │
+│ / filter pods…▌                              13 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
+│ ○ qiandao-1605400… xcx            0    2h Completed   │
+│ ○ lingqu-16054860… xcx            0   41m Completed   │
+│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
+│ ● metrics-server-… kube-system    0  119d ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
+│ ● local-path-prov… kube-system    0  119d ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+╰───────────────────────────────────────────────────────╯
+== down-again heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== down-again details 70x35 cells=85c7a9e58f49f6906b9263f4ae215226142d16480afa24b58b217e4159db10ee
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ● psql-6bc7744f9-r7zlc                                   [Running] │
+│   ys-odoo · Running · ready 1/1 · node demo-node-01 · 10.42.0.40   │
+│                                                                    │
+│ CPU 10m req 10m · lim 50m                 streamline · braille 2×4 │
+│  20m │           ⡀                                                 │
+│      │          ⢀⣿⣧                        ⢠                       │
+│  15m │──────⡆───⢸⣿⣿⡄───────⡆───────────────⣾⣧──⣰────────────────── │
+│      │     ⢰⣿ ⢀⣦⣾⣿⣿⣷⣠⣮⣷⡀  ⢸⣿              ⢠⣿⣿⣧⣠⣿⡇      request 10m │
+│  10m │╌╌╌╌╌⣸⣿⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣦⣿⣿⡆╌╌╌╌╌⡀⢀⣠⣤⣾⣿⣶⣽⣿⣿⣿⣿⣿⣿⣿⣾⣦⡀╌╌╌╌╌╌╌╌╌╌⢀⣾⣷● │
+│      │⣴⣷⣰⣷⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⢠⣿⣷⡀⣰⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⡄ ⣼⡄ ⣠⣤⣤⣤⣾⣿⣿⣿ │
+│   5m │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣽⣿⣿⣿⣿⣿⣿⣿⣿ │
+│      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │
+│    0 │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │
+│      └──────────────────────────────────────────────────────────── │
+│                                                                    │
+│ ╭──────────────────────────────╮ ╭───────────────────────────────╮ │
+│ │ Memory 77Mi / 128Mi          │ │ Network ↓ 8.0 kB/s ↑ 1.0 kB/s │ │
+│ │ ████████████████████████████ │ │ ▄▃▇▄▇▇▃▆▇▂▇▃▇▃▁▃▄▄▄▄▄▆▂▄▃▆▃▆▇ │ │
+│ │ ▄▄▄▅▅▄▄▅▅▅▅▆▆▆▆▆▆▇▇▆▇▇█▇▇▇▇▇ │ │ ▇▂█▇▁▂▄█▇▂▆▄▃▁▁▂█▇▄▇▂▄▆▆▃▅▁▅▂ │ │
+│ ╰──────────────────────────────╯ ╰───────────────────────────────╯ │
+│                                                                    │
+│ ╭ logs · tail -f ───────────────────────────────────── viewport ─╮ │
+│ │ 20:14:27  ERROR join raffle failed id=883117: already ended    │ │
+│ │ 20:14:30  INFO  reconnecting ws in 1s                          │ │
+│ │ 20:14:33  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:36  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:39  DEBUG heartbeat ok rtt=42ms                          │ │
+│ │ 20:14:42  INFO  danmaku batch received count=38                │ │
+│ │ 20:14:45  INFO  raffle detected id=883104 type=gift            │ │
+│ │ 20:14:48  INFO  join raffle ok id=883104 latency=118ms         │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== tab-focus node hidden
+== tab-focus pods 57x19 cells=187e4c63e41d6ac87abf7be291b18dcecada94dcb426e88fa870f46e1efefb15
+╭─ Pods ────────────────────────────────────────────────╮
+│                                                       │
+│ / filter pods…                               13 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
+│ ○ qiandao-1605400… xcx            0    2h Completed   │
+│ ○ lingqu-16054860… xcx            0   41m Completed   │
+│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
+│ ● metrics-server-… kube-system    0  119d ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
+│ ● local-path-prov… kube-system    0  119d ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+╰───────────────────────────────────────────────────────╯
+== tab-focus heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== tab-focus details 70x35 cells=3fde6a4614ec7083c908fee63d9f902fd0e1974df9c88b4a751be5b1ba4d2a04
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ● psql-6bc7744f9-r7zlc                                   [Running] │
+│   ys-odoo · Running · ready 1/1 · node demo-node-01 · 10.42.0.40   │
+│                                                                    │
+│ CPU 10m req 10m · lim 50m                 streamline · braille 2×4 │
+│  20m │           ⡀                                                 │
+│      │          ⢀⣿⣧                        ⢠                       │
+│  15m │──────⡆───⢸⣿⣿⡄───────⡆───────────────⣾⣧──⣰────────────────── │
+│      │     ⢰⣿ ⢀⣦⣾⣿⣿⣷⣠⣮⣷⡀  ⢸⣿              ⢠⣿⣿⣧⣠⣿⡇      request 10m │
+│  10m │╌╌╌╌╌⣸⣿⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣦⣿⣿⡆╌╌╌╌╌⡀⢀⣠⣤⣾⣿⣶⣽⣿⣿⣿⣿⣿⣿⣿⣾⣦⡀╌╌╌╌╌╌╌╌╌╌⢀⣾⣷● │
+│      │⣴⣷⣰⣷⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⢠⣿⣷⡀⣰⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⡄ ⣼⡄ ⣠⣤⣤⣤⣾⣿⣿⣿ │
+│   5m │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣽⣿⣿⣿⣿⣿⣿⣿⣿ │
+│      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │
+│    0 │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │
+│      └──────────────────────────────────────────────────────────── │
+│                                                                    │
+│ ╭──────────────────────────────╮ ╭───────────────────────────────╮ │
+│ │ Memory 77Mi / 128Mi          │ │ Network ↓ 8.0 kB/s ↑ 1.0 kB/s │ │
+│ │ ████████████████████████████ │ │ ▄▃▇▄▇▇▃▆▇▂▇▃▇▃▁▃▄▄▄▄▄▆▂▄▃▆▃▆▇ │ │
+│ │ ▄▄▄▅▅▄▄▅▅▅▅▆▆▆▆▆▆▇▇▆▇▇█▇▇▇▇▇ │ │ ▇▂█▇▁▂▄█▇▂▆▄▃▁▁▂█▇▄▇▂▄▆▆▃▅▁▅▂ │ │
+│ ╰──────────────────────────────╯ ╰───────────────────────────────╯ │
+│                                                                    │
+│ ╭ logs · tail -f ───────────────────────────────────── viewport ─╮ │
+│ │ 20:14:27  ERROR join raffle failed id=883117: already ended    │ │
+│ │ 20:14:30  INFO  reconnecting ws in 1s                          │ │
+│ │ 20:14:33  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:36  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:39  DEBUG heartbeat ok rtt=42ms                          │ │
+│ │ 20:14:42  INFO  danmaku batch received count=38                │ │
+│ │ 20:14:45  INFO  raffle detected id=883104 type=gift            │ │
+│ │ 20:14:48  INFO  join raffle ok id=883104 latency=118ms         │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== tab-log node hidden
+== tab-log pods 57x19 cells=187e4c63e41d6ac87abf7be291b18dcecada94dcb426e88fa870f46e1efefb15
+╭─ Pods ────────────────────────────────────────────────╮
+│                                                       │
+│ / filter pods…                               13 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
+│ ○ qiandao-1605400… xcx            0    2h Completed   │
+│ ○ lingqu-16054860… xcx            0   41m Completed   │
+│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
+│ ● metrics-server-… kube-system    0  119d ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
+│ ● local-path-prov… kube-system    0  119d ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+╰───────────────────────────────────────────────────────╯
+== tab-log heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== tab-log details 70x35 cells=be8ff0eafd66c152aae9f76a15e282b1aa83a699e30e8b994c875aec6db608cf
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ● psql-6bc7744f9-r7zlc                                   [Running] │
+│   ys-odoo · Running · ready 1/1 · node demo-node-01 · 10.42.0.40   │
+│                                                                    │
+│ ╭────────────────────────────────────────────────────────────────╮ │
+│ │ 20:14:00  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:03  DEBUG heartbeat ok rtt=42ms                          │ │
+│ │ 20:14:06  INFO  danmaku batch received count=38                │ │
+│ │ 20:14:09  INFO  raffle detected id=883104 type=gift            │ │
+│ │ 20:14:12  INFO  join raffle ok id=883104 latency=118ms         │ │
+│ │ 20:14:15  WARN  rate limited by upstream, backoff 2s           │ │
+│ │ 20:14:18  DEBUG heartbeat ok rtt=39ms                          │ │
+│ │ 20:14:21  INFO  danmaku batch received count=51                │ │
+│ │ 20:14:24  INFO  raffle detected id=883117 type=guard           │ │
+│ │ 20:14:27  ERROR join raffle failed id=883117: already ended    │ │
+│ │ 20:14:30  INFO  reconnecting ws in 1s                          │ │
+│ │ 20:14:33  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:36  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:39  DEBUG heartbeat ok rtt=42ms                          │ │
+│ │ 20:14:42  INFO  danmaku batch received count=38                │ │
+│ │ 20:14:45  INFO  raffle detected id=883104 type=gift            │ │
+│ │ 20:14:48  INFO  join raffle ok id=883104 latency=118ms         │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │ ❯ ▌                                 app · atual · 2 containers │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== tab-next node hidden
+== tab-next pods 57x19 cells=187e4c63e41d6ac87abf7be291b18dcecada94dcb426e88fa870f46e1efefb15
+╭─ Pods ────────────────────────────────────────────────╮
+│                                                       │
+│ / filter pods…                               13 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
+│ ○ qiandao-1605400… xcx            0    2h Completed   │
+│ ○ lingqu-16054860… xcx            0   41m Completed   │
+│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
+│ ● metrics-server-… kube-system    0  119d ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
+│ ● local-path-prov… kube-system    0  119d ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+╰───────────────────────────────────────────────────────╯
+== tab-next heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== tab-next details 70x35 cells=c15efcdf2be44ea093e66e71c4be9ae3b3e23569a93b84f16233f56a471c490a
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ● psql-6bc7744f9-r7zlc                                   [Running] │
+│   ys-odoo · Running · ready 1/1 · node demo-node-01 · 10.42.0.40   │
+│                                                                    │
+│ ╭────────────────────────────────────────────────────────────────╮ │
+│ │  1  apiVersion: v1                                             │ │
+│ │  2  kind: Pod                                                  │ │
+│ │  3  metadata:                                                  │ │
+│ │  4    name: psql-6bc7744f9-r7zlc                               │ │
+│ │  5    namespace: ys-odoo                                       │ │
+│ │  6    labels:                                                  │ │
+│ │  7      app: psql-6bc7744f9                                    │ │
+│ │  8  spec:                                                      │ │
+│ │  9    containers:                                              │ │
+│ │ 10    - name: app                                              │ │
+│ │ 11      image: registry.local/ys-odoo:1.4.2                    │ │
+│ │ 12      resources:                                             │ │
+│ │ 13        requests: { cpu: 10m, memory: 64Mi }                 │ │
+│ │ 14        limits: { cpu: 50m, memory: 128Mi }                  │ │
+│ │ 15      env:                                                   │ │
+│ │ 16      - name: LOG_LEVEL                                      │ │
+│ │ 17        value: info                                          │ │
+│ │ 18    restartPolicy: Always                                    │ │
+│ │ 19    nodeName: demo-node-01                                   │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== tab-security node hidden
+== tab-security pods 57x19 cells=187e4c63e41d6ac87abf7be291b18dcecada94dcb426e88fa870f46e1efefb15
+╭─ Pods ────────────────────────────────────────────────╮
+│                                                       │
+│ / filter pods…                               13 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
+│ ○ qiandao-1605400… xcx            0    2h Completed   │
+│ ○ lingqu-16054860… xcx            0   41m Completed   │
+│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
+│ ● metrics-server-… kube-system    0  119d ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
+│ ● local-path-prov… kube-system    0  119d ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+╰───────────────────────────────────────────────────────╯
+== tab-security heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== tab-security details 70x35 cells=30c164ba27e59a9dace606abf5c5b7c81d4dc2e119d5bd71c2f256a9f04b878a
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ╭────────────────────────────────────────────────────────────────╮ │
+│ │ S: namespace | Pod: ys-odoo/psql-6bc7744f9-r7zlc               │ │
+│ │ Dashboard coverage: complete in scope | pods 13/13             │ │
+│ │ No findings does not mean safe                                 │ │
+│ │ Local checks only; not PSS compliance.                         │ │
+│ │ POSTURE | Cluster | 78/100 (C) | 13/13 pods                    │ │
+│ │ Synthetic data (demo)                                          │ │
+│ │ Score ████████████████████████████░░░░░░░░                     │ │
+│ │ high      9 ████████████████████████                           │ │
+│ │ medium    6 ████████████████░░░░░░░░                           │ │
+│ │ info      4 ███████████░░░░░░░░░░░░░                           │ │
+│ │ Unknown checks: 4 | confirmed findings only in score           │ │
+│ │ Trend: ▆ (revision samples)                                    │ │
+│ │ ALERTS | new high since baseline / last ack | A: ack all       │ │
+│ │ No unacknowledged high alerts.                                 │ │
+│ │ TOP RULES | confirmed findings                                 │ │
+│ │ serviceAccountToken       4 ██████████████████                 │ │
+│ │ capabilitiesAdded         3 ██████████████░░░░                 │ │
+│ │ hostNetwork               3 ██████████████░░░░                 │ │
+│ │ imageLatest               3 ██████████████░░░░                 │ │
+│ │ limit-memory              3 ██████████████░░░░                 │ │
+│ │ NAMESPACES | lowest scores first                               │ │
+│ │ lgo                50 ████░░░░ | 2 findings                    │ │
+│ │ xcx                70 ██████░░ | 5 findings                    │ │
+│ │ bilibili-raffle    79 ██████░░ | 4 findings                    │ │
+│ │ kube-system        81 ██████░░ | 7 findings                    │ │
+│ │ ys-odoo            99 ████████ | 1 finding                     │ │
+│ │ More namespaces: use the namespace filter.                     │ │
+│ │ Score: 100 - (25*high + 8*medium + 2*info)/evaluated pods;     │ │
+│ │ floor 0, rounded.                                              │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== security-namespace node hidden
+== security-namespace pods 57x19 cells=187e4c63e41d6ac87abf7be291b18dcecada94dcb426e88fa870f46e1efefb15
+╭─ Pods ────────────────────────────────────────────────╮
+│                                                       │
+│ / filter pods…                               13 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
+│ ○ qiandao-1605400… xcx            0    2h Completed   │
+│ ○ lingqu-16054860… xcx            0   41m Completed   │
+│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
+│ ● metrics-server-… kube-system    0  119d ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
+│ ● local-path-prov… kube-system    0  119d ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+╰───────────────────────────────────────────────────────╯
+== security-namespace heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== security-namespace details 70x35 cells=1f64a63051e73d698e003d0c5af5695a3242b1cb9f8fc98fbc831fe09b1a389c
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ╭────────────────────────────────────────────────────────────────╮ │
+│ │ S: pod | Namespace: ys-odoo                                    │ │
+│ │ Dashboard coverage: complete in scope | pods 13/13             │ │
+│ │ No findings does not mean safe                                 │ │
+│ │ Local checks only; not PSS compliance.                         │ │
+│ │ POSTURE | Cluster | 78/100 (C) | 13/13 pods                    │ │
+│ │ Synthetic data (demo)                                          │ │
+│ │ Score ████████████████████████████░░░░░░░░                     │ │
+│ │ high      9 ████████████████████████                           │ │
+│ │ medium    6 ████████████████░░░░░░░░                           │ │
+│ │ info      4 ███████████░░░░░░░░░░░░░                           │ │
+│ │ Unknown checks: 4 | confirmed findings only in score           │ │
+│ │ Trend: ▆ (revision samples)                                    │ │
+│ │ ALERTS | new high since baseline / last ack | A: ack all       │ │
+│ │ No unacknowledged high alerts.                                 │ │
+│ │ TOP RULES | confirmed findings                                 │ │
+│ │ serviceAccountToken       4 ██████████████████                 │ │
+│ │ capabilitiesAdded         3 ██████████████░░░░                 │ │
+│ │ hostNetwork               3 ██████████████░░░░                 │ │
+│ │ imageLatest               3 ██████████████░░░░                 │ │
+│ │ limit-memory              3 ██████████████░░░░                 │ │
+│ │ NAMESPACES | lowest scores first                               │ │
+│ │ lgo                50 ████░░░░ | 2 findings                    │ │
+│ │ xcx                70 ██████░░ | 5 findings                    │ │
+│ │ bilibili-raffle    79 ██████░░ | 4 findings                    │ │
+│ │ kube-system        81 ██████░░ | 7 findings                    │ │
+│ │ ys-odoo            99 ████████ | 1 finding                     │ │
+│ │ More namespaces: use the namespace filter.                     │ │
+│ │ Score: 100 - (25*high + 8*medium + 2*info)/evaluated pods;     │ │
+│ │ floor 0, rounded.                                              │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== tab-events node hidden
+== tab-events pods 57x19 cells=187e4c63e41d6ac87abf7be291b18dcecada94dcb426e88fa870f46e1efefb15
+╭─ Pods ────────────────────────────────────────────────╮
+│                                                       │
+│ / filter pods…                               13 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
+│ ○ qiandao-1605400… xcx            0    2h Completed   │
+│ ○ lingqu-16054860… xcx            0   41m Completed   │
+│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
+│ ● metrics-server-… kube-system    0  119d ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
+│ ● local-path-prov… kube-system    0  119d ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+╰───────────────────────────────────────────────────────╯
+== tab-events heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== tab-events details 70x35 cells=9b792f3b138970c30a3140dd439a51601c4822e3e36f103ee838f08698c7908a
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ● psql-6bc7744f9-r7zlc                                   [Running] │
+│   ys-odoo · Running · ready 1/1 · node demo-node-01 · 10.42.0.40   │
+│                                                                    │
+│ ╭────────────────────────────────────────────────────────────────╮ │
+│ │ AGE    TYPE     REASON         MESSAGE  E  pod   ns   cluster  │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                   nenhum evento neste escopo                   │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== events-scope node hidden
+== events-scope pods 57x19 cells=187e4c63e41d6ac87abf7be291b18dcecada94dcb426e88fa870f46e1efefb15
+╭─ Pods ────────────────────────────────────────────────╮
+│                                                       │
+│ / filter pods…                               13 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
+│ ○ qiandao-1605400… xcx            0    2h Completed   │
+│ ○ lingqu-16054860… xcx            0   41m Completed   │
+│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
+│ ● metrics-server-… kube-system    0  119d ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
+│ ● local-path-prov… kube-system    0  119d ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+╰───────────────────────────────────────────────────────╯
+== events-scope heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== events-scope details 70x35 cells=52e00d122d404041452ea12868db1e91f9441562117adcfb55a874b3551458b5
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ● psql-6bc7744f9-r7zlc                                   [Running] │
+│   ys-odoo · Running · ready 1/1 · node demo-node-01 · 10.42.0.40   │
+│                                                                    │
+│ ╭────────────────────────────────────────────────────────────────╮ │
+│ │ AGE    TYPE     REASON         OBJECT          MESSAGE         │ │
+│ │ 12d    Warning  OOMKilling     Pod/odoo-7575b… Memory cgroup … │ │
+│ │ 12d    Normal   Started        Pod/odoo-7575b… Started contai… │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== tab-describe node hidden
+== tab-describe pods 57x19 cells=187e4c63e41d6ac87abf7be291b18dcecada94dcb426e88fa870f46e1efefb15
+╭─ Pods ────────────────────────────────────────────────╮
+│                                                       │
+│ / filter pods…                               13 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
+│ ○ qiandao-1605400… xcx            0    2h Completed   │
+│ ○ lingqu-16054860… xcx            0   41m Completed   │
+│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
+│ ● metrics-server-… kube-system    0  119d ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
+│ ● local-path-prov… kube-system    0  119d ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+╰───────────────────────────────────────────────────────╯
+== tab-describe heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== tab-describe details 70x35 cells=e8ce333f093ccb60f2db5349436630497bb00f92dc14107f0cf3e0b39a0bddf6
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ● psql-6bc7744f9-r7zlc                                   [Running] │
+│   ys-odoo · Running · ready 1/1 · node demo-node-01 · 10.42.0.40   │
+│                                                                    │
+│ ╭────────────────────────────────────────────────────────────────╮ │
+│ │ Containers  2 · ready 1/1                                      │ │
+│ │ ● init    init-perms        Completed · exit 0 · 64d ago (202… │ │
+│ │ ● app     app               running 64d · ready ✓ · st… ◂ logs │ │
+│ │                                                                │ │
+│ │ Name              psql-6bc7744f9-r7zlc                         │ │
+│ │ Namespace         ys-odoo                                      │ │
+│ │ Node              demo-node-01/192.168.0.12                    │ │
+│ │ Status            Running                                      │ │
+│ │ Ready             1/1                                          │ │
+│ │ IP                10.42.0.40                                   │ │
+│ │ Controlled By     ReplicaSet/psql-6bc7744f9                    │ │
+│ │ Image             registry.local/ys-odoo:1.4.2                 │ │
+│ │ Restart Count     0                                            │ │
+│ │ Requests          cpu: 10m, memory: 64Mi                       │ │
+│ │ Limits            cpu: 50m, memory: 128Mi                      │ │
+│ │ QoS Class         Burstable                                    │ │
+│ │ Conditions        Initialized ✓ Ready ✓ ContainersReady ✓ Pod… │ │
+│ │ Tolerations       node.kubernetes.io/not-ready:NoExecute for … │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== page-down node hidden
+== page-down pods 57x19 cells=187e4c63e41d6ac87abf7be291b18dcecada94dcb426e88fa870f46e1efefb15
+╭─ Pods ────────────────────────────────────────────────╮
+│                                                       │
+│ / filter pods…                               13 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
+│ ○ qiandao-1605400… xcx            0    2h Completed   │
+│ ○ lingqu-16054860… xcx            0   41m Completed   │
+│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
+│ ● metrics-server-… kube-system    0  119d ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
+│ ● local-path-prov… kube-system    0  119d ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+╰───────────────────────────────────────────────────────╯
+== page-down heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== page-down details 70x35 cells=e8ce333f093ccb60f2db5349436630497bb00f92dc14107f0cf3e0b39a0bddf6
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ● psql-6bc7744f9-r7zlc                                   [Running] │
+│   ys-odoo · Running · ready 1/1 · node demo-node-01 · 10.42.0.40   │
+│                                                                    │
+│ ╭────────────────────────────────────────────────────────────────╮ │
+│ │ Containers  2 · ready 1/1                                      │ │
+│ │ ● init    init-perms        Completed · exit 0 · 64d ago (202… │ │
+│ │ ● app     app               running 64d · ready ✓ · st… ◂ logs │ │
+│ │                                                                │ │
+│ │ Name              psql-6bc7744f9-r7zlc                         │ │
+│ │ Namespace         ys-odoo                                      │ │
+│ │ Node              demo-node-01/192.168.0.12                    │ │
+│ │ Status            Running                                      │ │
+│ │ Ready             1/1                                          │ │
+│ │ IP                10.42.0.40                                   │ │
+│ │ Controlled By     ReplicaSet/psql-6bc7744f9                    │ │
+│ │ Image             registry.local/ys-odoo:1.4.2                 │ │
+│ │ Restart Count     0                                            │ │
+│ │ Requests          cpu: 10m, memory: 64Mi                       │ │
+│ │ Limits            cpu: 50m, memory: 128Mi                      │ │
+│ │ QoS Class         Burstable                                    │ │
+│ │ Conditions        Initialized ✓ Ready ✓ ContainersReady ✓ Pod… │ │
+│ │ Tolerations       node.kubernetes.io/not-ready:NoExecute for … │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== filter-open node hidden
+== filter-open pods 57x19 cells=5d08644c007ff6a934badcdb590c8a0f855edaebe17d174a69148aec566ae8c0
+╭─ Pods · focus ────────────────────────────────────────╮
+│                                                       │
+│ / ▌                                          13 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
+│ ○ qiandao-1605400… xcx            0    2h Completed   │
+│ ○ lingqu-16054860… xcx            0   41m Completed   │
+│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
+│ ● metrics-server-… kube-system    0  119d ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
+│ ● local-path-prov… kube-system    0  119d ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+╰───────────────────────────────────────────────────────╯
+== filter-open heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== filter-open details 70x35 cells=a18bba09b71bef75054761a1220b3c44d1c32463df91418cffed5f1628ad62db
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ● psql-6bc7744f9-r7zlc                                   [Running] │
+│   ys-odoo · Running · ready 1/1 · node demo-node-01 · 10.42.0.40   │
+│                                                                    │
+│ ╭────────────────────────────────────────────────────────────────╮ │
+│ │ Containers  2 · ready 1/1                                      │ │
+│ │ ● init    init-perms        Completed · exit 0 · 64d ago (202… │ │
+│ │ ● app     app               running 64d · ready ✓ · st… ◂ logs │ │
+│ │                                                                │ │
+│ │ Name              psql-6bc7744f9-r7zlc                         │ │
+│ │ Namespace         ys-odoo                                      │ │
+│ │ Node              demo-node-01/192.168.0.12                    │ │
+│ │ Status            Running                                      │ │
+│ │ Ready             1/1                                          │ │
+│ │ IP                10.42.0.40                                   │ │
+│ │ Controlled By     ReplicaSet/psql-6bc7744f9                    │ │
+│ │ Image             registry.local/ys-odoo:1.4.2                 │ │
+│ │ Restart Count     0                                            │ │
+│ │ Requests          cpu: 10m, memory: 64Mi                       │ │
+│ │ Limits            cpu: 50m, memory: 128Mi                      │ │
+│ │ QoS Class         Burstable                                    │ │
+│ │ Conditions        Initialized ✓ Ready ✓ ContainersReady ✓ Pod… │ │
+│ │ Tolerations       node.kubernetes.io/not-ready:NoExecute for … │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== filter-b node hidden
+== filter-b pods 57x19 cells=be91b7394c2d02a67490ad4a755e8490cdba545276b6405e021ce388f6cbbfb3
+╭─ Pods · focus ────────────────────────────────────────╮
+│                                                       │
+│ / b▌                                         10 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
+│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
+│ ● metrics-server-… kube-system    0  119d ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
+│ ● local-path-prov… kube-system    0  119d ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│                                                       │
+│                                                       │
+│                                                       │
+╰───────────────────────────────────────────────────────╯
+== filter-b heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== filter-b details 70x35 cells=a18bba09b71bef75054761a1220b3c44d1c32463df91418cffed5f1628ad62db
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ● psql-6bc7744f9-r7zlc                                   [Running] │
+│   ys-odoo · Running · ready 1/1 · node demo-node-01 · 10.42.0.40   │
+│                                                                    │
+│ ╭────────────────────────────────────────────────────────────────╮ │
+│ │ Containers  2 · ready 1/1                                      │ │
+│ │ ● init    init-perms        Completed · exit 0 · 64d ago (202… │ │
+│ │ ● app     app               running 64d · ready ✓ · st… ◂ logs │ │
+│ │                                                                │ │
+│ │ Name              psql-6bc7744f9-r7zlc                         │ │
+│ │ Namespace         ys-odoo                                      │ │
+│ │ Node              demo-node-01/192.168.0.12                    │ │
+│ │ Status            Running                                      │ │
+│ │ Ready             1/1                                          │ │
+│ │ IP                10.42.0.40                                   │ │
+│ │ Controlled By     ReplicaSet/psql-6bc7744f9                    │ │
+│ │ Image             registry.local/ys-odoo:1.4.2                 │ │
+│ │ Restart Count     0                                            │ │
+│ │ Requests          cpu: 10m, memory: 64Mi                       │ │
+│ │ Limits            cpu: 50m, memory: 128Mi                      │ │
+│ │ QoS Class         Burstable                                    │ │
+│ │ Conditions        Initialized ✓ Ready ✓ ContainersReady ✓ Pod… │ │
+│ │ Tolerations       node.kubernetes.io/not-ready:NoExecute for … │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== filter-i node hidden
+== filter-i pods 57x19 cells=8e08a3e9a65b31bdd76f8b70ea9697077c72e14409437ec12657040be46d1097
+╭─ Pods · focus ────────────────────────────────────────╮
+│                                                       │
+│ / bi▌                                         3 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│                                                       │
+│                                                       │
+│                                                       │
+│                                                       │
+│                                                       │
+│                                                       │
+│                                                       │
+│                                                       │
+│                                                       │
+│                                                       │
+╰───────────────────────────────────────────────────────╯
+== filter-i heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== filter-i details 70x35 cells=80839303bf85bdc9fd40bb1819b4320186b2ae0717dc024ecfb111cb1e459fc8
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ● bilibili-raffle-5d8f9c7b4-x2kqp                        [Running] │
+│   bilibili-raffle · Running · ready 1/1 · node demo-node-01 · 10.… │
+│                                                                    │
+│ ╭────────────────────────────────────────────────────────────────╮ │
+│ │ Containers  1 · ready 1/1                                      │ │
+│ │ ● app     app               running 119d · ready ✓ · s… ◂ logs │ │
+│ │                                                                │ │
+│ │ Name              bilibili-raffle-5d8f9c7b4-x2kqp              │ │
+│ │ Namespace         bilibili-raffle                              │ │
+│ │ Node              demo-node-01/192.168.0.12                    │ │
+│ │ Status            Running                                      │ │
+│ │ Ready             1/1                                          │ │
+│ │ IP                10.42.0.23                                   │ │
+│ │ Controlled By     ReplicaSet/bilibili-raffle-5d8f9c7b4         │ │
+│ │ Image             registry.local/bilibili-raffle:1.4.2         │ │
+│ │ Restart Count     0                                            │ │
+│ │ Requests          cpu: 10m, memory: 64Mi                       │ │
+│ │ Limits            cpu: 50m, memory: 128Mi                      │ │
+│ │ QoS Class         Burstable                                    │ │
+│ │ Conditions        Initialized ✓ Ready ✓ ContainersReady ✓ Pod… │ │
+│ │ Tolerations       node.kubernetes.io/not-ready:NoExecute for … │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== filter-confirm node hidden
+== filter-confirm pods 57x19 cells=8e08a3e9a65b31bdd76f8b70ea9697077c72e14409437ec12657040be46d1097
+╭─ Pods · focus ────────────────────────────────────────╮
+│                                                       │
+│ / bi▌                                         3 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+│                                                       │
+│                                                       │
+│                                                       │
+│                                                       │
+│                                                       │
+│                                                       │
+│                                                       │
+│                                                       │
+│                                                       │
+│                                                       │
+╰───────────────────────────────────────────────────────╯
+== filter-confirm heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== filter-confirm details 70x35 cells=80839303bf85bdc9fd40bb1819b4320186b2ae0717dc024ecfb111cb1e459fc8
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ● bilibili-raffle-5d8f9c7b4-x2kqp                        [Running] │
+│   bilibili-raffle · Running · ready 1/1 · node demo-node-01 · 10.… │
+│                                                                    │
+│ ╭────────────────────────────────────────────────────────────────╮ │
+│ │ Containers  1 · ready 1/1                                      │ │
+│ │ ● app     app               running 119d · ready ✓ · s… ◂ logs │ │
+│ │                                                                │ │
+│ │ Name              bilibili-raffle-5d8f9c7b4-x2kqp              │ │
+│ │ Namespace         bilibili-raffle                              │ │
+│ │ Node              demo-node-01/192.168.0.12                    │ │
+│ │ Status            Running                                      │ │
+│ │ Ready             1/1                                          │ │
+│ │ IP                10.42.0.23                                   │ │
+│ │ Controlled By     ReplicaSet/bilibili-raffle-5d8f9c7b4         │ │
+│ │ Image             registry.local/bilibili-raffle:1.4.2         │ │
+│ │ Restart Count     0                                            │ │
+│ │ Requests          cpu: 10m, memory: 64Mi                       │ │
+│ │ Limits            cpu: 50m, memory: 128Mi                      │ │
+│ │ QoS Class         Burstable                                    │ │
+│ │ Conditions        Initialized ✓ Ready ✓ ContainersReady ✓ Pod… │ │
+│ │ Tolerations       node.kubernetes.io/not-ready:NoExecute for … │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== filter-clear node hidden
+== filter-clear pods 57x19 cells=51ad33d30c4ac03c4a1e5c1061d1e4b8a784a158958b36460f54c29c70a28f1a
+╭─ Pods · focus ────────────────────────────────────────╮
+│                                                       │
+│ / filter pods…▌                              13 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
+│ ○ qiandao-1605400… xcx            0    2h Completed   │
+│ ○ lingqu-16054860… xcx            0   41m Completed   │
+│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
+│ ● metrics-server-… kube-system    0  119d ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
+│ ● local-path-prov… kube-system    0  119d ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+╰───────────────────────────────────────────────────────╯
+== filter-clear heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== filter-clear details 70x35 cells=80839303bf85bdc9fd40bb1819b4320186b2ae0717dc024ecfb111cb1e459fc8
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ● bilibili-raffle-5d8f9c7b4-x2kqp                        [Running] │
+│   bilibili-raffle · Running · ready 1/1 · node demo-node-01 · 10.… │
+│                                                                    │
+│ ╭────────────────────────────────────────────────────────────────╮ │
+│ │ Containers  1 · ready 1/1                                      │ │
+│ │ ● app     app               running 119d · ready ✓ · s… ◂ logs │ │
+│ │                                                                │ │
+│ │ Name              bilibili-raffle-5d8f9c7b4-x2kqp              │ │
+│ │ Namespace         bilibili-raffle                              │ │
+│ │ Node              demo-node-01/192.168.0.12                    │ │
+│ │ Status            Running                                      │ │
+│ │ Ready             1/1                                          │ │
+│ │ IP                10.42.0.23                                   │ │
+│ │ Controlled By     ReplicaSet/bilibili-raffle-5d8f9c7b4         │ │
+│ │ Image             registry.local/bilibili-raffle:1.4.2         │ │
+│ │ Restart Count     0                                            │ │
+│ │ Requests          cpu: 10m, memory: 64Mi                       │ │
+│ │ Limits            cpu: 50m, memory: 128Mi                      │ │
+│ │ QoS Class         Burstable                                    │ │
+│ │ Conditions        Initialized ✓ Ready ✓ ContainersReady ✓ Pod… │ │
+│ │ Tolerations       node.kubernetes.io/not-ready:NoExecute for … │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== click-pod node hidden
+== click-pod pods 57x19 cells=92acb96e362077471b841fe39694b0c2f29f0b35669bd7c27143b5cb82a2b8af
+╭─ Pods · focus ────────────────────────────────────────╮
+│                                                       │
+│ / filter pods…▌                              13 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
+│ ○ qiandao-1605400… xcx            0    2h Completed   │
+│ ○ lingqu-16054860… xcx            0   41m Completed   │
+│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
+│ ● metrics-server-… kube-system    0  119d ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
+│ ● local-path-prov… kube-system    0  119d ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+╰───────────────────────────────────────────────────────╯
+== click-pod heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== click-pod details 70x35 cells=a18bba09b71bef75054761a1220b3c44d1c32463df91418cffed5f1628ad62db
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ● psql-6bc7744f9-r7zlc                                   [Running] │
+│   ys-odoo · Running · ready 1/1 · node demo-node-01 · 10.42.0.40   │
+│                                                                    │
+│ ╭────────────────────────────────────────────────────────────────╮ │
+│ │ Containers  2 · ready 1/1                                      │ │
+│ │ ● init    init-perms        Completed · exit 0 · 64d ago (202… │ │
+│ │ ● app     app               running 64d · ready ✓ · st… ◂ logs │ │
+│ │                                                                │ │
+│ │ Name              psql-6bc7744f9-r7zlc                         │ │
+│ │ Namespace         ys-odoo                                      │ │
+│ │ Node              demo-node-01/192.168.0.12                    │ │
+│ │ Status            Running                                      │ │
+│ │ Ready             1/1                                          │ │
+│ │ IP                10.42.0.40                                   │ │
+│ │ Controlled By     ReplicaSet/psql-6bc7744f9                    │ │
+│ │ Image             registry.local/ys-odoo:1.4.2                 │ │
+│ │ Restart Count     0                                            │ │
+│ │ Requests          cpu: 10m, memory: 64Mi                       │ │
+│ │ Limits            cpu: 50m, memory: 128Mi                      │ │
+│ │ QoS Class         Burstable                                    │ │
+│ │ Conditions        Initialized ✓ Ready ✓ ContainersReady ✓ Pod… │ │
+│ │ Tolerations       node.kubernetes.io/not-ready:NoExecute for … │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== wheel-pod node hidden
+== wheel-pod pods 57x19 cells=8d108cdbe7a5dc31368e1f3db4a2dc878265c18d19aff697f62e0c7b50281bf4
+╭─ Pods · focus ────────────────────────────────────────╮
+│                                                       │
+│ / filter pods…▌                              13 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
+│ ○ qiandao-1605400… xcx            0    2h Completed   │
+│ ○ lingqu-16054860… xcx            0   41m Completed   │
+│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
+│ ● metrics-server-… kube-system    0  119d ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
+│ ● local-path-prov… kube-system    0  119d ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+╰───────────────────────────────────────────────────────╯
+== wheel-pod heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== wheel-pod details 70x35 cells=aa74e5e06574b6d08598bb75e696344215cc27db8d5dc01b1e12c5b6503bce59
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ● odoo-7575bf6d8-9wjvk                                   [Running] │
+│   ys-odoo · Running · ready 1/1 · node demo-node-01 · 10.42.0.41   │
+│                                                                    │
+│ ╭────────────────────────────────────────────────────────────────╮ │
+│ │ Containers  1 · ready 1/1                                      │ │
+│ │ ● app     app               running 12d · ready ✓ · st… ◂ logs │ │
+│ │           last      OOMKilled · exit 137 · 12d ago (2026-10-0… │ │
+│ │           ↳ P logs anteriores · C troca container · E eventos  │ │
+│ │                                                                │ │
+│ │ Name              odoo-7575bf6d8-9wjvk                         │ │
+│ │ Namespace         ys-odoo                                      │ │
+│ │ Node              demo-node-01/192.168.0.12                    │ │
+│ │ Status            Running                                      │ │
+│ │ Ready             1/1                                          │ │
+│ │ IP                10.42.0.41                                   │ │
+│ │ Controlled By     ReplicaSet/odoo-7575bf6d8                    │ │
+│ │ Image             registry.local/ys-odoo:1.4.2                 │ │
+│ │ Restart Count     1                                            │ │
+│ │ Requests          cpu: 10m, memory: 64Mi                       │ │
+│ │ Limits            cpu: 50m, memory: 128Mi                      │ │
+│ │ QoS Class         Burstable                                    │ │
+│ │ Conditions        Initialized ✓ Ready ✓ ContainersReady ✓ Pod… │ │
+│ │ Tolerations       node.kubernetes.io/not-ready:NoExecute for … │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== hover-pod node hidden
+== hover-pod pods 57x19 cells=914b815bd057071259b44deb77fa4900c970b653b5bb688412914c62244d1954
+╭─ Pods · focus ────────────────────────────────────────╮
+│                                                       │
+│ / filter pods…▌                              13 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
+│ ○ qiandao-1605400… xcx            0    2h Completed   │
+│ ○ lingqu-16054860… xcx            0   41m Completed   │
+│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
+│ ● metrics-server-… kube-system    0  119d ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
+│ ● local-path-prov… kube-system    0  119d ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+╰───────────────────────────────────────────────────────╯
+== hover-pod heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== hover-pod details 70x35 cells=aa74e5e06574b6d08598bb75e696344215cc27db8d5dc01b1e12c5b6503bce59
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ● odoo-7575bf6d8-9wjvk                                   [Running] │
+│   ys-odoo · Running · ready 1/1 · node demo-node-01 · 10.42.0.41   │
+│                                                                    │
+│ ╭────────────────────────────────────────────────────────────────╮ │
+│ │ Containers  1 · ready 1/1                                      │ │
+│ │ ● app     app               running 12d · ready ✓ · st… ◂ logs │ │
+│ │           last      OOMKilled · exit 137 · 12d ago (2026-10-0… │ │
+│ │           ↳ P logs anteriores · C troca container · E eventos  │ │
+│ │                                                                │ │
+│ │ Name              odoo-7575bf6d8-9wjvk                         │ │
+│ │ Namespace         ys-odoo                                      │ │
+│ │ Node              demo-node-01/192.168.0.12                    │ │
+│ │ Status            Running                                      │ │
+│ │ Ready             1/1                                          │ │
+│ │ IP                10.42.0.41                                   │ │
+│ │ Controlled By     ReplicaSet/odoo-7575bf6d8                    │ │
+│ │ Image             registry.local/ys-odoo:1.4.2                 │ │
+│ │ Restart Count     1                                            │ │
+│ │ Requests          cpu: 10m, memory: 64Mi                       │ │
+│ │ Limits            cpu: 50m, memory: 128Mi                      │ │
+│ │ QoS Class         Burstable                                    │ │
+│ │ Conditions        Initialized ✓ Ready ✓ ContainersReady ✓ Pod… │ │
+│ │ Tolerations       node.kubernetes.io/not-ready:NoExecute for … │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== click-tab node hidden
+== click-tab pods 57x19 cells=8d9aed175a0494ee37376a130f6630a34b69e6d37b2bf6b298c1e08e6ca95252
+╭─ Pods ────────────────────────────────────────────────╮
+│                                                       │
+│ / filter pods…                               13 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
+│ ○ qiandao-1605400… xcx            0    2h Completed   │
+│ ○ lingqu-16054860… xcx            0   41m Completed   │
+│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
+│ ● metrics-server-… kube-system    0  119d ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
+│ ● local-path-prov… kube-system    0  119d ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+╰───────────────────────────────────────────────────────╯
+== click-tab heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== click-tab details 70x35 cells=dbec1315ba682ce57d8be459ed94cad236727f3f4eea5f9c40a3b96c66f418f9
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ● odoo-7575bf6d8-9wjvk                                   [Running] │
+│   ys-odoo · Running · ready 1/1 · node demo-node-01 · 10.42.0.41   │
+│                                                                    │
+│ ╭────────────────────────────────────────────────────────────────╮ │
+│ │ 20:14:00  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:03  DEBUG heartbeat ok rtt=42ms                          │ │
+│ │ 20:14:06  INFO  danmaku batch received count=38                │ │
+│ │ 20:14:09  INFO  raffle detected id=883104 type=gift            │ │
+│ │ 20:14:12  INFO  join raffle ok id=883104 latency=118ms         │ │
+│ │ 20:14:15  WARN  rate limited by upstream, backoff 2s           │ │
+│ │ 20:14:18  DEBUG heartbeat ok rtt=39ms                          │ │
+│ │ 20:14:21  INFO  danmaku batch received count=51                │ │
+│ │ 20:14:24  INFO  raffle detected id=883117 type=guard           │ │
+│ │ 20:14:27  ERROR join raffle failed id=883117: already ended    │ │
+│ │ 20:14:30  INFO  reconnecting ws in 1s                          │ │
+│ │ 20:14:33  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:36  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:39  DEBUG heartbeat ok rtt=42ms                          │ │
+│ │ 20:14:42  INFO  danmaku batch received count=38                │ │
+│ │ 20:14:45  INFO  raffle detected id=883104 type=gift            │ │
+│ │ 20:14:48  INFO  join raffle ok id=883104 latency=118ms         │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │ ❯ ▌                                                app · atual │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== toggle-left node 32x16 cells=3be00b1853a6c35e76b71268efaa0700bbf6562d780ee751fc8930957c9ff021
+╭─ Node ───────────────────────╮
+│                              │
+│  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  demo-no…│
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready │
+│    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25% │
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ████████│
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4…│
+│    ▀    ▀▀▀▀▀▀▀▀▀    ████████│
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13…│
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch am…│
+│    ▀ ▀  ▀▀▀▀▀▀▀▀▀            │
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀           │
+│  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀          │
+│                              │
+│                              │
+╰──────────────────────────────╯
+== toggle-left pods 46x19 cells=886b2ab67624cf4194259a14b3758456494264d7c2f1c0cd899ba69eba69b40a
+╭─ Pods ─────────────────────────────────────╮
+│                                            │
+│ / filter pods…                    13 items │
+│                                            │
+│   NAME  NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bili… bilibili-r…    0  119d █░░░░░░     │
+│ ● bili… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-… lgo            0   87d ██░░░░░     │
+│ ● psql… ys-odoo        0   64d ████░░░     │
+│ ● odoo… ys-odoo        1   64d ██████░     │
+│ ○ qian… xcx            0    2h Completed   │
+│ ○ ling… xcx            0   41m Completed   │
+│ ⠙ ling… xcx            0    8s Init:0/1    │
+│ ● core… kube-system    0  119d █░░░░░░     │
+│ ● metr… kube-system    0  119d ready 0/1   │
+│ ● trae… kube-system    0  119d ░░░░░░░     │
+│ ● loca… kube-system    0  119d ImagePullB… │
+│ ● svcl… kube-system    7  119d CrashLoopB… │
+╰────────────────────────────────────────────╯
+== toggle-left heatmap 46x16 cells=8cafa9949be4d694d33a048986f116ef1060328306732707509fbb32ec83b643
+╭─ CPU heatmap · last 2 min ─────────────────╮
+│                                            │
+│ bilibili-raf… ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ████████████████████ now │
+╰────────────────────────────────────────────╯
+== toggle-left details 48x35 cells=13b034de2ef8cacb0919f345eb4783a4fc83b6a42d9da9a64bb8fa2a1a1e6596
+╭──────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Se │
+│ ──────────────────────────────────────────── │
+│ ● odoo-7575bf6d8-9wjvk             [Running] │
+│   ys-odoo · Running · ready 1/1 · node demo… │
+│                                              │
+│ ╭──────────────────────────────────────────╮ │
+│ │ 20:14:00  INFO  ws connected room=21452… │ │
+│ │ 20:14:03  DEBUG heartbeat ok rtt=42ms    │ │
+│ │ 20:14:06  INFO  danmaku batch received … │ │
+│ │ 20:14:09  INFO  raffle detected id=8831… │ │
+│ │ 20:14:12  INFO  join raffle ok id=88310… │ │
+│ │ 20:14:15  WARN  rate limited by upstrea… │ │
+│ │ 20:14:18  DEBUG heartbeat ok rtt=39ms    │ │
+│ │ 20:14:21  INFO  danmaku batch received … │ │
+│ │ 20:14:24  INFO  raffle detected id=8831… │ │
+│ │ 20:14:27  ERROR join raffle failed id=8… │ │
+│ │ 20:14:30  INFO  reconnecting ws in 1s    │ │
+│ │ 20:14:33  INFO  ws connected room=21452… │ │
+│ │ 20:14:36  INFO  ws connected room=21452… │ │
+│ │ 20:14:39  DEBUG heartbeat ok rtt=42ms    │ │
+│ │ 20:14:42  INFO  danmaku batch received … │ │
+│ │ 20:14:45  INFO  raffle detected id=8831… │ │
+│ │ 20:14:48  INFO  join raffle ok id=88310… │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │ ❯ ▌                          app · atual │ │
+│ ╰──────────────────────────────────────────╯ │
+╰──────────────────────────────────────────────╯
+== toggle-left-again node hidden
+== toggle-left-again pods 57x19 cells=8d9aed175a0494ee37376a130f6630a34b69e6d37b2bf6b298c1e08e6ca95252
+╭─ Pods ────────────────────────────────────────────────╮
+│                                                       │
+│ / filter pods…                               13 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
+│ ○ qiandao-1605400… xcx            0    2h Completed   │
+│ ○ lingqu-16054860… xcx            0   41m Completed   │
+│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
+│ ● metrics-server-… kube-system    0  119d ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
+│ ● local-path-prov… kube-system    0  119d ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+╰───────────────────────────────────────────────────────╯
+== toggle-left-again heatmap 57x16 cells=90fd13af1f64f4b101aa2905e48d7923434b61c9b4f73e2f13dc0eee8c175515
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== toggle-left-again details 70x35 cells=dbec1315ba682ce57d8be459ed94cad236727f3f4eea5f9c40a3b96c66f418f9
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ● odoo-7575bf6d8-9wjvk                                   [Running] │
+│   ys-odoo · Running · ready 1/1 · node demo-node-01 · 10.42.0.41   │
+│                                                                    │
+│ ╭────────────────────────────────────────────────────────────────╮ │
+│ │ 20:14:00  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:03  DEBUG heartbeat ok rtt=42ms                          │ │
+│ │ 20:14:06  INFO  danmaku batch received count=38                │ │
+│ │ 20:14:09  INFO  raffle detected id=883104 type=gift            │ │
+│ │ 20:14:12  INFO  join raffle ok id=883104 latency=118ms         │ │
+│ │ 20:14:15  WARN  rate limited by upstream, backoff 2s           │ │
+│ │ 20:14:18  DEBUG heartbeat ok rtt=39ms                          │ │
+│ │ 20:14:21  INFO  danmaku batch received count=51                │ │
+│ │ 20:14:24  INFO  raffle detected id=883117 type=guard           │ │
+│ │ 20:14:27  ERROR join raffle failed id=883117: already ended    │ │
+│ │ 20:14:30  INFO  reconnecting ws in 1s                          │ │
+│ │ 20:14:33  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:36  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:39  DEBUG heartbeat ok rtt=42ms                          │ │
+│ │ 20:14:42  INFO  danmaku batch received count=38                │ │
+│ │ 20:14:45  INFO  raffle detected id=883104 type=gift            │ │
+│ │ 20:14:48  INFO  join raffle ok id=883104 latency=118ms         │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │ ❯ ▌                                                app · atual │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== palette node hidden
+== palette pods 57x19 cells=78b4239ae45160c9210b9e82625c1fa8aaa27fc9c3b28855cef7bcd58548e3d6
+╭─ Pods ────────────────────────────────────────────────╮
+│                                                       │
+│ / filter pods…                               13 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
+│ ○ qiandao-1605400… xcx            0    2h Completed   │
+│ ○ lingqu-16054860… xcx            0   41m Completed   │
+│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
+│ ● metrics-server-… kube-system    0  119d ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
+│ ● local-path-prov… kube-system    0  119d ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+╰───────────────────────────────────────────────────────╯
+== palette heatmap 57x16 cells=9873acb221566b44b0e41fbcf2d065107e1cbad4bee55c05c8fa7ef077957ed5
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== palette details 70x35 cells=1e0dd82ae8eacae3a6d373a1917f17721431aa27603c2e44eb1acf34afb7fa6b
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ● odoo-7575bf6d8-9wjvk                                   [Running] │
+│   ys-odoo · Running · ready 1/1 · node demo-node-01 · 10.42.0.41   │
+│                                                                    │
+│ ╭────────────────────────────────────────────────────────────────╮ │
+│ │ 20:14:00  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:03  DEBUG heartbeat ok rtt=42ms                          │ │
+│ │ 20:14:06  INFO  danmaku batch received count=38                │ │
+│ │ 20:14:09  INFO  raffle detected id=883104 type=gift            │ │
+│ │ 20:14:12  INFO  join raffle ok id=883104 latency=118ms         │ │
+│ │ 20:14:15  WARN  rate limited by upstream, backoff 2s           │ │
+│ │ 20:14:18  DEBUG heartbeat ok rtt=39ms                          │ │
+│ │ 20:14:21  INFO  danmaku batch received count=51                │ │
+│ │ 20:14:24  INFO  raffle detected id=883117 type=guard           │ │
+│ │ 20:14:27  ERROR join raffle failed id=883117: already ended    │ │
+│ │ 20:14:30  INFO  reconnecting ws in 1s                          │ │
+│ │ 20:14:33  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:36  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:39  DEBUG heartbeat ok rtt=42ms                          │ │
+│ │ 20:14:42  INFO  danmaku batch received count=38                │ │
+│ │ 20:14:45  INFO  raffle detected id=883104 type=gift            │ │
+│ │ 20:14:48  INFO  join raffle ok id=883104 latency=118ms         │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │ ❯ ▌                                                app · atual │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== data node hidden
+== data pods 57x19 cells=78b4239ae45160c9210b9e82625c1fa8aaa27fc9c3b28855cef7bcd58548e3d6
+╭─ Pods ────────────────────────────────────────────────╮
+│                                                       │
+│ / filter pods…                               13 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
+│ ○ qiandao-1605400… xcx            0    2h Completed   │
+│ ○ lingqu-16054860… xcx            0   41m Completed   │
+│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
+│ ● metrics-server-… kube-system    0  119d ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
+│ ● local-path-prov… kube-system    0  119d ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+╰───────────────────────────────────────────────────────╯
+== data heatmap 57x16 cells=9873acb221566b44b0e41fbcf2d065107e1cbad4bee55c05c8fa7ef077957ed5
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== data details 70x35 cells=1e0dd82ae8eacae3a6d373a1917f17721431aa27603c2e44eb1acf34afb7fa6b
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ● odoo-7575bf6d8-9wjvk                                   [Running] │
+│   ys-odoo · Running · ready 1/1 · node demo-node-01 · 10.42.0.41   │
+│                                                                    │
+│ ╭────────────────────────────────────────────────────────────────╮ │
+│ │ 20:14:00  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:03  DEBUG heartbeat ok rtt=42ms                          │ │
+│ │ 20:14:06  INFO  danmaku batch received count=38                │ │
+│ │ 20:14:09  INFO  raffle detected id=883104 type=gift            │ │
+│ │ 20:14:12  INFO  join raffle ok id=883104 latency=118ms         │ │
+│ │ 20:14:15  WARN  rate limited by upstream, backoff 2s           │ │
+│ │ 20:14:18  DEBUG heartbeat ok rtt=39ms                          │ │
+│ │ 20:14:21  INFO  danmaku batch received count=51                │ │
+│ │ 20:14:24  INFO  raffle detected id=883117 type=guard           │ │
+│ │ 20:14:27  ERROR join raffle failed id=883117: already ended    │ │
+│ │ 20:14:30  INFO  reconnecting ws in 1s                          │ │
+│ │ 20:14:33  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:36  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:39  DEBUG heartbeat ok rtt=42ms                          │ │
+│ │ 20:14:42  INFO  danmaku batch received count=38                │ │
+│ │ 20:14:45  INFO  raffle detected id=883104 type=gift            │ │
+│ │ 20:14:48  INFO  join raffle ok id=883104 latency=118ms         │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │ ❯ ▌                                                app · atual │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== resize-other node hidden
+== resize-other pods 71x19 cells=16749811fa49d865f9c732e5ed7005c6e1d47bffd944d072ac4ccffbee59aa59
+╭─ Pods ──────────────────────────────────────────────────────────────╮
+│                                                                     │
+│ / filter pods…                                             13 items │
+│                                                                     │
+│   NAME                           NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle-5d8f9c7b4-x2k… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7f6b8d9c5-mn4tz  bilibili-r…    2  119d ████░░░     │
+│ ● lgo-7c5d97584-hq8wd            lgo            0   87d ██░░░░░     │
+│ ● psql-6bc7744f9-r7zlc           ys-odoo        0   64d ████░░░     │
+│ ● odoo-7575bf6d8-9wjvk           ys-odoo        1   64d ██████░     │
+│ ○ qiandao-1605400800-k8f2m       xcx            0    2h Completed   │
+│ ○ lingqu-1605486000-4tq8n        xcx            0   41m Completed   │
+│ ⠙ lingqu-1605489600-b7xsd        xcx            0    8s Init:0/1    │
+│ ● coredns-6799fbcd5-w9t4p        kube-system    0  119d █░░░░░░     │
+│ ● metrics-server-67c658944b-lm2x kube-system    0  119d ready 0/1   │
+│ ● traefik-f4564c4f4-zq7rn        kube-system    0  119d ░░░░░░░     │
+│ ● local-path-provisioner-84db5d… kube-system    0  119d ImagePullB… │
+│ ● svclb-traefik-8c2f1-6n2vb      kube-system    7  119d CrashLoopB… │
+╰─────────────────────────────────────────────────────────────────────╯
+== resize-other heatmap 71x24 cells=792c353c0875d93f56f994d6e2f755ebaa692c82aa3face3120b5d7cd1514b77
+╭─ CPU heatmap · last 2 min ──────────────────────────────────────────╮
+│                                                                     │
+│ bilibili-raf… █████████████████████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live █████████████████████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 █████████████████████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… █████████████████████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… █████████████████████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… █████████████████████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ metrics-serv… █████████████████████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ traefik-f456… █████████████████████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│                                                                     │
+│                                                                     │
+│                                                                     │
+│                                                                     │
+│               -2m █████████████████████████████████████████████ now │
+╰─────────────────────────────────────────────────────────────────────╯
+== resize-other details 86x43 cells=a3d3acaf72d92636794710f5cfb3b3358663150c56509d4915db93ca69dce0fa
+╭────────────────────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security               tab ⇥ / shift+tab │
+│ ────────────────────────────────────────────────────────────────────────────────── │
+│ ● odoo-7575bf6d8-9wjvk                                                   [Running] │
+│   ys-odoo · Running · ready 1/1 · node demo-node-01 · 10.42.0.41                   │
+│                                                                                    │
+│ ╭────────────────────────────────────────────────────────────────────────────────╮ │
+│ │ 20:14:00  INFO  ws connected room=21452505 shard=3                             │ │
+│ │ 20:14:03  DEBUG heartbeat ok rtt=42ms                                          │ │
+│ │ 20:14:06  INFO  danmaku batch received count=38                                │ │
+│ │ 20:14:09  INFO  raffle detected id=883104 type=gift                            │ │
+│ │ 20:14:12  INFO  join raffle ok id=883104 latency=118ms                         │ │
+│ │ 20:14:15  WARN  rate limited by upstream, backoff 2s                           │ │
+│ │ 20:14:18  DEBUG heartbeat ok rtt=39ms                                          │ │
+│ │ 20:14:21  INFO  danmaku batch received count=51                                │ │
+│ │ 20:14:24  INFO  raffle detected id=883117 type=guard                           │ │
+│ │ 20:14:27  ERROR join raffle failed id=883117: already ended                    │ │
+│ │ 20:14:30  INFO  reconnecting ws in 1s                                          │ │
+│ │ 20:14:33  INFO  ws connected room=21452505 shard=3                             │ │
+│ │ 20:14:36  INFO  ws connected room=21452505 shard=3                             │ │
+│ │ 20:14:39  DEBUG heartbeat ok rtt=42ms                                          │ │
+│ │ 20:14:42  INFO  danmaku batch received count=38                                │ │
+│ │ 20:14:45  INFO  raffle detected id=883104 type=gift                            │ │
+│ │ 20:14:48  INFO  join raffle ok id=883104 latency=118ms                         │ │
+│ │                                                                                │ │
+│ │                                                                                │ │
+│ │                                                                                │ │
+│ │                                                                                │ │
+│ │                                                                                │ │
+│ │                                                                                │ │
+│ │                                                                                │ │
+│ │                                                                                │ │
+│ │                                                                                │ │
+│ │                                                                                │ │
+│ │                                                                                │ │
+│ │                                                                                │ │
+│ │                                                                                │ │
+│ │                                                                                │ │
+│ │                                                                                │ │
+│ │                                                                                │ │
+│ │ ❯ ▌                                                                app · atual │ │
+│ ╰────────────────────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────────────────────╯
+== resize-back node hidden
+== resize-back pods 57x19 cells=78b4239ae45160c9210b9e82625c1fa8aaa27fc9c3b28855cef7bcd58548e3d6
+╭─ Pods ────────────────────────────────────────────────╮
+│                                                       │
+│ / filter pods…                               13 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
+│ ○ qiandao-1605400… xcx            0    2h Completed   │
+│ ○ lingqu-16054860… xcx            0   41m Completed   │
+│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
+│ ● metrics-server-… kube-system    0  119d ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
+│ ● local-path-prov… kube-system    0  119d ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+╰───────────────────────────────────────────────────────╯
+== resize-back heatmap 57x16 cells=9873acb221566b44b0e41fbcf2d065107e1cbad4bee55c05c8fa7ef077957ed5
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== resize-back details 70x35 cells=1e0dd82ae8eacae3a6d373a1917f17721431aa27603c2e44eb1acf34afb7fa6b
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ● odoo-7575bf6d8-9wjvk                                   [Running] │
+│   ys-odoo · Running · ready 1/1 · node demo-node-01 · 10.42.0.41   │
+│                                                                    │
+│ ╭────────────────────────────────────────────────────────────────╮ │
+│ │ 20:14:00  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:03  DEBUG heartbeat ok rtt=42ms                          │ │
+│ │ 20:14:06  INFO  danmaku batch received count=38                │ │
+│ │ 20:14:09  INFO  raffle detected id=883104 type=gift            │ │
+│ │ 20:14:12  INFO  join raffle ok id=883104 latency=118ms         │ │
+│ │ 20:14:15  WARN  rate limited by upstream, backoff 2s           │ │
+│ │ 20:14:18  DEBUG heartbeat ok rtt=39ms                          │ │
+│ │ 20:14:21  INFO  danmaku batch received count=51                │ │
+│ │ 20:14:24  INFO  raffle detected id=883117 type=guard           │ │
+│ │ 20:14:27  ERROR join raffle failed id=883117: already ended    │ │
+│ │ 20:14:30  INFO  reconnecting ws in 1s                          │ │
+│ │ 20:14:33  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:36  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:39  DEBUG heartbeat ok rtt=42ms                          │ │
+│ │ 20:14:42  INFO  danmaku batch received count=38                │ │
+│ │ 20:14:45  INFO  raffle detected id=883104 type=gift            │ │
+│ │ 20:14:48  INFO  join raffle ok id=883104 latency=118ms         │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │ ❯ ▌                                                app · atual │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== help-open overlay
+== help-close node hidden
+== help-close pods 57x19 cells=78b4239ae45160c9210b9e82625c1fa8aaa27fc9c3b28855cef7bcd58548e3d6
+╭─ Pods ────────────────────────────────────────────────╮
+│                                                       │
+│ / filter pods…                               13 items │
+│                                                       │
+│   NAME             NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bilibili-raffle… bilibili-r…    0  119d █░░░░░░     │
+│ ● bilibili-live-7… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-7c5d97584-h… lgo            0   87d ██░░░░░     │
+│ ● psql-6bc7744f9-… ys-odoo        0   64d ████░░░     │
+│ ● odoo-7575bf6d8-… ys-odoo        1   64d ██████░     │
+│ ○ qiandao-1605400… xcx            0    2h Completed   │
+│ ○ lingqu-16054860… xcx            0   41m Completed   │
+│ ⠙ lingqu-16054896… xcx            0    8s Init:0/1    │
+│ ● coredns-6799fbc… kube-system    0  119d █░░░░░░     │
+│ ● metrics-server-… kube-system    0  119d ready 0/1   │
+│ ● traefik-f4564c4… kube-system    0  119d ░░░░░░░     │
+│ ● local-path-prov… kube-system    0  119d ImagePullB… │
+│ ● svclb-traefik-8… kube-system    7  119d CrashLoopB… │
+╰───────────────────────────────────────────────────────╯
+== help-close heatmap 57x16 cells=9873acb221566b44b0e41fbcf2d065107e1cbad4bee55c05c8fa7ef077957ed5
+╭─ CPU heatmap · last 2 min ────────────────────────────╮
+│                                                       │
+│ bilibili-raf… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ███████████████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ███████████████████████████████ now │
+╰───────────────────────────────────────────────────────╯
+== help-close details 70x35 cells=1e0dd82ae8eacae3a6d373a1917f17721431aa27603c2e44eb1acf34afb7fa6b
+╭────────────────────────────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Security                 │
+│ ────────────────────────────────────────────────────────────────── │
+│ ● odoo-7575bf6d8-9wjvk                                   [Running] │
+│   ys-odoo · Running · ready 1/1 · node demo-node-01 · 10.42.0.41   │
+│                                                                    │
+│ ╭────────────────────────────────────────────────────────────────╮ │
+│ │ 20:14:00  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:03  DEBUG heartbeat ok rtt=42ms                          │ │
+│ │ 20:14:06  INFO  danmaku batch received count=38                │ │
+│ │ 20:14:09  INFO  raffle detected id=883104 type=gift            │ │
+│ │ 20:14:12  INFO  join raffle ok id=883104 latency=118ms         │ │
+│ │ 20:14:15  WARN  rate limited by upstream, backoff 2s           │ │
+│ │ 20:14:18  DEBUG heartbeat ok rtt=39ms                          │ │
+│ │ 20:14:21  INFO  danmaku batch received count=51                │ │
+│ │ 20:14:24  INFO  raffle detected id=883117 type=guard           │ │
+│ │ 20:14:27  ERROR join raffle failed id=883117: already ended    │ │
+│ │ 20:14:30  INFO  reconnecting ws in 1s                          │ │
+│ │ 20:14:33  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:36  INFO  ws connected room=21452505 shard=3             │ │
+│ │ 20:14:39  DEBUG heartbeat ok rtt=42ms                          │ │
+│ │ 20:14:42  INFO  danmaku batch received count=38                │ │
+│ │ 20:14:45  INFO  raffle detected id=883104 type=gift            │ │
+│ │ 20:14:48  INFO  join raffle ok id=883104 latency=118ms         │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │                                                                │ │
+│ │ ❯ ▌                                                app · atual │ │
+│ ╰────────────────────────────────────────────────────────────────╯ │
+╰────────────────────────────────────────────────────────────────────╯
+== show-left node 32x16 cells=7ed6c95e4e1986cb6785ebe7a16feb8cc66dff20f4c0cabb53dd8743de5e0647
+╭─ Node ───────────────────────╮
+│                              │
+│  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  demo-no…│
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready │
+│    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25% │
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ████████│
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4…│
+│    ▀    ▀▀▀▀▀▀▀▀▀    ████████│
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13…│
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch am…│
+│    ▀ ▀  ▀▀▀▀▀▀▀▀▀            │
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀           │
+│  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀          │
+│                              │
+│                              │
+╰──────────────────────────────╯
+== show-left pods 46x19 cells=9e0401085bab9626a395728a00de179b8d6a6205004e27bb5acba1ada5580ee7
+╭─ Pods ─────────────────────────────────────╮
+│                                            │
+│ / filter pods…                    13 items │
+│                                            │
+│   NAME  NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bili… bilibili-r…    0  119d █░░░░░░     │
+│ ● bili… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-… lgo            0   87d ██░░░░░     │
+│ ● psql… ys-odoo        0   64d ████░░░     │
+│ ● odoo… ys-odoo        1   64d ██████░     │
+│ ○ qian… xcx            0    2h Completed   │
+│ ○ ling… xcx            0   41m Completed   │
+│ ⠙ ling… xcx            0    8s Init:0/1    │
+│ ● core… kube-system    0  119d █░░░░░░     │
+│ ● metr… kube-system    0  119d ready 0/1   │
+│ ● trae… kube-system    0  119d ░░░░░░░     │
+│ ● loca… kube-system    0  119d ImagePullB… │
+│ ● svcl… kube-system    7  119d CrashLoopB… │
+╰────────────────────────────────────────────╯
+== show-left heatmap 46x16 cells=001d0743f3e0d17428ded46b236e72935b1f8b43ee4e2253ddb09b4bfd18ce4e
+╭─ CPU heatmap · last 2 min ─────────────────╮
+│                                            │
+│ bilibili-raf… ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ████████████████████ now │
+╰────────────────────────────────────────────╯
+== show-left details 48x35 cells=034bcb01f43955cb4b5a06b497211e02fc8b406a73853e39aad7c6e8867f9ad1
+╭──────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Se │
+│ ──────────────────────────────────────────── │
+│ ● odoo-7575bf6d8-9wjvk             [Running] │
+│   ys-odoo · Running · ready 1/1 · node demo… │
+│                                              │
+│ ╭──────────────────────────────────────────╮ │
+│ │ 20:14:00  INFO  ws connected room=21452… │ │
+│ │ 20:14:03  DEBUG heartbeat ok rtt=42ms    │ │
+│ │ 20:14:06  INFO  danmaku batch received … │ │
+│ │ 20:14:09  INFO  raffle detected id=8831… │ │
+│ │ 20:14:12  INFO  join raffle ok id=88310… │ │
+│ │ 20:14:15  WARN  rate limited by upstrea… │ │
+│ │ 20:14:18  DEBUG heartbeat ok rtt=39ms    │ │
+│ │ 20:14:21  INFO  danmaku batch received … │ │
+│ │ 20:14:24  INFO  raffle detected id=8831… │ │
+│ │ 20:14:27  ERROR join raffle failed id=8… │ │
+│ │ 20:14:30  INFO  reconnecting ws in 1s    │ │
+│ │ 20:14:33  INFO  ws connected room=21452… │ │
+│ │ 20:14:36  INFO  ws connected room=21452… │ │
+│ │ 20:14:39  DEBUG heartbeat ok rtt=42ms    │ │
+│ │ 20:14:42  INFO  danmaku batch received … │ │
+│ │ 20:14:45  INFO  raffle detected id=8831… │ │
+│ │ 20:14:48  INFO  join raffle ok id=88310… │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │ ❯ ▌                          app · atual │ │
+│ ╰──────────────────────────────────────────╯ │
+╰──────────────────────────────────────────────╯
+== focus-namespaces node 32x16 cells=7ed6c95e4e1986cb6785ebe7a16feb8cc66dff20f4c0cabb53dd8743de5e0647
+╭─ Node ───────────────────────╮
+│                              │
+│  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  demo-no…│
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready │
+│    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25% │
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ████████│
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4…│
+│    ▀    ▀▀▀▀▀▀▀▀▀    ████████│
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13…│
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch am…│
+│    ▀ ▀  ▀▀▀▀▀▀▀▀▀            │
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀           │
+│  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀          │
+│                              │
+│                              │
+╰──────────────────────────────╯
+== focus-namespaces pods 46x19 cells=9e0401085bab9626a395728a00de179b8d6a6205004e27bb5acba1ada5580ee7
+╭─ Pods ─────────────────────────────────────╮
+│                                            │
+│ / filter pods…                    13 items │
+│                                            │
+│   NAME  NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bili… bilibili-r…    0  119d █░░░░░░     │
+│ ● bili… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-… lgo            0   87d ██░░░░░     │
+│ ● psql… ys-odoo        0   64d ████░░░     │
+│ ● odoo… ys-odoo        1   64d ██████░     │
+│ ○ qian… xcx            0    2h Completed   │
+│ ○ ling… xcx            0   41m Completed   │
+│ ⠙ ling… xcx            0    8s Init:0/1    │
+│ ● core… kube-system    0  119d █░░░░░░     │
+│ ● metr… kube-system    0  119d ready 0/1   │
+│ ● trae… kube-system    0  119d ░░░░░░░     │
+│ ● loca… kube-system    0  119d ImagePullB… │
+│ ● svcl… kube-system    7  119d CrashLoopB… │
+╰────────────────────────────────────────────╯
+== focus-namespaces heatmap 46x16 cells=001d0743f3e0d17428ded46b236e72935b1f8b43ee4e2253ddb09b4bfd18ce4e
+╭─ CPU heatmap · last 2 min ─────────────────╮
+│                                            │
+│ bilibili-raf… ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ████████████████████ now │
+╰────────────────────────────────────────────╯
+== focus-namespaces details 48x35 cells=e4ac117ca3bb20ed982328e09f5e82004e94643ca866a66254cc14b2bf33380b
+╭──────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Se │
+│ ──────────────────────────────────────────── │
+│ ● odoo-7575bf6d8-9wjvk             [Running] │
+│   ys-odoo · Running · ready 1/1 · node demo… │
+│                                              │
+│ ╭──────────────────────────────────────────╮ │
+│ │ 20:14:00  INFO  ws connected room=21452… │ │
+│ │ 20:14:03  DEBUG heartbeat ok rtt=42ms    │ │
+│ │ 20:14:06  INFO  danmaku batch received … │ │
+│ │ 20:14:09  INFO  raffle detected id=8831… │ │
+│ │ 20:14:12  INFO  join raffle ok id=88310… │ │
+│ │ 20:14:15  WARN  rate limited by upstrea… │ │
+│ │ 20:14:18  DEBUG heartbeat ok rtt=39ms    │ │
+│ │ 20:14:21  INFO  danmaku batch received … │ │
+│ │ 20:14:24  INFO  raffle detected id=8831… │ │
+│ │ 20:14:27  ERROR join raffle failed id=8… │ │
+│ │ 20:14:30  INFO  reconnecting ws in 1s    │ │
+│ │ 20:14:33  INFO  ws connected room=21452… │ │
+│ │ 20:14:36  INFO  ws connected room=21452… │ │
+│ │ 20:14:39  DEBUG heartbeat ok rtt=42ms    │ │
+│ │ 20:14:42  INFO  danmaku batch received … │ │
+│ │ 20:14:45  INFO  raffle detected id=8831… │ │
+│ │ 20:14:48  INFO  join raffle ok id=88310… │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │ ❯ ▌                          app · atual │ │
+│ ╰──────────────────────────────────────────╯ │
+╰──────────────────────────────────────────────╯
+== namespace-down node 32x16 cells=7ed6c95e4e1986cb6785ebe7a16feb8cc66dff20f4c0cabb53dd8743de5e0647
+╭─ Node ───────────────────────╮
+│                              │
+│  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  demo-no…│
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready │
+│    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25% │
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ████████│
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4…│
+│    ▀    ▀▀▀▀▀▀▀▀▀    ████████│
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13…│
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch am…│
+│    ▀ ▀  ▀▀▀▀▀▀▀▀▀            │
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀           │
+│  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀          │
+│                              │
+│                              │
+╰──────────────────────────────╯
+== namespace-down pods 46x19 cells=9e0401085bab9626a395728a00de179b8d6a6205004e27bb5acba1ada5580ee7
+╭─ Pods ─────────────────────────────────────╮
+│                                            │
+│ / filter pods…                    13 items │
+│                                            │
+│   NAME  NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● bili… bilibili-r…    0  119d █░░░░░░     │
+│ ● bili… bilibili-r…    2  119d ████░░░     │
+│ ● lgo-… lgo            0   87d ██░░░░░     │
+│ ● psql… ys-odoo        0   64d ████░░░     │
+│ ● odoo… ys-odoo        1   64d ██████░     │
+│ ○ qian… xcx            0    2h Completed   │
+│ ○ ling… xcx            0   41m Completed   │
+│ ⠙ ling… xcx            0    8s Init:0/1    │
+│ ● core… kube-system    0  119d █░░░░░░     │
+│ ● metr… kube-system    0  119d ready 0/1   │
+│ ● trae… kube-system    0  119d ░░░░░░░     │
+│ ● loca… kube-system    0  119d ImagePullB… │
+│ ● svcl… kube-system    7  119d CrashLoopB… │
+╰────────────────────────────────────────────╯
+== namespace-down heatmap 46x16 cells=001d0743f3e0d17428ded46b236e72935b1f8b43ee4e2253ddb09b4bfd18ce4e
+╭─ CPU heatmap · last 2 min ─────────────────╮
+│                                            │
+│ bilibili-raf… ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ████████████████████ now │
+╰────────────────────────────────────────────╯
+== namespace-down details 48x35 cells=e4ac117ca3bb20ed982328e09f5e82004e94643ca866a66254cc14b2bf33380b
+╭──────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Se │
+│ ──────────────────────────────────────────── │
+│ ● odoo-7575bf6d8-9wjvk             [Running] │
+│   ys-odoo · Running · ready 1/1 · node demo… │
+│                                              │
+│ ╭──────────────────────────────────────────╮ │
+│ │ 20:14:00  INFO  ws connected room=21452… │ │
+│ │ 20:14:03  DEBUG heartbeat ok rtt=42ms    │ │
+│ │ 20:14:06  INFO  danmaku batch received … │ │
+│ │ 20:14:09  INFO  raffle detected id=8831… │ │
+│ │ 20:14:12  INFO  join raffle ok id=88310… │ │
+│ │ 20:14:15  WARN  rate limited by upstrea… │ │
+│ │ 20:14:18  DEBUG heartbeat ok rtt=39ms    │ │
+│ │ 20:14:21  INFO  danmaku batch received … │ │
+│ │ 20:14:24  INFO  raffle detected id=8831… │ │
+│ │ 20:14:27  ERROR join raffle failed id=8… │ │
+│ │ 20:14:30  INFO  reconnecting ws in 1s    │ │
+│ │ 20:14:33  INFO  ws connected room=21452… │ │
+│ │ 20:14:36  INFO  ws connected room=21452… │ │
+│ │ 20:14:39  DEBUG heartbeat ok rtt=42ms    │ │
+│ │ 20:14:42  INFO  danmaku batch received … │ │
+│ │ 20:14:45  INFO  raffle detected id=8831… │ │
+│ │ 20:14:48  INFO  join raffle ok id=88310… │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │ ❯ ▌                          app · atual │ │
+│ ╰──────────────────────────────────────────╯ │
+╰──────────────────────────────────────────────╯
+== namespace-enter node 32x16 cells=7ed6c95e4e1986cb6785ebe7a16feb8cc66dff20f4c0cabb53dd8743de5e0647
+╭─ Node ───────────────────────╮
+│                              │
+│  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  demo-no…│
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready │
+│    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25% │
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ████████│
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4…│
+│    ▀    ▀▀▀▀▀▀▀▀▀    ████████│
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13…│
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch am…│
+│    ▀ ▀  ▀▀▀▀▀▀▀▀▀            │
+│   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀           │
+│  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀          │
+│                              │
+│                              │
+╰──────────────────────────────╯
+== namespace-enter pods 46x19 cells=b5f46eac54b226eb79309669b6f70656252b339eed587b2d5ace5ef758012b05
+╭─ Pods ─────────────────────────────────────╮
+│                                            │
+│ / filter pods…     ns:kube-system  5 items │
+│                                            │
+│   NAME  NAMESPACE    RST   AGE CPU/STATUS  │
+│ ● core… kube-system    0  119d █░░░░░░     │
+│ ● metr… kube-system    0  119d ready 0/1   │
+│ ● trae… kube-system    0  119d ░░░░░░░     │
+│ ● loca… kube-system    0  119d ImagePullB… │
+│ ● svcl… kube-system    7  119d CrashLoopB… │
+│                                            │
+│                                            │
+│                                            │
+│                                            │
+│                                            │
+│                                            │
+│                                            │
+│                                            │
+╰────────────────────────────────────────────╯
+== namespace-enter heatmap 46x16 cells=001d0743f3e0d17428ded46b236e72935b1f8b43ee4e2253ddb09b4bfd18ce4e
+╭─ CPU heatmap · last 2 min ─────────────────╮
+│                                            │
+│ bilibili-raf… ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ bilibili-live ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ lgo-7c5d97584 ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ psql-6bc7744… ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ odoo-7575bf6… ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│ coredns-6799… ████████████████████████████ │
+│               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │
+│               -2m ████████████████████ now │
+╰────────────────────────────────────────────╯
+== namespace-enter details 48x35 cells=e774bb0cb6d66b0560e88f59b1ce0ddbd15b701140429d58cc198674ed90af34
+╭──────────────────────────────────────────────╮
+│  Log   Config   Top   Describe   Events   Se │
+│ ──────────────────────────────────────────── │
+│ ● coredns-6799fbcd5-w9t4p          [Running] │
+│   kube-system · Running · ready 1/1 · node … │
+│                                              │
+│ ╭──────────────────────────────────────────╮ │
+│ │ 20:14:00  INFO  ws connected room=21452… │ │
+│ │ 20:14:03  DEBUG heartbeat ok rtt=42ms    │ │
+│ │ 20:14:06  INFO  danmaku batch received … │ │
+│ │ 20:14:09  INFO  raffle detected id=8831… │ │
+│ │ 20:14:12  INFO  join raffle ok id=88310… │ │
+│ │ 20:14:15  WARN  rate limited by upstrea… │ │
+│ │ 20:14:18  DEBUG heartbeat ok rtt=39ms    │ │
+│ │ 20:14:21  INFO  danmaku batch received … │ │
+│ │ 20:14:24  INFO  raffle detected id=8831… │ │
+│ │ 20:14:27  ERROR join raffle failed id=8… │ │
+│ │ 20:14:30  INFO  reconnecting ws in 1s    │ │
+│ │ 20:14:33  INFO  ws connected room=21452… │ │
+│ │ 20:14:36  INFO  ws connected room=21452… │ │
+│ │ 20:14:39  DEBUG heartbeat ok rtt=42ms    │ │
+│ │ 20:14:42  INFO  danmaku batch received … │ │
+│ │ 20:14:45  INFO  raffle detected id=8831… │ │
+│ │ 20:14:48  INFO  join raffle ok id=88310… │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │                                          │ │
+│ │ ❯ ▌                          app · atual │ │
+│ ╰──────────────────────────────────────────╯ │
+╰──────────────────────────────────────────────╯
+== namespace-clear restores namespace-down
