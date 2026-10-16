@@ -3,6 +3,7 @@ package ui
 import (
 	"fmt"
 	"math"
+	"strconv"
 
 	"github.com/TNK-Studio/lazykube/internal/data"
 	"github.com/TNK-Studio/lazykube/internal/draw"
@@ -29,19 +30,27 @@ func TopTab(r draw.Region, st DetailsState, ctx Ctx) {
 	}
 	r.Line(0, 0, title)
 	hint := draw.Line{muted("streamline · braille 2×4")}
+	if collecting(m) {
+		hint = draw.Line{muted(fmt.Sprintf("coletando %d/%d", m.Samples, m.Window))}
+	}
 	if r.W-hint.Width() > title.Width()+2 {
 		r.LineRight(0, hint)
 	}
-	if !m.Available {
-		centered(r.Sub(0, 1, r.W, chartRows+1), "metrics-server indisponível")
-	} else {
-		CPUChart(r.Sub(0, 1, r.W, chartRows+1), m.CPU, float64(p.CPURequest), ctx)
+	chart := r.Sub(0, 1, r.W, chartRows+1)
+	switch {
+	case !m.Available:
+		centered(chart, reasonOr(m.Reason, metricsDown))
+	default:
+		CPUChart(chart, m.CPU, float64(p.CPURequest), ctx)
+		if len(m.CPU) < 2 {
+			centered(chart.Sub(chartAxisW, 0, chart.W-chartAxisW, chartRows), fmt.Sprintf("coletando amostras %d/%d", m.Samples, m.Window))
+		}
 	}
 
 	cardsY := 1 + chartRows + 2
 	if r.H >= cardsY+cardHeight {
 		left := (r.W - 1) / 2
-		memoryCard(r.Sub(0, cardsY, left, cardHeight), m, p, ctx)
+		memoryCard(r.Sub(0, cardsY, left, cardHeight), m, p, st.MemBar, ctx)
 		networkCard(r.Sub(left+1, cardsY, r.W-left-1, cardHeight), m)
 	}
 
@@ -51,13 +60,62 @@ func TopTab(r draw.Region, st DetailsState, ctx Ctx) {
 	}
 }
 
-func cpuToDot(v float64, dotH int) int {
-	py := int(math.Round((1 - theme.Clamp(v, 0, chartMaxCPU)/chartMaxCPU) * float64(dotH-1)))
+func collecting(m data.Metrics) bool {
+	return m.Available && m.Window > 0 && m.Samples < m.Window
+}
+
+func reasonOr(reason, fallback string) string {
+	if reason != "" {
+		return reason
+	}
+	return fallback
+}
+
+func cpuToDot(v, top float64, dotH int) int {
+	py := int(math.Round((1 - theme.Clamp(v, 0, top)/top) * float64(dotH-1)))
 	return max(0, min(dotH-1, py))
 }
 
+func chartScale(samples []float64, request float64) float64 {
+	top := request
+	for _, v := range samples {
+		top = math.Max(top, v)
+	}
+	if top <= chartMaxCPU {
+		return chartMaxCPU
+	}
+	exp := math.Pow(10, math.Floor(math.Log10(top)))
+	for _, k := range []float64{1, 2, 4, 6, 8} {
+		if k*exp >= top {
+			return k * exp
+		}
+	}
+	return 10 * exp
+}
+
+func milliLabel(v float64) string {
+	if v == 0 {
+		return "0"
+	}
+	if v >= 1000 {
+		return strconv.FormatFloat(v/1000, 'g', 2, 64) + "c"
+	}
+	return fmt.Sprintf("%dm", int(math.Round(v)))
+}
+
+func scaleOr(v, fallback float64) float64 {
+	if v > 0 {
+		return v
+	}
+	return fallback
+}
+
 func CPUChart(r draw.Region, samples []float64, request float64, ctx Ctx) {
-	labels := map[int]string{0: "20m", 2: "15m", 4: "10m", 6: "5m", 8: "0"}
+	top := chartScale(samples, request)
+	labels := map[int]string{}
+	for row := 0; row < chartRows; row += 2 {
+		labels[row] = milliLabel(top * float64(chartRows-1-row) / float64(chartRows-1))
+	}
 	axis := draw.Fg(theme.Border)
 	for row := 0; row < chartRows; row++ {
 		if l, ok := labels[row]; ok {
@@ -81,7 +139,7 @@ func CPUChart(r draw.Region, samples []float64, request float64, ctx Ctx) {
 	topRow := chartRows - 1
 	for i, v := range samples {
 		xs[i] = int(math.Round(float64(i) * float64(dw-1) / float64(n-1)))
-		ys[i] = cpuToDot(v, dh)
+		ys[i] = cpuToDot(v, top, dh)
 		topRow = min(topRow, ys[i]/4)
 	}
 	areaColor := func(row int) theme.RGB {
@@ -111,7 +169,7 @@ func CPUChart(r draw.Region, samples []float64, request float64, ctx Ctx) {
 		b.Line(xs[i], ys[i], xs[i+1], ys[i+1], lineColor)
 	}
 
-	requestRow := cpuToDot(request, dh) / 4
+	requestRow := cpuToDot(request, top, dh) / 4
 	for row := 0; row < chartRows; row++ {
 		for col := 0; col < cols; col++ {
 			switch {
@@ -145,22 +203,21 @@ func tail(values []float64, n int) []float64 {
 	return values[len(values)-n:]
 }
 
-func memoryCard(r draw.Region, m data.Metrics, p *data.Pod, ctx Ctx) {
+func memoryCard(r draw.Region, m data.Metrics, p *data.Pod, bar float64, ctx Ctx) {
 	c := cardBox(r)
 	if c.Empty() {
 		return
 	}
-	limit := p.MemLimit
-	c.Line(0, 0, draw.Fit(c.W,
-		draw.Line{muted("Memory"), bold(fmt.Sprintf(" %dMi", m.MemNow), ctx.Pal.A), muted(fmt.Sprintf(" / %dMi", limit))},
-		draw.Line{muted("Mem"), bold(fmt.Sprintf(" %dMi", m.MemNow), ctx.Pal.A), muted(fmt.Sprintf("/%dMi", limit))},
-	))
-	frac := 0.0
-	if limit > 0 {
-		frac = float64(m.MemNow) / float64(limit)
+	limit := "no limit"
+	if p.MemLimit > 0 {
+		limit = fmt.Sprintf("%dMi", p.MemLimit)
 	}
-	Bar(c, 0, 1, c.W, frac, ctx.Pal.B, ctx.Pal.A)
-	c.Text(0, 2, draw.Sparkline(tail(m.Mem, c.W), memScale), draw.Fg(ctx.Pal.A))
+	c.Line(0, 0, draw.Fit(c.W,
+		draw.Line{muted("Memory"), bold(fmt.Sprintf(" %dMi", m.MemNow), ctx.Pal.A), muted(" / " + limit)},
+		draw.Line{muted("Mem"), bold(fmt.Sprintf(" %dMi", m.MemNow), ctx.Pal.A), muted("/" + limit)},
+	))
+	Bar(c, 0, 1, c.W, bar, ctx.Pal.B, ctx.Pal.A)
+	c.Text(0, 2, draw.Sparkline(tail(m.Mem, c.W), scaleOr(m.MemMax, memScale)), draw.Fg(ctx.Pal.A))
 }
 
 func networkCard(r draw.Region, m data.Metrics) {
@@ -169,18 +226,25 @@ func networkCard(r draw.Region, m data.Metrics) {
 		return
 	}
 	if len(m.RX) == 0 {
-		c.Line(0, 0, draw.Line{muted("Network "), muted("n/a")})
+		c.Line(0, 0, draw.Line{muted("Network "), muted(draw.Truncate(reasonOr(m.NetReason, "n/a"), max(0, c.W-8)))})
 		return
 	}
-	rx := fmt.Sprintf("%.1f kB/s", m.RXNow)
-	tx := fmt.Sprintf("%.1f kB/s", m.TXNow)
-	c.Line(0, 0, draw.Fit(c.W,
-		draw.Line{muted("Network"), colored(" ↓ "+rx, theme.OK), colored(" ↑ "+tx, theme.Warn)},
-		draw.Line{muted("Network"), colored(" ↓"+rx, theme.OK), colored(" ↑"+tx, theme.Warn)},
-		draw.Line{muted("Net"), colored(" ↓"+rx, theme.OK), colored(" ↑"+tx, theme.Warn)},
-	))
-	c.Text(0, 1, draw.Sparkline(tail(m.RX, c.W), rxScale), draw.Fg(theme.OK))
-	c.Text(0, 2, draw.Sparkline(tail(m.TX, c.W), txScale), draw.Fg(theme.Warn))
+	rxColor, txColor := theme.OK, theme.Warn
+	if m.NetStale {
+		rxColor, txColor = theme.Muted, theme.Muted
+		reason := "obsoleto: " + reasonOr(m.NetReason, "sem coleta recente")
+		c.Line(0, 0, draw.Line{muted("Network "), colored(draw.Truncate(reason, max(0, c.W-8)), theme.Warn)})
+	} else {
+		rx := fmt.Sprintf("%.1f kB/s", m.RXNow)
+		tx := fmt.Sprintf("%.1f kB/s", m.TXNow)
+		c.Line(0, 0, draw.Fit(c.W,
+			draw.Line{muted("Network"), colored(" ↓ "+rx, theme.OK), colored(" ↑ "+tx, theme.Warn)},
+			draw.Line{muted("Network"), colored(" ↓"+rx, theme.OK), colored(" ↑"+tx, theme.Warn)},
+			draw.Line{muted("Net"), colored(" ↓"+rx, theme.OK), colored(" ↑"+tx, theme.Warn)},
+		))
+	}
+	c.Text(0, 1, draw.Sparkline(tail(m.RX, c.W), scaleOr(m.RXMax, rxScale)), draw.Fg(rxColor))
+	c.Text(0, 2, draw.Sparkline(tail(m.TX, c.W), scaleOr(m.TXMax, txScale)), draw.Fg(txColor))
 }
 
 func miniLogs(r draw.Region, logs []data.LogLine, ctx Ctx) {

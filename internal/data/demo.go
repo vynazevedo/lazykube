@@ -122,9 +122,9 @@ func (d *Demo) Snapshot() Snapshot {
 	}
 }
 
-func (d *Demo) index(name string) int {
+func (d *Demo) index(key string) int {
 	for i, p := range d.pods {
-		if p.pod.Name == name {
+		if p.pod.Key() == key {
 			return i
 		}
 	}
@@ -155,11 +155,11 @@ func (d *Demo) Metrics(tick int, pod string, heatCols int) Metrics {
 	}
 	for i, p := range d.pods {
 		if p.pod.Status != StatusRunning {
-			m.PodCPU[p.pod.Name] = 0
+			m.PodCPU[p.pod.Key()] = 0
 			continue
 		}
 		v := p.cpuBase + int(math.Round((theme.Noise(float64(tick)*0.3+float64(i)*9)-0.5)*4))
-		m.PodCPU[p.pod.Name] = max(0, v)
+		m.PodCPU[p.pod.Key()] = max(0, v)
 	}
 
 	idx := d.index(pod)
@@ -172,6 +172,7 @@ func (d *Demo) Metrics(tick int, pod string, heatCols int) Metrics {
 		}
 	}
 	m.CPUNow = int(math.Round(m.CPU[cpuWindow-1]))
+	m.Samples, m.Window = cpuWindow, cpuWindow
 
 	m.Mem = make([]float64, sparkWindow)
 	m.RX = make([]float64, sparkWindow)

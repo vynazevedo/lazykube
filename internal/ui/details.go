@@ -81,6 +81,8 @@ type DetailsState struct {
 	Follow   bool
 	NewLines int
 	Wrap     bool
+	MemBar   float64
+	Slide    int
 }
 
 func DetailsPanel(r draw.Region, st DetailsState, ctx Ctx) {
@@ -96,7 +98,7 @@ func DetailsPanel(r draw.Region, st DetailsState, ctx Ctx) {
 		return
 	}
 	podHeader(c.Sub(0, 2, c.W, 2), *st.Pod, ctx)
-	body := c.Sub(0, DetailsContentTop, c.W, c.H-DetailsContentTop)
+	body := c.Sub(st.Slide, DetailsContentTop, c.W, c.H-DetailsContentTop)
 	switch st.Tab {
 	case TabTop:
 		TopTab(body, st, ctx)

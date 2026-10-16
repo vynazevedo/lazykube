@@ -5,14 +5,17 @@ import (
 	"testing"
 )
 
-const selected = "bilibili-live-7f6b8d9c5-mn4tz"
+const (
+	selectedName = "bilibili-live-7f6b8d9c5-mn4tz"
+	selected     = "bilibili-raffle/" + selectedName
+)
 
 func TestDemoSnapshotMatchesSpec(t *testing.T) {
 	s := NewDemo().Snapshot()
 	if len(s.Pods) != 13 || s.Cluster.Pods != 13 {
 		t.Fatalf("expected 13 pods, got %d", len(s.Pods))
 	}
-	if s.Pods[1].Name != selected || s.Pods[1].Restarts != 2 {
+	if s.Pods[1].Name != selectedName || s.Pods[1].Key() != selected || s.Pods[1].Restarts != 2 {
 		t.Fatalf("pod 1 mismatch: %+v", s.Pods[1])
 	}
 	if s.Pods[7].Status != StatusPending || s.Pods[5].Status != StatusCompleted {
@@ -51,7 +54,7 @@ func TestDemoMetricsDeterministic(t *testing.T) {
 	if !reflect.DeepEqual(a.HeatLabels, want) {
 		t.Fatalf("heat labels got %v", a.HeatLabels)
 	}
-	if a.PodCPU["qiandao-1605400800-k8f2m"] != 0 {
+	if a.PodCPU["xcx/qiandao-1605400800-k8f2m"] != 0 {
 		t.Fatal("completed pod must have zero cpu")
 	}
 }

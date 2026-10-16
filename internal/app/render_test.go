@@ -32,6 +32,7 @@ func demoModel(t testing.TB, w, h int) Model {
 		Now:        func() time.Time { return time.Unix(0, 0) },
 	})
 	m.clock = anim.Fixed(goldenT, goldenPhase, 30)
+	m.animated = false
 	next, _ := m.Update(tea.WindowSizeMsg{Width: w, Height: h})
 	return next.(Model)
 }

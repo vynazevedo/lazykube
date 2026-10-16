@@ -25,7 +25,12 @@ func (m Model) Render() *draw.Canvas {
 	ui.Header(region(screen, m.layout.Header), ui.HeaderState{Cluster: m.snap.Cluster, MetricsOK: m.metrics.Available}, ctx)
 
 	if m.layout.ShowLeft {
-		ui.NodePanel(region(screen, m.layout.Node), ui.NodeState{Node: m.snap.Node, CPU: m.metrics.NodeCPU}, ctx)
+		ui.NodePanel(region(screen, m.layout.Node), ui.NodeState{
+			Node:    m.snap.Node,
+			CPU:     m.metrics.NodeCPU,
+			CPUFrac: m.motion.nodeCPU.Pos,
+			MemFrac: m.motion.nodeMem.Pos,
+		}, ctx)
 		highlight := ""
 		if pod != nil {
 			highlight = pod.Namespace
@@ -56,7 +61,7 @@ func (m Model) Render() *draw.Canvas {
 		FilterPos:  m.filter.Position(),
 		Filtering:  m.filtering,
 		Focused:    m.focus == FocusPods,
-		SelectionK: map[int]float64{sel: 0.22},
+		SelectionK: m.selectionKs(pods),
 		NSFilter:   m.nsFilter,
 	}, ctx)
 
@@ -64,6 +69,7 @@ func (m Model) Render() *draw.Canvas {
 		Labels:    m.metrics.HeatLabels,
 		Heat:      m.metrics.Heat,
 		Available: m.metrics.Available,
+		Reason:    m.metrics.Reason,
 	}, ctx)
 
 	ui.DetailsPanel(region(screen, m.layout.Details), ui.DetailsState{
@@ -80,6 +86,8 @@ func (m Model) Render() *draw.Canvas {
 		Follow:   m.follow,
 		NewLines: m.newLines,
 		Wrap:     m.wrap,
+		MemBar:   m.motion.memBar.Pos,
+		Slide:    m.slideOffset(),
 	}, ctx)
 
 	ui.Footer(screen.Sub(0, m.layout.DividerY, m.w, 1), screen.Sub(0, m.layout.FooterY, m.w, 1), ui.FooterState{FPS: m.displayFPS()})
