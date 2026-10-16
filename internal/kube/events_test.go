@@ -9,6 +9,7 @@ import (
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/watch"
@@ -25,18 +26,25 @@ func fastWide(t *testing.T, retries int) {
 	t.Cleanup(func() { wideTiming = saved })
 }
 
+const eventsWaitLimit = 15 * time.Second
+
 func clusterState(s *Source) data.EventFeed {
 	return s.ScopedEvents(data.EventQuery{Scope: data.ScopeCluster})
 }
 
 func waitState(t *testing.T, s *Source, want data.FeedState) data.EventFeed {
 	t.Helper()
-	var got data.EventFeed
-	waitFor(t, func() bool {
-		got = clusterState(s)
-		return got.State == want
-	})
-	return got
+	deadline := time.Now().Add(eventsWaitLimit)
+	for {
+		got := clusterState(s)
+		if got.State == want {
+			return got
+		}
+		if time.Now().After(deadline) {
+			t.Fatalf("cluster events never reached state %v, last = %+v", want, got)
+		}
+		time.Sleep(20 * time.Millisecond)
+	}
 }
 
 func isProbe(a k8stesting.Action) bool {
@@ -237,5 +245,161 @@ func TestPodLogsEmptyTargetStopsStream(t *testing.T) {
 	case <-st.ctx.Done():
 	case <-time.After(2 * time.Second):
 		t.Fatal("empty target must cancel the subscription")
+	}
+}
+
+func TestEventsDefaultScopeTracksPermissionLoss(t *testing.T) {
+	ctl := &watchControl{}
+	s := startWith(t, nil, func(s *Source) {
+		s.manualPoll = true
+		c := s.client.(*fake.Clientset)
+		c.PrependWatchReactor("events", ctl.react)
+		c.PrependReactor("list", "events", func(a k8stesting.Action) (bool, runtime.Object, error) {
+			if a.GetNamespace() == "" && ctl.denied() {
+				return true, nil, errDenied
+			}
+			return false, nil, nil
+		})
+	}, testPod("apps", "web-1", "node-a", corev1.PodRunning),
+		event("apps", "e1", "Pod", "web-1", "", "Warning", fixedNow))
+	namespaceFeed := func() data.EventFeed {
+		return s.ScopedEvents(data.EventQuery{Scope: data.ScopeNamespace, Namespace: "apps"})
+	}
+	if got := waitState(t, s, data.FeedReady); len(got.Items) != 1 {
+		t.Fatalf("synced events = %+v", got.Items)
+	}
+	ctl.setDeny(true)
+	got := waitState(t, s, data.FeedForbidden)
+	if len(got.Items) != 0 || got.Reason != reasonClusterLost {
+		t.Fatalf("stale cluster events must not look current: %+v", got)
+	}
+	if ns := namespaceFeed(); ns.State != data.FeedForbidden || len(ns.Items) != 0 {
+		t.Fatalf("namespace feed must share the informer state: %+v", ns)
+	}
+	ctl.setDeny(false)
+	if got := waitState(t, s, data.FeedReady); len(got.Items) != 1 {
+		t.Fatalf("recovered events = %+v", got.Items)
+	}
+	if ns := namespaceFeed(); ns.State != data.FeedReady || len(ns.Items) != 1 {
+		t.Fatalf("namespace feed after recovery = %+v", ns)
+	}
+}
+
+type eventsRecovery struct {
+	mu        sync.Mutex
+	phase     int
+	current   *watch.FakeWatcher
+	release   chan struct{}
+	pageState chan data.FeedState
+	waitState chan data.FeedState
+}
+
+const (
+	eventsPhaseLive = iota
+	eventsPhasePaged
+	eventsPhasePending
+)
+
+func (r *eventsRecovery) get() int {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	return r.phase
+}
+
+func (r *eventsRecovery) set(phase int) {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.phase = phase
+	if r.current != nil {
+		r.current.Stop()
+		r.current = nil
+	}
+}
+
+func eventsReport(ch chan data.FeedState, s *Source) {
+	select {
+	case ch <- clusterState(s).State:
+	default:
+	}
+}
+
+func TestClusterEventsRecoveryWaitsForFullRelistAndWatch(t *testing.T) {
+	fastWide(t, 1)
+	r := &eventsRecovery{release: make(chan struct{}), pageState: make(chan data.FeedState, 1), waitState: make(chan data.FeedState, 1)}
+	fresh := event("other", "e2", "Pod", "y", "", "Warning", fixedNow)
+	fresh.ResourceVersion = "20"
+	var s *Source
+	s = namespacedStart(t, func(src *Source) {
+		c := src.client.(*fake.Clientset)
+		c.PrependWatchReactor("events", func(a k8stesting.Action) (bool, watch.Interface, error) {
+			if a.GetNamespace() != "" {
+				return false, nil, nil
+			}
+			switch r.get() {
+			case eventsPhasePaged:
+				return true, nil, errDenied
+			case eventsPhasePending:
+				eventsReport(r.waitState, s)
+				<-r.release
+			}
+			r.mu.Lock()
+			defer r.mu.Unlock()
+			r.current = watch.NewFake()
+			return true, r.current, nil
+		})
+		c.PrependReactor("list", "events", func(a k8stesting.Action) (bool, runtime.Object, error) {
+			if a.GetNamespace() != "" || isProbe(a) {
+				return false, nil, nil
+			}
+			switch r.get() {
+			case eventsPhasePaged:
+				if a.(k8stesting.ListActionImpl).ListOptions.Continue == "" {
+					return true, &corev1.EventList{ListMeta: metav1.ListMeta{Continue: "page-2", ResourceVersion: "20"}, Items: []corev1.Event{*fresh}}, nil
+				}
+				eventsReport(r.pageState, s)
+				return true, nil, errUnavailble
+			case eventsPhasePending:
+				return true, &corev1.EventList{ListMeta: metav1.ListMeta{ResourceVersion: "20"}, Items: []corev1.Event{*fresh}}, nil
+			}
+			return false, nil, nil
+		})
+	}, testPod("apps", "web-1", "node-a", corev1.PodRunning),
+		event("other", "e1", "Pod", "x", "", "Warning", fixedNow))
+	t.Cleanup(func() {
+		select {
+		case <-r.release:
+		default:
+			close(r.release)
+		}
+	})
+	clusterState(s)
+	if got := waitState(t, s, data.FeedReady); len(got.Items) != 1 || got.Items[0].Reason != "Re1" {
+		t.Fatalf("synced events = %+v", got.Items)
+	}
+	r.set(eventsPhasePaged)
+	select {
+	case st := <-r.pageState:
+		if st == data.FeedReady {
+			t.Fatal("a first page alone must not announce recovery")
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("second page never requested")
+	}
+	r.set(eventsPhasePending)
+	select {
+	case st := <-r.waitState:
+		if st == data.FeedReady {
+			t.Fatal("recovery must wait for the watch to be established")
+		}
+	case <-time.After(5 * time.Second):
+		t.Fatal("watch never requested")
+	}
+	if got := clusterState(s); got.State == data.FeedReady {
+		t.Fatalf("pending watch must not look current: %+v", got)
+	}
+	close(r.release)
+	got := waitState(t, s, data.FeedReady)
+	if len(got.Items) != 1 || got.Items[0].Reason != "Re2" {
+		t.Fatalf("recovered events must reflect the new list: %+v", got.Items)
 	}
 }

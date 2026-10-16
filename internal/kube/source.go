@@ -162,7 +162,7 @@ func (s *Source) start(ctx context.Context) error {
 		resources = append(resources, "deployments (optional)")
 	}
 	if s.caps.events {
-		s.eventInf = s.factory.Core().V1().Events().Informer()
+		s.eventInf = s.newEventsInformer()
 		if err := s.eventInf.AddIndexers(cache.Indexers{involvedIndex: involvedPodIndex}); err != nil {
 			return err
 		}

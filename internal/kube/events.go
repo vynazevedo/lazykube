@@ -2,13 +2,18 @@ package kube
 
 import (
 	"context"
+	"errors"
+	"io"
+	"sync"
 	"time"
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 
 	"github.com/TNK-Studio/lazykube/internal/data"
@@ -34,6 +39,9 @@ const (
 	reasonOutOfNamespace    = "fora do escopo --namespace "
 	reasonEventsSyncTimeout = "sincronização de eventos do cluster expirou"
 	reasonClusterLost       = "permissão de events no cluster perdida"
+	reasonEventsLost        = "permissão de events perdida"
+	reasonEventsResync      = "ressincronizando eventos"
+	initialEventsEnd        = "k8s.io/initial-events-end"
 )
 
 type wideEvents struct {
@@ -43,7 +51,7 @@ type wideEvents struct {
 	reason  string
 	retryAt time.Time
 	cancel  context.CancelFunc
-	inf     cache.SharedIndexInformer
+	inf     *eventsInformer
 }
 
 type wideFailure struct {
@@ -83,6 +91,9 @@ func (s *Source) ScopedEvents(q data.EventQuery) data.EventFeed {
 		if p == nil {
 			return feed
 		}
+		if feed.State, feed.Reason = eventsStatus(s.eventInf); feed.State != data.FeedReady {
+			return feed
+		}
 		objs, err := s.eventInf.GetIndexer().ByIndex(involvedIndex, podKey(p.Namespace, p.Name))
 		if err != nil {
 			feed.State, feed.Reason = data.FeedUnavailable, clip(err.Error())
@@ -105,6 +116,9 @@ func (s *Source) ScopedEvents(q data.EventQuery) data.EventFeed {
 			feed.State, feed.Reason = data.FeedUnavailable, reasonOutOfNamespace+s.opts.Namespace
 			return feed
 		}
+		if feed.State, feed.Reason = eventsStatus(s.eventInf); feed.State != data.FeedReady {
+			return feed
+		}
 		objs, err := s.eventInf.GetIndexer().ByIndex(cache.NamespaceIndex, q.Namespace)
 		if err != nil {
 			feed.State, feed.Reason = data.FeedUnavailable, clip(err.Error())
@@ -115,6 +129,9 @@ func (s *Source) ScopedEvents(q data.EventQuery) data.EventFeed {
 		inf, state, reason := s.clusterEventsInformer()
 		if inf == nil {
 			feed.State, feed.Reason = state, reason
+			return feed
+		}
+		if feed.State, feed.Reason = eventsStatus(inf); feed.State != data.FeedReady {
 			return feed
 		}
 		feed.Items = toEvents(eventsOf(inf.GetStore().List()), now, scopedEventsLimit)
@@ -190,63 +207,266 @@ func classify(err error) wideFailure {
 	return wideFailure{state: data.FeedUnavailable, reason: reasonEventsDown + ": " + clip(err.Error())}
 }
 
-func (s *Source) wideObserved(w *wideEvents, err error) {
-	if s.ctx.Err() != nil {
-		return
-	}
-	s.mu.Lock()
-	if !w.synced {
-		s.mu.Unlock()
-		return
-	}
-	state, reason := data.FeedReady, ""
-	switch {
-	case err == nil:
-	case denied(err):
-		state, reason = data.FeedForbidden, reasonClusterLost
-	default:
-		state, reason = data.FeedUnavailable, reasonEventsDown+": "+clip(err.Error())
-	}
-	s.mu.Unlock()
-	s.setWideState(w, state, reason)
+type eventsStamp struct{ uid, version string }
+
+type eventsInformer struct {
+	cache.SharedIndexInformer
+	mu       sync.Mutex
+	expected map[string]eventsStamp
+	listed   bool
+	watching bool
+	degraded bool
+	expired  bool
+	epoch    uint64
+	state    data.FeedState
+	reason   string
+	lost     string
+	dirty    func()
+	failed   func(error)
 }
 
-func (s *Source) newWideInformer(w *wideEvents, errs chan<- error) (cache.SharedIndexInformer, error) {
-	events := s.client.CoreV1().Events("")
+func eventsStatus(inf cache.SharedIndexInformer) (data.FeedState, string) {
+	tracked, ok := inf.(*eventsInformer)
+	if !ok {
+		return data.FeedReady, ""
+	}
+	return tracked.status()
+}
+
+func (s *Source) newEventsInformer() cache.SharedIndexInformer {
+	return s.factory.InformerFor(&corev1.Event{}, func(client kubernetes.Interface, resync time.Duration) cache.SharedIndexInformer {
+		lost := reasonEventsLost
+		if s.opts.Namespace == "" {
+			lost = reasonClusterLost
+		}
+		return s.buildEventsInformer(client, s.opts.Namespace, resync, lost, false, nil)
+	})
+}
+
+func (s *Source) buildEventsInformer(client kubernetes.Interface, namespace string, resync time.Duration, lost string, pending bool, failed func(error)) *eventsInformer {
+	t := &eventsInformer{lost: lost, dirty: s.markDirty, failed: failed}
+	if pending {
+		t.degraded, t.state, t.reason = true, data.FeedLoading, reasonEventsLoading
+	}
+	events := client.CoreV1().Events(namespace)
 	lw := &cache.ListWatch{
 		ListWithContextFunc: func(ctx context.Context, o metav1.ListOptions) (runtime.Object, error) {
 			obj, err := events.List(ctx, o)
-			s.wideObserved(w, err)
-			return obj, err
+			if err != nil {
+				t.fail(err)
+				return nil, err
+			}
+			t.listedPage(obj, o.Continue == "")
+			return obj, nil
 		},
 		WatchFuncWithContext: func(ctx context.Context, o metav1.ListOptions) (watch.Interface, error) {
 			wt, err := events.Watch(ctx, o)
-			s.wideObserved(w, err)
-			return wt, err
+			if err != nil {
+				t.fail(err)
+				return nil, err
+			}
+			return t.observe(ctx, wt, o.SendInitialEvents != nil && *o.SendInitialEvents), nil
 		},
 	}
-	inf := cache.NewSharedIndexInformerWithOptions(cache.ToListWatcherWithWatchListSemantics(lw, s.client), &corev1.Event{},
-		cache.SharedIndexInformerOptions{Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}})
-	if err := inf.SetTransform(stripManagedFields); err != nil {
-		return nil, err
-	}
-	if err := inf.SetWatchErrorHandlerWithContext(func(_ context.Context, _ *cache.Reflector, err error) {
-		s.wideObserved(w, err)
-		select {
-		case errs <- err:
-		default:
+	t.SharedIndexInformer = cache.NewSharedIndexInformerWithOptions(cache.ToListWatcherWithWatchListSemantics(lw, client), &corev1.Event{},
+		cache.SharedIndexInformerOptions{ResyncPeriod: resync, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}})
+	if err := t.SetWatchErrorHandlerWithContext(func(_ context.Context, _ *cache.Reflector, err error) {
+		if !routine(err) {
+			t.fail(err)
 		}
 	}); err != nil {
-		return nil, err
+		t.fail(err)
 	}
-	if _, err := inf.AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc:    func(any) { s.markDirty() },
-		UpdateFunc: func(any, any) { s.markDirty() },
-		DeleteFunc: func(any) { s.markDirty() },
-	}); err != nil {
-		return nil, err
+	return t
+}
+
+func routine(err error) bool {
+	return errors.Is(err, context.Canceled) || errors.Is(err, io.EOF) || apierrors.IsResourceExpired(err) || apierrors.IsGone(err)
+}
+
+func (t *eventsInformer) fail(err error) {
+	if errors.Is(err, context.Canceled) {
+		return
 	}
-	return inf, nil
+	state, reason := data.FeedUnavailable, reasonEventsDown+": "+clip(err.Error())
+	if denied(err) {
+		state, reason = data.FeedForbidden, t.lost
+	}
+	t.mu.Lock()
+	t.listed, t.watching, t.degraded = false, false, true
+	t.state, t.reason = state, reason
+	t.mu.Unlock()
+	t.dirty()
+	if t.failed != nil {
+		t.failed(err)
+	}
+}
+
+func (t *eventsInformer) listedPage(list runtime.Object, first bool) {
+	items, err := meta.ExtractList(list)
+	if err != nil {
+		t.fail(err)
+		return
+	}
+	metadata, err := meta.ListAccessor(list)
+	if err != nil {
+		t.fail(err)
+		return
+	}
+	t.mu.Lock()
+	if first || t.expected == nil {
+		t.resync()
+		t.expected = make(map[string]eventsStamp, len(items))
+		t.watching = false
+	}
+	for _, obj := range items {
+		t.record(watch.Added, obj)
+	}
+	t.listed = metadata.GetContinue() == ""
+	t.mu.Unlock()
+	t.dirty()
+}
+
+func (t *eventsInformer) record(kind watch.EventType, obj runtime.Object) {
+	m, err := meta.Accessor(obj)
+	if err != nil {
+		t.listed = false
+		return
+	}
+	key := podKey(m.GetNamespace(), m.GetName())
+	if kind == watch.Deleted {
+		delete(t.expected, key)
+		return
+	}
+	t.expected[key] = eventsStamp{string(m.GetUID()), m.GetResourceVersion()}
+}
+
+type eventsWatch struct {
+	upstream watch.Interface
+	out      chan watch.Event
+	done     chan struct{}
+	once     sync.Once
+}
+
+func (w *eventsWatch) Stop() { w.once.Do(func() { close(w.done); w.upstream.Stop() }) }
+
+func (w *eventsWatch) ResultChan() <-chan watch.Event { return w.out }
+
+func (t *eventsInformer) observe(ctx context.Context, upstream watch.Interface, initial bool) watch.Interface {
+	w := &eventsWatch{upstream: upstream, out: make(chan watch.Event), done: make(chan struct{})}
+	t.mu.Lock()
+	t.epoch++
+	epoch := t.epoch
+	if initial {
+		t.resync()
+		t.expected = make(map[string]eventsStamp)
+		t.listed = false
+	}
+	t.watching = true
+	t.mu.Unlock()
+	t.dirty()
+	go func() {
+		defer close(w.out)
+		defer w.Stop()
+		defer t.unwatch(epoch)
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-w.done:
+				return
+			case event, ok := <-upstream.ResultChan():
+				if !ok {
+					return
+				}
+				if err := t.apply(epoch, initial, event); err != nil {
+					t.fail(err)
+				}
+				select {
+				case <-ctx.Done():
+					return
+				case <-w.done:
+					return
+				case w.out <- event:
+				}
+				t.dirty()
+			}
+		}
+	}()
+	return w
+}
+
+func (t *eventsInformer) unwatch(epoch uint64) {
+	t.mu.Lock()
+	if t.epoch == epoch {
+		t.watching = false
+	}
+	t.mu.Unlock()
+	t.dirty()
+}
+
+func (t *eventsInformer) apply(epoch uint64, initial bool, event watch.Event) error {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	if t.epoch != epoch || t.expected == nil {
+		return nil
+	}
+	switch event.Type {
+	case watch.Added, watch.Modified, watch.Deleted:
+		t.record(event.Type, event.Object)
+	case watch.Bookmark:
+		m, err := meta.Accessor(event.Object)
+		if err == nil && initial && m.GetAnnotations()[initialEventsEnd] == "true" {
+			t.listed = true
+		}
+	case watch.Error:
+		t.watching = false
+		err := apierrors.FromObject(event.Object)
+		if !routine(err) {
+			return err
+		}
+		t.expired = true
+	}
+	return nil
+}
+
+func (t *eventsInformer) resync() {
+	expired := t.expired
+	t.expired = false
+	if t.expected == nil || expired || t.degraded {
+		return
+	}
+	t.degraded, t.state, t.reason = true, data.FeedLoading, reasonEventsResync
+}
+
+func (t *eventsInformer) status() (data.FeedState, string) {
+	objects := t.GetStore().List()
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	if t.degraded && t.consumed(objects) {
+		t.degraded = false
+	}
+	if !t.degraded {
+		return data.FeedReady, ""
+	}
+	return t.state, t.reason
+}
+
+func (t *eventsInformer) consumed(objects []any) bool {
+	if !t.listed || !t.watching || len(objects) != len(t.expected) {
+		return false
+	}
+	for _, obj := range objects {
+		m, err := meta.Accessor(obj)
+		if err != nil {
+			return false
+		}
+		stamp, ok := t.expected[podKey(m.GetNamespace(), m.GetName())]
+		if !ok || stamp != (eventsStamp{string(m.GetUID()), m.GetResourceVersion()}) {
+			return false
+		}
+	}
+	return true
 }
 
 func (s *Source) wideAttempt(w *wideEvents) error {
@@ -257,8 +477,20 @@ func (s *Source) wideAttempt(w *wideEvents) error {
 		return classify(err)
 	}
 	errs := make(chan error, 1)
-	inf, err := s.newWideInformer(w, errs)
-	if err != nil {
+	inf := s.buildEventsInformer(s.client, "", 0, reasonClusterLost, true, func(err error) {
+		select {
+		case errs <- err:
+		default:
+		}
+	})
+	if err := inf.SetTransform(stripManagedFields); err != nil {
+		return err
+	}
+	if _, err := inf.AddEventHandler(cache.ResourceEventHandlerFuncs{
+		AddFunc:    func(any) { s.markDirty() },
+		UpdateFunc: func(any, any) { s.markDirty() },
+		DeleteFunc: func(any) { s.markDirty() },
+	}); err != nil {
 		return err
 	}
 	runCtx, stop := context.WithCancel(s.ctx)
@@ -291,6 +523,9 @@ func (s *Source) wideAttempt(w *wideEvents) error {
 			return abort(wideFailure{state: data.FeedUnavailable, reason: reasonEventsSyncTimeout})
 		case <-poll.C:
 			if !inf.HasSynced() {
+				continue
+			}
+			if state, _ := inf.status(); state != data.FeedReady {
 				continue
 			}
 			s.mu.Lock()
