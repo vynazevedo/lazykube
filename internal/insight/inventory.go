@@ -49,7 +49,8 @@ func (i *Inventory) Publish(source SourceIdentity, namespace string, synthetic b
 		p.Entity.Source = source
 		valid = append(valid, p)
 	}
-	pods = valid
+	pods = make([]PodObservation, len(valid))
+	copy(pods, valid)
 	if missingIdentity {
 		coverage.Reason = inventoryCoverageReason(coverage.Reason, "pod identity or resource version missing")
 	}
