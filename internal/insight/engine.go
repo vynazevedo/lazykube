@@ -84,7 +84,8 @@ func (e *Engine) Step(batch ObservationBatch) SignalSnapshot {
 		return e.Snapshot()
 	}
 	same := e.initialized && batch.Cursor == e.cursor
-	gap := batch.SkippedInventoryRevisions > 0 || e.initialized && batch.Cursor.Revisions.Inventory > e.cursor.Revisions.Inventory+1
+	reset := batch.Reset && e.initialized && !same
+	gap := reset || batch.SkippedInventoryRevisions > 0 || e.initialized && batch.Cursor.Revisions.Inventory > e.cursor.Revisions.Inventory+1
 	if same && e.blocked {
 		return e.Snapshot()
 	}
@@ -95,6 +96,18 @@ func (e *Engine) Step(batch ObservationBatch) SignalSnapshot {
 		e.blocked = true
 		e.suspendAll(SuspensionSourceCoverage, e.coverage)
 		return e.Snapshot()
+	}
+	if reset && batch.FullInventory {
+		present := make(map[EntityKey]bool, len(batch.Pods))
+		for _, p := range batch.Pods {
+			present[p.Entity.EntityKey] = true
+		}
+		for key := range e.machines {
+			if !present[key.Entity] {
+				delete(e.machines, key)
+			}
+		}
+		e.pods = nil
 	}
 	if gap && !same {
 		e.cursor = batch.Cursor
@@ -185,6 +198,7 @@ func (m *signalMachine) suspend(reason SuspensionReason, coverage Coverage) {
 	m.problem = false
 	m.observations = 0
 	m.deltas = nil
+	m.signal.Evidence.WindowRestarts = 0
 	m.counterKnown = false
 	m.rebaseline = true
 }

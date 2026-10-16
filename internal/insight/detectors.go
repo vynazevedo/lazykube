@@ -26,7 +26,7 @@ func (e *Engine) evaluate(newBatch bool) {
 
 func (e *Engine) podRules(p PodObservation, newBatch bool) {
 	m, fresh, baseline := e.machine(p, ContainerObservation{}, RulePending, newBatch)
-	if p.Phase == PodUnknown {
+	if p.Phase == PodUnknown || pendingStatusMissing(p) {
 		m.suspend(SuspensionMissingStatus, Coverage{State: CoveragePartial, Reason: "pod phase unknown"})
 	} else if !m.suspended {
 		pending := p.Phase == PodPending
@@ -51,7 +51,9 @@ func (e *Engine) podRules(p PodObservation, newBatch bool) {
 			m.activate(SignalWarning)
 		}
 		m.lastEviction = e.now
-		m.signal.Evidence.TransitionObservedAt = e.now
+		if !baseline && m.seen && !m.wasEvicted {
+			m.signal.Evidence.TransitionObservedAt = e.now
+		}
 		m.signal.Evidence.Reason = ReasonEvicted
 	}
 	if (m.signal.State == SignalActive || m.signal.State == SignalRecovering) && e.now.Sub(m.lastEviction) >= e.config.EvictionQuiet {
@@ -190,4 +192,19 @@ func (e *Engine) oom(m *signalMachine, c ContainerObservation, fresh, baseline, 
 		m.termKnown = true
 	}
 	e.recover(m, healthy, e.now.Sub(m.lastOOM) >= e.config.OOMQuiet)
+}
+
+func pendingStatusMissing(p PodObservation) bool {
+	if p.Phase == PodSucceeded || p.Phase == PodFailed {
+		return false
+	}
+	if len(p.Containers) == 0 || p.Omissions.Containers > 0 {
+		return true
+	}
+	for _, c := range p.Containers {
+		if !c.StatusObserved || c.Phase == ContainerUnknown {
+			return true
+		}
+	}
+	return false
 }
