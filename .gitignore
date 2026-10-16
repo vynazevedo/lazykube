@@ -53,3 +53,7 @@ Temporary Items
 .apdisk
 
 # End of https://www.toptal.com/developers/gitignore/api/OSX
+
+# Local validation and release artifacts
+.local/
+dist/
