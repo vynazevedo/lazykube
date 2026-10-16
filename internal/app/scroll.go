@@ -37,6 +37,7 @@ func (m *Model) setTab(t ui.Tab) {
 	}
 	m.tab = t
 	m.scroll, m.follow, m.newLines = 0, true, 0
+	m.refreshEvents(m.activeName())
 	if t == ui.TabLog {
 		m.scroll = m.maxScroll()
 	}
@@ -49,14 +50,16 @@ func (m Model) pageSize() int {
 
 func (m Model) scrollTotal() int {
 	switch m.tab {
+	case ui.TabSecurity:
+		return len(m.securityView.Rows)
 	case ui.TabLog:
 		return len(ui.LogRows(m.logs, ui.LogWidth(m.layout.Details.W), m.wrap))
 	case ui.TabConfig:
 		return len(m.manifest)
 	case ui.TabDescribe:
-		return len(m.describe)
+		return len(ui.DescribeRows(ui.Diagnosis{Containers: m.dg.containers}, m.describe))
 	case ui.TabEvents:
-		return len(m.events)
+		return len(m.events.Items)
 	default:
 		return 0
 	}

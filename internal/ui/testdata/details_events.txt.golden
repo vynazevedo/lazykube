@@ -1,18 +1,18 @@
 ╭───────────────────────────────────────────────────────────────╮
-│  Log   Config   Top   Describe   Events     tab ⇥ / shift+tab │
+│  Log   Config   Top   Describe   Events   Security            │
 │ ───────────────────────────────────────────────────────────── │
 │ ● bilibili-live-7f6b8d9c5-mn4tz                     [Running] │
-│   bilibili-raffle · Running · node huawei-k3s-01 · 10.42.0.24 │
+│   bilibili-raffle · Running · ready 2/2 · node huawei-k3s-01… │
 │                                                               │
 │ ╭───────────────────────────────────────────────────────────╮ │
 │ │ AGE    TYPE     REASON         MESSAGE                    │ │
-│ │ 8s     Normal   Scheduled      Successfully assigned xcx… │ │
-│ │ 7s     Normal   Pulling        Pulling image "registry.l… │ │
-│ │ 41m    Normal   Completed      Job completed: lingqu-160… │ │
-│ │ 3d     Warning  BackOff        Back-off restarting faile… │ │
-│ │ 3d     Normal   Started        Started container app      │ │
-│ │ 12d    Warning  OOMKilled      Container odoo exceeded m… │ │
-│ │ 12d    Normal   Created        Created container odoo     │ │
+│ │ 17m    Warning  BackOff        ×3 Back-off restarting fa… │ │
+│ │ 17m    Normal   Pulled         ×2 Container image "regis… │ │
+│ │ 17m    Normal   Started        ×2 Started container app   │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
+│ │                                                           │ │
 │ │                                                           │ │
 │ │                                                           │ │
 │ │                                                           │ │

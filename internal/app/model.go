@@ -37,6 +37,11 @@ type Options struct {
 }
 
 type Model struct {
+	security          data.SecuritySnapshot
+	securityKey       string
+	securityNamespace bool
+	securityView      ui.SecurityView
+
 	w, h     int
 	layout   Layout
 	leftMode LeftMode
@@ -62,7 +67,8 @@ type Model struct {
 	snap     data.Snapshot
 	metrics  data.Metrics
 	logs     []data.LogLine
-	events   []data.Event
+	events   data.EventFeed
+	dg       diagState
 	manifest []string
 	describe []data.Field
 
@@ -109,6 +115,7 @@ func New(opts Options) Model {
 		keys:     DefaultKeyMap(),
 		filter:   ti,
 		src:      opts.Source,
+		dg:       newDiagState(opts.Source),
 		follow:   true,
 		motion:   newMotion(fps),
 	}
@@ -118,6 +125,7 @@ func New(opts Options) Model {
 		m.clock = anim.Fixed(0, 0, 0)
 	}
 	m.snap = m.src.Snapshot()
+	m.loadSecurity()
 	if opts.InitialPod >= 0 && opts.InitialPod < len(m.snap.Pods) {
 		m.selName = m.snap.Pods[opts.InitialPod].Key()
 	} else if len(m.snap.Pods) > 0 {
@@ -142,12 +150,14 @@ func (m Model) waitData() tea.Cmd {
 
 func (m *Model) reload() {
 	m.snap = m.src.Snapshot()
+	m.loadSecurity()
 	m.nsCursor = max(0, min(m.nsCursor, len(m.snap.Namespaces)-1))
 	m.depCursor = max(0, min(m.depCursor, len(m.snap.Deployments)-1))
 	pods := m.visiblePods()
 	if m.selectedIndex(pods) < 0 && len(pods) > 0 {
 		m.selName = pods[0].Key()
 		m.follow, m.newLines, m.logs = true, 0, nil
+		m.resetLogTarget()
 	}
 	m.ensurePodVisible()
 	m.refresh()
@@ -170,19 +180,18 @@ func (m *Model) heatCols() int {
 }
 
 func (m *Model) refresh() {
+	m.refreshSecurity()
 	name := m.activeName()
 	m.metrics = m.src.Metrics(m.clock.T, name, m.heatCols())
-	var logs []data.LogLine
+	m.refreshLogs(name)
+	m.refreshEvents(name)
+	m.manifest, m.describe, m.dg.containers = nil, nil, nil
 	if name != "" {
-		logs = m.src.Logs(name, m.clock.T, logBuffer)
-	}
-	m.applyLogs(logs)
-	m.events, m.manifest, m.describe = nil, nil, nil
-	if name != "" {
-		m.events = m.src.Events(name)
 		m.manifest = m.src.Manifest(name)
 		m.describe = m.src.Describe(name)
+		m.dg.containers = m.dg.diag.Containers(name)
 	}
+	m.updateMatches()
 	m.clampScroll()
 	m.setBarTargets()
 }

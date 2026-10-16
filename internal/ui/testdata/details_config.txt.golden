@@ -1,8 +1,8 @@
 ╭───────────────────────────────────────────────────────────────╮
-│  Log   Config   Top   Describe   Events     tab ⇥ / shift+tab │
+│  Log   Config   Top   Describe   Events   Security            │
 │ ───────────────────────────────────────────────────────────── │
 │ ● bilibili-live-7f6b8d9c5-mn4tz                     [Running] │
-│   bilibili-raffle · Running · node huawei-k3s-01 · 10.42.0.24 │
+│   bilibili-raffle · Running · ready 2/2 · node huawei-k3s-01… │
 │                                                               │
 │ ╭───────────────────────────────────────────────────────────╮ │
 │ │  1  apiVersion: v1                                        │ │

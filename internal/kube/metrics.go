@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"hash/fnv"
 	"math"
 	"sort"
 	"time"
@@ -67,7 +68,9 @@ type usage struct {
 	nodeMem   map[string]int64
 	net       map[string]*netState
 	version   int
-	heatKey   [2]int
+	heatGen   int
+	eligible  uint64
+	heatKey   [3]int
 	heatNames []string
 	heatCells [][]float64
 }
@@ -114,6 +117,9 @@ func maxOf(values []float64) float64 {
 func (u *usage) series(key, uid string) *podSeries {
 	ps := u.pods[key]
 	if ps == nil || ps.uid != uid {
+		if ps != nil {
+			u.version++
+		}
 		ps = &podSeries{uid: uid}
 		u.pods[key] = ps
 	}
@@ -135,6 +141,30 @@ func (u *usage) netState(node string) *netState {
 		u.net[node] = st
 	}
 	return st
+}
+
+func heatEligibility(pods []*corev1.Pod) uint64 {
+	h := fnv.New64a()
+	for _, p := range pods {
+		_, _ = h.Write([]byte(p.Namespace))
+		_, _ = h.Write([]byte{0})
+		_, _ = h.Write([]byte(p.Name))
+		_, _ = h.Write([]byte{0})
+		_, _ = h.Write([]byte(p.UID))
+		if podStatus(p) == data.StatusRunning {
+			_, _ = h.Write([]byte{1})
+		} else {
+			_, _ = h.Write([]byte{2})
+		}
+	}
+	return h.Sum64()
+}
+
+func (u *usage) noteEligibility(pods []*corev1.Pod) {
+	if fp := heatEligibility(pods); fp != u.eligible {
+		u.eligible = fp
+		u.heatGen++
+	}
 }
 
 func netBackoff(base time.Duration, failures int) time.Duration {
@@ -234,6 +264,7 @@ func (s *Source) pollMetrics(ctx context.Context) {
 	for key, ps := range u.pods {
 		if p := s.byKey[key]; p == nil || string(p.UID) != ps.uid {
 			delete(u.pods, key)
+			u.version++
 		}
 	}
 	u.nodeCPU, u.nodeMem = nodeCPU, nodeMem
@@ -441,7 +472,7 @@ func (s *Source) heat(m *data.Metrics, cols int) {
 		return
 	}
 	u := &s.usage
-	key := [2]int{u.version, cols}
+	key := [3]int{u.version, u.heatGen, cols}
 	if u.heatKey != key {
 		u.heatNames, u.heatCells = s.buildHeat(cols)
 		u.heatKey = key

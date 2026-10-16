@@ -14,22 +14,22 @@
                                                                                                                                                                 
                                                                                                                                                                 
                                                                                                                                                                 
-                                                                                                                                                                
                                    ╭─ Help ────────────────────────────────────────────────────────────────────────────────╮                                    
                                    │                                                                                       │                                    
                                    │  ↑/↓ k/j    move selection                 f          toggle follow (Log)             │                                    
-                                   │  tab        next panel                     s          shell in pod                    │                                    
-                                   │  shift+tab  previous panel                 ctrl+d     delete pod                      │                                    
-                                   │  /          filter pods                    ctrl+k     switch context                  │                                    
-                                   │  enter      confirm / filter namespace     p          cycle palette                   │                                    
-                                   │  esc        leave filter / clear           1          toggle left column              │                                    
-                                   │  l c t d e  Log Config Top Describe Events ctrl+p     pause animations                │                                    
-                                   │  [ ]        previous / next tab            ?          toggle help                     │                                    
-                                   │  pgup/pgdn  scroll viewport                q ctrl+c   quit                            │                                    
-                                   │  home/end   top / bottom                                                              │                                    
+                                   │  tab        next panel                     w          toggle wrap (Log)               │                                    
+                                   │  shift+tab  previous panel                 C          next log container              │                                    
+                                   │  /          filter pods                    P          current / previous logs         │                                    
+                                   │  enter      confirm / filter namespace     / n N      search Log (details focus)      │                                    
+                                   │  esc        leave filter / clear           E          events pod / ns / cluster       │                                    
+                                   │  l c t d e  Log Config Top Describe Events p          cycle palette                   │                                    
+                                   │  S          Security / namespace posture   1          toggle left column              │                                    
+                                   │  [ ]        previous / next tab            ctrl+p     pause animations                │                                    
+                                   │  pgup/pgdn  scroll viewport                ?          toggle help                     │                                    
+                                   │  home/end   top / bottom                   q ctrl+c   quit                            │                                    
+                                   │  g G        top / bottom (details)                                                    │                                    
                                    │                                                                                       │                                    
                                    ╰───────────────────────────────────────────────────────────────────────────────────────╯                                    
-                                                                                                                                                                
                                                                                                                                                                 
                                                                                                                                                                 
                                                                                                                                                                 

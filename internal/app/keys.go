@@ -15,11 +15,14 @@ type KeyMap struct {
 	TabTop      key.Binding
 	TabDescribe key.Binding
 	TabEvents   key.Binding
+	TabSecurity key.Binding
 	TabPrev     key.Binding
 	TabNext     key.Binding
-	Shell       key.Binding
-	Delete      key.Binding
-	Context     key.Binding
+	Container   key.Binding
+	Previous    key.Binding
+	SearchNext  key.Binding
+	SearchPrev  key.Binding
+	EventScope  key.Binding
 	Palette     key.Binding
 	ToggleLeft  key.Binding
 	Pause       key.Binding
@@ -51,12 +54,15 @@ func DefaultKeyMap() KeyMap {
 		TabConfig:   b("c", "config", "c"),
 		TabTop:      b("t", "top", "t"),
 		TabDescribe: b("d", "describe", "d"),
+		TabSecurity: b("S", "security / namespace posture", "S"),
 		TabEvents:   b("e", "events", "e"),
 		TabPrev:     b("[", "previous tab", "["),
 		TabNext:     b("]", "next tab", "]"),
-		Shell:       b("s", "shell", "s"),
-		Delete:      b("ctrl+d", "delete", "ctrl+d"),
-		Context:     b("ctrl+k", "context", "ctrl+k"),
+		Container:   b("C", "log container", "C"),
+		Previous:    b("P", "previous logs", "P"),
+		SearchNext:  b("n", "next match", "n"),
+		SearchPrev:  b("N", "previous match", "N"),
+		EventScope:  b("E", "events scope", "E"),
 		Palette:     b("p", "palette", "p"),
 		ToggleLeft:  b("1", "left column", "1"),
 		Pause:       b("ctrl+p", "pause", "ctrl+p"),

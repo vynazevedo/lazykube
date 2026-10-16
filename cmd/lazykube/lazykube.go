@@ -121,6 +121,9 @@ func run(args []string, stderr io.Writer, connect connector, progOpts ...tea.Pro
 	}
 	defer shutdown()
 	final, err := tea.NewProgram(model, progOpts...).Run()
+	if errors.Is(err, tea.ErrInterrupted) {
+		return app.ExitCancelled
+	}
 	if err != nil {
 		_, _ = fmt.Fprintln(stderr, "lazykube:", err)
 		return 1

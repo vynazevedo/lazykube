@@ -66,38 +66,7 @@ func podKey(namespace, name string) string {
 }
 
 func podStatus(p *corev1.Pod) data.PodStatus {
-	switch p.Status.Phase {
-	case corev1.PodSucceeded:
-		return data.StatusCompleted
-	case corev1.PodFailed:
-		return data.StatusFailed
-	case corev1.PodUnknown:
-		return data.StatusUnknown
-	}
-	if p.DeletionTimestamp != nil {
-		return data.StatusUnknown
-	}
-	creating := false
-	for _, cs := range append(append([]corev1.ContainerStatus{}, p.Status.InitContainerStatuses...), p.Status.ContainerStatuses...) {
-		if w := cs.State.Waiting; w != nil {
-			if failedReasons[w.Reason] {
-				return data.StatusFailed
-			}
-			if w.Reason == "ContainerCreating" || w.Reason == "PodInitializing" {
-				creating = true
-			}
-		}
-		if t := cs.State.Terminated; t != nil && t.ExitCode != 0 && p.Status.Phase == corev1.PodRunning {
-			return data.StatusFailed
-		}
-	}
-	if creating {
-		return data.StatusContainerCreating
-	}
-	if p.Status.Phase == corev1.PodRunning {
-		return data.StatusRunning
-	}
-	return data.StatusPending
+	return summarize(p).status
 }
 
 func resources(p *corev1.Pod) (cpuReq, cpuLim, memReq, memLim int) {
@@ -123,25 +92,21 @@ func controller(p *corev1.Pod) string {
 	return "-"
 }
 
-func restarts(p *corev1.Pod) int {
-	n := 0
-	for _, cs := range p.Status.ContainerStatuses {
-		n += int(cs.RestartCount)
-	}
-	return n
-}
-
 func toPod(p *corev1.Pod, now time.Time) data.Pod {
 	cpuReq, cpuLim, memReq, memLim := resources(p)
 	image := ""
 	if len(p.Spec.Containers) > 0 {
 		image = p.Spec.Containers[0].Image
 	}
+	sum := summarize(p)
 	return data.Pod{
 		Name:       p.Name,
 		Namespace:  p.Namespace,
-		Status:     podStatus(p),
-		Restarts:   restarts(p),
+		Status:     sum.status,
+		Reason:     sum.reason,
+		Ready:      sum.ready,
+		Containers: sum.total,
+		Restarts:   sum.restarts,
 		Age:        age(p.CreationTimestamp, now),
 		IP:         p.Status.PodIP,
 		Node:       p.Spec.NodeName,
@@ -227,9 +192,20 @@ func eventTime(e *corev1.Event) time.Time {
 	}
 }
 
+func eventCount(e *corev1.Event) int {
+	if e.Series != nil && e.Series.Count > 0 {
+		return int(e.Series.Count)
+	}
+	return max(1, int(e.Count))
+}
+
 func toEvents(events []*corev1.Event, now time.Time, limit int) []data.Event {
 	sorted := append([]*corev1.Event(nil), events...)
 	sort.SliceStable(sorted, func(i, j int) bool {
+		wi, wj := sorted[i].Type == corev1.EventTypeWarning, sorted[j].Type == corev1.EventTypeWarning
+		if wi != wj {
+			return wi
+		}
 		return eventTime(sorted[i]).After(eventTime(sorted[j]))
 	})
 	if len(sorted) > limit {
@@ -238,10 +214,13 @@ func toEvents(events []*corev1.Event, now time.Time, limit int) []data.Event {
 	out := make([]data.Event, len(sorted))
 	for i, e := range sorted {
 		out[i] = data.Event{
-			Age:     age(metav1.NewTime(eventTime(e)), now),
-			Type:    sanitize(e.Type),
-			Reason:  sanitize(e.Reason),
-			Message: sanitize(e.Message),
+			Age:       age(metav1.NewTime(eventTime(e)), now),
+			Type:      sanitize(e.Type),
+			Reason:    sanitize(e.Reason),
+			Object:    sanitize(e.InvolvedObject.Kind + "/" + e.InvolvedObject.Name),
+			Namespace: sanitize(e.Namespace),
+			Count:     eventCount(e),
+			Message:   clip(e.Message),
 		}
 	}
 	return out
@@ -289,6 +268,7 @@ func tolerations(p *corev1.Pod) string {
 
 func describePod(p *corev1.Pod, nodeAddr string) []data.Field {
 	cpuReq, cpuLim, memReq, memLim := resources(p)
+	sum := summarize(p)
 	node := p.Spec.NodeName
 	if node == "" {
 		node = "-"
@@ -303,11 +283,12 @@ func describePod(p *corev1.Pod, nodeAddr string) []data.Field {
 		{Key: "Name", Value: p.Name},
 		{Key: "Namespace", Value: p.Namespace},
 		{Key: "Node", Value: node},
-		{Key: "Status", Value: podStatus(p).String()},
+		{Key: "Status", Value: sum.reason},
+		{Key: "Ready", Value: fmt.Sprintf("%d/%d", sum.ready, sum.total)},
 		{Key: "IP", Value: p.Status.PodIP},
 		{Key: "Controlled By", Value: controller(p)},
 		{Key: "Image", Value: strings.Join(images, ", ")},
-		{Key: "Restart Count", Value: fmt.Sprint(restarts(p))},
+		{Key: "Restart Count", Value: fmt.Sprint(sum.restarts)},
 		{Key: "Requests", Value: quantityText(cpuReq, memReq)},
 		{Key: "Limits", Value: quantityText(cpuLim, memLim)},
 		{Key: "QoS Class", Value: string(p.Status.QOSClass)},

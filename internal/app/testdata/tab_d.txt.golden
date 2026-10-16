@@ -1,33 +1,33 @@
  lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d                                       ⠙ metrics every 5s ● live  
                                                                                                                                                                 
  ╭─ Node ────────────────────────────╮ ╭─ Pods · focus ─────────────────────────────────────╮ ╭───────────────────────────────────────────────────────────────╮ 
- │                                   │ │                                                    │ │  Log   Config   Top   Describe   Events     tab ⇥ / shift+tab │ 
+ │                                   │ │                                                    │ │  Log   Config   Top   Describe   Events   Security            │ 
  │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  huawei-k3s-01│ │ / filter pods…▌                           13 items │ │ ───────────────────────────────────────────────────────────── │ 
  │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready      │ │                                                    │ │ ● bilibili-live-7f6b8d9c5-mn4tz                     [Running] │ 
- │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25%      │ │   NAME          NAMESPACE        RST   AGE CPU     │ │   bilibili-raffle · Running · node huawei-k3s-01 · 10.42.0.24 │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   █████████████│ │ ● bilibili-raf… bilibili-raffle    0  119d █░░░░░░ │ │                                                               │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4/3.8Gi│ │ ● bilibili-liv… bilibili-raffle    2  119d ████░░░ │ │ ╭───────────────────────────────────────────────────────────╮ │ 
- │    ▀    ▀▀▀▀▀▀▀▀▀    █████████████│ │ ● lgo-7c5d9758… lgo                0   87d ██░░░░░ │ │ │ Name              bilibili-live-7f6b8d9c5-mn4tz           │ │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13 / 110│ │ ● psql-6bc7744… ys-odoo            0   64d ████░░░ │ │ │ Namespace         bilibili-raffle                         │ │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch amd64   │ │ ● odoo-7575bf6… ys-odoo            1   64d ██████░ │ │ │ Node              huawei-k3s-01/192.168.0.12              │ │ 
- │    ▀ ▀  ▀▀▀▀▀▀▀▀▀                 │ │ ○ qiandao-1605… xcx                0    2h ░░░░░░░ │ │ │ Status            Running                                 │ │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                │ │ ○ lingqu-16054… xcx                0   41m ░░░░░░░ │ │ │ IP                10.42.0.24                              │ │ 
- │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀               │ │ ⠙ lingqu-16054… xcx                0    8s ░░░░░░░ │ │ │ Controlled By     ReplicaSet/bilibili-live-7f6b8d9c5      │ │ 
- │                                   │ │ ● coredns-6799… kube-system        0  119d █░░░░░░ │ │ │ Image             registry.local/bilibili-raffle:1.4.2    │ │ 
- │                                   │ │ ● metrics-serv… kube-system        0  119d ██░░░░░ │ │ │ Restart Count     2                                       │ │ 
- ╰───────────────────────────────────╯ │ ● traefik-f456… kube-system        0  119d ░░░░░░░ │ │ │ Requests          cpu: 10m, memory: 64Mi                  │ │ 
- ╭─ Namespaces ──────────────────────╮ │ ● local-path-p… kube-system        0  119d ░░░░░░░ │ │ │ Limits            cpu: 50m, memory: 128Mi                 │ │ 
- │                                   │ │ ● svclb-traefi… kube-system        0  119d ░░░░░░░ │ │ │ QoS Class         Burstable                               │ │ 
- │ default                 ·····   0 │ ╰────────────────────────────────────────────────────╯ │ │ Conditions        Initialized ✓ Ready ✓ ContainersReady … │ │ 
- │ kube-system             █████   5 │ ╭─ CPU heatmap · last 2 min ─────────────────────────╮ │ │ Tolerations       node.kubernetes.io/not-ready:NoExecute… │ │ 
- │ kube-public             ·····   0 │ │                                                    │ │ │                                                           │ │ 
- │ kube-node-lease         ·····   0 │ │ bilibili-raf… ████████████████████████████████████ │ │ │                                                           │ │ 
- │ bilibili-raffle         ██░░░   2 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                           │ │ 
- │ lgo                     █░░░░   1 │ │ bilibili-live ████████████████████████████████████ │ │ │                                                           │ │ 
- │ xcx                     ███░░   3 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                           │ │ 
- │ ys-odoo                 ██░░░   2 │ │ lgo-7c5d97584 ████████████████████████████████████ │ │ │                                                           │ │ 
- │                                   │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                           │ │ 
- ╰───────────────────────────────────╯ │ psql-6bc7744… ████████████████████████████████████ │ │ │                                                           │ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25%      │ │   NAME          NAMESPACE    RST   AGE CPU/STATUS  │ │   bilibili-raffle · Running · ready 2/2 · node huawei-k3s-01… │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   █████████████│ │ ● bilibili-raf… bilibili-r…    0  119d █░░░░░░     │ │                                                               │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4/3.8Gi│ │ ● bilibili-liv… bilibili-r…    2  119d ████░░░     │ │ ╭───────────────────────────────────────────────────────────╮ │ 
+ │    ▀    ▀▀▀▀▀▀▀▀▀    █████████████│ │ ● lgo-7c5d9758… lgo            0   87d ██░░░░░     │ │ │ Containers  2 · ready 2/2                                 │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13 / 110│ │ ● psql-6bc7744… ys-odoo        0   64d ████░░░     │ │ │ ● app     app               running 17m · ready ✓… ◂ logs │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch amd64   │ │ ● odoo-7575bf6… ys-odoo        1   64d ██████░     │ │ │           last      Error · exit 1 · 17m ago (2026-10-16… │ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀                 │ │ ○ qiandao-1605… xcx            0    2h Completed   │ │ │           last msg  panic: runtime error: invalid memory… │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                │ │ ○ lingqu-16054… xcx            0   41m Completed   │ │ │           ↳ P logs anteriores · C troca container · E ev… │ │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀               │ │ ⠙ lingqu-16054… xcx            0    8s Init:0/1    │ │ │ ● app     log-shipper       running 119d · ready ✓ · sta… │ │ 
+ │                                   │ │ ● coredns-6799… kube-system    0  119d █░░░░░░     │ │ │                                                           │ │ 
+ │                                   │ │ ● metrics-serv… kube-system    0  119d ready 0/1   │ │ │ Name              bilibili-live-7f6b8d9c5-mn4tz           │ │ 
+ ╰───────────────────────────────────╯ │ ● traefik-f456… kube-system    0  119d ░░░░░░░     │ │ │ Namespace         bilibili-raffle                         │ │ 
+ ╭─ Namespaces ──────────────────────╮ │ ● local-path-p… kube-system    0  119d ImagePullB… │ │ │ Node              huawei-k3s-01/192.168.0.12              │ │ 
+ │                                   │ │ ● svclb-traefi… kube-system    7  119d CrashLoopB… │ │ │ Status            Running                                 │ │ 
+ │ default                 ·····   0 │ ╰────────────────────────────────────────────────────╯ │ │ Ready             2/2                                     │ │ 
+ │ kube-system             █████   5 │ ╭─ CPU heatmap · last 2 min ─────────────────────────╮ │ │ IP                10.42.0.24                              │ │ 
+ │ kube-public             ·····   0 │ │                                                    │ │ │ Controlled By     ReplicaSet/bilibili-live-7f6b8d9c5      │ │ 
+ │ kube-node-lease         ·····   0 │ │ bilibili-raf… ████████████████████████████████████ │ │ │ Image             registry.local/bilibili-raffle:1.4.2    │ │ 
+ │ bilibili-raffle         ██░░░   2 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Restart Count     2                                       │ │ 
+ │ lgo                     █░░░░   1 │ │ bilibili-live ████████████████████████████████████ │ │ │ Requests          cpu: 10m, memory: 64Mi                  │ │ 
+ │ xcx                     ███░░   3 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Limits            cpu: 50m, memory: 128Mi                 │ │ 
+ │ ys-odoo                 ██░░░   2 │ │ lgo-7c5d97584 ████████████████████████████████████ │ │ │ QoS Class         Burstable                               │ │ 
+ │                                   │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Conditions        Initialized ✓ Ready ✓ ContainersReady … │ │ 
+ ╰───────────────────────────────────╯ │ psql-6bc7744… ████████████████████████████████████ │ │ │ Tolerations       node.kubernetes.io/not-ready:NoExecute… │ │ 
  ╭─ Deployments ─────────────────────╮ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                           │ │ 
  │                                   │ │ odoo-7575bf6… ████████████████████████████████████ │ │ │                                                           │ │ 
  │ bilibili-raffle/bilibili-l… ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │                                                           │ │ 
@@ -45,4 +45,4 @@
  │                                   │ │               -2m ████████████████████████████ now │ │ ╰───────────────────────────────────────────────────────────╯ │ 
  ╰───────────────────────────────────╯ ╰────────────────────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────╯ 
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  ↑↓  move   tab  panel   /  filter   l  logs   s  shell   d  describe   ctrl+d  delete   ?  help   q  quit                                   bubbletea · 0 fps 
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                                                   bubbletea · 0 fps 

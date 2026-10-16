@@ -153,8 +153,8 @@ func TestTabsAndPalette(t *testing.T) {
 		t.Fatal("l opens Log")
 	}
 	m = press(t, m, "[")
-	if m.tab != ui.TabEvents {
-		t.Fatal("[ wraps to Events")
+	if m.tab != ui.TabSecurity {
+		t.Fatal("[ wraps to Security")
 	}
 	m = press(t, m, "]", "]")
 	if m.tab != ui.TabConfig {

@@ -17,9 +17,10 @@ const (
 	TabTop
 	TabDescribe
 	TabEvents
+	TabSecurity
 )
 
-var tabNames = []string{"Log", "Config", "Top", "Describe", "Events"}
+var tabNames = []string{"Log", "Config", "Top", "Describe", "Events", "Security"}
 
 func (t Tab) String() string {
 	if t < 0 || int(t) >= len(tabNames) {
@@ -29,7 +30,7 @@ func (t Tab) String() string {
 }
 
 func Tabs() []Tab {
-	return []Tab{TabLog, TabConfig, TabTop, TabDescribe, TabEvents}
+	return []Tab{TabLog, TabConfig, TabTop, TabDescribe, TabEvents, TabSecurity}
 }
 
 func (t Tab) Next(delta int) Tab {
@@ -68,14 +69,17 @@ const (
 )
 
 type DetailsState struct {
+	Security SecurityView
 	Tab      Tab
 	HoverTab int
 	Pod      *data.Pod
 	Metrics  data.Metrics
 	Logs     []data.LogLine
-	Events   []data.Event
+	Events   data.EventFeed
 	Manifest []string
 	Describe []data.Field
+	Diag     Diagnosis
+	LogInfo  LogInfo
 	Focused  bool
 	Scroll   int
 	Follow   bool
@@ -93,7 +97,15 @@ func DetailsPanel(r draw.Region, st DetailsState, ctx Ctx) {
 	}
 	tabBar(c.Sub(0, DetailsTabsRow, c.W, 1), st, ctx)
 	c.HLine(0, 1, c.W, '─', draw.Fg(theme.BorderSoft))
+	if st.Tab == TabSecurity {
+		SecurityTab(c.Sub(0, 2, c.W, c.H-2), st.Security, st.Scroll)
+		return
+	}
 	if st.Pod == nil {
+		if st.Tab == TabEvents && st.Events.Scope != data.ScopePod {
+			EventsTab(c.Sub(st.Slide, 2, c.W, c.H-2), st)
+			return
+		}
 		centered(c.Sub(0, 2, c.W, c.H-2), "no pod selected")
 		return
 	}
@@ -107,7 +119,7 @@ func DetailsPanel(r draw.Region, st DetailsState, ctx Ctx) {
 	case TabConfig:
 		ConfigTab(body, st, ctx)
 	case TabDescribe:
-		DescribeTab(body, st)
+		DescribeTab(body, st, ctx)
 	case TabEvents:
 		EventsTab(body, st)
 	}
@@ -135,11 +147,15 @@ func tabBar(r draw.Region, st DetailsState, ctx Ctx) {
 func podHeader(r draw.Region, p data.Pod, ctx Ctx) {
 	glyph, gc := StatusGlyph(p.Status, ctx)
 	sc := StatusColor(p.Status)
-	chip := "[" + p.Status.String() + "]"
+	chip := "[" + PodReason(p) + "]"
 	r.Put(0, 0, glyph, draw.Fg(gc))
 	r.Text(2, 0, draw.Truncate(p.Name, r.W-len(chip)-3), draw.Fg(theme.Text).WithBold())
 	r.LineRight(0, draw.Line{colored(chip, sc)})
-	info := strings.Join([]string{p.Namespace, p.Status.String(), "node " + p.Node, p.IP}, " · ")
+	parts := []string{p.Namespace, PodReason(p)}
+	if p.Containers > 0 {
+		parts = append(parts, fmt.Sprintf("ready %d/%d", p.Ready, p.Containers))
+	}
+	info := strings.Join(append(parts, "node "+p.Node, p.IP), " · ")
 	r.Text(2, 1, draw.Truncate(info, r.W-2), draw.Fg(theme.Muted))
 }
 
@@ -178,6 +194,8 @@ func LogWidth(panelW int) int {
 func ScrollRows(tab Tab, panelH int) int {
 	_, h := DetailsBody(0, panelH)
 	switch tab {
+	case TabSecurity:
+		return max(0, panelH-10)
 	case TabLog, TabEvents:
 		return max(0, h-3)
 	case TabConfig, TabDescribe:
@@ -216,26 +234,6 @@ func insetBox(r draw.Region) draw.Region {
 	return Box(r, theme.BgInset, theme.BorderSoft, theme.BgPanel, nil, nil).Inset(1, 0, 1, 0)
 }
 
-func LogTab(r draw.Region, st DetailsState, ctx Ctx) {
-	c := insetBox(r)
-	if c.Empty() {
-		return
-	}
-	rows := LogRows(st.Logs, c.W, st.Wrap)
-	visible := c.H - 1
-	for i := 0; i < visible && st.Scroll+i < len(rows); i++ {
-		logRow(c, i, rows[st.Scroll+i], ctx)
-	}
-	prompt := c.H - 1
-	c.Put(0, prompt, '❯', draw.Fg(ctx.Pal.A))
-	if ctx.Clock.CursorVisible() {
-		c.Put(2, prompt, '▌', draw.Fg(ctx.Pal.A))
-	}
-	if !st.Follow && st.NewLines > 0 {
-		c.LineRight(prompt, draw.Line{colored(fmt.Sprintf("↓ %d new", st.NewLines), ctx.Pal.A)})
-	}
-}
-
 func ConfigTab(r draw.Region, st DetailsState, ctx Ctx) {
 	c := insetBox(r)
 	for i := 0; i < c.H && st.Scroll+i < len(st.Manifest); i++ {
@@ -262,39 +260,4 @@ func yamlLine(r draw.Region, line string, ctx Ctx) {
 	x += r.Text(x, 0, draw.Truncate(key, r.W-x), draw.Fg(ctx.Pal.B))
 	x += r.Text(x, 0, ":", draw.Fg(theme.TextSoft))
 	r.Text(x, 0, draw.Truncate(value, r.W-x), draw.Fg(theme.TextSoft))
-}
-
-func DescribeTab(r draw.Region, st DetailsState) {
-	c := insetBox(r)
-	const keyW = 18
-	for i := 0; i < c.H && st.Scroll+i < len(st.Describe); i++ {
-		f := st.Describe[st.Scroll+i]
-		c.Text(0, i, draw.PadRight(f.Key, keyW), draw.Fg(theme.Muted))
-		c.Text(keyW, i, draw.Truncate(f.Value, c.W-keyW), draw.Fg(theme.Text))
-	}
-}
-
-func EventsTab(r draw.Region, st DetailsState) {
-	c := insetBox(r)
-	const ageW, typeW, reasonW = 6, 8, 14
-	typeX := ageW + 1
-	reasonX := typeX + typeW + 1
-	msgX := reasonX + reasonW + 1
-	hdr := draw.Fg(theme.Muted)
-	c.Text(0, 0, "AGE", hdr)
-	c.Text(typeX, 0, "TYPE", hdr)
-	c.Text(reasonX, 0, "REASON", hdr)
-	c.Text(msgX, 0, "MESSAGE", hdr)
-	for i := 0; i+1 < c.H && st.Scroll+i < len(st.Events); i++ {
-		e := st.Events[st.Scroll+i]
-		y := i + 1
-		typeColor := theme.OK
-		if e.Type == "Warning" {
-			typeColor = theme.Warn
-		}
-		c.Text(0, y, draw.Truncate(e.Age, ageW), draw.Fg(theme.Muted))
-		c.Text(typeX, y, draw.Truncate(e.Type, typeW), draw.Fg(typeColor))
-		c.Text(reasonX, y, draw.Truncate(e.Reason, reasonW), draw.Fg(theme.Text))
-		c.Text(msgX, y, draw.Truncate(e.Message, c.W-msgX), draw.Fg(theme.TextSoft))
-	}
 }

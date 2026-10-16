@@ -1,0 +1,48 @@
+ lazykube  v2.0   ◎ context huawei_k3s   k8s v1.28.4+k3s2  nodes 1  ns 8  pods 13  uptime 119d                                       ⠙ metrics every 5s ● live  
+                                                                                                                                                                
+ ╭─ Node ────────────────────────────╮ ╭─ Pods · focus ─────────────────────────────────────╮ ╭───────────────────────────────────────────────────────────────╮ 
+ │                                   │ │                                                    │ │  Log   Config   Top   Describe   Events   Security            │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  huawei-k3s-01│ │ / filter pods…▌                           13 items │ │ ───────────────────────────────────────────────────────────── │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready      │ │                                                    │ │ ╭───────────────────────────────────────────────────────────╮ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25%      │ │   NAME          NAMESPACE    RST   AGE CPU/STATUS  │ │ │ S: pod | Namespace: bilibili-raffle                       │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   █████████████│ │ ● bilibili-raf… bilibili-r…    0  119d █░░░░░░     │ │ │ Coverage: complete in scope | pods evaluated 2/2          │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4/3.8Gi│ │ ● bilibili-liv… bilibili-r…    2  119d ████░░░     │ │ │ No findings does not mean safe                            │ │ 
+ │    ▀    ▀▀▀▀▀▀▀▀▀    █████████████│ │ ● lgo-7c5d9758… lgo            0   87d ██░░░░░     │ │ │ Local checks only; not PSS compliance.                    │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13 / 110│ │ ● psql-6bc7744… ys-odoo        0   64d ████░░░     │ │ │ Pod bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz |       │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch amd64   │ │ ● odoo-7575bf6… ys-odoo        1   64d ██████░     │ │ │ complete in scope                                         │ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀                 │ │ ○ qiandao-1605… xcx            0    2h Completed   │ │ │ Observed 2026-10-16 12:00:00Z | UID                       │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                │ │ ○ lingqu-16054… xcx            0   41m Completed   │ │ │ demo-bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz | RV 1 │ │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀               │ │ ⠙ lingqu-16054… xcx            0    8s Init:0/1    │ │ │ [high] privileged | finding | container: init-permissions │ │ 
+ │                                   │ │ ● coredns-6799… kube-system    0  119d █░░░░░░     │ │ │ Field: spec.initContainers[0].securityContext.privileged  │ │ 
+ │                                   │ │ ● metrics-serv… kube-system    0  119d ready 0/1   │ │ │ Evidence: true                                            │ │ 
+ ╰───────────────────────────────────╯ │ ● traefik-f456… kube-system    0  119d ░░░░░░░     │ │ │ Privileged init container configured. Disable privileged  │ │ 
+ ╭─ Namespaces ──────────────────────╮ │ ● local-path-p… kube-system    0  119d ImagePullB… │ │ │ mode                                                      │ │ 
+ │                                   │ │ ● svclb-traefi… kube-system    7  119d CrashLoopB… │ │ │ Source: demo fixture v1 | configuration observed          │ │ 
+ │ default                 ·····   0 │ ╰────────────────────────────────────────────────────╯ │ │ [medium] imageLatest | finding | container: app           │ │ 
+ │ kube-system             █████   5 │ ╭─ CPU heatmap · last 2 min ─────────────────────────╮ │ │ Field: spec.containers[0].image                           │ │ 
+ │ kube-public             ·····   0 │ │                                                    │ │ │ Evidence: latest tag without digest                       │ │ 
+ │ kube-node-lease         ·····   0 │ │ bilibili-raf… ████████████████████████████████████ │ │ │ Image reference is mutable. Pin a verified digest         │ │ 
+ │ bilibili-raffle         ██░░░   2 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Source: demo fixture v1 | configuration observed          │ │ 
+ │ lgo                     █░░░░   1 │ │ bilibili-live ████████████████████████████████████ │ │ │ [medium] limit-memory | finding | container: app          │ │ 
+ │ xcx                     ███░░   3 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Field: spec.containers[0].resources.limits.memory         │ │ 
+ │ ys-odoo                 ██░░░   2 │ │ lgo-7c5d97584 ████████████████████████████████████ │ │ │ Evidence: absent at container and pod levels              │ │ 
+ │                                   │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Availability risk. Set a suitable memory limit            │ │ 
+ ╰───────────────────────────────────╯ │ psql-6bc7744… ████████████████████████████████████ │ │ │ Source: demo fixture v1 | configuration observed          │ │ 
+ ╭─ Deployments ─────────────────────╮ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Pod bilibili-raffle/bilibili-raffle-5d8f9c7b4-x2kqp |     │ │ 
+ │                                   │ │ odoo-7575bf6… ████████████████████████████████████ │ │ │ complete in scope                                         │ │ 
+ │ bilibili-raffle/bilibili-l… ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Observed 2026-10-16 12:00:00Z | UID                       │ │ 
+ │ bilibili-raffle/bilibili-r… ● 1/1 │ │ coredns-6799… ████████████████████████████████████ │ │ │ demo-bilibili-raffle/bilibili-raffle-5d8f9c7b4-x2kqp |    │ │ 
+ │ ys-odoo/psql                ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ RV 1                                                      │ │ 
+ │ ys-odoo/odoo                ● 1/1 │ │ metrics-serv… ████████████████████████████████████ │ │ │ [info] runAsRoot | unknown | container: app               │ │ 
+ │ lgo/lgo                     ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Field: spec.containers[0].securityContext.runAsUser       │ │ 
+ │ kube-system/coredns         ● 1/1 │ │ traefik-f456… ████████████████████████████████████ │ │ │ Evidence: UID unspecified; runtime user unknown           │ │ 
+ │ kube-system/metrics-server  ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Image user is not inspected. Require a non-root user      │ │ 
+ │ kube-system/traefik         ● 1/1 │ │                                                    │ │ │ Source: demo fixture v1 | runtime unknown                 │ │ 
+ │                                   │ │                                                    │ │ │                                                           │ │ 
+ │                                   │ │                                                    │ │ │                                                           │ │ 
+ │                                   │ │                                                    │ │ │                                                           │ │ 
+ │                                   │ │                                                    │ │ │                                                           │ │ 
+ │                                   │ │               -2m ████████████████████████████ now │ │ ╰───────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────╯ ╰────────────────────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   l  logs   d  describe   e  events   ?  help   q  quit                                                   bubbletea · 0 fps 

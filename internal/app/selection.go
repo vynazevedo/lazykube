@@ -74,6 +74,7 @@ func (m *Model) selectPod(i int) {
 		m.follow = true
 		m.newLines = 0
 		m.logs = nil
+		m.resetLogTarget()
 		m.refresh()
 	}
 	m.ensurePodVisible()

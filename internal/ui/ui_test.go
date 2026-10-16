@@ -60,14 +60,17 @@ func demoDetails(tab Tab) DetailsState {
 	snap := d.Snapshot()
 	pod := snap.Pods[1]
 	return DetailsState{
+		Security: BuildSecurityView(d.Security(), selectedPod, pod.Namespace, false, 57),
 		Tab:      tab,
 		HoverTab: -1,
 		Pod:      &pod,
 		Metrics:  d.Metrics(40, selectedPod, 36),
 		Logs:     d.Logs(selectedPod, 40, 500),
-		Events:   d.Events(selectedPod),
+		Events:   d.ScopedEvents(data.EventQuery{Scope: data.ScopePod, Pod: selectedPod}),
 		Manifest: d.Manifest(selectedPod),
 		Describe: d.Describe(selectedPod),
+		Diag:     Diagnosis{Containers: d.Containers(selectedPod), LogContainer: "app"},
+		LogInfo:  LogInfo{Container: "app", Containers: 2},
 		Follow:   true,
 		MemBar:   float64(d.Metrics(40, selectedPod, 36).MemNow) / float64(pod.MemLimit),
 	}
@@ -195,7 +198,7 @@ func TestTabAt(t *testing.T) {
 	if _, ok := TabAt(-1); ok {
 		t.Fatal("negative x must miss")
 	}
-	if TabTop.Next(1) != TabDescribe || TabLog.Next(-1) != TabEvents {
+	if TabTop.Next(1) != TabDescribe || TabLog.Next(-1) != TabSecurity {
 		t.Fatal("tab cycling broken")
 	}
 }

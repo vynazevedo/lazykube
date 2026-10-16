@@ -1,14 +1,22 @@
 ╭───────────────────────────────────────────────────────────────╮
-│  Log   Config   Top   Describe   Events     tab ⇥ / shift+tab │
+│  Log   Config   Top   Describe   Events   Security            │
 │ ───────────────────────────────────────────────────────────── │
 │ ● bilibili-live-7f6b8d9c5-mn4tz                     [Running] │
-│   bilibili-raffle · Running · node huawei-k3s-01 · 10.42.0.24 │
+│   bilibili-raffle · Running · ready 2/2 · node huawei-k3s-01… │
 │                                                               │
 │ ╭───────────────────────────────────────────────────────────╮ │
+│ │ Containers  2 · ready 2/2                                 │ │
+│ │ ● app     app               running 17m · ready ✓… ◂ logs │ │
+│ │           last      Error · exit 1 · 17m ago (2026-10-16… │ │
+│ │           last msg  panic: runtime error: invalid memory… │ │
+│ │           ↳ P logs anteriores · C troca container · E ev… │ │
+│ │ ● app     log-shipper       running 119d · ready ✓ · sta… │ │
+│ │                                                           │ │
 │ │ Name              bilibili-live-7f6b8d9c5-mn4tz           │ │
 │ │ Namespace         bilibili-raffle                         │ │
 │ │ Node              huawei-k3s-01/192.168.0.12              │ │
 │ │ Status            Running                                 │ │
+│ │ Ready             2/2                                     │ │
 │ │ IP                10.42.0.24                              │ │
 │ │ Controlled By     ReplicaSet/bilibili-live-7f6b8d9c5      │ │
 │ │ Image             registry.local/bilibili-raffle:1.4.2    │ │
@@ -18,14 +26,6 @@
 │ │ QoS Class         Burstable                               │ │
 │ │ Conditions        Initialized ✓ Ready ✓ ContainersReady … │ │
 │ │ Tolerations       node.kubernetes.io/not-ready:NoExecute… │ │
-│ │                                                           │ │
-│ │                                                           │ │
-│ │                                                           │ │
-│ │                                                           │ │
-│ │                                                           │ │
-│ │                                                           │ │
-│ │                                                           │ │
-│ │                                                           │ │
 │ │                                                           │ │
 │ │                                                           │ │
 │ │                                                           │ │
