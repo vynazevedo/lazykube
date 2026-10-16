@@ -6,11 +6,11 @@
  │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  demo-node-01 │ │ / filter pods…             ns:kube-system  5 items │ │ ───────────────────────────────────────────────────────────── │ 
  │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready      │ │                                                    │ │ ● coredns-6799fbcd5-w9t4p                           [Running] │ 
  │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25%      │ │   NAME          NAMESPACE    RST   SEC CPU/STATUS  │ │   kube-system · Running · ready 1/1 · node demo-node-01 · 10… │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   █████████████│ │ ● coredns-6799… kube-system    0  98 A █░░░░░░     │ │                                                               │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4/3.8Gi│ │ ● metrics-serv… kube-system    0  59 F ready 0/1   │ │ CPU 10m req 10m · lim 50m            streamline · braille 2×4 │ 
- │    ▀    ▀▀▀▀▀▀▀▀▀    █████████████│ │ ● traefik-f456… kube-system    0  50 F ░░░░░░░     │ │  20m │                                                        │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   █████████████│ │ ● coredns-6799… kube-system    0  75 C █░░░░░░     │ │                                                               │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4/3.8Gi│ │ ● metrics-serv… kube-system    0  20 F ready 0/1   │ │ CPU 10m req 10m · lim 50m            streamline · braille 2×4 │ 
+ │    ▀    ▀▀▀▀▀▀▀▀▀    █████████████│ │ ● traefik-f456… kube-system    0  20 F ░░░░░░░     │ │  20m │                                                        │ 
  │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13 / 110│ │ ● local-path-p… kube-system    0 100 A ImagePullB… │ │      │     ⣸⡄                 ⣇                               │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch amd64   │ │ ● svclb-traefi… kube-system    7  98 A CrashLoopB… │ │  15m │──⡀─⢀⣿⣧────────────────⢸⣿⡀─⣀─────────────────────────── │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch amd64   │ │ ● svclb-traefi… kube-system    7  75 C CrashLoopB… │ │  15m │──⡀─⢀⣿⣧────────────────⢸⣿⡀─⣀─────────────────────────── │ 
  │    ▀ ▀  ▀▀▀▀▀▀▀▀▀                 │ │                                                    │ │      │⡠⣼⣿⣄⣼⣿⣿⣆       ⡄       ⣼⣿⣧⣰⣿⣷⡄              request 10m │ 
  │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                │ │                                                    │ │  10m │⣿⣿⣿⣿⣿⣿⣿⣿⣧⡠⣤⣄╌╌⢰⣧╌╌╌⢀⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣤⣀⣴⣶⣆╌╌╌╌╌╌╌╌⢀⣾⣿⣿⣿⣿⣿⣿⣿⣿⣤● │ 
  │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀               │ │                                                    │ │      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⡀⣼⣿⡀⣼⣦⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣿⣧⢀⣄ ⣠⣲⣽⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 

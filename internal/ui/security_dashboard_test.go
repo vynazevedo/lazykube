@@ -17,7 +17,7 @@ func TestSecurityDashboardCoverage(t *testing.T) {
 		view := DashboardSecurityView(SecurityView{}, session, "", "", 45)
 		text := strings.Join(view.Rows, " ")
 		if state == data.CoveragePartial {
-			if !strings.Contains(text, "partial | 40/55 pods") {
+			if !strings.Contains(text, "partial | 13/55 pods") {
 				t.Fatalf("partial not visible: %s", text)
 			}
 		} else if !strings.Contains(text, "not rated | test coverage reason") || strings.Contains(text, "/100 (") {
@@ -77,7 +77,17 @@ func TestSecurityDashboardAlertOverflow(t *testing.T) {
 
 func TestSecurityDashboardSingularFinding(t *testing.T) {
 	var session data.SecuritySession
-	session.Update(data.NewDemo().Security())
+	snapshot := data.NewDemo().Security()
+	for key, p := range snapshot.Pods {
+		if p.Target.Namespace == "ys-odoo" {
+			p.Findings = nil
+			if p.Target.Name == "odoo-7575bf6d8-9wjvk" {
+				p.Findings = []data.Finding{{Rule: "serviceAccountToken", Severity: data.SeverityInfo, Result: data.ResultFinding}}
+			}
+			snapshot.Pods[key] = p
+		}
+	}
+	session.Update(snapshot)
 	view := DashboardSecurityView(SecurityView{}, session, "ys-odoo", "", 80)
 	text := strings.Join(view.Rows, " ")
 	if strings.Contains(text, "1 findings") || !strings.Contains(text, "1 finding") {

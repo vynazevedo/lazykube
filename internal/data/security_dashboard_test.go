@@ -11,7 +11,7 @@ func TestPostureScore(t *testing.T) {
 		high, medium, info, pods, want int
 		grade                          string
 	}{
-		{0, 0, 0, 1, 100, "A"}, {0, 1, 0, 1, 92, "A"}, {0, 2, 0, 1, 84, "B"}, {1, 0, 0, 1, 75, "C"}, {1, 1, 1, 1, 65, "D"}, {2, 0, 0, 1, 50, "F"}, {20, 0, 0, 1, 0, "F"}, {1, 1, 1, 5, 93, "A"},
+		{0, 0, 0, 1, 100, "A"}, {0, 1, 0, 1, 94, "A"}, {0, 2, 0, 1, 88, "B"}, {1, 0, 0, 1, 60, "D"}, {1, 1, 1, 1, 53, "E"}, {2, 0, 0, 1, 20, "F"}, {20, 0, 0, 1, 0, "F"}, {1, 1, 1, 5, 91, "A"},
 	} {
 		s := ScorePosture(Coverage{State: CoverageComplete, Evaluated: tc.pods, Total: tc.pods}, tc.high, tc.medium, tc.info)
 		if !s.Available || s.Value != tc.want || s.Grade != tc.grade || s.Partial {
@@ -19,7 +19,7 @@ func TestPostureScore(t *testing.T) {
 		}
 	}
 	partial := ScorePosture(Coverage{State: CoveragePartial, Evaluated: 40, Total: 55}, 40, 0, 0)
-	if !partial.Partial || !partial.Available || partial.Value != 75 {
+	if !partial.Partial || !partial.Available || partial.Value != 60 {
 		t.Fatal(partial)
 	}
 	for _, state := range []CoverageState{CoverageDenied, CoverageUnavailable, CoverageStale, CoverageCollecting, CoverageUnsupported, CoverageDisabled} {
@@ -45,7 +45,7 @@ func TestSecurityAggregate(t *testing.T) {
 	p.Findings = append(p.Findings, Finding{Rule: "unknown", Result: ResultUnknown, Severity: SeverityHigh}, Finding{Rule: "ignore", Result: ResultNotFound, Severity: SeverityHigh})
 	s.Pods["a/pod"] = p
 	d := AggregateSecurity(s)
-	if d.Cluster.High != 1 || d.Cluster.Unknown != 1 || d.Cluster.Score.Value != 75 || len(d.Cluster.Rules) != 1 || d.Pods["a/pod"].Value != 75 || d.Namespaces["a"].Score.Value != 75 {
+	if d.Cluster.High != 1 || d.Cluster.Unknown != 1 || d.Cluster.Score.Value != 60 || len(d.Cluster.Rules) != 1 || d.Pods["a/pod"].Value != 60 || d.Namespaces["a"].Score.Value != 60 {
 		t.Fatalf("aggregate %+v", d)
 	}
 	if !reflect.DeepEqual(d, AggregateSecurity(s)) {
@@ -208,7 +208,7 @@ func TestSecurityAggregateOrderAndGrades(t *testing.T) {
 	if a.Ranking[0].Name != "a" || a.Ranking[1].Name != "b" || a.Cluster.Rules[0].Rule != "a" || a.Cluster.Rules[2].Rule != "z" {
 		t.Fatal("unstable order")
 	}
-	if got := ScorePosture(Coverage{State: CoverageComplete, Evaluated: 2, Total: 2}, 1, 0, 0).Value; got != 88 {
+	if got := ScorePosture(Coverage{State: CoverageComplete, Evaluated: 2, Total: 2}, 1, 0, 0).Value; got != 80 {
 		t.Fatalf("rounding: %d", got)
 	}
 }

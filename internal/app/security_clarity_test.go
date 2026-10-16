@@ -32,3 +32,20 @@ func TestSecuritySelectedPodClarity(t *testing.T) {
 		golden(t, fmt.Sprintf("pod_security_clarity_%d.txt", size[0]), m.Render().Plain())
 	}
 }
+
+func TestSecurityDistributionGoldens(t *testing.T) {
+	for _, size := range [][2]int{{130, 40}, {160, 48}} {
+		m := press(t, demoModel(t, size[0], size[1]), "S")
+		for i, row := range m.securityView.Rows {
+			if strings.HasPrefix(row, "POSTURE |") {
+				m.scrollTo(i)
+				break
+			}
+		}
+		out := m.Render().Plain()
+		if !strings.Contains(out, "median") || !strings.Contains(out, "worst decile") {
+			t.Fatal("scope distribution missing")
+		}
+		golden(t, fmt.Sprintf("security_distribution_%d.txt", size[0]), out)
+	}
+}

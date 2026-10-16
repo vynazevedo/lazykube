@@ -52,9 +52,10 @@ func DashboardSecurityView(detail SecurityView, session data.SecuritySession, sc
 	selected := session.Dashboard.Pods[pod]
 	ns := session.Dashboard.Namespaces[namespace]
 	cluster := session.Dashboard.Cluster
-	add("Scores /100: Pod " + securityCompactScore(selected) + " | Namespace " + securityCompactScore(ns.Score) + " | Cluster " + securityCompactScore(cluster.Score))
+	add("Security /100: Pod " + securityCompactScore(selected) + " | Namespace " + securityCompactScore(ns.Score) + " | Cluster " + securityCompactScore(cluster.Score))
+	add("Hygiene /100: Pod " + securityCompactScore(session.Dashboard.PodHygiene[pod]) + " | Namespace " + securityCompactScore(ns.Hygiene) + " | Cluster " + securityCompactScore(cluster.Hygiene))
 	add(fmt.Sprintf("Namespace mean (%d pods) | Cluster mean (%d pods)", ns.Score.Coverage.Evaluated, cluster.Score.Coverage.Evaluated))
-	add("Selected pod: " + securityScoreLabel(selected))
+	add("Selected pod security: " + securityScoreLabel(selected))
 	if detail.Synthetic {
 		add("Synthetic data (demo)")
 	}
@@ -63,6 +64,23 @@ func DashboardSecurityView(detail SecurityView, session data.SecuritySession, sc
 	if a.Score.Available {
 		add("Score " + securityBar(a.Score.Value, 100, max(1, min(36, width-6))))
 	}
+	add("SEC column: Security; p = partial. Hygiene scored separately.")
+	for _, dimension := range []struct {
+		name         string
+		score        data.PostureScore
+		distribution data.ScoreDistribution
+	}{{"Security", a.Score, a.Distribution}, {"Hygiene", a.Hygiene, a.HygieneDistribution}} {
+		if !dimension.score.Available {
+			add(dimension.name + ": " + securityScoreLabel(dimension.score))
+			continue
+		}
+		add(fmt.Sprintf("%s mean %d | median %d | worst decile %d", dimension.name, dimension.distribution.Mean, dimension.distribution.Median, dimension.distribution.WorstDecile))
+		for i, grade := range "ABCDEF" {
+			n := dimension.distribution.Grades[i]
+			add(fmt.Sprintf("%c %4d %s", grade, n, securityBar(n, max(1, dimension.distribution.Count), min(24, max(1, width-8)))))
+		}
+	}
+	add("Worst decile = mean of lowest ceil(N/10) pod scores.")
 	maximum := max(1, a.High, a.Medium, a.Info)
 	for _, severity := range []struct {
 		name  string
@@ -101,7 +119,7 @@ func DashboardSecurityView(detail SecurityView, session data.SecuritySession, sc
 	if count > 5 {
 		add(fmt.Sprintf("%d more %s below pod details.", count-5, securityPlural(count-5, "alert")))
 	}
-	add("TOP RULES | confirmed findings")
+	add("TOP RULES | affected pods, both dimensions")
 	for i, rule := range a.Rules {
 		if i == 5 {
 			break
@@ -135,7 +153,7 @@ func DashboardSecurityView(detail SecurityView, session data.SecuritySession, sc
 		add("More namespaces: use the namespace filter.")
 	}
 	add("Score: " + data.SecurityScoreFormula)
-	add("Grades: A >=90, B >=80, C >=70, D >=60, F <60. Not a safety rating.")
+	add("Grades: A >=90, B >=80, C >=70, D >=60, E >=50, F <50. Not a safety rating.")
 
 	if count > 5 {
 		add("MORE ALERTS | pending since baseline / last ack")

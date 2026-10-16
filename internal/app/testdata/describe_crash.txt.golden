@@ -6,19 +6,19 @@
  │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  demo-node-01 │ │ / filter pods…                            13 items │ │ ───────────────────────────────────────────────────────────── │ 
  │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready      │ │                                                    │ │ ● svclb-traefik-8c2f1-6n2vb                [CrashLoopBackOff] │ 
  │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25%      │ │   NAME          NAMESPACE    RST   SEC CPU/STATUS  │ │   kube-system · CrashLoopBackOff · ready 0/1 · node demo-nod… │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   █████████████│ │ ● bilibili-raf… bilibili-r…    0  98 A █░░░░░░     │ │                                                               │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4/3.8Gi│ │ ● bilibili-liv… bilibili-r…    2  59 F ████░░░     │ │ ╭───────────────────────────────────────────────────────────╮ │ 
- │    ▀    ▀▀▀▀▀▀▀▀▀    █████████████│ │ ● lgo-7c5d9758… lgo            0  50 F ██░░░░░     │ │ │ Containers  1 · ready 0/1                                 │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   █████████████│ │ ● bilibili-raf… bilibili-r…    0  75 C █░░░░░░     │ │                                                               │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4/3.8Gi│ │ ● bilibili-liv… bilibili-r…    2  20 F ████░░░     │ │ ╭───────────────────────────────────────────────────────────╮ │ 
+ │    ▀    ▀▀▀▀▀▀▀▀▀    █████████████│ │ ● lgo-7c5d9758… lgo            0  20 F ██░░░░░     │ │ │ Containers  1 · ready 0/1                                 │ │ 
  │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13 / 110│ │ ● psql-6bc7744… ys-odoo        0 100 A ████░░░     │ │ │ ✗ app     lb-tcp-80         CrashLoopBackOff · re… ◂ logs │ │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch amd64   │ │ ● odoo-7575bf6… ys-odoo        1  98 A ██████░     │ │ │           message   back-off 5m0s restarting failed cont… │ │ 
- │    ▀ ▀  ▀▀▀▀▀▀▀▀▀                 │ │ ○ qiandao-1605… xcx            0  59 F Completed   │ │ │           last      Error · exit 1 · 1m ago (2026-10-16 … │ │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                │ │ ○ lingqu-16054… xcx            0  50 F Completed   │ │ │           ↳ P logs anteriores · C troca container · E ev… │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch amd64   │ │ ● odoo-7575bf6… ys-odoo        1  75 C ██████░     │ │ │           message   back-off 5m0s restarting failed cont… │ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀                 │ │ ○ qiandao-1605… xcx            0  20 F Completed   │ │ │           last      Error · exit 1 · 1m ago (2026-10-16 … │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                │ │ ○ lingqu-16054… xcx            0  20 F Completed   │ │ │           ↳ P logs anteriores · C troca container · E ev… │ │ 
  │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀               │ │ ⠙ lingqu-16054… xcx            0 100 A Init:0/1    │ │ │                                                           │ │ 
- │                                   │ │ ● coredns-6799… kube-system    0  98 A █░░░░░░     │ │ │ Name              svclb-traefik-8c2f1-6n2vb               │ │ 
- │                                   │ │ ● metrics-serv… kube-system    0  59 F ready 0/1   │ │ │ Namespace         kube-system                             │ │ 
- ╰───────────────────────────────────╯ │ ● traefik-f456… kube-system    0  50 F ░░░░░░░     │ │ │ Node              demo-node-01/192.168.0.12               │ │ 
+ │                                   │ │ ● coredns-6799… kube-system    0  75 C █░░░░░░     │ │ │ Name              svclb-traefik-8c2f1-6n2vb               │ │ 
+ │                                   │ │ ● metrics-serv… kube-system    0  20 F ready 0/1   │ │ │ Namespace         kube-system                             │ │ 
+ ╰───────────────────────────────────╯ │ ● traefik-f456… kube-system    0  20 F ░░░░░░░     │ │ │ Node              demo-node-01/192.168.0.12               │ │ 
  ╭─ Namespaces ──────────────────────╮ │ ● local-path-p… kube-system    0 100 A ImagePullB… │ │ │ Status            CrashLoopBackOff                        │ │ 
- │                                   │ │ ● svclb-traefi… kube-system    7  98 A CrashLoopB… │ │ │ Ready             0/1                                     │ │ 
+ │                                   │ │ ● svclb-traefi… kube-system    7  75 C CrashLoopB… │ │ │ Ready             0/1                                     │ │ 
  │ default                 ·····   0 │ ╰────────────────────────────────────────────────────╯ │ │ IP                10.42.0.6                               │ │ 
  │ kube-system             █████   5 │ ╭─ CPU heatmap · last 2 min ─────────────────────────╮ │ │ Controlled By     ReplicaSet/svclb-traefik-8c2f1          │ │ 
  │ kube-public             ·····   0 │ │                                                    │ │ │ Image             registry.local/kube-system:1.4.2        │ │ 

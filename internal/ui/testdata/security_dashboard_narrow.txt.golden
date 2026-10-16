@@ -6,11 +6,14 @@
 │ │ Dashboard coverage: complete in scop… │ │
 │ │ No findings does not mean safe        │ │
 │ │ Local checks only; not PSS complianc… │ │
-│ │ Scores /100: Pod 59 F | Namespace 66  │ │
-│ │ D | Cluster 76 C                      │ │
+│ │ Security /100: Pod 20 F | Namespace   │ │
+│ │ 28 F | Cluster 52 E                   │ │
+│ │ Hygiene /100: Pod 88 B | Namespace    │ │
+│ │ 94 A | Cluster 97 A                   │ │
 │ │ Namespace mean (2 pods) | Cluster     │ │
 │ │ mean (13 pods)                        │ │
-│ │ Selected pod: 59/100 (F) | 1/1 pod    │ │
+│ │ Selected pod security: 20/100 (F) |   │ │
+│ │ 1/1 pod                               │ │
 │ │ Synthetic data (demo)                 │ │
 │ │ Pod                                   │ │
 │ │ bilibili-raffle/bilibili-live-7f6b8d9 │ │
@@ -19,6 +22,16 @@
 │ │ demo-bilibili-raffle/bilibili-live-7f │ │
 │ │ 6b8d9c5-mn4tz | RV 1                  │ │
 │ │ HIGH findings                         │ │
+│ │ [high] allowPrivilegeEscalation |     │ │
+│ │ finding | container: init-permissions │ │
+│ │ Field:                                │ │
+│ │ spec.initContainers[0].securityContex │ │
+│ │ t.allowPrivilegeEscalation            │ │
+│ │ Evidence: forced by privileged        │ │
+│ │ Additional privileges possible.       │ │
+│ │ Disable privileged mode               │ │
+│ │ Source: demo fixture v2 |             │ │
+│ │ configuration observed                │ │
 │ │ [high] privileged | finding |         │ │
 │ │ container: init-permissions           │ │
 │ │ Field:                                │ │
@@ -27,22 +40,9 @@
 │ │ Evidence: true                        │ │
 │ │ Privileged init container             │ │
 │ │ configured. Disable privileged mode   │ │
-│ │ Source: demo fixture v1 |             │ │
+│ │ Source: demo fixture v2 |             │ │
 │ │ configuration observed                │ │
 │ │ MEDIUM findings                       │ │
 │ │ [medium] imageLatest | finding |      │ │
-│ │ container: app                        │ │
-│ │ Field: spec.containers[0].image       │ │
-│ │ Evidence: latest tag without digest   │ │
-│ │ Image reference is mutable. Pin a     │ │
-│ │ verified digest                       │ │
-│ │ Source: demo fixture v1 |             │ │
-│ │ configuration observed                │ │
-│ │ [medium] limit-memory | finding |     │ │
-│ │ container: app                        │ │
-│ │ Field:                                │ │
-│ │ spec.containers[0].resources.limits.m │ │
-│ │ emory                                 │ │
-│ │ Evidence: absent at container and     │ │
 │ ╰───────────────────────────────────────╯ │
 ╰───────────────────────────────────────────╯

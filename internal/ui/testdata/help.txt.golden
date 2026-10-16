@@ -11,8 +11,6 @@
                                                                                                                                                                 
                                                                                                                                                                 
                                                                                                                                                                 
-                                                                                                                                                                
-                                                                                                                                                                
                                    ╭─ Help ────────────────────────────────────────────────────────────────────────────────╮                                    
                                    │                                                                                       │                                    
                                    │  ↑/↓ k/j    move selection                 home/end   top / bottom                    │                                    
@@ -28,10 +26,12 @@
                                    │  A          ack all Security alerts        ctrl+p     pause animations                │                                    
                                    │  [ ]        previous / next tab            ?          toggle help                     │                                    
                                    │  pgup/pgdn  scroll viewport                q ctrl+c   quit                            │                                    
+                                   │  Security score v2: max(0,100-40H-6M-I), per pod and dimension.                       │                                    
+                                   │  Each rule once at worst severity; Security and Hygiene are separate.                 │                                    
+                                   │  Scope: mean, median, lowest ceil(N/10) mean. SEC = Security; p = partial.            │                                    
+                                   │  Unknown is not a penalty. Score is not safety or PSS compliance.                     │                                    
                                    │                                                                                       │                                    
                                    ╰───────────────────────────────────────────────────────────────────────────────────────╯                                    
-                                                                                                                                                                
-                                                                                                                                                                
                                                                                                                                                                 
                                                                                                                                                                 
                                                                                                                                                                 

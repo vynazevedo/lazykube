@@ -6,42 +6,42 @@
  │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  demo-node-01 │ │ / filter pods…▌                           13 items │ │ ───────────────────────────────────────────────────────────── │ 
  │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready      │ │                                                    │ │ ╭───────────────────────────────────────────────────────────╮ │ 
  │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 21%      │ │   NAME          NAMESPACE    RST   SEC CPU/STATUS  │ │ │ S: namespace | Pod: bilibili-raffle/bilibili-live-7f6b8d… │ │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   █████████████│ │ ● bilibili-raf… bilibili-r…    0  73 C █░░░░░░     │ │ │ Dashboard coverage: complete in scope | pods 13/13        │ │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4/3.8Gi│ │ ● bilibili-liv… bilibili-r…    2  59 F ████░░░     │ │ │ No findings does not mean safe                            │ │ 
- │    ▀    ▀▀▀▀▀▀▀▀▀    █████████████│ │ ● lgo-7c5d9758… lgo            0  50 F ██░░░░░     │ │ │ Local checks only; not PSS compliance.                    │ │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13 / 110│ │ ● psql-6bc7744… ys-odoo        0 100 A ████░░░     │ │ │ Source: demo fixture v1 | configuration observed          │ │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch amd64   │ │ ● odoo-7575bf6… ys-odoo        1  98 A ██████░     │ │ │ [medium] limit-memory | finding | container: app          │ │ 
- │    ▀ ▀  ▀▀▀▀▀▀▀▀▀                 │ │ ○ qiandao-1605… xcx            0  59 F Completed   │ │ │ Field: spec.containers[0].resources.limits.memory         │ │ 
- │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                │ │ ○ lingqu-16054… xcx            0  50 F Completed   │ │ │ Evidence: absent at container and pod levels              │ │ 
- │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀               │ │ ⠙ lingqu-16054… xcx            0 100 A Init:0/1    │ │ │ Availability risk. Set a suitable memory limit            │ │ 
- │                                   │ │ ● coredns-6799… kube-system    0  98 A ░░░░░░░     │ │ │ Source: demo fixture v1 | configuration observed          │ │ 
- │                                   │ │ ● metrics-serv… kube-system    0  59 F ready 0/1   │ │ │ POSTURE | Cluster | 76/100 (C) | 13/13 pods               │ │ 
- ╰───────────────────────────────────╯ │ ● traefik-f456… kube-system    0  50 F ░░░░░░░     │ │ │ Score ███████████████████████████░░░░░░░░░                │ │ 
- ╭─ Namespaces ──────────────────────╮ │ ● local-path-p… kube-system    0 100 A ImagePullB… │ │ │ high     10 ████████████████████████                      │ │ 
- │                                   │ │ ● svclb-traefi… kube-system    7  98 A CrashLoopB… │ │ │ medium    6 ██████████████░░░░░░░░░░                      │ │ 
- │ default                 ·····   0 │ ╰────────────────────────────────────────────────────╯ │ │ info      4 ██████████░░░░░░░░░░░░░░                      │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   █████████████│ │ ● bilibili-raf… bilibili-r…    0  35 F █░░░░░░     │ │ │ Dashboard coverage: complete in scope | pods 13/13        │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4/3.8Gi│ │ ● bilibili-liv… bilibili-r…    2  20 F ████░░░     │ │ │ No findings does not mean safe                            │ │ 
+ │    ▀    ▀▀▀▀▀▀▀▀▀    █████████████│ │ ● lgo-7c5d9758… lgo            0  20 F ██░░░░░     │ │ │ Local checks only; not PSS compliance.                    │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13 / 110│ │ ● psql-6bc7744… ys-odoo        0 100 A ████░░░     │ │ │ Hygiene mean 97 | median 100 | worst decile 88            │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch amd64   │ │ ● odoo-7575bf6… ys-odoo        1  75 C ██████░     │ │ │ A   10 ██████████████████░░░░░░                           │ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀                 │ │ ○ qiandao-1605… xcx            0  20 F Completed   │ │ │ B    3 ██████░░░░░░░░░░░░░░░░░░                           │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                │ │ ○ lingqu-16054… xcx            0  20 F Completed   │ │ │ C    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀               │ │ ⠙ lingqu-16054… xcx            0 100 A Init:0/1    │ │ │ D    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ │                                   │ │ ● coredns-6799… kube-system    0  75 C ░░░░░░░     │ │ │ E    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ │                                   │ │ ● metrics-serv… kube-system    0  20 F ready 0/1   │ │ │ F    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ ╰───────────────────────────────────╯ │ ● traefik-f456… kube-system    0  20 F ░░░░░░░     │ │ │ Worst decile = mean of lowest ceil(N/10) pod scores.      │ │ 
+ ╭─ Namespaces ──────────────────────╮ │ ● local-path-p… kube-system    0 100 A ImagePullB… │ │ │ high     13 ██████████████░░░░░░░░░░                      │ │ 
+ │                                   │ │ ● svclb-traefi… kube-system    7  75 C CrashLoopB… │ │ │ medium   22 ████████████████████████                      │ │ 
+ │ default                 ·····   0 │ ╰────────────────────────────────────────────────────╯ │ │ info      4 ████░░░░░░░░░░░░░░░░░░░░                      │ │ 
  │ kube-system             █████   5 │ ╭─ CPU heatmap · last 2 min ─────────────────────────╮ │ │ Unknown checks: 4 | confirmed findings only in score      │ │ 
- │ kube-public             ·····   0 │ │                                                    │ │ │ Trend: ▆▆ (revision samples)                              │ │ 
+ │ kube-public             ·····   0 │ │                                                    │ │ │ Trend: ▅▅ (revision samples)                              │ │ 
  │ kube-node-lease         ·····   0 │ │ bilibili-raf… ████████████████████████████████████ │ │ │ ALERTS | new high since baseline / last ack | A: ack all  │ │ 
  │ bilibili-raffle         ██░░░   2 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ ! bilibili-raffle/bilibili-raffle-5d8f9c7b4-x2kqp |       │ │ 
  │ lgo                     █░░░░   1 │ │ bilibili-live ████████████████████████████████████ │ │ │ hostPID | pod                                             │ │ 
- │ xcx                     ███░░   3 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ TOP RULES | confirmed findings                            │ │ 
- │                                   │ │ lgo-7c5d97584 ████████████████████████████████████ │ │ │ serviceAccountToken       4 ██████████████████            │ │ 
- ╰───────────────────────────────────╯ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ capabilitiesAdded         3 ██████████████░░░░            │ │ 
- ╭─ Deployments ─────────────────────╮ │ psql-6bc7744… ████████████████████████████████████ │ │ │ hostNetwork               3 ██████████████░░░░            │ │ 
- │                                   │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ imageLatest               3 ██████████████░░░░            │ │ 
- │ bilibili-raffle/bilibili-l… ● 1/1 │ │ odoo-7575bf6… ████████████████████████████████████ │ │ │ limit-memory              3 ██████████████░░░░            │ │ 
+ │ xcx                     ███░░   3 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ TOP RULES | affected pods, both dimensions                │ │ 
+ │                                   │ │ lgo-7c5d97584 ████████████████████████████████████ │ │ │ allowPrivilegeEscalat…    7 ██████████████████            │ │ 
+ ╰───────────────────────────────────╯ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ capabilitiesDrop          4 ██████████░░░░░░░░            │ │ 
+ ╭─ Deployments ─────────────────────╮ │ psql-6bc7744… ████████████████████████████████████ │ │ │ runAsNonRoot              4 ██████████░░░░░░░░            │ │ 
+ │                                   │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ seccomp                   4 ██████████░░░░░░░░            │ │ 
+ │ bilibili-raffle/bilibili-l… ● 1/1 │ │ odoo-7575bf6… ████████████████████████████████████ │ │ │ serviceAccountToken       4 ██████████░░░░░░░░            │ │ 
  │ bilibili-raffle/bilibili-r… ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ NAMESPACES | lowest scores first                          │ │ 
- │ ys-odoo/psql                ● 1/1 │ │ coredns-6799… ████████████████████████████████████ │ │ │ lgo                50 ████░░░░ | 2 findings               │ │ 
- │ ys-odoo/odoo                ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ bilibili-raffle    66 █████░░░ | 5 findings               │ │ 
- │ lgo/lgo                     ● 1/1 │ │ metrics-serv… ████████████████████████████████████ │ │ │ xcx                70 ██████░░ | 5 findings               │ │ 
- │ kube-system/coredns         ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ kube-system        81 ██████░░ | 7 findings               │ │ 
- │ kube-system/metrics-server  ● 1/1 │ │ traefik-f456… ████████████████████████████████████ │ │ │ ys-odoo            99 ████████ | 1 finding                │ │ 
+ │ ys-odoo/psql                ● 1/1 │ │ coredns-6799… ████████████████████████████████████ │ │ │ lgo                20 ██░░░░░░ | 2 findings               │ │ 
+ │ ys-odoo/odoo                ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ bilibili-raffle    28 ██░░░░░░ | 10 findings              │ │ 
+ │ lgo/lgo                     ● 1/1 │ │ metrics-serv… ████████████████████████████████████ │ │ │ xcx                47 ████░░░░ | 6 findings               │ │ 
+ │ kube-system/coredns         ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ kube-system        58 █████░░░ | 16 findings              │ │ 
+ │ kube-system/metrics-server  ● 1/1 │ │ traefik-f456… ████████████████████████████████████ │ │ │ ys-odoo            88 ███████░ | 5 findings               │ │ 
  │ kube-system/traefik         ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ More namespaces: use the namespace filter.                │ │ 
- │                                   │ │                                                    │ │ │ Score: 100 - (25*high + 8*medium + 2*info)/evaluated      │ │ 
- │                                   │ │                                                    │ │ │ pods; floor 0, rounded.                                   │ │ 
- │                                   │ │                                                    │ │ │ Grades: A >=90, B >=80, C >=70, D >=60, F <60. Not a      │ │ 
- │                                   │ │                                                    │ │ │ safety rating.                                            │ │ 
+ │                                   │ │                                                    │ │ │ Score: v2 per pod/dimension: max(0, 100 - 40H - 6M - I);  │ │ 
+ │                                   │ │                                                    │ │ │ each rule once, worst severity.                           │ │ 
+ │                                   │ │                                                    │ │ │ Grades: A >=90, B >=80, C >=70, D >=60, E >=50, F <50.    │ │ 
+ │                                   │ │                                                    │ │ │ Not a safety rating.                                      │ │ 
  │                                   │ │               -2m ████████████████████████████ now │ │ ╰───────────────────────────────────────────────────────────╯ │ 
  ╰───────────────────────────────────╯ ╰────────────────────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────╯ 
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────

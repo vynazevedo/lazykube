@@ -6,43 +6,43 @@
 │ │ Dashboard coverage: complete in scope | pods 13/13        │ │
 │ │ No findings does not mean safe                            │ │
 │ │ Local checks only; not PSS compliance.                    │ │
-│ │ Scores /100: Pod 59 F | Namespace 66 D | Cluster 76 C     │ │
+│ │ Security /100: Pod 20 F | Namespace 28 F | Cluster 52 E   │ │
+│ │ Hygiene /100: Pod 88 B | Namespace 94 A | Cluster 97 A    │ │
 │ │ Namespace mean (2 pods) | Cluster mean (13 pods)          │ │
-│ │ Selected pod: 59/100 (F) | 1/1 pod                        │ │
+│ │ Selected pod security: 20/100 (F) | 1/1 pod               │ │
 │ │ Synthetic data (demo)                                     │ │
 │ │ Pod bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz |       │ │
 │ │ complete in scope                                         │ │
 │ │ Observed 2026-10-16 12:00:00Z | UID                       │ │
 │ │ demo-bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz | RV 1 │ │
 │ │ HIGH findings                                             │ │
+│ │ [high] allowPrivilegeEscalation | finding | container:    │ │
+│ │ init-permissions                                          │ │
+│ │ Field:                                                    │ │
+│ │ spec.initContainers[0].securityContext.allowPrivilegeEsca │ │
+│ │ lation                                                    │ │
+│ │ Evidence: forced by privileged                            │ │
+│ │ Additional privileges possible. Disable privileged mode   │ │
+│ │ Source: demo fixture v2 | configuration observed          │ │
 │ │ [high] privileged | finding | container: init-permissions │ │
 │ │ Field: spec.initContainers[0].securityContext.privileged  │ │
 │ │ Evidence: true                                            │ │
 │ │ Privileged init container configured. Disable privileged  │ │
 │ │ mode                                                      │ │
-│ │ Source: demo fixture v1 | configuration observed          │ │
+│ │ Source: demo fixture v2 | configuration observed          │ │
 │ │ MEDIUM findings                                           │ │
 │ │ [medium] imageLatest | finding | container: app           │ │
 │ │ Field: spec.containers[0].image                           │ │
 │ │ Evidence: latest tag without digest                       │ │
 │ │ Image reference is mutable. Pin a verified digest         │ │
-│ │ Source: demo fixture v1 | configuration observed          │ │
+│ │ Source: demo fixture v2 | configuration observed          │ │
 │ │ [medium] limit-memory | finding | container: app          │ │
 │ │ Field: spec.containers[0].resources.limits.memory         │ │
 │ │ Evidence: absent at container and pod levels              │ │
 │ │ Availability risk. Set a suitable memory limit            │ │
-│ │ Source: demo fixture v1 | configuration observed          │ │
-│ │ POSTURE | Cluster | 76/100 (C) | 13/13 pods               │ │
-│ │ Score ███████████████████████████░░░░░░░░░                │ │
-│ │ high     10 ████████████████████████                      │ │
-│ │ medium    6 ██████████████░░░░░░░░░░                      │ │
-│ │ info      4 ██████████░░░░░░░░░░░░░░                      │ │
-│ │ Unknown checks: 4 | confirmed findings only in score      │ │
-│ │ Trend: ▆▆ (revision samples)                              │ │
-│ │ ALERTS | new high since baseline / last ack | A: ack all  │ │
-│ │ ! bilibili-raffle/bilibili-raffle-5d8f9c7b4-x2kqp |       │ │
-│ │ hostPID | pod                                             │ │
-│ │ TOP RULES | confirmed findings                            │ │
-│ │ serviceAccountToken       4 ██████████████████            │ │
+│ │ Source: demo fixture v2 | configuration observed          │ │
+│ │ POSTURE | Cluster | 52/100 (E) | 13/13 pods               │ │
+│ │ Score ███████████████████░░░░░░░░░░░░░░░░░                │ │
+│ │ SEC column: Security; p = partial. Hygiene scored         │ │
 │ ╰───────────────────────────────────────────────────────────╯ │
 ╰───────────────────────────────────────────────────────────────╯

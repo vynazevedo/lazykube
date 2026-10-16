@@ -9,7 +9,7 @@ import (
 const SecurityHistoryLimit = 40
 const SecurityIdentityRetention = 40
 const SecurityUncertainIdentityLimit = 4096
-const SecurityScoreFormula = "100 - (25*high + 8*medium + 2*info)/evaluated pods; floor 0, rounded."
+const SecurityScoreFormula = "v2 per pod/dimension: max(0, 100 - 40H - 6M - I); each rule once, worst severity."
 
 type PostureScore struct {
 	Value     int
@@ -24,7 +24,7 @@ func ScorePosture(c Coverage, high, medium, info int) PostureScore {
 	if c.Evaluated <= 0 || (c.State != CoverageComplete && c.State != CoveragePartial) {
 		return s
 	}
-	penalty := (25*high + 8*medium + 2*info)
+	penalty := (40*high + 6*medium + info)
 	s.Value = max(0, int(math.Round(100-float64(penalty)/float64(c.Evaluated))))
 	s.Available = true
 	switch {
@@ -36,6 +36,8 @@ func ScorePosture(c Coverage, high, medium, info int) PostureScore {
 		s.Grade = "C"
 	case s.Value >= 60:
 		s.Grade = "D"
+	case s.Value >= 50:
+		s.Grade = "E"
 	default:
 		s.Grade = "F"
 	}
@@ -47,6 +49,9 @@ type RuleCount struct {
 	Count int
 }
 type SecurityAggregate struct {
+	Hygiene                     PostureScore
+	Distribution                ScoreDistribution
+	HygieneDistribution         ScoreDistribution
 	Name                        string
 	Score                       PostureScore
 	High, Medium, Info, Unknown int
@@ -56,93 +61,8 @@ type SecurityDashboard struct {
 	Cluster    SecurityAggregate
 	Namespaces map[string]SecurityAggregate
 	Pods       map[string]PostureScore
+	PodHygiene map[string]PostureScore
 	Ranking    []SecurityAggregate
-}
-
-func AggregateSecurity(s SecuritySnapshot) SecurityDashboard {
-	d := SecurityDashboard{Namespaces: make(map[string]SecurityAggregate), Pods: make(map[string]PostureScore)}
-	counts := make(map[string]map[string]int)
-	for name, ns := range s.Namespaces {
-		d.Namespaces[name] = SecurityAggregate{Name: name, Score: PostureScore{Coverage: ns.Coverage}}
-	}
-	for key, p := range s.Pods {
-		a := d.Namespaces[p.Target.Namespace]
-		a.Name = p.Target.Namespace
-		var high, medium, info int
-		for _, f := range p.Findings {
-			if f.Result == ResultUnknown {
-				a.Unknown++
-				d.Cluster.Unknown++
-				continue
-			}
-			if f.Result != ResultFinding {
-				continue
-			}
-			switch f.Severity {
-			case SeverityHigh:
-				high++
-			case SeverityMedium:
-				medium++
-			case SeverityInfo:
-				info++
-			}
-			for _, scope := range []string{"", p.Target.Namespace} {
-				if counts[scope] == nil {
-					counts[scope] = make(map[string]int)
-				}
-				counts[scope][f.Rule]++
-			}
-		}
-		podCoverage := p.Coverage
-		if s.Coverage.State != CoverageComplete && s.Coverage.State != CoveragePartial {
-			podCoverage.State, podCoverage.Reason = s.Coverage.State, s.Coverage.Reason
-		}
-		d.Pods[key] = ScorePosture(podCoverage, high, medium, info)
-		a.High += high
-		a.Medium += medium
-		a.Info += info
-		d.Cluster.High += high
-		d.Cluster.Medium += medium
-		d.Cluster.Info += info
-		d.Namespaces[a.Name] = a
-	}
-	finish := func(a SecurityAggregate, c Coverage, rules map[string]int) SecurityAggregate {
-		a.Score = ScorePosture(c, a.High, a.Medium, a.Info)
-		for rule, count := range rules {
-			a.Rules = append(a.Rules, RuleCount{rule, count})
-		}
-		slices.SortFunc(a.Rules, func(a, b RuleCount) int {
-			if n := cmp.Compare(b.Count, a.Count); n != 0 {
-				return n
-			}
-			return cmp.Compare(a.Rule, b.Rule)
-		})
-		return a
-	}
-	d.Cluster.Name = "Cluster"
-	d.Cluster = finish(d.Cluster, s.Coverage, counts[""])
-	for name, a := range d.Namespaces {
-		coverage := a.Score.Coverage
-		if s.Coverage.State != CoverageComplete && s.Coverage.State != CoveragePartial {
-			coverage.State, coverage.Reason = s.Coverage.State, s.Coverage.Reason
-		}
-		a = finish(a, coverage, counts[name])
-		d.Namespaces[name] = a
-		d.Ranking = append(d.Ranking, a)
-	}
-	slices.SortFunc(d.Ranking, func(a, b SecurityAggregate) int {
-		if a.Score.Available != b.Score.Available {
-			if a.Score.Available {
-				return -1
-			}
-			return 1
-		}
-		if n := cmp.Compare(a.Score.Value, b.Score.Value); n != 0 {
-			return n
-		}
-		return cmp.Compare(a.Name, b.Name)
-	})
-	return d
 }
 
 type SecurityIdentity struct {
@@ -160,11 +80,21 @@ type SecuritySession struct {
 	previous    map[SecurityIdentity]uint64
 	observation uint64
 	pending     map[SecurityIdentity]Finding
+	ruleVersion string
 }
 
 func (s *SecuritySession) Update(snapshot SecuritySnapshot) bool {
-	if s.loaded && s.Revision == snapshot.Revision {
+	if s.loaded && s.Revision == snapshot.Revision && (snapshot.RuleVersion == "" || snapshot.RuleVersion == s.ruleVersion) {
 		return false
+	}
+	if snapshot.RuleVersion != "" && s.ruleVersion != "" && s.ruleVersion != snapshot.RuleVersion {
+		s.baseline = false
+		s.previous = nil
+		s.pending = nil
+		s.History = nil
+	}
+	if snapshot.RuleVersion != "" {
+		s.ruleVersion = snapshot.RuleVersion
 	}
 	s.Dashboard = AggregateSecurity(snapshot)
 	s.observation++

@@ -11,34 +11,34 @@
 │ │ Observed 2026-10-16 12:00:00Z | UID                       │ │
 │ │ demo-bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz | RV 1 │ │
 │ │ HIGH findings                                             │ │
+│ │ [high] allowPrivilegeEscalation | finding | container:    │ │
+│ │ init-permissions                                          │ │
+│ │ Field:                                                    │ │
+│ │ spec.initContainers[0].securityContext.allowPrivilegeEsca │ │
+│ │ lation                                                    │ │
+│ │ Evidence: forced by privileged                            │ │
+│ │ Additional privileges possible. Disable privileged mode   │ │
+│ │ Source: demo fixture v2 | configuration observed          │ │
 │ │ [high] privileged | finding | container: init-permissions │ │
 │ │ Field: spec.initContainers[0].securityContext.privileged  │ │
 │ │ Evidence: true                                            │ │
 │ │ Privileged init container configured. Disable privileged  │ │
 │ │ mode                                                      │ │
-│ │ Source: demo fixture v1 | configuration observed          │ │
+│ │ Source: demo fixture v2 | configuration observed          │ │
 │ │ MEDIUM findings                                           │ │
 │ │ [medium] imageLatest | finding | container: app           │ │
 │ │ Field: spec.containers[0].image                           │ │
 │ │ Evidence: latest tag without digest                       │ │
 │ │ Image reference is mutable. Pin a verified digest         │ │
-│ │ Source: demo fixture v1 | configuration observed          │ │
+│ │ Source: demo fixture v2 | configuration observed          │ │
 │ │ [medium] limit-memory | finding | container: app          │ │
 │ │ Field: spec.containers[0].resources.limits.memory         │ │
 │ │ Evidence: absent at container and pod levels              │ │
 │ │ Availability risk. Set a suitable memory limit            │ │
-│ │ Source: demo fixture v1 | configuration observed          │ │
+│ │ Source: demo fixture v2 | configuration observed          │ │
 │ │ Pod bilibili-raffle/bilibili-raffle-5d8f9c7b4-x2kqp |     │ │
 │ │ complete in scope                                         │ │
 │ │ Observed 2026-10-16 12:00:00Z | UID                       │ │
 │ │ demo-bilibili-raffle/bilibili-raffle-5d8f9c7b4-x2kqp |    │ │
-│ │ RV 1                                                      │ │
-│ │ INFO findings                                             │ │
-│ │ [info] serviceAccountToken | finding | container: app     │ │
-│ │ Field: spec.automountServiceAccountToken                  │ │
-│ │ Evidence: default token mount enabled                     │ │
-│ │ Credentials available to workload. Disable automatic      │ │
-│ │ mount when unused                                         │ │
-│ │ Source: demo fixture v1 | configuration observed          │ │
 │ ╰───────────────────────────────────────────────────────────╯ │
 ╰───────────────────────────────────────────────────────────────╯

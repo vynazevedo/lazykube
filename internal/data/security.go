@@ -52,6 +52,7 @@ type ResourceRef struct {
 }
 
 type Finding struct {
+	Assessment     AssessmentState
 	Rule           string
 	RuleVersion    string
 	Origin         string
@@ -76,6 +77,8 @@ type Coverage struct {
 }
 
 type PodPosture struct {
+	RuleVersion   string
+	Assessments   []RuleAssessment
 	LocalCoverage Coverage
 	Target        ResourceRef
 	Coverage      Coverage
@@ -90,6 +93,7 @@ type NamespacePosture struct {
 }
 
 type SecuritySnapshot struct {
+	RuleVersion  string
 	ListCoverage Coverage
 	Revision     uint64
 	Pods         map[string]PodPosture
