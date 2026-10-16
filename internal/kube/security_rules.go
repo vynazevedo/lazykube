@@ -269,7 +269,7 @@ func validImageDigest(digest string) bool {
 }
 
 func normalizeCapability(c corev1.Capability) string {
-	if c == "ALL" {
+	if strings.EqualFold(string(c), "ALL") {
 		return "ALL"
 	}
 	name := strings.ToUpper(string(c))
@@ -325,6 +325,6 @@ func (e *podEvaluator) checkUnsupportedCapabilities(values []corev1.Capability, 
 	if len(unsupported) == 0 {
 		return false
 	}
-	e.add(rule, field, strings.Join(unsupported, ", "), data.SeverityInfo, data.ResultUnknown, "Unsupported capability names; no mitigation inferred", "Use canonical capability names without CAP_ and uppercase ALL", data.AssessmentUnknown)
+	e.add(rule, field, strings.Join(unsupported, ", "), data.SeverityInfo, data.ResultUnknown, "Unsupported capability names; no mitigation inferred", "Use canonical capability names without CAP_", data.AssessmentUnknown)
 	return true
 }

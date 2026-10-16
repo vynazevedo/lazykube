@@ -15,6 +15,20 @@ func TestSecurityEffectiveCapabilities(t *testing.T) {
 		score      int
 	}{
 		{"all", []corev1.Capability{"ALL"}, nil, data.SeverityHigh, true, 14},
+		{"all add", []corev1.Capability{"all"}, []corev1.Capability{}, data.SeverityHigh, true, 14},
+		{"all add individual", []corev1.Capability{"all", "NET_BIND_SERVICE"}, []corev1.Capability{}, data.SeverityHigh, true, 14},
+		{"all drop", []corev1.Capability{}, []corev1.Capability{"all"}, "", false, 100},
+		{"all drop bind", []corev1.Capability{"NET_BIND_SERVICE"}, []corev1.Capability{"all"}, data.SeverityMedium, false, 94},
+		{"all drop admin", []corev1.Capability{"SYS_ADMIN"}, []corev1.Capability{"all"}, data.SeverityHigh, true, 20},
+		{"all both", []corev1.Capability{"all"}, []corev1.Capability{"all"}, "", false, 100},
+		{"all both bind", []corev1.Capability{"all", "NET_BIND_SERVICE"}, []corev1.Capability{"all"}, data.SeverityMedium, false, 94},
+		{"All add", []corev1.Capability{"All"}, []corev1.Capability{}, data.SeverityHigh, true, 14},
+		{"All add individual", []corev1.Capability{"All", "NET_BIND_SERVICE"}, []corev1.Capability{}, data.SeverityHigh, true, 14},
+		{"All drop", []corev1.Capability{}, []corev1.Capability{"All"}, "", false, 100},
+		{"All drop bind", []corev1.Capability{"NET_BIND_SERVICE"}, []corev1.Capability{"All"}, data.SeverityMedium, false, 94},
+		{"All drop admin", []corev1.Capability{"SYS_ADMIN"}, []corev1.Capability{"All"}, data.SeverityHigh, true, 20},
+		{"All both", []corev1.Capability{"All"}, []corev1.Capability{"All"}, "", false, 100},
+		{"All both bind", []corev1.Capability{"All", "NET_BIND_SERVICE"}, []corev1.Capability{"All"}, data.SeverityMedium, false, 94},
 		{"sysadmin", []corev1.Capability{"SYS_ADMIN"}, nil, data.SeverityHigh, true, 14},
 		{"prefix", []corev1.Capability{"CAP_SYS_ADMIN"}, nil, "", false, 94},
 		{"all minus sysadmin", []corev1.Capability{"ALL"}, []corev1.Capability{"SYS_ADMIN"}, data.SeverityHigh, false, 54},
@@ -48,7 +62,7 @@ func TestSecurityEffectiveCapabilities(t *testing.T) {
 }
 
 func TestSecurityUnsupportedCapabilityIsUnknown(t *testing.T) {
-	for _, name := range []corev1.Capability{"CAP_SYS_ADMIN", "CAP_ALL", "cap_sys_admin", "all", "NOT_A_CAPABILITY"} {
+	for _, name := range []corev1.Capability{"CAP_SYS_ADMIN", "CAP_ALL", "cap_sys_admin", "NOT_A_CAPABILITY"} {
 		t.Run(string(name), func(t *testing.T) {
 			p := hardenedPod()
 			p.Spec.Containers[0].SecurityContext.Capabilities.Add = []corev1.Capability{name}
@@ -64,7 +78,7 @@ func TestSecurityUnsupportedCapabilityIsUnknown(t *testing.T) {
 }
 
 func TestSecurityUnsupportedDropCannotMitigate(t *testing.T) {
-	for _, drop := range []corev1.Capability{"CAP_SYS_ADMIN", "cap_sys_admin", "CAP_ALL", "all", "NOT_A_CAPABILITY"} {
+	for _, drop := range []corev1.Capability{"CAP_SYS_ADMIN", "cap_sys_admin", "CAP_ALL", "NOT_A_CAPABILITY"} {
 		t.Run(string(drop), func(t *testing.T) {
 			p := hardenedPod()
 			p.Spec.Containers[0].SecurityContext.Capabilities = &corev1.Capabilities{Add: []corev1.Capability{"ALL"}, Drop: []corev1.Capability{drop}}
