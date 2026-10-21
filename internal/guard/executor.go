@@ -88,47 +88,66 @@ func (e *Executor) Prepare(parent context.Context, r Request) (Preview, error) {
 	defer e.mu.Unlock()
 	ctx, cancel := e.operationContext(parent)
 	defer cancel()
+	var token [16]byte
+	if _, err := rand.Read(token[:]); err != nil {
+		return Preview{}, Unavailable
+	}
+	id := hex.EncodeToString(token[:])
+	d, err := e.policy.Evaluate(e.session, r)
+	reject := func(reason Reason) (Preview, error) {
+		if auditErr := e.rejection(id, r, d, reason); auditErr != nil {
+			return Preview{}, auditErr
+		}
+		return Preview{}, reason
+	}
+	if ctx.Err() != nil {
+		return reject(Canceled)
+	}
+	if err != nil {
+		return reject(safeReason(err, Invalid))
+	}
+	if e.failed {
+		return Preview{}, AuditFailed
+	}
+	if !e.backend.Supported(r.Action) {
+		return reject(Unsupported)
+	}
+	if err = e.access(ctx, r); err != nil {
+		if ctx.Err() != nil {
+			return reject(Canceled)
+		}
+		return reject(safeReason(err, Unavailable))
+	}
+	if ctx.Err() != nil {
+		return reject(Canceled)
+	}
 	r.Parameters.Command = slices.Clone(r.Parameters.Command)
 	r.Parameters.Document = slices.Clone(r.Parameters.Document)
 	if r.Action == Restart {
 		r.Parameters.Document = []byte(e.clock.Now().UTC().Format(time.RFC3339Nano))
 	}
-	d, err := e.policy.Evaluate(e.session, r)
-	if err != nil {
-		return Preview{}, err
-	}
-	if e.failed {
-		return Preview{}, AuditFailed
+	if err = e.backend.Validate(ctx, r); err != nil {
+		if ctx.Err() != nil {
+			return reject(Canceled)
+		}
+		return reject(safeReason(err, Stale))
 	}
 	if ctx.Err() != nil {
-		return Preview{}, Canceled
+		return reject(Canceled)
 	}
-	if !e.backend.Supported(r.Action) {
-		return Preview{}, Unsupported
-	}
-	if err = e.access(ctx, r); err != nil {
-		return Preview{}, err
-	}
-	if err = e.backend.Validate(ctx, r); err != nil {
-		return Preview{}, Stale
-	}
-	r.Parameters.Command = slices.Clone(r.Parameters.Command)
-	r.Parameters.Document = slices.Clone(r.Parameters.Document)
-	var token [16]byte
-	if _, err = rand.Read(token[:]); err != nil {
-		return Preview{}, Unavailable
-	}
-	id := hex.EncodeToString(token[:])
 	if err = e.event(id, r, d, "preview", ""); err != nil {
 		return Preview{}, err
 	}
 	if d.DryRun {
 		if err = e.backend.Send(ctx, r, true); err != nil {
-			return Preview{}, DryRunFailed
+			if ctx.Err() != nil {
+				return reject(Canceled)
+			}
+			return reject(DryRunFailed)
 		}
 	}
 	if ctx.Err() != nil {
-		return Preview{}, Canceled
+		return reject(Canceled)
 	}
 	now := e.clock.Now()
 	for id, p := range e.plans {
@@ -137,7 +156,7 @@ func (e *Executor) Prepare(parent context.Context, r Request) (Preview, error) {
 		}
 	}
 	if len(e.plans) >= 16 {
-		return Preview{}, Unavailable
+		return reject(Unavailable)
 	}
 	out := Preview{ID: id, Action: r.Action, Target: r.Target, Decision: d, ExpiresAt: now.Add(2 * time.Minute)}
 	e.plans[out.ID] = plan{preview: out, request: r}
@@ -154,6 +173,8 @@ func (e *Executor) Execute(parent context.Context, id string, c Confirmation) (R
 	delete(e.plans, id)
 	ctx, cancel := e.operationContext(parent)
 	defer cancel()
+	ctx, deadlineCancel := context.WithTimeout(ctx, max(0, p.preview.ExpiresAt.Sub(e.clock.Now())))
+	defer deadlineCancel()
 	d, err := e.policy.Evaluate(e.session, p.request)
 	if err != nil {
 		return result, err
@@ -161,30 +182,46 @@ func (e *Executor) Execute(parent context.Context, id string, c Confirmation) (R
 	if !c.Approved || d.HighRisk && c.Resource != p.request.Target.Name || d.Mode.Protected && c.Context != e.session.Context {
 		return result, ConfirmationRequired
 	}
-	if !e.clock.Now().Before(p.preview.ExpiresAt) || ctx.Err() != nil {
+	if e.planExpired(ctx, p) {
 		result.Outcome = Canceled
 		if err = e.event(id, p.request, d, "canceled", Canceled); err != nil {
 			return result, err
 		}
 		return result, Canceled
 	}
-	if err = e.access(ctx, p.request); err != nil {
-		result.Outcome = Denied
-		if auditErr := e.event(id, p.request, d, "denied", Denied); auditErr != nil {
+	cancelBeforeSend := func() (Result, error) {
+		result.Outcome = Canceled
+		if auditErr := e.rejection(id, p.request, d, Canceled); auditErr != nil {
+			return result, auditErr
+		}
+		return result, Canceled
+	}
+	err = e.access(ctx, p.request)
+	if e.planExpired(ctx, p) {
+		return cancelBeforeSend()
+	}
+	if err != nil {
+		result.Outcome = safeReason(err, Unavailable)
+		if auditErr := e.rejection(id, p.request, d, result.Outcome); auditErr != nil {
 			return result, auditErr
 		}
 		return result, err
 	}
-	if err = e.backend.Validate(ctx, p.request); err != nil {
-		return result, Stale
+	err = e.backend.Validate(ctx, p.request)
+	if e.planExpired(ctx, p) {
+		return cancelBeforeSend()
 	}
-	if ctx.Err() != nil {
-		return result, Canceled
+	if err != nil {
+		result.Outcome = safeReason(err, Stale)
+		if auditErr := e.rejection(id, p.request, d, result.Outcome); auditErr != nil {
+			return result, auditErr
+		}
+		return result, result.Outcome
 	}
 	if err = e.event(id, p.request, d, "intent", ""); err != nil {
 		return result, err
 	}
-	if ctx.Err() != nil {
+	if e.planExpired(ctx, p) {
 		result.Outcome = Canceled
 	} else {
 		err = e.backend.Send(ctx, p.request, false)
@@ -206,4 +243,28 @@ func (e *Executor) Execute(parent context.Context, id string, c Confirmation) (R
 		return result, result.Outcome
 	}
 	return result, nil
+}
+
+func (e *Executor) planExpired(ctx context.Context, p plan) bool {
+	return ctx.Err() != nil || !e.clock.Now().Before(p.preview.ExpiresAt)
+}
+func safeReason(err error, fallback Reason) Reason {
+	var reason Reason
+	if errors.As(err, &reason) {
+		switch reason {
+		case Invalid, ReadOnly, InvalidConfig, Denied, Unavailable, Unsupported, Stale, Canceled, AuditFailed, DryRunFailed, ConfirmationRequired, Unknown:
+			return reason
+		}
+	}
+	return fallback
+}
+func (e *Executor) rejection(id string, r Request, d Decision, reason Reason) error {
+	phase := "denied"
+	switch reason {
+	case Canceled:
+		phase = "canceled"
+	case Unavailable:
+		phase = "unavailable"
+	}
+	return e.event(id, r, d, phase, reason)
 }
