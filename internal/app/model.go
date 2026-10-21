@@ -35,6 +35,7 @@ type Options struct {
 	NoAnim     bool
 	InitialPod int
 	Now        func() time.Time
+	Session    data.SessionRef
 }
 
 type Model struct {
@@ -70,6 +71,7 @@ type Model struct {
 	filtering bool
 
 	src      data.Source
+	session  data.SessionRef
 	snap     data.Snapshot
 	metrics  data.Metrics
 	logs     []data.LogLine
@@ -122,6 +124,7 @@ func New(opts Options) Model {
 		keys:     DefaultKeyMap(),
 		filter:   ti,
 		src:      opts.Source,
+		session:  opts.Session,
 		dg:       newDiagState(opts.Source),
 		follow:   true,
 		motion:   newMotion(fps),
@@ -153,7 +156,7 @@ func (m Model) waitData() tea.Cmd {
 	if !ok {
 		return nil
 	}
-	return waitChange(live.Changes())
+	return waitChange(live.Changes(), m.session.Generation)
 }
 
 func (m *Model) reload() {
@@ -232,10 +235,13 @@ func (m *Model) refresh() {
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case dataMsg:
+		if msg.session != m.session.Generation {
+			return m, nil
+		}
 		m.reload()
 		return m, m.waitData()
 	case frameMsg:
-		if msg.gen != m.gen || !m.running() {
+		if msg.session != m.session.Generation || msg.gen != m.gen || !m.running() {
 			return m, nil
 		}
 		prev := m.clock.T
@@ -276,6 +282,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if m.dep.open {
 			m.dep.open = false
 			return wake(idle, m, nil)
+		}
+		if cmd := m.headerClick(tea.Mouse(msg)); cmd != nil {
+			return wake(idle, m, cmd)
 		}
 		if next, ok := m.handleShellClick(tea.Mouse(msg)); ok {
 			return wake(idle, next, nil)

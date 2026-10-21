@@ -43,6 +43,8 @@ type KeyMap struct {
 	Workloads   key.Binding
 	Nodes       key.Binding
 	Events      key.Binding
+	Context     key.Binding
+	Namespace   key.Binding
 }
 
 func DefaultKeyMap() KeyMap {
@@ -90,6 +92,8 @@ func DefaultKeyMap() KeyMap {
 		Workloads:   b("3", "Workloads screen", "3"),
 		Nodes:       b("4", "Nodes screen", "4"),
 		Events:      b("6", "Events screen", "6"),
+		Context:     b("c", "switch context", "c"),
+		Namespace:   b("n", "switch namespace", "n"),
 	}
 }
 
@@ -101,5 +105,6 @@ func (k KeyMap) Bindings() []key.Binding {
 		k.Palette, k.ToggleLeft, k.Pause, k.Help, k.Quit,
 		k.PageUp, k.PageDown, k.Home, k.End, k.Follow, k.Wrap, k.Top, k.Bottom,
 		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads, k.Nodes, k.Events,
+		k.Context, k.Namespace,
 	}
 }

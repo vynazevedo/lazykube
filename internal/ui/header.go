@@ -37,13 +37,7 @@ func Header(r draw.Region, st HeaderState, ctx Ctx) {
 	}
 	right := r.W - pill.Width()
 
-	chip := theme.BgChip
-	ctxPill := draw.Line{
-		draw.S(" ◎ ", draw.Fg(ctx.Pal.C).WithBg(chip)),
-		draw.S("context ", draw.Fg(theme.Muted).WithBg(chip)),
-		draw.S(st.Cluster.Context+" ", draw.Fg(ctx.Pal.C).WithBg(chip).WithBold()),
-	}
-	ctxPill = ctxPill.Truncate(max(0, right-x-2))
+	ctxPill := headerTarget(st, ctx).Truncate(max(0, right-x-2))
 	x += r.Line(x, 0, ctxPill)
 
 	c := st.Cluster
@@ -65,6 +59,46 @@ func Header(r draw.Region, st HeaderState, ctx Ctx) {
 	}
 	r.Line(x, 0, stats)
 	r.Line(right, 0, pill)
+}
+
+const (
+	HeaderNone = iota
+	HeaderContext
+	HeaderNamespace
+)
+
+func headerNamespace(c data.Cluster) string {
+	if c.Namespace == "" {
+		return data.AllNamespacesLabel
+	}
+	return draw.Sanitize(c.Namespace)
+}
+
+func headerTarget(st HeaderState, ctx Ctx) draw.Line {
+	chip := theme.BgChip
+	return draw.Line{
+		draw.S(" ◎ ", draw.Fg(ctx.Pal.C).WithBg(chip)),
+		draw.S("context ", draw.Fg(theme.Muted).WithBg(chip)),
+		draw.S(draw.Sanitize(st.Cluster.Context)+" ", draw.Fg(ctx.Pal.C).WithBg(chip).WithBold()),
+		draw.S("namespace ", draw.Fg(theme.Muted).WithBg(chip)),
+		draw.S(headerNamespace(st.Cluster)+" ", draw.Fg(ctx.Pal.C).WithBg(chip).WithBold()),
+	}
+}
+
+func HeaderTargetAt(st HeaderState, x int) int {
+	start := len("lazykube") + draw.Width("  "+Version+"  ")
+	if st.Synthetic {
+		start += draw.Width(" [DEMO]")
+	}
+	split := start + draw.Width(" ◎ context "+draw.Sanitize(st.Cluster.Context)+" ")
+	end := split + draw.Width("namespace "+headerNamespace(st.Cluster)+" ")
+	switch {
+	case x >= start && x < split:
+		return HeaderContext
+	case x >= split && x < end:
+		return HeaderNamespace
+	}
+	return HeaderNone
 }
 
 func statusPill(st HeaderState, ctx Ctx) draw.Line {

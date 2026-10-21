@@ -20,7 +20,7 @@ func (m Model) Render() *draw.Canvas {
 		return c
 	}
 	ctx := ui.Ctx{Pal: m.pal, Clock: m.clock}
-	ui.Header(region(screen, m.layout.Header), ui.HeaderState{Synthetic: m.snap.Synthetic, Cluster: m.snap.Cluster, MetricsOK: m.metrics.Available, SecurityAlerts: len(m.securitySession.Alerts)}, ctx)
+	ui.Header(region(screen, m.layout.Header), m.headerState(), ctx)
 
 	ui.Menu(region(screen, m.layout.Menu), ui.MenuState{Items: m.menuItems(), Active: m.menuActive(), Cursor: m.menu.cursor, Focused: m.menu.open}, ctx)
 	ui.Breadcrumbs(region(screen, m.layout.Crumbs), crumbLabels(m.crumbs()), ctx)

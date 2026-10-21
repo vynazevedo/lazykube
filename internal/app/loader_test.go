@@ -59,7 +59,7 @@ func sameStates(got []ui.StepState, want ...ui.StepState) bool {
 }
 
 func progress(stage data.Stage, done bool, detail string) progressMsg {
-	return progressMsg{data.Progress{Stage: stage, Done: done, Context: "dev", Detail: detail}}
+	return progressMsg{p: data.Progress{Stage: stage, Done: done, Context: "dev", Detail: detail}}
 }
 
 func midwayLoader(t *testing.T, noAnim bool) Loader {

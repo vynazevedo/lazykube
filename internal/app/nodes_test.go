@@ -241,7 +241,7 @@ func TestNodesKeysAreHonest(t *testing.T) {
 			}
 		}
 	}
-	for _, k := range []string{"tab", "shift+tab", "l", "c", "t", "d", "e", "S", "E", "C", "P", "f", "w", "g", "G", "1", "[", "]", "pgdn", "home"} {
+	for _, k := range []string{"tab", "shift+tab", "l", "t", "d", "e", "S", "E", "C", "P", "f", "w", "g", "G", "1", "[", "]", "pgdn", "home"} {
 		got := press(t, m, k)
 		if got.tab != m.tab || got.focus != m.focus || got.scroll != m.scroll || got.follow != m.follow || got.wrap != m.wrap || got.leftMode != m.leftMode || got.nav != m.nav || got.securityNamespace != m.securityNamespace {
 			t.Fatalf("%s has no effect on Nodes and must not change hidden state", k)

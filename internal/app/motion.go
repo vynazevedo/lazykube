@@ -100,7 +100,7 @@ func (m Model) scheduleTick() tea.Cmd {
 	if !m.running() {
 		return nil
 	}
-	return frameCmd(m.frameRate(), m.gen)
+	return frameCmd(m.frameRate(), m.gen, m.session.Generation)
 }
 
 func (m *Model) restartTick() tea.Cmd {

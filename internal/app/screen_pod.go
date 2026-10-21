@@ -47,6 +47,7 @@ func (podScreen) Keys(m Model) []key.Binding {
 		k.Palette, k.Pause, k.Help, k.Quit,
 		k.PageUp, k.PageDown, k.Home, k.End, k.Follow, k.Wrap, k.Top, k.Bottom,
 		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads, k.Nodes, k.Events,
+		k.Context, k.Namespace,
 	}
 }
 

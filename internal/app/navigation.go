@@ -279,6 +279,10 @@ func (m Model) routeKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 		case key.Matches(msg, k.Events):
 			m.activateScreen(ScreenEvents)
 			return m, nil
+		case key.Matches(msg, k.Context):
+			return m, requestPick(pickContext)
+		case key.Matches(msg, k.Namespace):
+			return m, requestPick(pickNamespace)
 		case key.Matches(msg, k.Esc):
 			m.handleEsc()
 			return m, nil
@@ -316,6 +320,23 @@ func crumbLabels(cs []crumb) []string {
 		out[i] = c.label
 	}
 	return out
+}
+
+func (m Model) headerState() ui.HeaderState {
+	return ui.HeaderState{Synthetic: m.snap.Synthetic, Cluster: m.snap.Cluster, MetricsOK: m.metrics.Available, SecurityAlerts: len(m.securitySession.Alerts)}
+}
+
+func (m Model) headerClick(ms tea.Mouse) tea.Cmd {
+	if ms.Button != tea.MouseLeft || m.layout.TooSmall || m.helpOpen || m.menu.open || !m.layout.Header.Contains(ms.X, ms.Y) {
+		return nil
+	}
+	switch ui.HeaderTargetAt(m.headerState(), ms.X-m.layout.Header.X) {
+	case ui.HeaderContext:
+		return requestPick(pickContext)
+	case ui.HeaderNamespace:
+		return requestPick(pickNamespace)
+	}
+	return nil
 }
 
 func (m Model) handleShellClick(ms tea.Mouse) (Model, bool) {

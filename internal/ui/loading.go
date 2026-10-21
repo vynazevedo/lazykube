@@ -24,6 +24,9 @@ type LoadingState struct {
 	Steps    []LoadingStep
 	Progress float64
 	Error    string
+	Target   string
+	Previous string
+	Hints    []KeyHelp
 }
 
 const (
@@ -89,6 +92,9 @@ func Loading(r draw.Region, st LoadingState, ctx Ctx) {
 		logoH = logoRows
 	}
 	body := logoH + 2 + 2 + len(st.Steps) + 2
+	if st.Target != "" {
+		body++
+	}
 	if failed {
 		body += 2 + len(errLines)
 	}
@@ -146,6 +152,15 @@ func Loading(r draw.Region, st LoadingState, ctx Ctx) {
 	sub := draw.Line{muted(Version + "  ·  "), text(subtitle)}.Truncate(r.W)
 	r.Line(max(0, (r.W-sub.Width())/2), y, sub)
 	y += 2
+	if st.Target != "" {
+		dest := draw.Line{muted("destino "), bold(draw.Sanitize(st.Target), ctx.Pal.C)}
+		if st.Previous != "" {
+			dest = append(dest, muted("  ·  anterior "), text(draw.Sanitize(st.Previous)))
+		}
+		dest = dest.Truncate(r.W)
+		r.Line(max(0, (r.W-dest.Width())/2), y-1, dest)
+		y++
+	}
 
 	x := (r.W - w) / 2
 	loadingBar(r.Sub(x, y, w, 1), st.Progress, failed, ctx)
@@ -171,6 +186,15 @@ func Loading(r draw.Region, st LoadingState, ctx Ctx) {
 	hint := draw.Line{bold("ctrl+c", ctx.Pal.A), muted(" cancelar")}
 	if failed {
 		hint = draw.Line{bold("q", ctx.Pal.A), muted(" sair")}
+	}
+	if len(st.Hints) > 0 {
+		hint = nil
+		for i, h := range st.Hints {
+			if i > 0 {
+				hint = append(hint, faint("  ·  "))
+			}
+			hint = append(hint, bold(h.Key, ctx.Pal.A), muted(" "+h.Desc))
+		}
 	}
 	hint = hint.Truncate(r.W)
 	r.Line(max(0, (r.W-hint.Width())/2), y, hint)

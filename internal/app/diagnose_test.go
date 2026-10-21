@@ -20,7 +20,7 @@ const (
 
 func TestHelpIsHonest(t *testing.T) {
 	km := reflect.TypeOf(KeyMap{})
-	for _, gone := range []string{"Shell", "Delete", "Context"} {
+	for _, gone := range []string{"Shell", "Delete"} {
 		if _, ok := km.FieldByName(gone); ok {
 			t.Fatalf("KeyMap still declares unimplemented %s", gone)
 		}
@@ -28,7 +28,7 @@ func TestHelpIsHonest(t *testing.T) {
 	all := append(ui.ShortHelp(), ui.FullHelp()...)
 	for _, h := range all {
 		desc := strings.ToLower(h.Desc)
-		for _, word := range []string{"shell", "delete", "context"} {
+		for _, word := range []string{"shell", "delete"} {
 			if strings.Contains(desc, word) {
 				t.Fatalf("help still announces %q: %+v", word, h)
 			}
@@ -43,7 +43,7 @@ func TestHelpIsHonest(t *testing.T) {
 			keys[k] = true
 		}
 	}
-	for _, k := range []string{"C", "P", "alt+n", "N", "E", "S", "w", "g", "G", "m", "2", "3", "4", "6", "enter", "esc"} {
+	for _, k := range []string{"c", "n", "C", "P", "alt+n", "N", "E", "S", "w", "g", "G", "m", "2", "3", "4", "6", "enter", "esc"} {
 		if !keys[k] {
 			t.Fatalf("implemented key %q missing from help", k)
 		}
