@@ -369,7 +369,6 @@ lazykube/
 │   ├── draw/            # canvas, braille, larguras de grafema
 │   ├── anim/            # relógio, springs e fades
 │   └── theme/           # paletas e gradientes
-├── pkg/                 # utilitários herdados
 └── assets/              # imagens do README
 ```
 
