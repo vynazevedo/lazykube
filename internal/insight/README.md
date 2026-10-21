@@ -59,7 +59,7 @@ A source identity change starts a new baseline. Recreated UIDs never inherit old
 
 This delivery does not collect metrics, create incidents, correlate nodes/workloads, acknowledge or silence anything, import Security alerts, or change UI/navigation/permissions. Those remain later Radar PRs. No score or intrusion claim is introduced.
 
-Snapshots return at most MaxOperationalSignals (20000) sorted records. TotalSignals, OmittedSignals and per-rule Counts preserve exact counts when display records exceed the cap. This cap does not remove the underlying detector baselines and does not turn omitted evidence into health. R5 can compact these counts into incident summaries. Current-input detector memory and projection memory must be measured separately from snapshot payload.
+The 20000-state budget is applied before cloning input or creating machines. Selection is deterministic by pod namespace/name/UID and container kind/name. TotalSignals, OmittedSignals and per-rule Counts include every requested rule evaluation; excluded entities have no detector baseline and make snapshot coverage partial. The selected subset continues to advance without claiming coverage of omitted entities. Entity identities are interned, episode metadata is compact, and Snapshot materializes only the bounded selected set. BenchmarkReviewEngine10000 measures Step, Advance and Snapshot for 10000 pods and 100000 containers, retaining Inventory, its detached input batch, the engine and its result. This is heap retention excluding original fixtures, not process RSS or a promise of complete detection for all 100000 containers.
 
 ## R1 projection budget corrections
 
