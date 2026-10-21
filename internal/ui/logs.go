@@ -83,19 +83,34 @@ func logSource(info LogInfo) string {
 	return src
 }
 
-func searchLine(info LogInfo, ctx Ctx) draw.Line {
+const LogNextLabel = "[Próxima]"
+
+func searchPrefix(info LogInfo, ctx Ctx) draw.Line {
 	line := draw.Line{colored("/", ctx.Pal.A), text(info.Query)}
 	if info.Searching && ctx.Clock.CursorVisible() {
 		line = append(line, colored("▌", ctx.Pal.A))
 	}
+	return append(line, muted("  "))
+}
+
+func searchLine(info LogInfo, ctx Ctx) draw.Line {
 	switch {
 	case info.Query == "":
+		return searchPrefix(info, ctx)
 	case info.Matches == 0:
-		line = append(line, colored("  sem ocorrências", theme.Warn))
-	default:
-		line = append(line, muted(fmt.Sprintf("  %d/%d", info.Match+1, info.Matches)), faint("  n N"))
+		return append(searchPrefix(info, ctx), colored("sem ocorrências", theme.Warn))
 	}
-	return line
+	return append(searchPrefix(info, ctx), colored(LogNextLabel, ctx.Pal.A), muted(fmt.Sprintf("  %d/%d", info.Match+1, info.Matches)), faint("  alt+n N"))
+}
+
+func LogNextHit(x, y, panelW, panelH int, info LogInfo, ctx Ctx) bool {
+	if info.Query == "" || info.Matches == 0 {
+		return false
+	}
+	w := panelW - 8
+	start := 4 + searchPrefix(info, ctx).Width()
+	end := start + draw.Width(LogNextLabel)
+	return y == panelH-3 && x >= start && x < end && end-4 <= w/2
 }
 
 func LogTab(r draw.Region, st DetailsState, ctx Ctx) {

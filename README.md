@@ -233,8 +233,9 @@ os painéis: clique seleciona, a roda rola e o clique na aba troca de aba.
  │                                                       │
  ├─ DETALHES ────────────────────────────────────────────┤
  │                                                       │
- │  l  c  t  d  e     Log, Config, Top, Describe, Events │
- │  [  ]              aba anterior / próxima             │
+ │  l  t  d  e        Log, Top, Describe, Events         │
+ │  [  ]              aba anterior / próxima, Config     │
+ │  /  alt+n  N       busca no Log; botão [Próxima]      │
  │  f                 liga / desliga follow dos logs     │
  │  w                 quebra de linha                    │
  │  g  G              topo / fim                         │

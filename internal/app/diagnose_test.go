@@ -43,7 +43,7 @@ func TestHelpIsHonest(t *testing.T) {
 			keys[k] = true
 		}
 	}
-	for _, k := range []string{"C", "P", "n", "N", "E", "S", "w", "g", "G", "m", "2", "3", "4", "6", "enter", "esc"} {
+	for _, k := range []string{"C", "P", "alt+n", "N", "E", "S", "w", "g", "G", "m", "2", "3", "4", "6", "enter", "esc"} {
 		if !keys[k] {
 			t.Fatalf("implemented key %q missing from help", k)
 		}
@@ -193,9 +193,9 @@ func TestLogSearch(t *testing.T) {
 		t.Fatal("enter keeps the query and leaves edit mode")
 	}
 	first := m.dg.matchIdx
-	m = press(t, m, "n")
+	m = press(t, m, "alt+n")
 	if m.dg.matchIdx != (first+1)%len(m.dg.matches) {
-		t.Fatal("n must go to the next match")
+		t.Fatal("alt+n must go to the next match")
 	}
 	m = press(t, m, "N", "N")
 	if m.dg.matchIdx != (first-1+len(m.dg.matches))%len(m.dg.matches) {
@@ -456,5 +456,44 @@ func TestHelpOverlayMatchesActiveRoute(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestLogNextButtonStepsMatches(t *testing.T) {
+	m := press(t, detailsModel(t, 1), "l", "/", "h", "e", "a", "r", "t", "enter")
+	if len(m.dg.matches) < 2 {
+		t.Fatalf("setup needs matches, got %d", len(m.dg.matches))
+	}
+	lines := strings.Split(m.Render().Plain(), "\n")
+	x, y := -1, -1
+	for row, l := range lines {
+		if i := strings.Index(l, ui.LogNextLabel); i >= 0 {
+			x, y = len([]rune(l[:i])), row
+		}
+	}
+	if y < 0 {
+		t.Fatal("the Log search shows a textual Próxima button")
+	}
+	first := m.dg.matchIdx
+	for _, dx := range []int{0, len([]rune(ui.LogNextLabel)) - 1} {
+		next, _ := m.Update(tea.MouseClickMsg{X: x + dx, Y: y, Button: tea.MouseLeft})
+		if got := next.(Model).dg.matchIdx; got != (first+1)%len(m.dg.matches) {
+			t.Fatalf("clicking Próxima at +%d goes to the next match, got %d", dx, got)
+		}
+	}
+	for _, dx := range []int{-1, len([]rune(ui.LogNextLabel))} {
+		next, _ := m.Update(tea.MouseClickMsg{X: x + dx, Y: y, Button: tea.MouseLeft})
+		if next.(Model).dg.matchIdx != first {
+			t.Fatalf("a click outside the button at %+d keeps the match", dx)
+		}
+	}
+	if n := press(t, m, "n"); n.dg.matchIdx != first {
+		t.Fatal("n no longer steps the Log search")
+	}
+	if c := press(t, detailsModel(t, 1), "l", "c"); c.tab != ui.TabLog {
+		t.Fatal("c no longer opens Config; Config stays on the tab bar and [ ]")
+	}
+	if c := press(t, detailsModel(t, 1), "l", "]"); c.tab != ui.TabConfig {
+		t.Fatal("] reaches Config")
 	}
 }

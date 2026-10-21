@@ -42,7 +42,7 @@ func (podScreen) Keys(m Model) []key.Binding {
 	k := m.keys
 	return []key.Binding{
 		k.Up, k.Down, k.Esc, k.Filter,
-		k.TabLog, k.TabConfig, k.TabTop, k.TabDescribe, k.TabEvents, k.TabSecurity, k.SecurityAck,
+		k.TabLog, k.TabTop, k.TabDescribe, k.TabEvents, k.TabSecurity, k.SecurityAck,
 		k.TabPrev, k.TabNext, k.Container, k.Previous, k.SearchNext, k.SearchPrev, k.EventScope,
 		k.Palette, k.Pause, k.Help, k.Quit,
 		k.PageUp, k.PageDown, k.Home, k.End, k.Follow, k.Wrap, k.Top, k.Bottom,
