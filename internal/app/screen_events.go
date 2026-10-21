@@ -213,16 +213,27 @@ func (m *Model) cycleEventsScope() {
 	m.ev.Scope = scopes[(i+1)%len(scopes)]
 	m.ev.Cursor, m.ev.UID, m.ev.msgScroll, m.ev.reading, m.ev.gone = 0, "", 0, false, false
 	m.refreshEventsScreen()
+	m.trackClusterFeed()
 }
 
 func (m *Model) restoreEvents(f eventsFrame) {
 	m.ev = eventsView{eventsFrame: f}
-	if f.Scope == data.ScopeCluster && m.snap.Cluster.Namespace != "" {
-		m.ev.Scope = data.ScopeNamespace
-		if m.ev.Namespace == "" {
-			m.ev.Namespace = m.snap.Cluster.Namespace
+}
+
+func (m Model) clusterFeedNeeded() bool {
+	onEvents := m.onScreen(ScreenEvents) && m.ev.Scope == data.ScopeCluster && m.eventsSelectable()
+	onTab := m.screen().ShowsDetails() && m.tab == ui.TabEvents && m.dg.scope == data.ScopeCluster
+	return onEvents || onTab
+}
+
+func (m *Model) trackClusterFeed() {
+	need := m.clusterFeedNeeded()
+	if m.wideFeed && !need {
+		if r, ok := m.dg.diag.(data.ClusterEventsReleaser); ok {
+			r.ReleaseClusterEvents()
 		}
 	}
+	m.wideFeed = need
 }
 
 func (m *Model) refreshEventsScreen() {

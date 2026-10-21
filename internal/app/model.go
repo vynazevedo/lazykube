@@ -78,6 +78,7 @@ type Model struct {
 	events   data.EventFeed
 	dg       diagState
 	ev       eventsView
+	wideFeed bool
 	manifest []string
 	describe []data.Field
 
@@ -227,6 +228,7 @@ func (m *Model) refresh() {
 		m.dg.containers = m.dg.diag.Containers(name)
 	}
 	m.refreshEventsScreen()
+	m.trackClusterFeed()
 	m.updateMatches()
 	m.clampScroll()
 	m.setBarTargets()

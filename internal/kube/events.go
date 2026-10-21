@@ -615,4 +615,7 @@ func eventUID(obj any) ([]string, error) {
 	return []string{string(m.GetUID())}, nil
 }
 
-var _ data.EventMessages = (*Source)(nil)
+var (
+	_ data.EventMessages         = (*Source)(nil)
+	_ data.ClusterEventsReleaser = (*Source)(nil)
+)

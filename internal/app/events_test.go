@@ -17,10 +17,15 @@ type eventsSource struct {
 	connected string
 	feed      func(data.EventQuery) data.EventFeed
 	queries   *[]data.EventQuery
+	released  *int
 }
 
 func newEventsSource(connected string, feed func(data.EventQuery) data.EventFeed) eventsSource {
-	return eventsSource{Demo: data.NewDemo(), connected: connected, feed: feed, queries: &[]data.EventQuery{}}
+	return eventsSource{Demo: data.NewDemo(), connected: connected, feed: feed, queries: &[]data.EventQuery{}, released: new(int)}
+}
+
+func (s eventsSource) ReleaseClusterEvents() {
+	*s.released++
 }
 
 func (s eventsSource) Snapshot() data.Snapshot {
@@ -178,9 +183,20 @@ func TestEventsClusterNeedsExplicitIntent(t *testing.T) {
 	}
 	before := src.clusterQueries()
 	dash := press(t, m, "2")
-	back := press(t, dash, "esc")
-	if !back.onScreen(ScreenEvents) || back.ev.Scope != data.ScopeNamespace || back.ev.Namespace != "bilibili-raffle" || src.clusterQueries() != before {
-		t.Fatalf("returning to Events on a restricted connection does not query the cluster again: %+v", back.ev.eventsFrame)
+	if *src.released != 1 {
+		t.Fatalf("leaving Events releases the cluster feed, released %d", *src.released)
+	}
+	after := src.clusterQueries()
+	next, _ = dash.Update(dataMsg{})
+	if src.clusterQueries() != after {
+		t.Fatal("the Dashboard does not query the cluster feed")
+	}
+	back := press(t, next.(Model), "esc")
+	if !back.onScreen(ScreenEvents) || back.ev.Scope != data.ScopeCluster || src.clusterQueries() <= before {
+		t.Fatalf("returning to Events keeps the explicit cluster scope: %+v", back.ev.eventsFrame)
+	}
+	if away := press(t, back, "E"); away.ev.Scope == data.ScopeCluster || *src.released != 2 {
+		t.Fatalf("leaving the cluster scope releases the feed, released %d", *src.released)
 	}
 	all := events(t, demoModel(t, 160, 48))
 	all = press(t, all, "E", "E", "E")

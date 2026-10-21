@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	tea "charm.land/bubbletea/v2"
+
+	"github.com/vynazevedo/lazykube/internal/data"
 )
 
 func TestWheelBehindHelpChangesNothing(t *testing.T) {
@@ -82,5 +84,33 @@ func TestSmallTerminalIsClearAndUsable(t *testing.T) {
 	grown, _ := demoModel(t, 80, 24).Update(tea.WindowSizeMsg{Width: 160, Height: 48})
 	if grown.(Model).layout.TooSmall || !strings.Contains(grown.(Model).Render().Plain(), "Pods") {
 		t.Fatal("growing the terminal restores the full interface")
+	}
+}
+
+func TestDetailsEventsTabReleasesClusterFeed(t *testing.T) {
+	src := newEventsSource("bilibili-raffle", nil)
+	m := press(t, nodeModel(t, src, 160, 48), "e")
+	for range 3 {
+		if m.dg.scope == data.ScopeCluster {
+			break
+		}
+		m = press(t, m, "E")
+	}
+	if m.dg.scope != data.ScopeCluster || src.clusterQueries() == 0 {
+		t.Fatal("setup reads the cluster feed in the Events tab")
+	}
+	if *src.released != 0 {
+		t.Fatal("the feed stays while the tab shows it")
+	}
+	m = press(t, m, "l")
+	if *src.released != 1 {
+		t.Fatalf("leaving the Events tab releases the cluster feed, released %d", *src.released)
+	}
+	m = press(t, m, "e")
+	if m.dg.scope != data.ScopeCluster || *src.released != 1 {
+		t.Fatal("returning to the tab keeps the explicit cluster scope")
+	}
+	if press(t, m, "4"); *src.released != 2 {
+		t.Fatalf("a screen without details releases the feed, released %d", *src.released)
 	}
 }
