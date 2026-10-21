@@ -7,23 +7,29 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	tea "charm.land/bubbletea/v2"
 
 	"github.com/vynazevedo/lazykube/internal/app"
 	"github.com/vynazevedo/lazykube/internal/data"
+	"github.com/vynazevedo/lazykube/internal/guard"
 	"github.com/vynazevedo/lazykube/internal/kube"
 	"github.com/vynazevedo/lazykube/internal/theme"
 )
 
 type flags struct {
-	demo       bool
-	context    string
-	kubeconfig string
-	namespace  string
-	palette    string
-	noAnim     bool
-	fps        int
+	readWrite         bool
+	protectedContexts string
+	readOnlyContexts  string
+	auditPath         string
+	demo              bool
+	context           string
+	kubeconfig        string
+	namespace         string
+	palette           string
+	noAnim            bool
+	fps               int
 }
 
 var quietStderr = silenceStderr
@@ -34,6 +40,10 @@ func parseFlags(args []string, out io.Writer) (flags, error) {
 	var f flags
 	fs := flag.NewFlagSet("lazykube", flag.ContinueOnError)
 	fs.SetOutput(out)
+	fs.BoolVar(&f.readWrite, "read-write", false, "enable actions for this process, subject to context policy")
+	fs.StringVar(&f.protectedContexts, "protected-contexts", "", "comma-separated protected context names")
+	fs.StringVar(&f.readOnlyContexts, "read-only-contexts", "", "comma-separated read-only context names")
+	fs.StringVar(&f.auditPath, "audit-file", "", "private local audit JSONL path")
 	fs.BoolVar(&f.demo, "demo", false, "run with deterministic synthetic data")
 	fs.StringVar(&f.context, "context", "", "kubeconfig context to use")
 	fs.StringVar(&f.kubeconfig, "kubeconfig", "", "path to the kubeconfig file")
@@ -74,13 +84,34 @@ func baseOptions(f flags) (app.Options, error) {
 	return app.Options{Palette: pal, FPS: f.fps, NoAnim: f.noAnim}, nil
 }
 
-func clusterConnector(kubeconfig string, t data.Target, connect connector) app.Connector {
+func listed(csv, name string) bool {
+	for _, item := range strings.Split(csv, ",") {
+		if strings.TrimSpace(item) == name {
+			return true
+		}
+	}
+	return false
+}
+
+func environmentFor(f flags) func(string) (guard.Environment, error) {
+	return func(name string) (guard.Environment, error) {
+		env := guard.DefaultEnvironment(name)
+		env.Protected = listed(f.protectedContexts, name)
+		env.ReadOnly = listed(f.readOnlyContexts, name)
+		return env, nil
+	}
+}
+
+func clusterConnector(f flags, t data.Target, connect connector) app.Connector {
 	return func(ctx context.Context, report func(data.Progress)) (data.Source, func(), error) {
 		return connect(ctx, kube.ConnectOptions{
-			Kubeconfig: kubeconfig,
-			Context:    t.Context,
-			Namespace:  t.Namespace,
-			Progress:   report,
+			AllowWrites:        f.readWrite,
+			AuditPath:          f.auditPath,
+			ResolveEnvironment: environmentFor(f),
+			Kubeconfig:         f.kubeconfig,
+			Context:            t.Context,
+			Namespace:          t.Namespace,
+			Progress:           report,
 		})
 	}
 }
@@ -114,12 +145,11 @@ func newModel(f flags, connect connector) (tea.Model, func(), error) {
 		})
 		return r, r.Shutdown, nil
 	}
-	kubeconfig := f.kubeconfig
 	r := app.NewRoot(app.RootOptions{
 		Options: opts,
 		Initial: data.Target{Context: f.context, Namespace: f.namespace},
-		Connect: func(t data.Target) app.Connector { return clusterConnector(kubeconfig, t, connect) },
-		Catalog: func() (data.ContextCatalog, error) { return kube.Contexts(kubeconfig) },
+		Connect: func(t data.Target) app.Connector { return clusterConnector(f, t, connect) },
+		Catalog: func() (data.ContextCatalog, error) { return kube.Contexts(f.kubeconfig) },
 	})
 	return r, r.Shutdown, nil
 }

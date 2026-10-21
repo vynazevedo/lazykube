@@ -13,6 +13,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 
 	"github.com/vynazevedo/lazykube/internal/data"
+	"github.com/vynazevedo/lazykube/internal/guard"
 	"github.com/vynazevedo/lazykube/internal/theme"
 	"github.com/vynazevedo/lazykube/internal/ui"
 )
@@ -23,6 +24,15 @@ type fakeLive struct {
 }
 
 func (s fakeLive) Changes() <-chan struct{} { return s.changes }
+
+func (s fakeLive) GuardSession() guard.Session {
+	ctx := s.Snapshot().Cluster.Context
+	return guard.Session{Context: ctx, Namespace: s.Snapshot().Cluster.Namespace, Identity: "id-" + ctx, Environment: guard.Environment{Valid: true, Protected: ctx == "gamma"}}
+}
+
+func (s fakeLive) AccessMode() guard.Mode {
+	return guard.NewPolicy(true).Mode(s.GuardSession())
+}
 
 type fakeSource struct {
 	target data.Target
@@ -691,5 +701,30 @@ func TestRootFailureChoicesAreClickable(t *testing.T) {
 	d.clickText("q sair")
 	if !d.quit {
 		t.Fatal("q sair quits by click")
+	}
+}
+
+func TestRootSessionFollowsGuardPolicy(t *testing.T) {
+	d := newRootDriver(t, newFakeCluster(), data.Target{Context: "alpha"})
+	d.until("initial", connectedTo("alpha", ""))
+	m, _ := d.r.model()
+	if plain := d.r.Render().Plain(); !strings.Contains(plain, "[RW]") || strings.Contains(plain, "[RO]") || m.session.Identity != "id-alpha" {
+		t.Fatalf("the header shows the guard mode of the session: %+v", m.session)
+	}
+	d.pickTarget(pickContext, "gamma")
+	d.until("gamma", connectedTo("gamma", "apps"))
+	m, _ = d.r.model()
+	plain := d.r.Render().Plain()
+	if !strings.Contains(plain, "[RO]") || !strings.Contains(plain, "[PROTECTED]") || strings.Contains(plain, "[RW]") {
+		t.Fatal("a protected context is read only in the header")
+	}
+	if !m.session.Mode.Protected || !m.session.Mode.ReadOnly || m.session.Identity != "id-gamma" || m.session.Generation != d.r.gen {
+		t.Fatalf("the session reference follows the new guard session: %+v", m.session)
+	}
+	hs := m.headerState()
+	g := ui.HeaderLayout(hs, m.layout.Header.W)
+	line := []rune(strings.Split(plain, "\n")[0])
+	if !strings.HasPrefix(string(line[m.layout.Header.X+g.CtxStart:]), " ◎ context gamma") {
+		t.Fatal("the badges are part of the header geometry")
 	}
 }

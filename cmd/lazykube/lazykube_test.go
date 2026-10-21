@@ -13,6 +13,7 @@ import (
 
 	"github.com/vynazevedo/lazykube/internal/app"
 	"github.com/vynazevedo/lazykube/internal/data"
+	"github.com/vynazevedo/lazykube/internal/guard"
 	"github.com/vynazevedo/lazykube/internal/kube"
 )
 
@@ -68,7 +69,7 @@ func TestConnectorPassesOptionsAndProgress(t *testing.T) {
 		return data.NewDemo(), func() {}, nil
 	}
 	var reported []data.Progress
-	src, _, err := clusterConnector("/k", data.Target{Context: "dev", Namespace: "apps"}, connect)(context.Background(), func(p data.Progress) { reported = append(reported, p) })
+	src, _, err := clusterConnector(flags{kubeconfig: "/k"}, data.Target{Context: "dev", Namespace: "apps"}, connect)(context.Background(), func(p data.Progress) { reported = append(reported, p) })
 	if err != nil || src == nil {
 		t.Fatalf("err=%v src=%v", err, src)
 	}
@@ -214,5 +215,62 @@ func TestDemoConnectorIsSynthetic(t *testing.T) {
 	}
 	if _, _, err := demoConnector(data.Target{Context: "prod"})(context.Background(), func(data.Progress) {}); err == nil {
 		t.Fatal("only synthetic contexts exist in demo")
+	}
+}
+
+func TestReadWriteRequiresExplicitProcessFlag(t *testing.T) {
+	for _, tc := range []struct {
+		args   []string
+		writes bool
+	}{{nil, false}, {[]string{"--read-write"}, true}, {[]string{"--read-write=false"}, false}} {
+		f, err := parseFlags(tc.args, &bytes.Buffer{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		var options kube.ConnectOptions
+		connect := func(_ context.Context, o kube.ConnectOptions) (data.Source, func(), error) {
+			options = o
+			return data.NewDemo(), func() {}, nil
+		}
+		_, _, err = clusterConnector(f, data.Target{}, connect)(context.Background(), func(data.Progress) {})
+		if err != nil || options.AllowWrites != tc.writes {
+			t.Fatal(options.AllowWrites, err)
+		}
+		env, err := options.ResolveEnvironment("dev-product")
+		if err != nil || env.Protected {
+			t.Fatal(env, err)
+		}
+	}
+	if _, err := parseFlags([]string{"--read-only=false"}, &bytes.Buffer{}); err == nil {
+		t.Fatal("legacy write opt-out accepted")
+	}
+}
+
+func TestProtectedContextsAreExactAndOverrideReadWrite(t *testing.T) {
+	f, err := parseFlags([]string{"--read-write", "--protected-contexts=prod, staging"}, &bytes.Buffer{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	var options kube.ConnectOptions
+	connect := func(_ context.Context, o kube.ConnectOptions) (data.Source, func(), error) {
+		options = o
+		return data.NewDemo(), func() {}, nil
+	}
+	_, _, err = clusterConnector(f, data.Target{}, connect)(context.Background(), func(data.Progress) {})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, tc := range []struct {
+		name      string
+		protected bool
+	}{{"prod", true}, {"staging", true}, {"dev-product", false}, {"prod-east", false}} {
+		env, resolveErr := options.ResolveEnvironment(tc.name)
+		if resolveErr != nil || env.Protected != tc.protected {
+			t.Fatal(tc.name, env, resolveErr)
+		}
+		mode := guard.NewPolicy(options.AllowWrites).Mode(guard.Session{Environment: env})
+		if mode.ReadOnly != tc.protected {
+			t.Fatal(tc.name, mode)
+		}
 	}
 }

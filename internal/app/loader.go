@@ -404,7 +404,7 @@ func (l Loader) start(src data.Source) (tea.Model, tea.Cmd) {
 	opts := l.opts
 	opts.Source = src
 	opts.Palette = l.pal
-	opts.Session = data.SessionRef{Context: l.context, Generation: l.generation, Mode: data.ModeReadOnly}
+	opts.Session = sessionRef(src, l.context, l.generation)
 	if l.target != nil {
 		opts.Session.Namespace = l.target.Namespace
 	}

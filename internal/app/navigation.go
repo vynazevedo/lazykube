@@ -7,6 +7,7 @@ import (
 	"charm.land/bubbles/v2/key"
 	tea "charm.land/bubbletea/v2"
 
+	"github.com/vynazevedo/lazykube/internal/data"
 	"github.com/vynazevedo/lazykube/internal/ui"
 )
 
@@ -323,7 +324,12 @@ func crumbLabels(cs []crumb) []string {
 }
 
 func (m Model) headerState() ui.HeaderState {
-	return ui.HeaderState{Synthetic: m.snap.Synthetic, Cluster: m.snap.Cluster, MetricsOK: m.metrics.Available, SecurityAlerts: len(m.securitySession.Alerts)}
+	mode := m.session.Mode
+	if mode == (data.EffectiveMode{}) {
+		mode = data.ReadOnlyMode
+	}
+	readOnly := mode.ReadOnly || !mode.Valid
+	return ui.HeaderState{ReadOnly: readOnly, Writable: !readOnly, Protected: mode.Protected, Synthetic: m.snap.Synthetic, Cluster: m.snap.Cluster, MetricsOK: m.metrics.Available, SecurityAlerts: len(m.securitySession.Alerts)}
 }
 
 func (m Model) headerClick(ms tea.Mouse) tea.Cmd {

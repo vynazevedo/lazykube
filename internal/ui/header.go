@@ -12,6 +12,9 @@ import (
 var Version = "v2.0"
 
 type HeaderState struct {
+	ReadOnly       bool
+	Writable       bool
+	Protected      bool
 	Synthetic      bool
 	Cluster        data.Cluster
 	MetricsOK      bool
@@ -27,9 +30,7 @@ func Header(r draw.Region, st HeaderState, ctx Ctx) {
 		r.Put(x+i, 0, ch, draw.Fg(colors[i]).WithBold())
 	}
 	x += len(logo)
-	if st.Synthetic {
-		x += r.Text(x, 0, " [DEMO]", draw.Fg(theme.Warn).WithBold())
-	}
+	x += r.Line(x, 0, headerBadges(st))
 	x += r.Line(x, 0, draw.Line{muted("  " + Version + "  ")})
 
 	pill := headerPill(st, ctx)
@@ -97,11 +98,25 @@ func headerPill(st HeaderState, ctx Ctx) draw.Line {
 	return pill
 }
 
-func HeaderLayout(st HeaderState, w int) HeaderGeometry {
-	start := len("lazykube") + draw.Width("  "+Version+"  ")
+func headerBadges(st HeaderState) draw.Line {
+	var l draw.Line
 	if st.Synthetic {
-		start += draw.Width(" [DEMO]")
+		l = append(l, draw.S(" [DEMO]", draw.Fg(theme.Warn).WithBold()))
 	}
+	switch {
+	case st.ReadOnly:
+		l = append(l, draw.S(" [RO]", draw.Fg(theme.Warn).WithBold()))
+	case st.Writable:
+		l = append(l, draw.S(" [RW]", draw.Fg(theme.Err).WithBold()))
+	}
+	if st.Protected {
+		l = append(l, draw.S(" [PROTECTED]", draw.Fg(theme.Err).WithBold()))
+	}
+	return l
+}
+
+func HeaderLayout(st HeaderState, w int) HeaderGeometry {
+	start := len("lazykube") + headerBadges(st).Width() + draw.Width("  "+Version+"  ")
 	g := HeaderGeometry{CtxStart: start, NsStart: start, End: start}
 	g.Right = w - headerPill(st, Ctx{Pal: theme.DefaultPalette(), Clock: anim.Fixed(0, 0, 0)}).Width()
 	room := g.Right - start - 2 - draw.Width(headerCtxLabel) - draw.Width(headerNsLabel) - 2

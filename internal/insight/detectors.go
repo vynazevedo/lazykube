@@ -5,28 +5,31 @@ func (e *Engine) evaluate(newBatch bool) {
 	containers := make(map[signalKey]bool)
 	for _, p := range e.pods {
 		present[p.Entity.EntityKey] = true
-		e.podRules(p, newBatch)
 		for _, c := range p.Containers {
-			containers[signalKey{Entity: p.Entity.EntityKey, Container: c.Name, Kind: c.Kind}] = true
-			e.containerRules(p, c, newBatch)
+			containers[signalKey{Entity: e.entities[p.Entity.EntityKey], Container: c.Name, Kind: c.Kind}] = true
 		}
 	}
-	for key, m := range e.machines {
-		if !present[key.Entity] {
-			delete(e.machines, key)
-			continue
-		}
+	for key := range e.machines {
 		container := key
 		container.Rule = ""
-		if key.Container != "" && !containers[container] {
-			m.suspend(SuspensionMissingStatus, Coverage{State: CoveragePartial, Reason: "container not observed"})
+		if !present[*key.Entity] || key.Container != "" && !containers[container] {
+			delete(e.machines, key)
+		}
+	}
+	for _, p := range e.pods {
+		e.podRules(p, newBatch)
+		for _, c := range p.Containers {
+			e.containerRules(p, c, newBatch)
 		}
 	}
 }
 
 func (e *Engine) podRules(p PodObservation, newBatch bool) {
 	m, fresh, baseline := e.machine(p, ContainerObservation{}, RulePending, newBatch)
-	if p.Phase == PodUnknown {
+	if m == nil {
+		return
+	}
+	if p.Phase == PodUnknown || pendingStatusMissing(p) {
 		m.suspend(SuspensionMissingStatus, Coverage{State: CoveragePartial, Reason: "pod phase unknown"})
 	} else if !m.suspended {
 		pending := p.Phase == PodPending
@@ -37,6 +40,9 @@ func (e *Engine) podRules(p PodObservation, newBatch bool) {
 		m.consumed(p)
 	}
 	m, fresh, baseline = e.machine(p, ContainerObservation{}, RuleEvicted, newBatch)
+	if m == nil {
+		return
+	}
 	if p.Phase == PodUnknown {
 		m.suspend(SuspensionMissingStatus, Coverage{State: CoveragePartial, Reason: "pod phase unknown"})
 		return
@@ -50,11 +56,13 @@ func (e *Engine) podRules(p PodObservation, newBatch bool) {
 			e.begin(m, baseline)
 			m.activate(SignalWarning)
 		}
-		m.lastEviction = e.now
-		m.signal.Evidence.TransitionObservedAt = e.now
+		m.activitySince = e.now
+		if !baseline && m.seen && !m.wasEvicted {
+			m.signal.Evidence.TransitionObservedAt = e.now
+		}
 		m.signal.Evidence.Reason = ReasonEvicted
 	}
-	if (m.signal.State == SignalActive || m.signal.State == SignalRecovering) && e.now.Sub(m.lastEviction) >= e.config.EvictionQuiet {
+	if (m.signal.State == SignalActive || m.signal.State == SignalRecovering) && e.now.Sub(m.activitySince) >= e.config.EvictionQuiet {
 		m.signal.State = SignalResolved
 		m.signal.ResolvedAt = e.now
 	}
@@ -66,6 +74,9 @@ func (e *Engine) containerRules(p PodObservation, c ContainerObservation, newBat
 	healthy := c.Phase == ContainerRunning && c.Ready == TruthTrue
 	for _, rule := range []Rule{RuleRestarts, RuleCrashLoop, RuleOOM, RuleImagePull} {
 		m, fresh, baseline := e.machine(p, c, rule, newBatch)
+		if m == nil {
+			continue
+		}
 		if !c.StatusObserved || c.Phase == ContainerUnknown {
 			m.suspend(SuspensionMissingStatus, Coverage{State: CoveragePartial, Reason: "container status not observed"})
 			continue
@@ -127,7 +138,7 @@ func (e *Engine) restarts(m *signalMachine, c ContainerObservation, fresh, basel
 			m.signal.Evidence.CounterBefore = m.counter
 			m.signal.Evidence.CounterAfter = c.RestartCount
 			m.deltas = append(m.deltas, restartDelta{at: e.now, count: int64(c.RestartCount) - int64(m.counter)})
-			m.lastRestart = e.now
+			m.activitySince = e.now
 			m.counter = c.RestartCount
 		}
 	}
@@ -143,7 +154,7 @@ func (e *Engine) restarts(m *signalMachine, c ContainerObservation, fresh, basel
 			severity = SignalHigh
 		}
 		m.activate(severity)
-	} else if (m.signal.State == SignalActive || m.signal.State == SignalRecovering) && e.now.Sub(m.lastRestart) >= e.config.RestartWindow {
+	} else if (m.signal.State == SignalActive || m.signal.State == SignalRecovering) && e.now.Sub(m.activitySince) >= e.config.RestartWindow {
 		m.signal.State = SignalResolved
 		m.signal.ResolvedAt = e.now
 	}
@@ -179,7 +190,7 @@ func (e *Engine) oom(m *signalMachine, c ContainerObservation, fresh, baseline, 
 		m.activate(SignalHigh)
 		m.termAt = termination.FinishedAt
 		m.termKnown = true
-		m.lastOOM = e.now
+		m.activitySince = e.now
 		m.healthy = false
 		m.signal.Evidence.EventAt = termination.FinishedAt
 		m.signal.Evidence.ExitCode = termination.ExitCode
@@ -189,5 +200,20 @@ func (e *Engine) oom(m *signalMachine, c ContainerObservation, fresh, baseline, 
 		m.termAt = termination.FinishedAt
 		m.termKnown = true
 	}
-	e.recover(m, healthy, e.now.Sub(m.lastOOM) >= e.config.OOMQuiet)
+	e.recover(m, healthy, e.now.Sub(m.activitySince) >= e.config.OOMQuiet)
+}
+
+func pendingStatusMissing(p PodObservation) bool {
+	if p.Phase == PodSucceeded || p.Phase == PodFailed {
+		return false
+	}
+	if len(p.Containers) == 0 || p.Omissions.Containers > 0 {
+		return true
+	}
+	for _, c := range p.Containers {
+		if !c.StatusObserved || c.Phase == ContainerUnknown {
+			return true
+		}
+	}
+	return false
 }

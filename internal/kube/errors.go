@@ -31,6 +31,7 @@ const (
 	ErrorTimeout
 	ErrorCanceled
 	ErrorServer
+	ErrorGuard
 )
 
 type ConnectError struct {
@@ -74,6 +75,8 @@ func (e *ConnectError) Error() string {
 		return "conexão cancelada"
 	case ErrorServer:
 		return "o servidor do contexto " + name + " respondeu com erro"
+	case ErrorGuard:
+		return "não foi possível preparar a sessão protegida do contexto " + name
 	}
 	return "falha ao conectar ao contexto " + name
 }

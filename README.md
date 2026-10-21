@@ -169,6 +169,15 @@ lazykube --demo --no-anim
 
 O uso com um cluster requer um kubeconfig válido.
 
+O processo inicia somente leitura (`[RO]`). A flag `--read-write` libera
+a tentativa de acoes apenas neste processo, sujeita a RBAC e a politica do
+contexto. Contextos protegidos continuam bloqueados. O executor e os contratos
+para futuros handlers de acoes estao descritos em
+[Guardrails](internal/guard/README.md); esta entrega nao adiciona teclas de mutacao.
+`--protected-contexts` e `--read-only-contexts` recebem nomes exatos separados
+por virgula. `--audit-file` permite escolher um caminho absoluto para o audit
+privado. Nenhuma tecla desativa a politica.
+
 ---
 
 ## `[0x02]` Uso

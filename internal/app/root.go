@@ -10,6 +10,7 @@ import (
 	"github.com/vynazevedo/lazykube/internal/anim"
 	"github.com/vynazevedo/lazykube/internal/data"
 	"github.com/vynazevedo/lazykube/internal/draw"
+	"github.com/vynazevedo/lazykube/internal/guard"
 	"github.com/vynazevedo/lazykube/internal/theme"
 	"github.com/vynazevedo/lazykube/internal/ui"
 )
@@ -71,7 +72,7 @@ func NewRoot(opts RootOptions) Root {
 	}
 	r.attempt, r.gen = 1, 1
 	base := r.base
-	base.Session = data.SessionRef{Generation: r.gen, Mode: data.ModeReadOnly}
+	base.Session = sessionRef(base.Source, "", r.gen)
 	m := New(base)
 	m.session.Context, m.session.Namespace = m.snap.Cluster.Context, m.snap.Cluster.Namespace
 	r.cur, r.pending = m, data.Target{Context: m.snap.Cluster.Context, Namespace: m.snap.Cluster.Namespace}
@@ -370,6 +371,21 @@ func (r Root) View() tea.View {
 		v.ReportFocus = true
 	}
 	return v
+}
+
+type guarded interface {
+	GuardSession() guard.Session
+	AccessMode() guard.Mode
+}
+
+func sessionRef(src data.Source, context string, gen uint64) data.SessionRef {
+	ref := data.SessionRef{Context: context, Generation: gen, Mode: data.ReadOnlyMode}
+	if g, ok := src.(guarded); ok {
+		s, mode := g.GuardSession(), g.AccessMode()
+		ref.Context, ref.Namespace, ref.Identity = s.Context, s.Namespace, s.Identity
+		ref.Mode = data.EffectiveMode{ReadOnly: mode.ReadOnly, Protected: mode.Protected, Valid: mode.ConfigValid}
+	}
+	return ref
 }
 
 func (r Root) Connecting() bool {

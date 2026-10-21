@@ -40,13 +40,18 @@ func (t Target) NamespaceLabel() string {
 	return t.Namespace
 }
 
-type EffectiveMode int
+type EffectiveMode struct {
+	ReadOnly  bool
+	Protected bool
+	Valid     bool
+}
 
-const ModeReadOnly EffectiveMode = iota
+var ReadOnlyMode = EffectiveMode{ReadOnly: true, Valid: true}
 
 type SessionRef struct {
 	Context    string
 	Namespace  string
+	Identity   string
 	Generation uint64
 	Mode       EffectiveMode
 }

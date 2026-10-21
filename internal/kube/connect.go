@@ -3,7 +3,10 @@ package kube
 import (
 	"context"
 	"fmt"
+	"github.com/vynazevedo/lazykube/internal/guard"
 	"io"
+	"k8s.io/client-go/dynamic"
+	"time"
 
 	"github.com/go-logr/logr"
 	"k8s.io/client-go/discovery"
@@ -22,10 +25,13 @@ const (
 )
 
 type ConnectOptions struct {
-	Kubeconfig string
-	Context    string
-	Namespace  string
-	Progress   func(data.Progress)
+	AllowWrites        bool
+	ResolveEnvironment func(string) (guard.Environment, error)
+	AuditPath          string
+	Kubeconfig         string
+	Context            string
+	Namespace          string
+	Progress           func(data.Progress)
 }
 
 func SilenceClientLogs() {
@@ -93,8 +99,32 @@ func Connect(ctx context.Context, opts ConnectOptions) (*Source, error) {
 	if err != nil {
 		return nil, connectError(ErrorClientConfig, name, err)
 	}
-	s := newSource(client, mc, Options{Context: name, Namespace: opts.Namespace, Progress: opts.Progress})
+	s := newSource(client, mc, Options{Context: name, Namespace: opts.Namespace, Progress: opts.Progress, DisableNetwork: true})
 	s.version = dc
+	environment := guard.DefaultEnvironment(name)
+	if opts.ResolveEnvironment != nil {
+		var resolveErr error
+		environment, resolveErr = opts.ResolveEnvironment(name)
+		if resolveErr != nil {
+			environment.Valid = false
+		}
+	}
+	s.guardSession = guard.Session{Context: name, Namespace: opts.Namespace, Identity: fmt.Sprintf("session-%d", s.generation), Generation: s.generation, Environment: environment}
+	s.guardPolicy = guard.NewPolicy(opts.AllowWrites)
+	auditPath := opts.AuditPath
+	if auditPath == "" {
+		auditPath, _ = guard.DefaultAuditPath()
+	}
+	actionClient, clientErr := dynamic.NewForConfig(cfg)
+	if clientErr != nil {
+		s.Close()
+		return nil, connectError(ErrorGuard, name, clientErr)
+	}
+	s.actions, err = NewActionExecutor(s.ctx, s.guardSession, opts.AllowWrites, client, actionClient, guard.NewFileAudit(auditPath), guard.ClockFunc(time.Now), nil)
+	if err != nil {
+		s.Close()
+		return nil, connectError(ErrorGuard, name, err)
+	}
 	if err := s.start(ctx); err != nil {
 		s.Close()
 		return nil, publicError(err, name, exec)
