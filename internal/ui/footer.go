@@ -188,7 +188,70 @@ func HelpOverlay(screen draw.Region, items []KeyHelp, ctx Ctx) {
 	}
 }
 
-func TooSmall(screen draw.Region, w, h int) {
+type SmallState struct {
+	W, H       int
+	MinW, MinH int
+	Synthetic  bool
+	Cluster    data.Cluster
+	Pods       int
+	Namespaces int
+}
+
+func missingText(st SmallState) string {
+	cols, rows := max(0, st.MinW-st.W), max(0, st.MinH-st.H)
+	switch {
+	case cols > 0 && rows > 0:
+		return fmt.Sprintf("faltam %d colunas e %d linhas", cols, rows)
+	case cols > 0:
+		return fmt.Sprintf("faltam %d colunas", cols)
+	}
+	return fmt.Sprintf("faltam %d linhas", rows)
+}
+
+func TooSmall(screen draw.Region, st SmallState, ctx Ctx) {
 	screen.Fill(theme.BgApp)
-	centered(screen, fmt.Sprintf("terminal muito pequeno - mínimo 120×36 (atual %d×%d)", w, h))
+	if screen.Empty() {
+		return
+	}
+	logo := draw.Line{}
+	colors := theme.TextGradient(ctx.Pal, len("lazykube"), ctx.Clock.Phase)
+	for i, ch := range "lazykube" {
+		logo = append(logo, draw.S(string(ch), draw.Fg(colors[i]).WithBold()))
+	}
+	if st.Synthetic {
+		logo = append(logo, draw.S(" [DEMO]", draw.Fg(theme.Warn).WithBold()))
+	}
+	target := draw.Line{muted("context "), text(draw.Sanitize(st.Cluster.Context)), muted("  namespace "), text(headerNamespace(st.Cluster))}
+	summary := draw.Line{faint(fmt.Sprintf("%d pods · %d namespaces observados", st.Pods, st.Namespaces))}
+	keys := draw.Line{bold("q", ctx.Pal.A), muted(" sair  "), bold("c", ctx.Pal.A), muted(" contexto  "), bold("n", ctx.Pal.A), muted(" namespace")}
+	type row struct {
+		line draw.Line
+		keep int
+	}
+	rows := []row{
+		{logo, 3},
+		{target, 1},
+		{nil, 0},
+		{draw.Line{colored(fmt.Sprintf("terminal pequeno: %d×%d", st.W, st.H), theme.Warn)}, 3},
+		{draw.Line{text(fmt.Sprintf("a interface completa precisa de %d×%d", st.MinW, st.MinH))}, 3},
+		{draw.Line{muted(missingText(st))}, 2},
+		{nil, 0},
+		{summary, 1},
+		{nil, 0},
+		{keys, 3},
+	}
+	for level := 0; len(rows) > screen.H && level <= 2; level++ {
+		kept := rows[:0]
+		for _, r := range rows {
+			if r.keep > level {
+				kept = append(kept, r)
+			}
+		}
+		rows = kept
+	}
+	y := max(0, (screen.H-len(rows))/2)
+	for i, r := range rows {
+		l := r.line.Truncate(screen.W)
+		screen.Line(max(0, (screen.W-l.Width())/2), y+i, l)
+	}
 }

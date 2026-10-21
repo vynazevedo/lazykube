@@ -16,7 +16,7 @@ func (m Model) Render() *draw.Canvas {
 	c := draw.NewCanvas(m.w, m.h, theme.BgApp)
 	screen := c.Region()
 	if m.layout.TooSmall {
-		ui.TooSmall(screen, m.w, m.h)
+		ui.TooSmall(screen, ui.SmallState{W: m.w, H: m.h, MinW: MinWidth, MinH: MinHeight, Synthetic: m.snap.Synthetic, Cluster: m.snap.Cluster, Pods: len(m.snap.Pods), Namespaces: len(m.snap.Namespaces)}, ui.Ctx{Pal: m.pal, Clock: m.clock})
 		return c
 	}
 	ctx := ui.Ctx{Pal: m.pal, Clock: m.clock}

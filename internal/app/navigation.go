@@ -262,6 +262,14 @@ func (m Model) routeKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 	if m.dep.open {
 		return m.handleOverlayKey(msg)
 	}
+	if !m.helpOpen && !m.filtering && !m.dg.searching {
+		switch {
+		case key.Matches(msg, m.keys.Context):
+			return m, requestPick(pickContext, m.session.Generation)
+		case key.Matches(msg, m.keys.Namespace):
+			return m, requestPick(pickNamespace, m.session.Generation)
+		}
+	}
 	if !m.helpOpen && !m.filtering && !m.dg.searching && !m.layout.TooSmall {
 		k := m.keys
 		switch {
@@ -280,10 +288,6 @@ func (m Model) routeKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 		case key.Matches(msg, k.Events):
 			m.activateScreen(ScreenEvents)
 			return m, nil
-		case key.Matches(msg, k.Context):
-			return m, requestPick(pickContext, m.session.Generation)
-		case key.Matches(msg, k.Namespace):
-			return m, requestPick(pickNamespace, m.session.Generation)
 		case key.Matches(msg, k.Esc):
 			m.handleEsc()
 			return m, nil
