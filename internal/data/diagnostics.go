@@ -153,6 +153,20 @@ type EventFeed struct {
 	Reason string
 }
 
+const (
+	EventPreviewBytes = 300
+	EventMessageBytes = 8 << 10
+)
+
+type EventMessage struct {
+	Text      string
+	Truncated bool
+}
+
+type EventMessages interface {
+	EventMessage(uid string) (EventMessage, bool)
+}
+
 type Diagnostics interface {
 	Containers(pod string) []Container
 	PodLogs(req LogRequest, tick, n int) LogView

@@ -197,15 +197,20 @@ func statusFor(phase corev1.PodPhase, reason string) data.PodStatus {
 }
 
 func clip(s string) string {
+	out, _ := clipTo(s, maxDiagMessage)
+	return out
+}
+
+func clipTo(s string, limit int) (string, bool) {
 	s = strings.Join(strings.Fields(data.Sanitize(s)), " ")
-	if len(s) <= maxDiagMessage {
-		return s
+	if len(s) <= limit {
+		return s, false
 	}
-	cut := maxDiagMessage
+	cut := limit
 	for cut > 0 && !utf8.RuneStart(s[cut]) {
 		cut--
 	}
-	return s[:cut] + "…"
+	return s[:cut] + "…", true
 }
 
 func toTermination(t *corev1.ContainerStateTerminated, now time.Time, loc *time.Location) *data.Termination {

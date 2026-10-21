@@ -114,6 +114,7 @@ type Namespace struct {
 }
 
 type Event struct {
+	UID       string
 	Age       string
 	Type      string
 	Reason    string
@@ -121,6 +122,7 @@ type Event struct {
 	Namespace string
 	Count     int
 	Message   string
+	Truncated bool
 }
 
 type LogLine struct {
