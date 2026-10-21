@@ -185,6 +185,9 @@ func (r Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		r.w, r.h = msg.Width, msg.Height
 	case pickMsg:
+		if !r.pickAllowed(msg) {
+			return r, nil
+		}
 		return r.openPicker(msg.kind), nil
 	case choiceMsg:
 		if !r.attemptLive(msg.attempt) {
@@ -233,6 +236,15 @@ func (r Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		r.publish()
 	}
 	return r, cmd
+}
+
+func (r Root) pickAllowed(msg pickMsg) bool {
+	if msg.loader {
+		l, ok := r.cur.(Loader)
+		return ok && l.attempt == msg.attempt && l.err != nil
+	}
+	m, ok := r.model()
+	return ok && r.published == r.attempt && m.session.Generation == msg.session
 }
 
 func (r Root) openPicker(kind pickKind) Root {

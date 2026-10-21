@@ -18,10 +18,15 @@ const (
 	pickNamespace
 )
 
-type pickMsg struct{ kind pickKind }
+type pickMsg struct {
+	kind    pickKind
+	session uint64
+	attempt uint64
+	loader  bool
+}
 
-func requestPick(kind pickKind) tea.Cmd {
-	return func() tea.Msg { return pickMsg{kind: kind} }
+func requestPick(kind pickKind, session uint64) tea.Cmd {
+	return func() tea.Msg { return pickMsg{kind: kind, session: session} }
 }
 
 type choice int

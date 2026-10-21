@@ -280,9 +280,9 @@ func (m Model) routeKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 			m.activateScreen(ScreenEvents)
 			return m, nil
 		case key.Matches(msg, k.Context):
-			return m, requestPick(pickContext)
+			return m, requestPick(pickContext, m.session.Generation)
 		case key.Matches(msg, k.Namespace):
-			return m, requestPick(pickNamespace)
+			return m, requestPick(pickNamespace, m.session.Generation)
 		case key.Matches(msg, k.Esc):
 			m.handleEsc()
 			return m, nil
@@ -332,9 +332,9 @@ func (m Model) headerClick(ms tea.Mouse) tea.Cmd {
 	}
 	switch ui.HeaderTargetAt(m.headerState(), m.layout.Header.W, ms.X-m.layout.Header.X) {
 	case ui.HeaderContext:
-		return requestPick(pickContext)
+		return requestPick(pickContext, m.session.Generation)
 	case ui.HeaderNamespace:
-		return requestPick(pickNamespace)
+		return requestPick(pickNamespace, m.session.Generation)
 	}
 	return nil
 }

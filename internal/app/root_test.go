@@ -527,3 +527,35 @@ func TestRootRepeatedSwitchDoesNotLeak(t *testing.T) {
 	closedOnce(t, f.all()...)
 	eventually(t, "goroutines back to the baseline", func() bool { return runtime.NumGoroutine() <= baseline+4 })
 }
+
+func TestRootRejectsStalePickRequests(t *testing.T) {
+	f := newFakeCluster()
+	d := newRootDriver(t, f, data.Target{Context: "alpha"})
+	d.until("initial", connectedTo("alpha", ""))
+	m, _ := d.r.model()
+	_, fromAlpha := m.Update(keyPress("c"))
+	_, nsFromAlpha := m.Update(keyPress("n"))
+	if fromAlpha == nil || nsFromAlpha == nil {
+		t.Fatal("c and n request pickers")
+	}
+	d.pickTarget(pickContext, "beta")
+	d.until("beta", connectedTo("beta", "default"))
+	d.dispatch(fromAlpha())
+	d.dispatch(nsFromAlpha())
+	if d.r.pick != nil {
+		t.Fatal("a picker request from an older session is rejected")
+	}
+
+	f.setFail("gamma", errors.New("negado"))
+	d.pickTarget(pickContext, "gamma")
+	d.until("gamma fails", failed)
+	_, fromFailure := d.r.cur.(Loader).Update(keyPress("c"))
+	d.press("r")
+	d.until("retry fails", func(r Root) bool { return failed(r) && r.cur.(Loader).attempt != 0 })
+	d.dispatch(fromFailure())
+	if d.r.pick != nil {
+		t.Fatal("a picker request from an older attempt is rejected")
+	}
+	d.press("c")
+	d.until("current attempt opens the picker", picking)
+}

@@ -487,7 +487,7 @@ func (l Loader) choose(key string) tea.Cmd {
 	case (key == "b" || key == "esc") && l.canBack():
 		return emit(choiceMsg{choice: choiceBack, attempt: attempt})
 	case key == "c":
-		return requestPick(pickContext)
+		return emit(pickMsg{kind: pickContext, attempt: attempt, loader: true})
 	case key == "q" || key == "esc":
 		return tea.Quit
 	}
