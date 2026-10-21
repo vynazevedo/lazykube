@@ -647,3 +647,49 @@ func TestRootPickerReceivesPaste(t *testing.T) {
 	d.press("enter")
 	d.until("pasted namespace", connectedTo("alpha", "ops-team"))
 }
+
+func (d *rootDriver) clickText(label string) {
+	d.t.Helper()
+	for y, line := range strings.Split(d.r.Render().Plain(), "\n") {
+		if i := strings.Index(line, label); i >= 0 {
+			d.send(tea.MouseClickMsg{X: len([]rune(line[:i])) + 1, Y: y, Button: tea.MouseLeft})
+			d.drain()
+			return
+		}
+	}
+	d.t.Fatalf("screen has no %q", label)
+}
+
+func TestRootFailureChoicesAreClickable(t *testing.T) {
+	f := newFakeCluster()
+	d := newRootDriver(t, f, data.Target{Context: "alpha"})
+	d.until("initial", connectedTo("alpha", ""))
+	f.setFail("beta", errors.New("negado"))
+	d.pickTarget(pickContext, "beta")
+	d.until("beta fails", failed)
+	if v := d.r.View(); v.MouseMode != tea.MouseModeCellMotion {
+		t.Fatal("the failure screen with choices reads the mouse")
+	}
+	attempt := d.r.attempt
+	d.clickText("r repetir")
+	d.until("retry by click", func(r Root) bool { return failed(r) && r.attempt == attempt+1 })
+	d.clickText("c escolher contexto")
+	d.until("picker by click", picking)
+	d.press("esc")
+	d.clickText("b voltar ao anterior")
+	d.until("back by click", connectedTo("alpha", ""))
+
+	f.setFail("gamma", errors.New("negado"))
+	d.pickTarget(pickContext, "gamma")
+	d.until("gamma fails", failed)
+	before := d.r.attempt
+	d.send(tea.MouseClickMsg{X: 0, Y: 0, Button: tea.MouseLeft})
+	d.drain()
+	if d.r.attempt != before || d.quit {
+		t.Fatal("a click away from the choices does nothing")
+	}
+	d.clickText("q sair")
+	if !d.quit {
+		t.Fatal("q sair quits by click")
+	}
+}

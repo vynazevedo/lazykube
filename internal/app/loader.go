@@ -273,6 +273,19 @@ func (l Loader) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return *l.main, nil
 		}
 		return l, l.tick()
+	case tea.MouseClickMsg:
+		if l.main != nil {
+			return l.forward(msg)
+		}
+		if l.choices && msg.Button == tea.MouseLeft {
+			if key, ok := l.hintAt(msg.X, msg.Y); ok {
+				if key == "ctrl+c" {
+					return l.Update(tea.KeyPressMsg{Code: 'c', Mod: tea.ModCtrl})
+				}
+				return l, l.choose(key)
+			}
+		}
+		return l, nil
 	case tea.KeyPressMsg:
 		if l.main != nil {
 			return l.forward(msg)
@@ -468,6 +481,19 @@ func (l Loader) View() tea.View {
 		v.ReportFocus = true
 	}
 	return v
+}
+
+func (l Loader) hintAt(x, y int) (string, bool) {
+	if l.w <= 0 || l.h <= 0 {
+		return "", false
+	}
+	c := draw.NewCanvas(l.w, l.h, theme.BgApp)
+	for _, s := range ui.Loading(c.Region(), l.state(), ui.Ctx{Pal: l.pal, Clock: l.clock}) {
+		if y == s.Y && x >= s.X && x < s.X+s.W {
+			return s.Key, true
+		}
+	}
+	return "", false
 }
 
 func (l Loader) canBack() bool {

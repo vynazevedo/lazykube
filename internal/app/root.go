@@ -364,7 +364,8 @@ func (r Root) View() tea.View {
 	v.AltScreen = true
 	v.BackgroundColor = theme.BgApp
 	v.WindowTitle = "lazykube"
-	if _, ok := r.model(); ok || r.pick != nil {
+	l, loading := r.cur.(Loader)
+	if _, ok := r.model(); ok || r.pick != nil || (loading && l.choices) {
 		v.MouseMode = tea.MouseModeCellMotion
 		v.ReportFocus = true
 	}
