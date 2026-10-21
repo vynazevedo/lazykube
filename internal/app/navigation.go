@@ -166,7 +166,7 @@ func (m *Model) activateScreen(id ScreenID) {
 func (m *Model) handleEsc() {
 	switch {
 	case m.onScreen(ScreenEvents) && m.ev.reading:
-		m.ev.reading = false
+		m.stopReadingEvent()
 	case m.tab == ui.TabLog && m.dg.search.Value() != "":
 		m.dg.search.SetValue("")
 		m.updateMatches()

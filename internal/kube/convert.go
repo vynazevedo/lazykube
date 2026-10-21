@@ -213,14 +213,17 @@ func toEvents(events []*corev1.Event, now time.Time, limit int) []data.Event {
 	}
 	out := make([]data.Event, len(sorted))
 	for i, e := range sorted {
+		message, truncated := clipTo(e.Message, data.EventPreviewBytes)
 		out[i] = data.Event{
+			UID:       string(e.UID),
 			Age:       age(metav1.NewTime(eventTime(e)), now),
 			Type:      sanitize(e.Type),
 			Reason:    sanitize(e.Reason),
 			Object:    sanitize(e.InvolvedObject.Kind + "/" + e.InvolvedObject.Name),
 			Namespace: sanitize(e.Namespace),
 			Count:     eventCount(e),
-			Message:   clip(e.Message),
+			Message:   message,
+			Truncated: truncated,
 		}
 	}
 	return out
