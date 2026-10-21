@@ -203,3 +203,31 @@ func TestRunSigintDuringLoadingExitsCancelled(t *testing.T) {
 		t.Fatal("deferred shutdown must cancel the connection")
 	}
 }
+
+func TestReadWriteRequiresExplicitProcessFlag(t *testing.T) {
+	for _, tc := range []struct {
+		args   []string
+		writes bool
+	}{{nil, false}, {[]string{"--read-write"}, true}, {[]string{"--read-write=false"}, false}} {
+		f, err := parseFlags(tc.args, &bytes.Buffer{})
+		if err != nil {
+			t.Fatal(err)
+		}
+		var options kube.ConnectOptions
+		connect := func(_ context.Context, o kube.ConnectOptions) (data.Source, func(), error) {
+			options = o
+			return data.NewDemo(), func() {}, nil
+		}
+		_, _, err = clusterConnector(f, connect)(context.Background(), func(data.Progress) {})
+		if err != nil || options.AllowWrites != tc.writes {
+			t.Fatal(options.AllowWrites, err)
+		}
+		env, err := options.ResolveEnvironment("prod")
+		if err != nil || !env.Protected {
+			t.Fatal(env, err)
+		}
+	}
+	if _, err := parseFlags([]string{"--read-only=false"}, &bytes.Buffer{}); err == nil {
+		t.Fatal("legacy write opt-out accepted")
+	}
+}
