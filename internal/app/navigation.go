@@ -330,7 +330,7 @@ func (m Model) headerClick(ms tea.Mouse) tea.Cmd {
 	if ms.Button != tea.MouseLeft || m.layout.TooSmall || m.helpOpen || m.menu.open || !m.layout.Header.Contains(ms.X, ms.Y) {
 		return nil
 	}
-	switch ui.HeaderTargetAt(m.headerState(), ms.X-m.layout.Header.X) {
+	switch ui.HeaderTargetAt(m.headerState(), m.layout.Header.W, ms.X-m.layout.Header.X) {
 	case ui.HeaderContext:
 		return requestPick(pickContext)
 	case ui.HeaderNamespace:

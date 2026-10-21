@@ -387,7 +387,7 @@ func TestRootPickerInputAndCancel(t *testing.T) {
 	}
 	hs := m.headerState()
 	for x := range 160 {
-		if ui.HeaderTargetAt(hs, x) == ui.HeaderNamespace {
+		if ui.HeaderTargetAt(hs, m.layout.Header.W, x) == ui.HeaderNamespace {
 			click(x + m.layout.Header.X)
 			break
 		}
