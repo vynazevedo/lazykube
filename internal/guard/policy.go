@@ -57,7 +57,7 @@ func (p Policy) Mode(s Session) Mode {
 	return Mode{ReadOnly: !p.allowWrites || s.Environment.ReadOnly || s.Environment.Protected, Protected: s.Environment.Protected, ConfigValid: true}
 }
 func DefaultEnvironment(name string) Environment {
-	return Environment{Valid: name != "", Protected: strings.Contains(strings.ToLower(name), "prod")}
+	return Environment{Valid: name != ""}
 }
 
 type Target struct{ Group, Version, Resource, Namespace, Name, UID, ResourceVersion string }
@@ -94,7 +94,7 @@ func (p Policy) Evaluate(s Session, r Request) (Decision, error) {
 	if s.Context == "" || s.Identity == "" || s.Generation == 0 || t.Version == "" || t.Resource == "" || t.Name == "" || t.UID == "" || t.ResourceVersion == "" || strings.Contains(t.Resource, "/") || strings.ContainsAny(t.Name, "/\\") || s.Namespace != "" && t.Namespace != s.Namespace {
 		return d, Invalid
 	}
-	if t.Resource == "nodes" {
+	if !SupportsAction(r.Action, t) {
 		return d, Unsupported
 	}
 	switch r.Action {
@@ -138,6 +138,9 @@ func (p Policy) Evaluate(s Session, r Request) (Decision, error) {
 }
 
 func Requirements(r Request) []Access {
+	if !SupportsAction(r.Action, r.Target) {
+		return nil
+	}
 	t := r.Target
 	a := Access{Group: t.Group, Version: t.Version, Resource: t.Resource, Namespace: t.Namespace, Name: t.Name, Verb: "get"}
 	write := a
