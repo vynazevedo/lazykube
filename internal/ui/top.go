@@ -23,9 +23,13 @@ const (
 func TopTab(r draw.Region, st DetailsState, ctx Ctx) {
 	m := st.Metrics
 	p := st.Pod
+	cpu := "n/a"
+	if m.Available && m.CPUKnown {
+		cpu = fmt.Sprintf("%dm", m.CPUNow)
+	}
 	title := draw.Line{
 		muted("CPU"),
-		bold(fmt.Sprintf(" %dm", m.CPUNow), ctx.Pal.C),
+		bold(" "+cpu, ctx.Pal.C),
 		muted(fmt.Sprintf(" req %dm · lim %dm", p.CPURequest, p.CPULimit)),
 	}
 	r.Line(0, 0, title)
@@ -40,6 +44,8 @@ func TopTab(r draw.Region, st DetailsState, ctx Ctx) {
 	switch {
 	case !m.Available:
 		centered(chart, reasonOr(m.Reason, metricsDown))
+	case !m.CPUKnown:
+		centered(chart, "sem amostra atual de CPU")
 	default:
 		CPUChart(chart, m.CPU, float64(p.CPURequest), ctx)
 		if len(m.CPU) < 2 {

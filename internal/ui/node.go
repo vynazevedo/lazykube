@@ -131,7 +131,7 @@ func NodePanel(r draw.Region, st NodeState, ctx Ctx) {
 	n := st.Node
 	ready, readyColor := "NotReady", theme.Err
 	switch {
-	case n.Coverage.State != "" && n.Coverage.State != data.CoverageComplete:
+	case !n.ReadyKnown || n.Coverage.State != "" && n.Coverage.State != data.CoverageComplete:
 		ready, readyColor = "Unknown", theme.Muted
 	case n.Ready:
 		ready, readyColor = "Ready", theme.OK

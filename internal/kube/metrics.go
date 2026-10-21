@@ -49,6 +49,7 @@ type podSeries struct {
 	uid              string
 	cpu, mem, rx, tx []float64
 	sampledAt        time.Time
+	cpuKnown         bool
 	prevRX, prevTX   uint64
 	prevAt           time.Time
 	netAt            time.Time
@@ -219,10 +220,16 @@ func (s *Source) pollMetrics(ctx context.Context) {
 	}
 	samples := make(map[string]sample, len(pms.Items))
 	for _, pm := range pms.Items {
+		known := len(pm.Containers) > 0
 		var c, m int64
 		for _, ct := range pm.Containers {
+			_, present := ct.Usage[corev1.ResourceCPU]
+			known = known && present
 			c += ct.Usage.Cpu().MilliValue()
 			m += ct.Usage.Memory().Value()
+		}
+		if !known {
+			continue
 		}
 		samples[podKey(pm.Namespace, pm.Name)] = sample{cpu: float64(c), mem: float64(m >> 20), at: pm.Timestamp.Time}
 	}
@@ -242,12 +249,16 @@ func (s *Source) pollMetrics(ctx context.Context) {
 	u := &s.usage
 	u.ok, u.reason = true, ""
 	changed := false
+	for _, ps := range u.pods {
+		ps.cpuKnown = false
+	}
 	for key, sm := range samples {
 		p := s.byKey[key]
 		if p == nil || (!sm.at.IsZero() && sm.at.Before(p.CreationTimestamp.Time)) {
 			continue
 		}
 		ps := u.series(key, string(p.UID))
+		ps.cpuKnown = sm.at.IsZero() || !sm.at.Before(ps.sampledAt)
 		if !sm.at.IsZero() && !sm.at.After(ps.sampledAt) {
 			continue
 		}
@@ -417,6 +428,7 @@ func (s *Source) Metrics(_ int, key string, heatCols int) data.Metrics {
 		m.CPU = tailCopy(ps.cpu, cpuWindow)
 		m.Samples = len(m.CPU)
 		m.CPUNow = int(last(ps.cpu))
+		m.CPUKnown = u.ok && ps.cpuKnown && len(ps.cpu) > 0
 		m.Mem = tailCopy(ps.mem, sparkWindow)
 		m.MemNow = int(last(ps.mem))
 		m.MemMax = math.Max(maxOf(m.Mem), 1)

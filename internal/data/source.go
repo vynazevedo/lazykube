@@ -64,6 +64,7 @@ type Node struct {
 	Name        string
 	Address     string
 	Ready       bool
+	ReadyKnown  bool
 	MemUsed     string
 	MemTotal    string
 	MemFraction float64
@@ -152,6 +153,7 @@ type Metrics struct {
 	PodCPU       map[string]int
 	CPU          []float64
 	CPUNow       int
+	CPUKnown     bool
 	Mem          []float64
 	MemNow       int
 	RX           []float64

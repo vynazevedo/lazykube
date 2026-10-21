@@ -132,13 +132,13 @@ func nodeAddress(n *corev1.Node) string {
 	return "-"
 }
 
-func nodeReady(n *corev1.Node) bool {
+func nodeReady(n *corev1.Node) (bool, bool) {
 	for _, c := range n.Status.Conditions {
 		if c.Type == corev1.NodeReady {
-			return c.Status == corev1.ConditionTrue
+			return c.Status == corev1.ConditionTrue, c.Status == corev1.ConditionTrue || c.Status == corev1.ConditionFalse
 		}
 	}
-	return false
+	return false, false
 }
 
 func toNode(n *corev1.Node, pods int, memUsed int64, memKnown bool) data.Node {
@@ -147,10 +147,12 @@ func toNode(n *corev1.Node, pods int, memUsed int64, memKnown bool) data.Node {
 		alloc = n.Status.Capacity
 	}
 	memTotal := alloc.Memory().Value()
+	ready, readyKnown := nodeReady(n)
 	out := data.Node{
 		Name:        n.Name,
 		Address:     nodeAddress(n),
-		Ready:       nodeReady(n),
+		Ready:       ready,
+		ReadyKnown:  readyKnown,
 		MemUsed:     "n/a",
 		MemTotal:    formatBytes(memTotal),
 		Pods:        pods,
