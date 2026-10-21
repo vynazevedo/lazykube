@@ -2,6 +2,7 @@ package app
 
 import (
 	tea "charm.land/bubbletea/v2"
+	"github.com/vynazevedo/lazykube/internal/guard"
 
 	"github.com/vynazevedo/lazykube/internal/draw"
 	"github.com/vynazevedo/lazykube/internal/theme"
@@ -20,7 +21,11 @@ func (m Model) Render() *draw.Canvas {
 		return c
 	}
 	ctx := ui.Ctx{Pal: m.pal, Clock: m.clock}
-	ui.Header(region(screen, m.layout.Header), ui.HeaderState{Synthetic: m.snap.Synthetic, Cluster: m.snap.Cluster, MetricsOK: m.metrics.Available, SecurityAlerts: len(m.securitySession.Alerts)}, ctx)
+	mode := guard.Mode{ReadOnly: true, ConfigValid: true}
+	if source, ok := m.src.(interface{ AccessMode() guard.Mode }); ok {
+		mode = source.AccessMode()
+	}
+	ui.Header(region(screen, m.layout.Header), ui.HeaderState{ReadOnly: mode.ReadOnly, Protected: mode.Protected, Synthetic: m.snap.Synthetic, Cluster: m.snap.Cluster, MetricsOK: m.metrics.Available, SecurityAlerts: len(m.securitySession.Alerts)}, ctx)
 
 	ui.Menu(region(screen, m.layout.Menu), ui.MenuState{Items: m.menuItems(), Active: m.menuActive(), Cursor: m.menu.cursor, Focused: m.menu.open}, ctx)
 	ui.Breadcrumbs(region(screen, m.layout.Crumbs), crumbLabels(m.crumbs()), ctx)

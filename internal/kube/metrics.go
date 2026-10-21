@@ -320,6 +320,10 @@ func metricsReason(err error) string {
 }
 
 func (s *Source) pollNetwork(parent context.Context) {
+	if s.opts.DisableNetwork {
+		return
+	}
+
 	now := s.opts.Now()
 	s.mu.RLock()
 	node := s.displayNodeLocked()
@@ -472,6 +476,9 @@ func (s *Source) staleReasonLocked(p *corev1.Pod, ps *podSeries) (string, bool) 
 }
 
 func (s *Source) netReasonLocked(p *corev1.Pod, ps *podSeries) string {
+	if s.opts.DisableNetwork {
+		return "disabled by policy"
+	}
 	if !s.caps.nodes {
 		return reasonNodesDeny
 	}

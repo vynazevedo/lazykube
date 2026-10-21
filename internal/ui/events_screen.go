@@ -24,9 +24,16 @@ type EventsScreenState struct {
 	Reading    bool
 	MsgScroll  int
 	Selectable bool
+	Held       *data.Event
+	Gone       bool
+	Detail     *data.EventMessage
+	Expandable bool
 }
 
 func (st EventsScreenState) Selected() *data.Event {
+	if st.Gone && st.Held != nil {
+		return st.Held
+	}
 	if !st.Selectable || st.Cursor < 0 || st.Cursor >= len(st.Feed.Items) {
 		return nil
 	}
@@ -197,14 +204,18 @@ func EventsTable(r draw.Region, st EventsScreenState, ctx Ctx) {
 		for i := 0; i < rows && off+i < len(feed.Items); i++ {
 			idx := off + i
 			style := func(c theme.RGB) draw.Style { return draw.Fg(c) }
-			if idx == st.Cursor {
+			if !st.Gone && idx == st.Cursor {
 				style = func(c theme.RGB) draw.Style { return draw.Fg(c).WithBg(theme.BorderFaint).WithBold() }
 			}
-			body.Line(0, i, eventsRow(cols, inner.W, feed.Items[idx], idx == st.Cursor, style).Truncate(inner.W))
+			body.Line(0, i, eventsRow(cols, inner.W, feed.Items[idx], !st.Gone && idx == st.Cursor, style).Truncate(inner.W))
 		}
 	}
 	if inner.H > rows+EventsTableTop {
-		inner.Line(0, inner.H-1, draw.Line{faint(fmt.Sprintf("%d eventos · enter abre a mensagem completa, sem resolver o objeto pelo texto", len(feed.Items)))}.Truncate(inner.W))
+		hint := "enter abre a mensagem completa"
+		if !st.Expandable {
+			hint = "enter abre a mensagem recebida"
+		}
+		inner.Line(0, inner.H-1, draw.Line{faint(fmt.Sprintf("%d eventos · %s, sem resolver o objeto pelo texto", len(feed.Items), hint))}.Truncate(inner.W))
 	}
 }
 
@@ -213,21 +224,59 @@ func EventMessageLines(st EventsScreenState, width int) []draw.Line {
 	if e == nil {
 		return []draw.Line{{faint("nenhum evento selecionado")}}
 	}
-	lines := []draw.Line{
+	var lines []draw.Line
+	if st.Gone {
+		lines = append(lines, draw.Line{colored("evento não está mais no feed; exibindo a última leitura", theme.Warn)})
+	}
+	lines = append(lines, []draw.Line{
 		{muted("Evento: "), text(draw.Sanitize(e.Type + " " + e.Reason)), faint(" · "), text(draw.Sanitize(e.Object))},
 		{muted("Namespace: "), text(draw.Sanitize(e.Namespace)), faint(" · "), muted("count "), text(fmt.Sprintf("%d", e.Count)), faint(" · "), muted("idade "), text(draw.Sanitize(e.Age))},
 		nil,
-	}
-	for _, l := range draw.Wrap(draw.Sanitize(e.Message), max(1, width)) {
+	}...)
+	body, note := eventMessageBody(st, e)
+	for _, l := range draw.Wrap(draw.Sanitize(body), max(1, width)) {
 		lines = append(lines, draw.Line{text(l)})
+	}
+	if note != "" {
+		lines = append(lines, draw.Line{colored(note, theme.Warn)})
 	}
 	return append(lines, nil, draw.Line{faint("Navegação ao recurso por referência tipada: fase futura")})
 }
 
+func eventMessageBody(st EventsScreenState, e *data.Event) (string, string) {
+	switch {
+	case st.Detail != nil && st.Detail.Truncated:
+		return st.Detail.Text, fmt.Sprintf("mensagem truncada no teto de %d KiB", data.EventMessageBytes>>10)
+	case st.Detail != nil:
+		return st.Detail.Text, ""
+	case !e.Truncated:
+		return e.Message, ""
+	case st.Expandable && st.Reading:
+		return e.Message, "prévia truncada; texto completo fora do cache de eventos"
+	case st.Expandable:
+		return e.Message, "prévia truncada; enter carrega o texto completo"
+	}
+	return e.Message, fmt.Sprintf("mensagem truncada em %d bytes pela fonte", data.EventPreviewBytes)
+}
+
+func messageComplete(st EventsScreenState) bool {
+	e := st.Selected()
+	if e == nil {
+		return true
+	}
+	if st.Detail != nil {
+		return !st.Detail.Truncated
+	}
+	return !e.Truncated
+}
+
 func EventMessagePanel(r draw.Region, st EventsScreenState, ctx Ctx) {
 	title := "Mensagem completa"
+	if !messageComplete(st) {
+		title = "Mensagem truncada"
+	}
 	if st.Reading {
-		title = "Mensagem completa · focus"
+		title += " · focus"
 	}
 	inner := Panel(r, title, st.Reading, ctx).Inset(1, 0, 1, 0)
 	if inner.Empty() {

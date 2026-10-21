@@ -24,6 +24,7 @@ import (
 	metricsclient "k8s.io/metrics/pkg/client/clientset/versioned"
 
 	"github.com/vynazevedo/lazykube/internal/data"
+	"github.com/vynazevedo/lazykube/internal/guard"
 	"github.com/vynazevedo/lazykube/internal/insight"
 )
 
@@ -38,12 +39,13 @@ const (
 var ErrSyncTimeout = errors.New("timed out waiting for the cluster cache to sync")
 
 type Options struct {
-	Context     string
-	Namespace   string
-	SyncTimeout time.Duration
-	Now         func() time.Time
-	Location    *time.Location
-	Progress    func(data.Progress)
+	DisableNetwork bool
+	Context        string
+	Namespace      string
+	SyncTimeout    time.Duration
+	Now            func() time.Time
+	Location       *time.Location
+	Progress       func(data.Progress)
 }
 
 type caps struct {
@@ -55,6 +57,9 @@ type caps struct {
 }
 
 type Source struct {
+	guardSession       guard.Session
+	guardPolicy        guard.Policy
+	actions            *guard.Executor
 	rebuildMu          sync.Mutex
 	observations       *insight.Inventory
 	observationPods    map[string]insight.PodObservation

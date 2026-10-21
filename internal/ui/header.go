@@ -11,6 +11,8 @@ import (
 var Version = "v2.0"
 
 type HeaderState struct {
+	ReadOnly       bool
+	Protected      bool
 	Synthetic      bool
 	Cluster        data.Cluster
 	MetricsOK      bool
@@ -28,6 +30,12 @@ func Header(r draw.Region, st HeaderState, ctx Ctx) {
 	x += len(logo)
 	if st.Synthetic {
 		x += r.Text(x, 0, " [DEMO]", draw.Fg(theme.Warn).WithBold())
+	}
+	if st.ReadOnly {
+		x += r.Text(x, 0, " [RO]", draw.Fg(theme.Warn).WithBold())
+	}
+	if st.Protected {
+		x += r.Text(x, 0, " [PROTECTED]", draw.Fg(theme.Err).WithBold())
 	}
 	x += r.Line(x, 0, draw.Line{muted("  " + Version + "  ")})
 
