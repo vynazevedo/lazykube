@@ -12,21 +12,21 @@
                                                                                                                                                                 
                                    ╭─ Help ────────────────────────────────────────────────────────────────────────────────╮                                    
                                    │                                                                                       │                                    
-                                   │  ↑/↓ k/j    move selection                 pgup/pgdn  scroll viewport                 │                                    
-                                   │  tab        next panel                     home/end   top / bottom                    │                                    
-                                   │  shift+tab  previous panel                 g G        top / bottom (details)          │                                    
-                                   │  /          filter pods                    f          toggle follow (Log)             │                                    
-                                   │  enter      open pod / namespace scope     w          toggle wrap (Log)               │                                    
-                                   │  esc        clear search/filter, back      C          next log container              │                                    
-                                   │  m          screens menu ← → enter         P          current / previous logs         │                                    
-                                   │  2          Dashboard screen               / n N      search Log (details focus)      │                                    
-                                   │  3          Workloads screen               E          events pod / ns / cluster       │                                    
-                                   │  4          Nodes screen                   p          cycle palette                   │                                    
-                                   │  6          Events screen                  1          toggle left column              │                                    
-                                   │  l c t d e  Log Config Top Describe Events ctrl+p     pause animations                │                                    
+                                   │  ↑/↓ k/j    move selection                 [ ]        previous / next tab, Config     │                                    
+                                   │  tab        next panel                     pgup/pgdn  scroll viewport                 │                                    
+                                   │  shift+tab  previous panel                 home/end   top / bottom                    │                                    
+                                   │  /          filter pods                    g G        top / bottom (details)          │                                    
+                                   │  enter      open pod / namespace scope     f          toggle follow (Log)             │                                    
+                                   │  esc        clear search/filter, back      w          toggle wrap (Log)               │                                    
+                                   │  m          screens menu ← → enter         C          next log container              │                                    
+                                   │  2          Dashboard screen               P          current / previous logs         │                                    
+                                   │  3          Workloads screen               / alt+n N  search Log (details focus)      │                                    
+                                   │  4          Nodes screen                   E          events pod / ns / cluster       │                                    
+                                   │  6          Events screen                  p          cycle palette                   │                                    
+                                   │  c n        switch context / namespace     1          toggle left column              │                                    
+                                   │  l t d e    Log Top Describe Events        ctrl+p     pause animations                │                                    
                                    │  S          Security / namespace posture   ?          toggle help                     │                                    
                                    │  A          ack all Security alerts        q ctrl+c   quit                            │                                    
-                                   │  [ ]        previous / next tab                                                       │                                    
                                    │  Security score v2: max(0,100-40H-6M-I), per pod and dimension.                       │                                    
                                    │  Each rule once at worst severity; Security and Hygiene are separate.                 │                                    
                                    │  Scope: mean, median, lowest ceil(N/10) mean. SEC = Security; p = partial.            │                                    

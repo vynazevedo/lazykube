@@ -14,7 +14,7 @@ func topText(st DetailsState) string {
 
 func TestTopTabShowsCollectingProgress(t *testing.T) {
 	st := demoDetails(TabTop)
-	st.Metrics = data.Metrics{Available: true, CPU: []float64{12}, Samples: 1, Window: 60, NetReason: "coletando amostras"}
+	st.Metrics = data.Metrics{Available: true, CPUKnown: true, CPU: []float64{12}, Samples: 1, Window: 60, NetReason: "coletando amostras"}
 	out := topText(st)
 	for _, want := range []string{"coletando amostras 1/60", "coletando 1/60", "Network coletando amostras"} {
 		if !strings.Contains(out, want) {

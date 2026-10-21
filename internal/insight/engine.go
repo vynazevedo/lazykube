@@ -110,6 +110,7 @@ func (e *Engine) Step(batch ObservationBatch) SignalSnapshot {
 			}
 		}
 		e.pods = nil
+		e.ruleTotals = nil
 	}
 	if gap && !same {
 		e.cursor = batch.Cursor

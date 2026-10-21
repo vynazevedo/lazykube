@@ -218,6 +218,7 @@ func (m *Model) cycleScope() {
 	m.dg.scope = m.dg.scope.Next()
 	m.scroll = 0
 	m.refreshEvents(m.detailTarget())
+	m.trackClusterFeed()
 }
 
 func (m Model) searchActive() bool {

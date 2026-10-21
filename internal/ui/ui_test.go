@@ -115,7 +115,9 @@ func TestPanelGoldens(t *testing.T) {
 		Footer(r.Sub(0, 0, 160, 1), r.Sub(0, 1, 160, 1), FooterState{FPS: 30})
 	}))
 	check(t, "help", canvas(160, 48, func(r draw.Region) { HelpOverlay(r, FullHelp(), ctx) }))
-	check(t, "too_small", canvas(100, 30, func(r draw.Region) { TooSmall(r, 100, 30) }))
+	check(t, "too_small", canvas(100, 30, func(r draw.Region) {
+		TooSmall(r, SmallState{W: 100, H: 30, MinW: 120, MinH: 36, Cluster: data.Cluster{Context: "demo"}, Pods: 13, Namespaces: 8}, fixedCtx())
+	}))
 }
 
 func TestFocusedBorderIsGradient(t *testing.T) {

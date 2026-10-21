@@ -398,6 +398,9 @@ func (s *Source) Changes() <-chan struct{} {
 
 func (s *Source) Close() {
 	s.closeOnce.Do(func() {
+		if s.actions != nil {
+			s.actions.Close()
+		}
 		s.cancel()
 		s.mu.Lock()
 		if s.stream != nil {
@@ -545,6 +548,7 @@ func (s *Source) rebuild() {
 			Pods:       len(outPods),
 			Uptime:     uptime,
 			Namespace:  s.opts.Namespace,
+			Listed:     s.nsInf != nil,
 		},
 		Pods:        outPods,
 		Deployments: outDeploys,

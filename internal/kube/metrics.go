@@ -46,12 +46,13 @@ const (
 )
 
 type podSeries struct {
-	uid              string
-	cpu, mem, rx, tx []float64
-	sampledAt        time.Time
-	prevRX, prevTX   uint64
-	prevAt           time.Time
-	netAt            time.Time
+	uid                string
+	cpu, mem, rx, tx   []float64
+	cpuAt, memAt       time.Time
+	cpuKnown, memKnown bool
+	prevRX, prevTX     uint64
+	prevAt             time.Time
+	netAt              time.Time
 }
 
 type netState struct {
@@ -214,25 +215,35 @@ func (s *Source) pollMetrics(ctx context.Context) {
 		return
 	}
 	type sample struct {
-		cpu, mem float64
-		at       time.Time
+		cpu, mem           float64
+		cpuKnown, memKnown bool
+		at                 time.Time
 	}
 	samples := make(map[string]sample, len(pms.Items))
 	for _, pm := range pms.Items {
+		cpuKnown, memKnown := len(pm.Containers) > 0, len(pm.Containers) > 0
 		var c, m int64
 		for _, ct := range pm.Containers {
+			_, cpuPresent := ct.Usage[corev1.ResourceCPU]
+			_, memPresent := ct.Usage[corev1.ResourceMemory]
+			cpuKnown = cpuKnown && cpuPresent
+			memKnown = memKnown && memPresent
 			c += ct.Usage.Cpu().MilliValue()
 			m += ct.Usage.Memory().Value()
 		}
-		samples[podKey(pm.Namespace, pm.Name)] = sample{cpu: float64(c), mem: float64(m >> 20), at: pm.Timestamp.Time}
+		samples[podKey(pm.Namespace, pm.Name)] = sample{cpu: float64(c), mem: float64(m >> 20), at: pm.Timestamp.Time, cpuKnown: cpuKnown, memKnown: memKnown}
 	}
 	nodeCPU := map[string]int64{}
 	nodeMem := map[string]int64{}
 	if s.caps.nodes {
 		if nms, err := s.metrics.MetricsV1beta1().NodeMetricses().List(ctx, metav1.ListOptions{}); err == nil {
 			for _, nm := range nms.Items {
-				nodeCPU[nm.Name] = nm.Usage.Cpu().MilliValue()
-				nodeMem[nm.Name] = nm.Usage.Memory().Value()
+				if cpu, ok := nm.Usage[corev1.ResourceCPU]; ok {
+					nodeCPU[nm.Name] = cpu.MilliValue()
+				}
+				if mem, ok := nm.Usage[corev1.ResourceMemory]; ok {
+					nodeMem[nm.Name] = mem.Value()
+				}
 			}
 		}
 	}
@@ -242,19 +253,27 @@ func (s *Source) pollMetrics(ctx context.Context) {
 	u := &s.usage
 	u.ok, u.reason = true, ""
 	changed := false
+	for _, ps := range u.pods {
+		ps.cpuKnown, ps.memKnown = false, false
+	}
 	for key, sm := range samples {
 		p := s.byKey[key]
 		if p == nil || (!sm.at.IsZero() && sm.at.Before(p.CreationTimestamp.Time)) {
 			continue
 		}
 		ps := u.series(key, string(p.UID))
-		if !sm.at.IsZero() && !sm.at.After(ps.sampledAt) {
-			continue
+		ps.cpuKnown = sm.cpuKnown && (sm.at.IsZero() || !sm.at.Before(ps.cpuAt))
+		ps.memKnown = sm.memKnown && (sm.at.IsZero() || !sm.at.Before(ps.memAt))
+		if ps.cpuKnown && (sm.at.IsZero() || sm.at.After(ps.cpuAt)) {
+			ps.cpuAt = sm.at
+			ps.cpu = push(ps.cpu, sm.cpu)
+			changed = true
 		}
-		ps.sampledAt = sm.at
-		ps.cpu = push(ps.cpu, sm.cpu)
-		ps.mem = push(ps.mem, sm.mem)
-		changed = true
+		if ps.memKnown && (sm.at.IsZero() || sm.at.After(ps.memAt)) {
+			ps.memAt = sm.at
+			ps.mem = push(ps.mem, sm.mem)
+			changed = true
+		}
 	}
 	if changed {
 		u.version++
@@ -403,7 +422,7 @@ func (s *Source) Metrics(_ int, key string, heatCols int) data.Metrics {
 		}
 	}
 	for k := range u.pods {
-		if ps := u.live(k, s.byKey[k]); ps != nil && len(ps.cpu) > 0 {
+		if ps := u.live(k, s.byKey[k]); ps != nil && u.ok && ps.cpuKnown && len(ps.cpu) > 0 {
 			m.PodCPU[k] = int(last(ps.cpu))
 		}
 	}
@@ -421,8 +440,10 @@ func (s *Source) Metrics(_ int, key string, heatCols int) data.Metrics {
 		m.CPU = tailCopy(ps.cpu, cpuWindow)
 		m.Samples = len(m.CPU)
 		m.CPUNow = int(last(ps.cpu))
+		m.CPUKnown = u.ok && ps.cpuKnown && len(ps.cpu) > 0
 		m.Mem = tailCopy(ps.mem, sparkWindow)
 		m.MemNow = int(last(ps.mem))
+		m.MemKnown = u.ok && ps.memKnown && len(ps.mem) > 0
 		m.MemMax = math.Max(maxOf(m.Mem), 1)
 		if _, _, _, lim := resources(p); lim > 0 {
 			m.MemMax = float64(lim)

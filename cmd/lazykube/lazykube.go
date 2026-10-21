@@ -5,7 +5,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"github.com/vynazevedo/lazykube/internal/guard"
 	"io"
 	"os"
 	"strings"
@@ -14,6 +13,7 @@ import (
 
 	"github.com/vynazevedo/lazykube/internal/app"
 	"github.com/vynazevedo/lazykube/internal/data"
+	"github.com/vynazevedo/lazykube/internal/guard"
 	"github.com/vynazevedo/lazykube/internal/kube"
 	"github.com/vynazevedo/lazykube/internal/theme"
 )
@@ -31,6 +31,12 @@ type flags struct {
 	noAnim            bool
 	fps               int
 }
+
+var (
+	quietStderr  = silenceStderr
+	buildModel   = newModel
+	errIsolation = errors.New("não foi possível isolar o stderr dos plugins de autenticação")
+)
 
 type connector func(ctx context.Context, opts kube.ConnectOptions) (data.Source, func(), error)
 
@@ -82,30 +88,50 @@ func baseOptions(f flags) (app.Options, error) {
 	return app.Options{Palette: pal, FPS: f.fps, NoAnim: f.noAnim}, nil
 }
 
-func clusterConnector(f flags, connect connector) app.Connector {
+func listed(csv, name string) bool {
+	for _, item := range strings.Split(csv, ",") {
+		if strings.TrimSpace(item) == name {
+			return true
+		}
+	}
+	return false
+}
+
+func environmentFor(f flags) func(string) (guard.Environment, error) {
+	return func(name string) (guard.Environment, error) {
+		env := guard.DefaultEnvironment(name)
+		env.Protected = listed(f.protectedContexts, name)
+		env.ReadOnly = listed(f.readOnlyContexts, name)
+		return env, nil
+	}
+}
+
+func clusterConnector(f flags, t data.Target, connect connector) app.Connector {
 	return func(ctx context.Context, report func(data.Progress)) (data.Source, func(), error) {
 		return connect(ctx, kube.ConnectOptions{
-			AllowWrites: f.readWrite,
-			AuditPath:   f.auditPath,
-			ResolveEnvironment: func(name string) (guard.Environment, error) {
-				env := guard.DefaultEnvironment(name)
-				for _, context := range strings.Split(f.protectedContexts, ",") {
-					if strings.TrimSpace(context) == name {
-						env.Protected = true
-					}
-				}
-				for _, context := range strings.Split(f.readOnlyContexts, ",") {
-					if strings.TrimSpace(context) == name {
-						env.ReadOnly = true
-					}
-				}
-				return env, nil
-			},
-			Kubeconfig: f.kubeconfig,
-			Context:    f.context,
-			Namespace:  f.namespace,
-			Progress:   report,
+			AllowWrites:        f.readWrite,
+			AuditPath:          f.auditPath,
+			ResolveEnvironment: environmentFor(f),
+			Kubeconfig:         f.kubeconfig,
+			Context:            t.Context,
+			Namespace:          t.Namespace,
+			Progress:           report,
 		})
+	}
+}
+
+func demoConnector(t data.Target) app.Connector {
+	return func(ctx context.Context, report func(data.Progress)) (data.Source, func(), error) {
+		if _, ok := data.DemoContexts().Find(t.Context); !ok {
+			return nil, nil, data.NewPublicError(fmt.Sprintf("contexto sintético %q desconhecido", t.Context))
+		}
+		for _, s := range data.Stages() {
+			report(data.Progress{Stage: s, Done: true, Context: t.Context})
+		}
+		if err := ctx.Err(); err != nil {
+			return nil, nil, err
+		}
+		return data.NewDemoScoped(t.Context, t.Namespace), func() {}, nil
 	}
 }
 
@@ -116,17 +142,25 @@ func newModel(f flags, connect connector) (tea.Model, func(), error) {
 	}
 	if f.demo {
 		opts.Source, opts.InitialPod = data.NewDemo(), 1
-		return app.New(opts), func() {}, nil
+		r := app.NewRoot(app.RootOptions{
+			Options: opts,
+			Connect: demoConnector,
+			Catalog: func() (data.ContextCatalog, error) { return data.DemoContexts(), nil },
+		})
+		return r, r.Shutdown, nil
 	}
-	l := app.NewLoader(app.LoaderOptions{Options: opts, Context: f.context, Connect: clusterConnector(f, connect)})
-	return l, l.Shutdown, nil
+	r := app.NewRoot(app.RootOptions{
+		Options: opts,
+		Initial: data.Target{Context: f.context, Namespace: f.namespace},
+		Connect: func(t data.Target) app.Connector { return clusterConnector(f, t, connect) },
+		Catalog: func() (data.ContextCatalog, error) { return kube.Contexts(f.kubeconfig) },
+	})
+	return r, r.Shutdown, nil
 }
 
 func finish(final tea.Model, stderr io.Writer) int {
-	if l, ok := final.(app.Loader); ok {
-		if stage, msg, failed := l.Failure(); failed {
-			_, _ = fmt.Fprintf(stderr, "lazykube: %s: %s\n", stage, msg)
-		}
+	if stage, msg, failed := app.Failure(final); failed {
+		_, _ = fmt.Fprintf(stderr, "lazykube: %s: %s\n", stage, msg)
 	}
 	return app.ExitCode(final)
 }
@@ -140,13 +174,30 @@ func run(args []string, stderr io.Writer, connect connector, progOpts ...tea.Pro
 		_, _ = fmt.Fprintln(stderr, err)
 		return 2
 	}
-	model, shutdown, err := newModel(f, connect)
+	model, shutdown, err := buildModel(f, connect)
 	if err != nil {
 		_, _ = fmt.Fprintln(stderr, "lazykube:", err)
 		return 1
 	}
-	defer shutdown()
-	final, err := tea.NewProgram(model, progOpts...).Run()
+	box := &crashBox{}
+	final, err := func() (tea.Model, error) {
+		restore, err := quietStderr()
+		if err != nil {
+			shutdown()
+			return nil, err
+		}
+		defer restore()
+		defer shutdown()
+		p := tea.NewProgram(guarded{inner: model, box: box}, progOpts...)
+		box.mu.Lock()
+		box.quit = p.Quit
+		box.mu.Unlock()
+		return p.Run()
+	}()
+	if box.write(stderr) {
+		return app.ExitFailure
+	}
+	final = unwrapGuarded(final)
 	if errors.Is(err, tea.ErrInterrupted) {
 		return app.ExitCancelled
 	}

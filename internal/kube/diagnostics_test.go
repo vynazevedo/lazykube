@@ -511,3 +511,38 @@ func TestEventMessageLoadsFullTextOnDemand(t *testing.T) {
 		t.Fatalf("after the explicit cluster feed the wide cache serves the message: ok=%v", ok)
 	}
 }
+
+func TestClusterEventsStopWhenReleased(t *testing.T) {
+	s := namespacedStart(t, nil,
+		testPod("apps", "web-1", "node-a", corev1.PodRunning),
+		event("other", "e2", "Pod", "x", "", "Warning", fixedNow))
+	s.ScopedEvents(data.EventQuery{Scope: data.ScopeCluster})
+	waitFor(t, func() bool { return s.ScopedEvents(data.EventQuery{Scope: data.ScopeCluster}).State == data.FeedReady })
+	s.mu.RLock()
+	first := s.wide.inf
+	s.mu.RUnlock()
+	s.ReleaseClusterEvents()
+	waitFor(t, first.IsStopped)
+	s.mu.RLock()
+	idle := s.wide == nil
+	s.mu.RUnlock()
+	if !idle {
+		t.Fatal("released cluster events leave no subscription behind")
+	}
+	if _, ok := s.EventMessage("ev-e2"); ok {
+		t.Fatal("a released cluster cache no longer serves messages")
+	}
+	if again := s.ScopedEvents(data.EventQuery{Scope: data.ScopeCluster}); again.State != data.FeedLoading {
+		t.Fatalf("an explicit request after the release starts a new subscription: %+v", again)
+	}
+	waitFor(t, func() bool { return s.ScopedEvents(data.EventQuery{Scope: data.ScopeCluster}).State == data.FeedReady })
+	s.mu.RLock()
+	second := s.wide.inf
+	s.mu.RUnlock()
+	if second == first || second.IsStopped() {
+		t.Fatal("the new subscription is a fresh informer")
+	}
+	s.ReleaseClusterEvents()
+	s.ReleaseClusterEvents()
+	waitFor(t, second.IsStopped)
+}

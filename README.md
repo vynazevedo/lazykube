@@ -271,8 +271,18 @@ a cobertura; sua ausência deve resultar em degradação explícita da funcional
 
 Ao iniciar, uma tela de loading animada mostra cada etapa da conexão:
 kubeconfig, contexto e versão do servidor, permissões e sincronização do
-cache. Se uma etapa falhar, a tela aponta qual foi e por quê; `q` sai e
-`ctrl+c` cancela a conexão a qualquer momento.
+cache. Se uma etapa falhar, a tela aponta qual foi e por quê e oferece `r`
+repetir, `b` voltar ao contexto anterior, `c` escolher outro contexto e `q`
+sair; `ctrl+c` cancela a conexão a qualquer momento.
+
+Dentro da TUI, `c` abre o seletor de contextos do kubeconfig (com filtro `/`)
+e `n` o seletor de namespace; clicar no contexto ou no namespace do cabeçalho
+faz o mesmo. A troca fecha a sessão anterior e reconecta pela tela de loading,
+sem reiniciar o binário. As escolhas valem só para a execução atual: o
+lazykube nunca escreve no kubeconfig nem altera o `current-context`.
+`--kubeconfig` seleciona um arquivo; sem ele, `KUBECONFIG` com vários
+arquivos segue a precedência nativa do client-go. Cada contexto lembra o
+último namespace usado nesta execução, e `Todos` só vale quando escolhido.
 
 O lazykube só lê o cluster: lista e observa recursos, segue logs e consulta
 métricas. Nenhuma ação de escrita é executada.
@@ -311,11 +321,14 @@ os painéis: clique seleciona, a roda rola e o clique na aba troca de aba.
  │  enter             filtra pods pelo namespace         │
  │  esc               limpa filtros                      │
  │  1                 mostra / esconde coluna esquerda   │
+ │  c                 troca de contexto do kubeconfig    │
+ │  n                 namespace; Todos só se escolhido   │
  │                                                       │
  ├─ DETALHES ────────────────────────────────────────────┤
  │                                                       │
- │  l  c  t  d  e     Log, Config, Top, Describe, Events │
- │  [  ]              aba anterior / próxima             │
+ │  l  t  d  e        Log, Top, Describe, Events         │
+ │  [  ]              aba anterior / próxima, Config     │
+ │  /  alt+n  N       busca no Log; botão [Próxima]      │
  │  f                 liga / desliga follow dos logs     │
  │  w                 quebra de linha                    │
  │  g  G              topo / fim                         │

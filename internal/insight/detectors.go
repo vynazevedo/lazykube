@@ -204,7 +204,7 @@ func (e *Engine) oom(m *signalMachine, c ContainerObservation, fresh, baseline, 
 }
 
 func pendingStatusMissing(p PodObservation) bool {
-	if p.Phase == PodSucceeded || p.Phase == PodFailed {
+	if p.Phase == PodPending || p.Phase == PodSucceeded || p.Phase == PodFailed {
 		return false
 	}
 	if len(p.Containers) == 0 || p.Omissions.Containers > 0 {

@@ -39,7 +39,7 @@ func (st NodeSummaryState) observed() bool {
 
 func (st NodeSummaryState) ready() (string, theme.RGB) {
 	switch {
-	case !st.observed():
+	case !st.observed() || !st.Node.ReadyKnown:
 		return nodeUnknown, theme.Muted
 	case st.Node.Ready:
 		return "True", theme.OK

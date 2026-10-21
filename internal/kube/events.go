@@ -55,6 +55,8 @@ type wideEvents struct {
 	retryAt time.Time
 	cancel  context.CancelFunc
 	inf     *eventsInformer
+	ctx     context.Context
+	stop    context.CancelFunc
 }
 
 type wideFailure struct {
@@ -155,6 +157,7 @@ func (s *Source) clusterEventsInformer() (cache.SharedIndexInformer, data.FeedSt
 	}
 	if !w.running && !w.synced && s.ctx.Err() == nil && !s.opts.Now().Before(w.retryAt) {
 		w.running, w.state, w.reason = true, data.FeedLoading, reasonEventsLoading
+		w.ctx, w.stop = context.WithCancel(s.ctx)
 		s.wg.Add(1)
 		go s.runWideEvents(w)
 	}
@@ -178,7 +181,7 @@ func (s *Source) runWideEvents(w *wideEvents) {
 	defer s.wg.Done()
 	for attempt := 1; ; attempt++ {
 		err := s.wideAttempt(w)
-		if err == nil || s.ctx.Err() != nil {
+		if err == nil || w.ctx.Err() != nil {
 			return
 		}
 		f, ok := err.(wideFailure)
@@ -195,7 +198,7 @@ func (s *Source) runWideEvents(w *wideEvents) {
 		}
 		s.setWideState(w, data.FeedUnavailable, f.reason)
 		select {
-		case <-s.ctx.Done():
+		case <-w.ctx.Done():
 			return
 		case <-time.After(wideTiming.backoff << (attempt - 1)):
 		}
@@ -482,7 +485,7 @@ func (t *eventsInformer) consumed(objects []any) bool {
 }
 
 func (s *Source) wideAttempt(w *wideEvents) error {
-	ctx, cancel := context.WithTimeout(s.ctx, requestTimeout)
+	ctx, cancel := context.WithTimeout(w.ctx, requestTimeout)
 	_, err := s.client.CoreV1().Events("").List(ctx, metav1.ListOptions{Limit: 1})
 	cancel()
 	if err != nil {
@@ -505,7 +508,7 @@ func (s *Source) wideAttempt(w *wideEvents) error {
 	}); err != nil {
 		return err
 	}
-	runCtx, stop := context.WithCancel(s.ctx)
+	runCtx, stop := context.WithCancel(w.ctx)
 	s.mu.Lock()
 	w.inf, w.cancel = inf, stop
 	s.mu.Unlock()
@@ -527,8 +530,8 @@ func (s *Source) wideAttempt(w *wideEvents) error {
 	defer poll.Stop()
 	for {
 		select {
-		case <-s.ctx.Done():
-			return abort(s.ctx.Err())
+		case <-w.ctx.Done():
+			return abort(w.ctx.Err())
 		case err := <-errs:
 			return abort(classify(err))
 		case <-deadline.C:
@@ -551,17 +554,35 @@ func (s *Source) wideAttempt(w *wideEvents) error {
 
 func (s *Source) shutdownWideEvents() {
 	s.mu.Lock()
-	var cancel context.CancelFunc
-	if s.wide != nil {
-		cancel = s.wide.cancel
-	}
+	halt := s.wide.halters()
 	s.mu.Unlock()
-	if cancel != nil {
-		cancel()
+	halt()
+}
+
+func (w *wideEvents) halters() func() {
+	if w == nil {
+		return func() {}
+	}
+	stop, cancel := w.stop, w.cancel
+	return func() {
+		for _, f := range []context.CancelFunc{stop, cancel} {
+			if f != nil {
+				f()
+			}
+		}
 	}
 }
 
-var _ data.Diagnostics = (*Source)(nil)
+func (s *Source) ReleaseClusterEvents() {
+	if s.opts.Namespace == "" {
+		return
+	}
+	s.mu.Lock()
+	halt := s.wide.halters()
+	s.wide = nil
+	s.mu.Unlock()
+	halt()
+}
 
 func (s *Source) EventMessage(uid string) (data.EventMessage, bool) {
 	if uid == "" {
@@ -594,4 +615,7 @@ func eventUID(obj any) ([]string, error) {
 	return []string{string(m.GetUID())}, nil
 }
 
-var _ data.EventMessages = (*Source)(nil)
+var (
+	_ data.EventMessages         = (*Source)(nil)
+	_ data.ClusterEventsReleaser = (*Source)(nil)
+)
