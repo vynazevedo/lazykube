@@ -19,7 +19,10 @@ import (
 	"github.com/vynazevedo/lazykube/internal/data"
 )
 
-const scopedEventsLimit = 200
+const (
+	scopedEventsLimit = 200
+	eventUIDIndex     = "uid"
+)
 
 type wideTimingConfig struct {
 	sync     time.Duration
@@ -265,7 +268,7 @@ func (s *Source) buildEventsInformer(client kubernetes.Interface, namespace stri
 		},
 	}
 	t.SharedIndexInformer = cache.NewSharedIndexInformerWithOptions(cache.ToListWatcherWithWatchListSemantics(lw, client), &corev1.Event{},
-		cache.SharedIndexInformerOptions{ResyncPeriod: resync, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}})
+		cache.SharedIndexInformerOptions{ResyncPeriod: resync, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc, eventUIDIndex: eventUID}})
 	if err := t.SetWatchErrorHandlerWithContext(func(_ context.Context, _ *cache.Reflector, err error) {
 		if !routine(err) {
 			t.failWatch(err)
@@ -559,3 +562,36 @@ func (s *Source) shutdownWideEvents() {
 }
 
 var _ data.Diagnostics = (*Source)(nil)
+
+func (s *Source) EventMessage(uid string) (data.EventMessage, bool) {
+	if uid == "" {
+		return data.EventMessage{}, false
+	}
+	infs := []cache.SharedIndexInformer{s.eventInf}
+	s.mu.RLock()
+	if s.wide != nil && s.wide.synced && s.wide.inf != nil {
+		infs = append(infs, s.wide.inf)
+	}
+	s.mu.RUnlock()
+	for _, inf := range infs {
+		if inf == nil {
+			continue
+		}
+		objs, err := inf.GetIndexer().ByIndex(eventUIDIndex, uid)
+		if found := eventsOf(objs); err == nil && len(found) > 0 {
+			text, truncated := clipTo(found[0].Message, data.EventMessageBytes)
+			return data.EventMessage{Text: text, Truncated: truncated}, true
+		}
+	}
+	return data.EventMessage{}, false
+}
+
+func eventUID(obj any) ([]string, error) {
+	m, err := meta.Accessor(obj)
+	if err != nil {
+		return nil, err
+	}
+	return []string{string(m.GetUID())}, nil
+}
+
+var _ data.EventMessages = (*Source)(nil)

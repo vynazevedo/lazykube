@@ -122,6 +122,7 @@ type Event struct {
 	Namespace string
 	Count     int
 	Message   string
+	Truncated bool
 }
 
 type LogLine struct {

@@ -119,5 +119,11 @@ func TestDemoEventsHaveUniqueIdentity(t *testing.T) {
 			t.Fatalf("demo event %s %s needs a unique UID, got %q", e.Object, e.Reason, e.UID)
 		}
 		seen[e.UID] = true
+		if full, ok := NewDemo().EventMessage(e.UID); !ok || full.Text != e.Message || full.Truncated {
+			t.Fatalf("demo serves the full message of %s", e.UID)
+		}
+	}
+	if _, ok := NewDemo().EventMessage(""); ok {
+		t.Fatal("an empty UID is not an event")
 	}
 }

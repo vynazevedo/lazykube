@@ -8,6 +8,7 @@ import (
 	"sync"
 	"testing"
 	"time"
+	"unicode/utf8"
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -471,5 +472,42 @@ func TestClusterEventsForbiddenWhenNamespaced(t *testing.T) {
 	})
 	if got := s.ScopedEvents(data.EventQuery{Scope: data.ScopeCluster}); got.Reason != reasonClusterDeny {
 		t.Fatalf("reason = %q", got.Reason)
+	}
+}
+
+func TestEventMessageLoadsFullTextOnDemand(t *testing.T) {
+	long := event("apps", "long", "Pod", "web-1", "", "Warning", fixedNow)
+	long.Message = strings.Repeat("palavra\x1b[2J ", 200) + "fim"
+	huge := event("apps", "huge", "Pod", "web-1", "", "Warning", fixedNow)
+	huge.Message = strings.Repeat("é", 12<<10)
+	other := event("other", "far", "Pod", "x", "", "Warning", fixedNow)
+	other.Message = strings.Repeat("distante ", 100)
+	s := namespacedStart(t, nil, testPod("apps", "web-1", "node-a", corev1.PodRunning), long, huge, other)
+
+	feed := s.ScopedEvents(data.EventQuery{Scope: data.ScopeNamespace, Namespace: "apps"})
+	for _, e := range feed.Items {
+		if !e.Truncated || len(e.Message) > data.EventPreviewBytes+len("…") {
+			t.Fatalf("the feed keeps a bounded preview of %s: truncated=%v len=%d", e.UID, e.Truncated, len(e.Message))
+		}
+	}
+	full, ok := s.EventMessage("ev-long")
+	want := strings.TrimSpace(strings.Repeat("palavra ", 200)) + " fim"
+	if !ok || full.Truncated || full.Text != want {
+		t.Fatalf("the opened event loads its whole sanitized message: ok=%v truncated=%v len=%d", ok, full.Truncated, len(full.Text))
+	}
+	capped, ok := s.EventMessage("ev-huge")
+	if !ok || !capped.Truncated || len(capped.Text) > data.EventMessageBytes+len("…") || !utf8.ValidString(capped.Text) {
+		t.Fatalf("the full message is capped explicitly: ok=%v truncated=%v len=%d", ok, capped.Truncated, len(capped.Text))
+	}
+	if _, ok := s.EventMessage("ev-far"); ok {
+		t.Fatal("an event outside the connected namespace is not served before the cluster feed is opened")
+	}
+	if _, ok := s.EventMessage("missing"); ok {
+		t.Fatal("unknown UID")
+	}
+	s.ScopedEvents(data.EventQuery{Scope: data.ScopeCluster})
+	waitFor(t, func() bool { return s.ScopedEvents(data.EventQuery{Scope: data.ScopeCluster}).State == data.FeedReady })
+	if far, ok := s.EventMessage("ev-far"); !ok || far.Text != strings.TrimSpace(other.Message) {
+		t.Fatalf("after the explicit cluster feed the wide cache serves the message: ok=%v", ok)
 	}
 }

@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 	"testing"
 
@@ -421,5 +422,70 @@ func TestEventsSelectionFollowsIdentity(t *testing.T) {
 	browse := reload(press(t, table, "home", "down"), ev("y"), ev("c"), ev("a"), ev("x"))
 	if sel := browse.eventsState().Selected(); sel == nil || sel.UID != "a" || browse.ev.Cursor != 2 {
 		t.Fatalf("the table cursor follows identity outside reading too, got %+v at %d", sel, browse.ev.Cursor)
+	}
+}
+
+type messageSource struct {
+	eventsSource
+	full  map[string]data.EventMessage
+	asked *[]string
+}
+
+func (s messageSource) EventMessage(uid string) (data.EventMessage, bool) {
+	*s.asked = append(*s.asked, uid)
+	msg, ok := s.full[uid]
+	return msg, ok
+}
+
+type previewSource struct {
+	data.Source
+	feed eventsSource
+}
+
+func (s previewSource) Snapshot() data.Snapshot { return s.feed.Snapshot() }
+
+func (s previewSource) ScopedEvents(q data.EventQuery) data.EventFeed { return s.feed.ScopedEvents(q) }
+
+func (s previewSource) Containers(pod string) []data.Container { return s.feed.Containers(pod) }
+
+func (s previewSource) PodLogs(req data.LogRequest, tick, n int) data.LogView {
+	return s.feed.PodLogs(req, tick, n)
+}
+
+func TestEventsMessageIsHonestAboutTruncation(t *testing.T) {
+	preview := strings.Repeat("prévia ", 40) + "…"
+	feed := func(q data.EventQuery) data.EventFeed {
+		return data.EventFeed{Scope: q.Scope, Items: []data.Event{
+			{UID: "u1", Age: "1m", Type: "Warning", Reason: "Failed", Object: "Pod/a", Namespace: "kube-system", Count: 1, Message: preview, Truncated: true},
+			{UID: "u2", Age: "2m", Type: "Warning", Reason: "BackOff", Object: "Pod/b", Namespace: "kube-system", Count: 1, Message: preview, Truncated: true},
+		}}
+	}
+	src := messageSource{eventsSource: newEventsSource("", feed), asked: &[]string{}, full: map[string]data.EventMessage{
+		"u1": {Text: "texto integral do evento fim-real"},
+		"u2": {Text: "inicio do texto enorme", Truncated: true},
+	}}
+	m := events(t, nodeModel(t, src, 160, 48))
+	plain := m.Render().Plain()
+	if len(*src.asked) != 0 || strings.Contains(plain, "Mensagem completa") || !strings.Contains(plain, "prévia truncada; enter carrega o texto completo") {
+		t.Fatalf("the preview does not claim to be complete and loads nothing before enter: asked %v", *src.asked)
+	}
+	m = press(t, m, "enter")
+	plain = m.Render().Plain()
+	if !slices.Equal(*src.asked, []string{"u1"}) || !strings.Contains(plain, "fim-real") || !strings.Contains(plain, "Mensagem completa · focus") || strings.Contains(plain, "prévia truncada") {
+		t.Fatalf("enter loads the full message of the opened event only: asked %v", *src.asked)
+	}
+	m = press(t, press(t, m, "esc", "down", "enter"))
+	plain = m.Render().Plain()
+	if !slices.Contains(*src.asked, "u2") || strings.Contains(plain, "Mensagem completa") || !strings.Contains(plain, "truncada no teto de 8 KiB") {
+		t.Fatal("a message above the explicit cap says so")
+	}
+
+	bare := newEventsSource("", feed)
+	plainFeed := events(t, nodeModel(t, previewSource{Source: bare.Demo, feed: bare}, 160, 48))
+	if p := plainFeed.Render().Plain(); !strings.Contains(p, "truncada em 300 bytes pela fonte") || strings.Contains(p, "enter carrega") || strings.Contains(p, "mensagem completa") || !strings.Contains(p, "enter abre a mensagem recebida") {
+		t.Fatal("without full messages the screen does not promise them")
+	}
+	if p := press(t, plainFeed, "enter").Render().Plain(); strings.Contains(p, "Mensagem completa") || !strings.Contains(p, "Mensagem truncada · focus") {
+		t.Fatal("reading a truncated message without the full text is labeled truncated")
 	}
 }

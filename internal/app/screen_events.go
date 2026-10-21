@@ -28,6 +28,8 @@ type eventsView struct {
 	msgScroll int
 	held      data.Event
 	gone      bool
+	detail    data.EventMessage
+	detailUID string
 }
 
 func (eventsScreen) ID() ScreenID {
@@ -111,6 +113,44 @@ func (m Model) eventsState() ui.EventsScreenState {
 		Selectable: m.eventsSelectable(),
 		Held:       m.heldEvent(),
 		Gone:       m.ev.gone,
+		Detail:     m.eventDetail(),
+		Expandable: m.eventMessages() != nil,
+	}
+}
+
+func (m Model) eventMessages() data.EventMessages {
+	src, _ := m.dg.diag.(data.EventMessages)
+	return src
+}
+
+func (m Model) selectedEventUID() string {
+	if m.ev.gone {
+		return m.ev.held.UID
+	}
+	if m.ev.Cursor >= 0 && m.ev.Cursor < len(m.ev.feed.Items) && m.eventsSelectable() {
+		return m.ev.feed.Items[m.ev.Cursor].UID
+	}
+	return ""
+}
+
+func (m Model) eventDetail() *data.EventMessage {
+	if uid := m.selectedEventUID(); uid == "" || uid != m.ev.detailUID {
+		return nil
+	}
+	d := m.ev.detail
+	return &d
+}
+
+func (m *Model) loadEventDetail() {
+	src := m.eventMessages()
+	e := m.eventsState().Selected()
+	if !m.ev.reading || src == nil || e == nil || !e.Truncated || e.UID == "" {
+		return
+	}
+	if msg, ok := src.EventMessage(e.UID); ok {
+		m.ev.detail, m.ev.detailUID = msg, e.UID
+	} else if m.ev.detailUID != e.UID {
+		m.ev.detail, m.ev.detailUID = data.EventMessage{}, ""
 	}
 }
 
@@ -190,6 +230,7 @@ func (m *Model) refreshEventsScreen() {
 	}
 	m.ev.feed = m.dg.diag.ScopedEvents(data.EventQuery{Scope: m.ev.Scope, Pod: m.ev.Pod, Namespace: m.ev.Namespace})
 	m.syncEventSelection()
+	m.loadEventDetail()
 }
 
 func (m *Model) syncEventSelection() {
@@ -268,6 +309,7 @@ func (m Model) handleEventsKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 	case key.Matches(msg, k.Enter):
 		if m.eventsState().Selected() != nil {
 			m.ev.reading, m.ev.msgScroll = true, 0
+			m.loadEventDetail()
 		}
 	case key.Matches(msg, k.EventScope):
 		m.cycleEventsScope()
@@ -292,6 +334,7 @@ func (m *Model) handleEventsClick(ms tea.Mouse) {
 		}
 	case m.layout.Message.Contains(ms.X, ms.Y) && m.eventsState().Selected() != nil:
 		m.ev.reading = true
+		m.loadEventDetail()
 	}
 }
 
@@ -311,6 +354,7 @@ func (m *Model) handleEventsWheel(ms tea.Mouse) {
 		m.ev.reading = false
 		m.moveEvent(delta)
 		m.ev.reading = reading && !m.ev.gone
+		m.loadEventDetail()
 	case m.layout.Message.Contains(ms.X, ms.Y):
 		m.ev.msgScroll = max(0, min(m.ev.msgScroll+delta, m.maxMsgScroll()))
 	}

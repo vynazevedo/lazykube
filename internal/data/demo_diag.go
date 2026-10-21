@@ -279,4 +279,16 @@ func (d *Demo) ScopedEvents(q EventQuery) EventFeed {
 	return feed
 }
 
-var _ Diagnostics = (*Demo)(nil)
+func (d *Demo) EventMessage(uid string) (EventMessage, bool) {
+	for _, e := range d.ScopedEvents(EventQuery{Scope: ScopeCluster}).Items {
+		if uid != "" && e.UID == uid {
+			return EventMessage{Text: e.Message}, true
+		}
+	}
+	return EventMessage{}, false
+}
+
+var (
+	_ Diagnostics   = (*Demo)(nil)
+	_ EventMessages = (*Demo)(nil)
+)
