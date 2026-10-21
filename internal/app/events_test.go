@@ -489,3 +489,31 @@ func TestEventsMessageIsHonestAboutTruncation(t *testing.T) {
 		t.Fatal("reading a truncated message without the full text is labeled truncated")
 	}
 }
+
+func TestEventsDetailFollowsUpdatesOfTheSameEvent(t *testing.T) {
+	preview := strings.Repeat("prévia ", 40) + "…"
+	items := []data.Event{{UID: "u1", Age: "1m", Type: "Warning", Reason: "Failed", Object: "Pod/a", Namespace: "kube-system", Count: 1, Message: preview, Truncated: true}}
+	src := messageSource{eventsSource: newEventsSource("", func(q data.EventQuery) data.EventFeed {
+		return data.EventFeed{Scope: q.Scope, Items: append([]data.Event(nil), items...)}
+	}), asked: &[]string{}, full: map[string]data.EventMessage{"u1": {Text: "texto integral antigo"}}}
+	m := press(t, events(t, nodeModel(t, src, 160, 48)), "enter")
+	if !strings.Contains(m.Render().Plain(), "texto integral antigo") {
+		t.Fatal("setup reads the full message")
+	}
+	items[0].Message, items[0].Truncated, items[0].Count = "mensagem curta nova", false, 2
+	next, _ := m.Update(dataMsg{})
+	m = next.(Model)
+	plain := m.Render().Plain()
+	if strings.Contains(plain, "texto integral antigo") || !strings.Contains(plain, "mensagem curta nova") || !strings.Contains(plain, "Mensagem completa · focus") {
+		t.Fatal("an update of the same event to a short message replaces the old full text")
+	}
+	items[0].Message, items[0].Truncated = preview, true
+	src.full["u1"] = data.EventMessage{Text: "texto integral novo"}
+	next, _ = m.Update(dataMsg{})
+	if p := next.(Model).Render().Plain(); !strings.Contains(p, "texto integral novo") {
+		t.Fatal("a long message again reloads the full text")
+	}
+	if p := press(t, next.(Model), "esc").Render().Plain(); strings.Contains(p, "texto integral") || !strings.Contains(p, "prévia truncada") {
+		t.Fatal("outside reading the panel shows the current preview, not a cached detail")
+	}
+}

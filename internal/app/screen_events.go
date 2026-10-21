@@ -135,7 +135,7 @@ func (m Model) selectedEventUID() string {
 }
 
 func (m Model) eventDetail() *data.EventMessage {
-	if uid := m.selectedEventUID(); uid == "" || uid != m.ev.detailUID {
+	if uid := m.selectedEventUID(); !m.ev.reading || uid == "" || uid != m.ev.detailUID {
 		return nil
 	}
 	d := m.ev.detail
@@ -146,6 +146,7 @@ func (m *Model) loadEventDetail() {
 	src := m.eventMessages()
 	e := m.eventsState().Selected()
 	if !m.ev.reading || src == nil || e == nil || !e.Truncated || e.UID == "" {
+		m.ev.detail, m.ev.detailUID = data.EventMessage{}, ""
 		return
 	}
 	if msg, ok := src.EventMessage(e.UID); ok {
