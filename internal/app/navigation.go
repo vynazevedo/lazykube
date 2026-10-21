@@ -164,6 +164,31 @@ func (m *Model) activateScreen(id ScreenID) {
 	}
 }
 
+func (m Model) shortcutDestination(msg tea.KeyPressMsg) DestinationID {
+	for _, b := range []key.Binding{m.keys.Dashboard, m.keys.Workloads, m.keys.Nodes, m.keys.Events} {
+		if !key.Matches(msg, b) {
+			continue
+		}
+		if d, ok := registry.shortcut(b.Keys()[0]); ok {
+			return d.ID
+		}
+	}
+	return ""
+}
+
+func (m *Model) activateDestination(id DestinationID) bool {
+	d, ok := registry.get(id)
+	if !ok {
+		return false
+	}
+	t, ok := registry.target(d)
+	if !ok {
+		return false
+	}
+	m.activateScreen(t.Screen)
+	return true
+}
+
 func (m *Model) handleEsc() {
 	switch {
 	case m.onScreen(ScreenEvents) && m.ev.reading:
@@ -190,20 +215,6 @@ func (m Model) menuItems() []ui.MenuItem {
 		items[i] = ui.MenuItem{Key: menuKey(id), Title: s.Title()}
 	}
 	return items
-}
-
-func menuKey(id ScreenID) string {
-	switch id {
-	case ScreenDashboard:
-		return "2"
-	case ScreenWorkloads:
-		return "3"
-	case ScreenNodes:
-		return "4"
-	case ScreenEvents:
-		return "6"
-	}
-	return ""
 }
 
 func (m Model) menuActive() int {
@@ -237,18 +248,9 @@ func (m Model) handleMenuKey(msg tea.KeyPressMsg) Model {
 	case key.Matches(msg, k.Enter):
 		m.menu.open = false
 		m.activateScreen(registeredScreens()[m.menu.cursor])
-	case key.Matches(msg, k.Dashboard):
+	case m.shortcutDestination(msg) != "":
 		m.menu.open = false
-		m.activateScreen(ScreenDashboard)
-	case key.Matches(msg, k.Workloads):
-		m.menu.open = false
-		m.activateScreen(ScreenWorkloads)
-	case key.Matches(msg, k.Nodes):
-		m.menu.open = false
-		m.activateScreen(ScreenNodes)
-	case key.Matches(msg, k.Events):
-		m.menu.open = false
-		m.activateScreen(ScreenEvents)
+		m.activateDestination(m.shortcutDestination(msg))
 	case key.Matches(msg, k.Esc), key.Matches(msg, k.Menu), key.Matches(msg, k.NextPanel), key.Matches(msg, k.PrevPanel):
 		m.menu.open = false
 	}
@@ -276,17 +278,8 @@ func (m Model) routeKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 		case key.Matches(msg, k.Menu):
 			m.openMenu()
 			return m, nil
-		case key.Matches(msg, k.Dashboard):
-			m.activateScreen(ScreenDashboard)
-			return m, nil
-		case key.Matches(msg, k.Workloads):
-			m.activateScreen(ScreenWorkloads)
-			return m, nil
-		case key.Matches(msg, k.Nodes):
-			m.activateScreen(ScreenNodes)
-			return m, nil
-		case key.Matches(msg, k.Events):
-			m.activateScreen(ScreenEvents)
+		case m.shortcutDestination(msg) != "":
+			m.activateDestination(m.shortcutDestination(msg))
 			return m, nil
 		case key.Matches(msg, k.Esc):
 			m.handleEsc()

@@ -1,0 +1,44 @@
+cluster | Cluster | categoria
+  cluster.dashboard | Dashboard | pronto | atalho 2
+  nodes | Nodes | pronto | atalho 4
+  namespaces | Namespaces | futuro
+  events | Events | pronto | atalho 6
+workloads | Workloads | categoria | atalho 3 | padrão workloads.pods
+  workloads.overview | Overview | futuro
+  workloads.pods | Pods | pronto
+  workloads.deployments | Deployments | pronto
+  workloads.statefulsets | StatefulSets | futuro
+  workloads.daemonsets | DaemonSets | futuro
+  workloads.jobs | Jobs | futuro
+  workloads.cronjobs | CronJobs | futuro
+  workloads.replicasets | ReplicaSets | futuro
+configuration | Configuration | categoria
+  configuration.configmaps | ConfigMaps | futuro
+  configuration.secrets | Secrets | futuro
+  configuration.resourcequotas | ResourceQuotas | futuro
+  configuration.limitranges | LimitRanges | futuro
+  configuration.hpa | HPA | futuro
+  configuration.poddisruptionbudgets | PodDisruptionBudgets | futuro
+network | Network | categoria
+  network.services | Services | futuro
+  network.endpoints | Endpoints | futuro
+  network.endpointslices | EndpointSlices | futuro
+  network.ingresses | Ingresses | futuro
+  network.ingressclasses | IngressClasses | futuro
+  network.networkpolicies | NetworkPolicies | futuro
+storage | Storage | categoria
+  storage.persistentvolumeclaims | PersistentVolumeClaims | futuro
+  storage.persistentvolumes | PersistentVolumes | futuro
+  storage.storageclasses | StorageClasses | futuro
+access | Access Control | categoria
+  access.serviceaccounts | ServiceAccounts | futuro
+  access.roles | Roles | futuro
+  access.rolebindings | RoleBindings | futuro
+  access.clusterroles | ClusterRoles | futuro
+  access.clusterrolebindings | ClusterRoleBindings | futuro
+custom | Custom Resources | categoria
+  custom.definitions | Definitions | futuro
+helm | Helm | categoria
+  helm.releases | Releases | futuro
+security | Security | futuro | reservado 5
+radar | Radar | futuro | reservado 7

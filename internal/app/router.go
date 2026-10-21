@@ -112,7 +112,3 @@ func (r router) crumbStart() int {
 	}
 	return 0
 }
-
-func registeredScreens() []ScreenID {
-	return []ScreenID{ScreenDashboard, ScreenWorkloads, ScreenNodes, ScreenEvents}
-}
