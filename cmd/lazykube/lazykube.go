@@ -179,6 +179,7 @@ func run(args []string, stderr io.Writer, connect connector, progOpts ...tea.Pro
 		_, _ = fmt.Fprintln(stderr, "lazykube:", err)
 		return 1
 	}
+	box := &crashBox{}
 	final, err := func() (tea.Model, error) {
 		restore, err := quietStderr()
 		if err != nil {
@@ -187,8 +188,16 @@ func run(args []string, stderr io.Writer, connect connector, progOpts ...tea.Pro
 		}
 		defer restore()
 		defer shutdown()
-		return tea.NewProgram(model, progOpts...).Run()
+		p := tea.NewProgram(guarded{inner: model, box: box}, progOpts...)
+		box.mu.Lock()
+		box.quit = p.Quit
+		box.mu.Unlock()
+		return p.Run()
 	}()
+	if box.write(stderr) {
+		return app.ExitFailure
+	}
+	final = unwrapGuarded(final)
 	if errors.Is(err, tea.ErrInterrupted) {
 		return app.ExitCancelled
 	}
