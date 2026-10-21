@@ -21,6 +21,7 @@ var errKubeconfig = errors.New("kubeconfig ilegível ou inválido")
 func loadingRules(kubeconfig string) *clientcmd.ClientConfigLoadingRules {
 	rules := clientcmd.NewDefaultClientConfigLoadingRules()
 	rules.ExplicitPath = kubeconfig
+	rules.MigrationRules = nil
 	return rules
 }
 

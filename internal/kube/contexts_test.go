@@ -2,10 +2,13 @@ package kube
 
 import (
 	"bytes"
+	"errors"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"k8s.io/client-go/tools/clientcmd"
 
 	"github.com/vynazevedo/lazykube/internal/data"
 )
@@ -163,4 +166,38 @@ func read(t *testing.T, path string) []byte {
 		t.Fatal(err)
 	}
 	return b
+}
+
+func TestKubeconfigLoadingNeverMigrates(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	dest := filepath.Join(home, ".kube", "config")
+	saved := clientcmd.RecommendedHomeFile
+	clientcmd.RecommendedHomeFile = dest
+	t.Cleanup(func() { clientcmd.RecommendedHomeFile = saved })
+	if err := os.MkdirAll(filepath.Dir(dest), 0o700); err != nil {
+		t.Fatal(err)
+	}
+	legacy := filepath.Join(home, ".kube", ".kubeconfig")
+	if err := os.WriteFile(legacy, []byte(kubeconfigA), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	a, _ := writeKubeconfigs(t)
+	for name, run := range map[string]func(){
+		"catalog explicit": func() { _, _ = Contexts(a) },
+		"catalog default":  func() { t.Setenv("KUBECONFIG", ""); _, _ = Contexts("") },
+		"resolve":          func() { _, _ = ResolveContext(ConnectOptions{Kubeconfig: a, Context: "alpha"}) },
+		"rest config":      func() { _, _ = restConfig(ConnectOptions{Kubeconfig: a}, "alpha") },
+	} {
+		run()
+		if _, err := os.Stat(dest); !errors.Is(err, os.ErrNotExist) {
+			t.Fatalf("%s: loading the kubeconfig must never migrate the legacy file", name)
+		}
+	}
+	if len(loadingRules("").MigrationRules) != 0 {
+		t.Fatal("migration rules are disabled")
+	}
+	if !bytes.Equal(read(t, legacy), []byte(kubeconfigA)) {
+		t.Fatal("the legacy file stays unchanged")
+	}
 }
