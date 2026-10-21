@@ -292,7 +292,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		next, cmd := m.screen().Update(m, msg)
 		return wake(idle, next, cmd)
 	case tea.MouseWheelMsg:
-		if m.menu.open || m.dep.open {
+		if m.menu.open || m.dep.open || m.helpOpen {
 			return m, nil
 		}
 		idle := !m.busy()
