@@ -1,0 +1,24 @@
+name: Propor melhoria
+description: Problema concreto e comportamento desejado.
+title: 'feat: '
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Qual problema precisa ser resolvido?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Comportamento proposto e alternativas
+    validations:
+      required: true
+  - type: textarea
+    id: validation
+    attributes:
+      label: Critérios de aceitação e validação sem cluster real
+  - type: textarea
+    id: permissions
+    attributes:
+      label: Impacto em permissões, privacidade e compatibilidade
