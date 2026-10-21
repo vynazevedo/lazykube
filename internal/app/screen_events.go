@@ -81,6 +81,7 @@ func (eventsScreen) Keys(m Model) []key.Binding {
 	return append(out,
 		k.SecurityAck, k.Palette, k.Pause, k.Help, k.Quit,
 		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads, k.Nodes, k.Events,
+		k.Context, k.Namespace,
 	)
 }
 
@@ -134,7 +135,7 @@ func (m Model) selectedEventUID() string {
 }
 
 func (m Model) eventDetail() *data.EventMessage {
-	if uid := m.selectedEventUID(); uid == "" || uid != m.ev.detailUID {
+	if uid := m.selectedEventUID(); !m.ev.reading || uid == "" || uid != m.ev.detailUID {
 		return nil
 	}
 	d := m.ev.detail
@@ -145,6 +146,7 @@ func (m *Model) loadEventDetail() {
 	src := m.eventMessages()
 	e := m.eventsState().Selected()
 	if !m.ev.reading || src == nil || e == nil || !e.Truncated || e.UID == "" {
+		m.ev.detail, m.ev.detailUID = data.EventMessage{}, ""
 		return
 	}
 	if msg, ok := src.EventMessage(e.UID); ok {
@@ -211,16 +213,27 @@ func (m *Model) cycleEventsScope() {
 	m.ev.Scope = scopes[(i+1)%len(scopes)]
 	m.ev.Cursor, m.ev.UID, m.ev.msgScroll, m.ev.reading, m.ev.gone = 0, "", 0, false, false
 	m.refreshEventsScreen()
+	m.trackClusterFeed()
 }
 
 func (m *Model) restoreEvents(f eventsFrame) {
 	m.ev = eventsView{eventsFrame: f}
-	if f.Scope == data.ScopeCluster && m.snap.Cluster.Namespace != "" {
-		m.ev.Scope = data.ScopeNamespace
-		if m.ev.Namespace == "" {
-			m.ev.Namespace = m.snap.Cluster.Namespace
+}
+
+func (m Model) clusterFeedNeeded() bool {
+	onEvents := m.onScreen(ScreenEvents) && m.ev.Scope == data.ScopeCluster && m.eventsSelectable()
+	onTab := m.screen().ShowsDetails() && m.tab == ui.TabEvents && m.dg.scope == data.ScopeCluster
+	return onEvents || onTab
+}
+
+func (m *Model) trackClusterFeed() {
+	need := m.clusterFeedNeeded()
+	if m.wideFeed && !need {
+		if r, ok := m.dg.diag.(data.ClusterEventsReleaser); ok {
+			r.ReleaseClusterEvents()
 		}
 	}
+	m.wideFeed = need
 }
 
 func (m *Model) refreshEventsScreen() {

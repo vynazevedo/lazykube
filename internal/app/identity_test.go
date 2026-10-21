@@ -63,7 +63,7 @@ func TestSelectionUsesNamespaceQualifiedKey(t *testing.T) {
 
 func TestWaitChangeReturnsAfterClose(t *testing.T) {
 	ch := make(chan struct{})
-	cmd := waitChange(ch)
+	cmd := waitChange(ch, 0)
 	close(ch)
 	done := make(chan tea.Msg, 1)
 	go func() { done <- cmd() }()

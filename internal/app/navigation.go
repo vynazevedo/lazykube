@@ -7,6 +7,7 @@ import (
 	"charm.land/bubbles/v2/key"
 	tea "charm.land/bubbletea/v2"
 
+	"github.com/vynazevedo/lazykube/internal/data"
 	"github.com/vynazevedo/lazykube/internal/ui"
 )
 
@@ -167,7 +168,7 @@ func (m *Model) handleEsc() {
 	switch {
 	case m.onScreen(ScreenEvents) && m.ev.reading:
 		m.stopReadingEvent()
-	case m.tab == ui.TabLog && m.dg.search.Value() != "":
+	case m.screen().ShowsDetails() && m.tab == ui.TabLog && m.dg.search.Value() != "":
 		m.dg.search.SetValue("")
 		m.updateMatches()
 	case m.filter.Value() != m.nav.entryFilter:
@@ -261,6 +262,14 @@ func (m Model) routeKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 	if m.dep.open {
 		return m.handleOverlayKey(msg)
 	}
+	if !m.helpOpen && !m.filtering && !m.dg.searching {
+		switch {
+		case key.Matches(msg, m.keys.Context):
+			return m, requestPick(pickContext, m.session.Generation)
+		case key.Matches(msg, m.keys.Namespace):
+			return m, requestPick(pickNamespace, m.session.Generation)
+		}
+	}
 	if !m.helpOpen && !m.filtering && !m.dg.searching && !m.layout.TooSmall {
 		k := m.keys
 		switch {
@@ -316,6 +325,28 @@ func crumbLabels(cs []crumb) []string {
 		out[i] = c.label
 	}
 	return out
+}
+
+func (m Model) headerState() ui.HeaderState {
+	mode := m.session.Mode
+	if mode == (data.EffectiveMode{}) {
+		mode = data.ReadOnlyMode
+	}
+	readOnly := mode.ReadOnly || !mode.Valid
+	return ui.HeaderState{ReadOnly: readOnly, Writable: !readOnly, Protected: mode.Protected, Synthetic: m.snap.Synthetic, Cluster: m.snap.Cluster, MetricsOK: m.metrics.Available, SecurityAlerts: len(m.securitySession.Alerts)}
+}
+
+func (m Model) headerClick(ms tea.Mouse) tea.Cmd {
+	if ms.Button != tea.MouseLeft || m.layout.TooSmall || m.helpOpen || m.menu.open || !m.layout.Header.Contains(ms.X, ms.Y) {
+		return nil
+	}
+	switch ui.HeaderTargetAt(m.headerState(), m.layout.Header.W, ms.X-m.layout.Header.X) {
+	case ui.HeaderContext:
+		return requestPick(pickContext, m.session.Generation)
+	case ui.HeaderNamespace:
+		return requestPick(pickNamespace, m.session.Generation)
+	}
+	return nil
 }
 
 func (m Model) handleShellClick(ms tea.Mouse) (Model, bool) {

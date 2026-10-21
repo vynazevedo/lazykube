@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"context"
-	"errors"
 	"io"
 	"strings"
 	"sync"
@@ -46,7 +45,7 @@ func TestDemoSkipsConnectorAndLoader(t *testing.T) {
 	if err != nil || called || shutdown == nil {
 		t.Fatalf("demo build: err=%v called=%v", err, called)
 	}
-	if _, ok := model.(app.Model); !ok {
+	if r, ok := model.(app.Root); !ok || r.Connecting() {
 		t.Fatalf("demo must start on the main model, got %T", model)
 	}
 }
@@ -57,7 +56,7 @@ func TestRealModeStartsOnLoader(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer shutdown()
-	if _, ok := model.(app.Loader); !ok {
+	if r, ok := model.(app.Root); !ok || !r.Connecting() {
 		t.Fatalf("real mode must open the loading screen, got %T", model)
 	}
 }
@@ -69,9 +68,8 @@ func TestConnectorPassesOptionsAndProgress(t *testing.T) {
 		o.Progress(data.Progress{Stage: data.StageSync})
 		return data.NewDemo(), func() {}, nil
 	}
-	f := flags{context: "dev", kubeconfig: "/k", namespace: "apps", palette: "charm", fps: 30}
 	var reported []data.Progress
-	src, _, err := clusterConnector(f, connect)(context.Background(), func(p data.Progress) { reported = append(reported, p) })
+	src, _, err := clusterConnector(flags{kubeconfig: "/k"}, data.Target{Context: "dev", Namespace: "apps"}, connect)(context.Background(), func(p data.Progress) { reported = append(reported, p) })
 	if err != nil || src == nil {
 		t.Fatalf("err=%v src=%v", err, src)
 	}
@@ -141,7 +139,7 @@ func TestRunReportsConnectError(t *testing.T) {
 	connect := func(_ context.Context, o kube.ConnectOptions) (data.Source, func(), error) {
 		o.Progress(data.Progress{Stage: data.StageKubeconfig, Done: true, Context: "dev"})
 		o.Progress(data.Progress{Stage: data.StageConnect, Context: "dev"})
-		return nil, nil, errors.New("cannot reach the API server:\n\x1b[31mdial tcp: refused")
+		return nil, nil, data.NewPublicError("cannot reach the API server:\n\x1b[31mdial tcp: refused")
 	}
 	code, stderr := runWith(t, connect, "q")
 	if code != app.ExitFailure {
@@ -205,6 +203,21 @@ func TestRunSigintDuringLoadingExitsCancelled(t *testing.T) {
 	}
 }
 
+func TestDemoConnectorIsSynthetic(t *testing.T) {
+	t.Setenv("KUBECONFIG", "/nonexistent/lazykube-test")
+	src, closeFn, err := demoConnector(data.Target{Context: "demo-edge", Namespace: "xcx"})(context.Background(), func(data.Progress) {})
+	if err != nil || closeFn == nil {
+		t.Fatalf("demo connector: %v", err)
+	}
+	snap := src.Snapshot()
+	if !snap.Synthetic || snap.Cluster.Context != "demo-edge" || snap.Cluster.Namespace != "xcx" {
+		t.Fatalf("demo target = %+v", snap.Cluster)
+	}
+	if _, _, err := demoConnector(data.Target{Context: "prod"})(context.Background(), func(data.Progress) {}); err == nil {
+		t.Fatal("only synthetic contexts exist in demo")
+	}
+}
+
 func TestReadWriteRequiresExplicitProcessFlag(t *testing.T) {
 	for _, tc := range []struct {
 		args   []string
@@ -219,7 +232,7 @@ func TestReadWriteRequiresExplicitProcessFlag(t *testing.T) {
 			options = o
 			return data.NewDemo(), func() {}, nil
 		}
-		_, _, err = clusterConnector(f, connect)(context.Background(), func(data.Progress) {})
+		_, _, err = clusterConnector(f, data.Target{}, connect)(context.Background(), func(data.Progress) {})
 		if err != nil || options.AllowWrites != tc.writes {
 			t.Fatal(options.AllowWrites, err)
 		}
@@ -243,7 +256,7 @@ func TestProtectedContextsAreExactAndOverrideReadWrite(t *testing.T) {
 		options = o
 		return data.NewDemo(), func() {}, nil
 	}
-	_, _, err = clusterConnector(f, connect)(context.Background(), func(data.Progress) {})
+	_, _, err = clusterConnector(f, data.Target{}, connect)(context.Background(), func(data.Progress) {})
 	if err != nil {
 		t.Fatal(err)
 	}

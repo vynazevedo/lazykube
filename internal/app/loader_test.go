@@ -59,7 +59,7 @@ func sameStates(got []ui.StepState, want ...ui.StepState) bool {
 }
 
 func progress(stage data.Stage, done bool, detail string) progressMsg {
-	return progressMsg{data.Progress{Stage: stage, Done: done, Context: "dev", Detail: detail}}
+	return progressMsg{p: data.Progress{Stage: stage, Done: done, Context: "dev", Detail: detail}}
 }
 
 func midwayLoader(t *testing.T, noAnim bool) Loader {
@@ -106,7 +106,7 @@ func TestLoaderShowsFailedStage(t *testing.T) {
 	l := newTestLoader(nil, false)
 	l, _ = loaderStep(t, l, progress(data.StageKubeconfig, true, ""))
 	l, _ = loaderStep(t, l, progress(data.StageConnect, false, ""))
-	l, cmd := loaderStep(t, l, connectedMsg{err: errors.New("cannot reach the API server:\n\x1b]0;pwn\x07dial tcp 10.0.0.1:6443: i/o timeout")})
+	l, cmd := loaderStep(t, l, connectedMsg{err: data.NewPublicError("cannot reach the API server:\n\x1b]0;pwn\x07dial tcp: i/o timeout")})
 	if cmd != nil {
 		t.Fatal("failure must not schedule more work")
 	}
@@ -117,8 +117,12 @@ func TestLoaderShowsFailedStage(t *testing.T) {
 	if !failed || stage != "conectando ao contexto dev" || strings.ContainsAny(msg, "\x1b\x07\n") {
 		t.Fatalf("failure = %q %q %v", stage, msg, failed)
 	}
-	if msg != "cannot reach the API server: dial tcp 10.0.0.1:6443: i/o timeout" {
+	if msg != "cannot reach the API server: dial tcp: i/o timeout" {
 		t.Fatalf("message = %q", msg)
+	}
+	raw, _ := loaderStep(t, newTestLoader(nil, true), connectedMsg{err: errors.New("Get https://10.0.0.1/api?token=SENTINELA: plugin stderr SENTINELA")})
+	if _, msg, _ := raw.Failure(); msg != data.RedactedFailure || strings.Contains(raw.Render().Plain(), "SENTINELA") {
+		t.Fatalf("an error without a public message is redacted: %q", msg)
 	}
 	if l, cmd = loaderStep(t, l, loaderFrameMsg{at: epoch.Add(time.Second)}); cmd != nil {
 		t.Fatal("failed screen must stop animating")
@@ -273,7 +277,7 @@ func TestLoaderClosesLateSourceAfterShutdown(t *testing.T) {
 func loadingGoldenLoader(t *testing.T, failed bool) Loader {
 	l := midwayLoader(t, true)
 	if failed {
-		l, _ = loaderStep(t, l, connectedMsg{err: errors.New("timed out waiting for the cluster cache to sync")})
+		l, _ = loaderStep(t, l, connectedMsg{err: data.NewPublicError("timed out waiting for the cluster cache to sync")})
 	}
 	l.clock = anim.Fixed(goldenT, goldenPhase, 30)
 	return l

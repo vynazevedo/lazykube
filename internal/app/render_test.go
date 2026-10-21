@@ -78,9 +78,11 @@ func TestScreenGolden(t *testing.T) {
 func TestEveryTabRenders(t *testing.T) {
 	m := demoModel(t, 160, 48)
 	for _, k := range []string{"l", "c", "t", "d", "e"} {
-		next, _ := m.Update(keyPress(k))
-		got := next.(Model).Render().Plain()
-		golden(t, "tab_"+k+".txt", got)
+		keys := []string{k}
+		if k == "c" {
+			keys = []string{"l", "]"}
+		}
+		golden(t, "tab_"+k+".txt", press(t, m, keys...).Render().Plain())
 	}
 }
 
