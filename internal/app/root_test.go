@@ -616,3 +616,34 @@ func TestRootCatalogReadDoesNotBlock(t *testing.T) {
 		t.Fatal("ctrl+c still quits")
 	}
 }
+
+func TestRootPickerReceivesPaste(t *testing.T) {
+	d := newRootDriver(t, newFakeCluster(), data.Target{Context: "alpha", Namespace: "apps"})
+	d.until("initial", connectedTo("alpha", "apps"))
+	d.press("/")
+	d.send(tea.PasteMsg{Content: "under"})
+	d.press("enter")
+	under, _ := d.r.model()
+	if under.filter.Value() != "under" {
+		t.Fatal("without a picker paste still reaches the pod filter")
+	}
+
+	d.press("c")
+	d.until("picker", picking)
+	d.press("/")
+	d.send(tea.PasteMsg{Content: "gam"})
+	if vis := d.r.pick.visible(); len(vis) != 1 || vis[0].item.Label != "gamma" {
+		t.Fatalf("paste reaches the picker filter: %q", d.r.pick.filter.Value())
+	}
+	d.press("esc", "esc")
+
+	d.press("n")
+	d.until("picker", picking)
+	d.press("end", "enter")
+	d.send(tea.PasteMsg{Content: "ops-team"})
+	if m, _ := d.r.model(); m.filter.Value() != "under" {
+		t.Fatal("paste with the picker open does not reach the model below")
+	}
+	d.press("enter")
+	d.until("pasted namespace", connectedTo("alpha", "ops-team"))
+}

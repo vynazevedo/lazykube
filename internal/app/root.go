@@ -243,6 +243,10 @@ func (r Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if r.pick != nil {
 			return r, nil
 		}
+	case tea.PasteMsg:
+		if r.pick != nil {
+			return r, r.pick.paste(msg)
+		}
 	}
 	next, cmd := r.cur.Update(msg)
 	r.cur = next

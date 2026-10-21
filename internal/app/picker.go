@@ -225,6 +225,20 @@ func (p *picker) confirm() (pickResult, tea.Cmd) {
 	return pickResult{target: e.target, ok: true}, nil
 }
 
+func (p *picker) paste(msg tea.PasteMsg) tea.Cmd {
+	var cmd tea.Cmd
+	switch {
+	case p.loading:
+	case p.inputting:
+		p.input, cmd = p.input.Update(msg)
+		p.err = ""
+	case p.filtering:
+		p.filter, cmd = p.filter.Update(msg)
+		p.cursor = 0
+	}
+	return cmd
+}
+
 func (p *picker) key(msg tea.KeyPressMsg) (pickResult, tea.Cmd) {
 	k := msg.String()
 	switch {
