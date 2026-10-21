@@ -55,6 +55,7 @@ type caps struct {
 }
 
 type Source struct {
+	rebuildMu          sync.Mutex
 	observations       *insight.Inventory
 	observationPods    map[string]insight.PodObservation
 	observationBudgets map[string]observationBudgetUse
@@ -450,6 +451,8 @@ func listOf[T any](inf cache.SharedIndexInformer) []*T {
 }
 
 func (s *Source) rebuild() {
+	s.rebuildMu.Lock()
+	defer s.rebuildMu.Unlock()
 	now := s.opts.Now()
 	pods := listOf[corev1.Pod](s.podInf)
 	sort.Slice(pods, func(i, j int) bool {
@@ -543,11 +546,12 @@ func (s *Source) rebuild() {
 		Namespaces:  outNS,
 	}
 
+	observations := s.prepareObservations(pods)
 	s.mu.Lock()
 	snap.DeploymentCoverage = s.deploymentCoverage
 	s.snap = snap
 	s.byKey = byKey
-	s.publishObservations(pods)
+	s.observations = observations
 	s.usage.noteEligibility(pods)
 	s.nodes = nodes
 	s.nodeList = nodeList

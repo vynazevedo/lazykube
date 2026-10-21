@@ -17,11 +17,25 @@ var _ insight.ObservationSource = (*Source)(nil)
 
 func (s *Source) Observations(after insight.Cursor) insight.ObservationBatch {
 	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return s.observations.Observations(after)
+	current := s.observations
+	s.mu.RUnlock()
+	return current.Observations(after)
 }
 
 func (s *Source) publishObservations(pods []*corev1.Pod) {
+	s.rebuildMu.Lock()
+	defer s.rebuildMu.Unlock()
+	next := s.prepareObservations(pods)
+	s.mu.Lock()
+	s.observations = next
+	s.mu.Unlock()
+}
+
+func (s *Source) prepareObservations(pods []*corev1.Pod) *insight.Inventory {
+	s.mu.RLock()
+	nextInventory := *s.observations
+	podCoverage := s.podCoverage
+	s.mu.RUnlock()
 	source := insight.SourceIdentity{SessionID: strconv.FormatUint(s.generation, 10), Context: s.opts.Context, Generation: s.generation}
 	pods = slices.Clone(pods)
 	slices.SortFunc(pods, func(a, b *corev1.Pod) int {
@@ -59,7 +73,7 @@ func (s *Source) publishObservations(pods []*corev1.Pod) {
 	}
 	s.observationPods = next
 	s.observationBudgets = nextBudgets
-	coverage := observationCoverage(s.podCoverage)
+	coverage := observationCoverage(podCoverage)
 	coverage.Total = len(pods)
 	if omissions != (insight.ObservationOmissions{}) {
 		if coverage.State == insight.CoverageComplete {
@@ -71,7 +85,8 @@ func (s *Source) publishObservations(pods []*corev1.Pod) {
 		}
 		coverage.Reason += detail
 	}
-	s.observations.Publish(source, s.opts.Namespace, false, projected, coverage)
+	nextInventory.Publish(source, s.opts.Namespace, false, projected, coverage)
+	return &nextInventory
 }
 
 func observationCoverage(c data.Coverage) insight.Coverage {
