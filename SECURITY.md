@@ -10,9 +10,10 @@ no GitHub Security Advisories para iniciar um relato privado aos mantenedores.
 Inclua versão ou SHA, impacto, passos de reprodução com dados sintéticos e,
 quando possível, um teste que não dependa de um cluster real.
 
-O reporte privado precisa estar habilitado nas configurações do repositório.
-Se o botão não estiver disponível, não publique os detalhes. Solicite a ativação
-ao mantenedor em uma issue contendo somente esse pedido, sem descrever a falha.
+O reporte privado de vulnerabilidades está habilitado no repositório.
+Se houver dificuldade de acesso, solicite orientação ao mantenedor
+[@vynazevedo](https://github.com/vynazevedo) pelo GitHub, sem publicar detalhes
+da falha em issues ou discussões.
 A divulgação e a release de correção serão coordenadas no advisory privado.
 Não há garantia de prazo de resposta para este projeto mantido voluntariamente.
 
