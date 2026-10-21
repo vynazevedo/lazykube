@@ -24,11 +24,27 @@ type demoPod struct {
 }
 
 type Demo struct {
-	security SecuritySnapshot
-	pods     []demoPod
+	security  SecuritySnapshot
+	pods      []demoPod
+	context   string
+	namespace string
 }
 
+const DemoContext = "demo"
+
 func NewDemo() *Demo {
+	return NewDemoScoped(DemoContext, "")
+}
+
+func DemoContexts() ContextCatalog {
+	return ContextCatalog{Synthetic: true, Current: DemoContext, Contexts: []KubeContext{
+		{Name: DemoContext, Cluster: "demo-cluster", User: "demo-user", Current: true},
+		{Name: "demo-edge", Cluster: "demo-edge", User: "demo-user", Namespace: "xcx"},
+		{Name: "demo-lab", Cluster: "demo-lab", User: "demo-viewer", Namespace: "kube-system"},
+	}}
+}
+
+func NewDemoScoped(context, namespace string) *Demo {
 	rows := []struct {
 		name, ns string
 		status   PodStatus
@@ -51,9 +67,13 @@ func NewDemo() *Demo {
 		{"local-path-provisioner-84db5d-h4", "kube-system", StatusFailed, 0, "119d", 1, 5},
 		{"svclb-traefik-8c2f1-6n2vb", "kube-system", StatusFailed, 7, "119d", 1, 6},
 	}
-	d := &Demo{pods: make([]demoPod, len(rows))}
-	for i, r := range rows {
-		d.pods[i] = demoPod{
+	d := &Demo{pods: make([]demoPod, 0, len(rows)), context: context, namespace: namespace}
+	for _, r := range rows {
+		if namespace != "" && r.ns != namespace {
+			continue
+		}
+		i := len(d.pods)
+		d.pods = append(d.pods, demoPod{
 			cpuBase: r.cpu,
 			pod: Pod{
 				Name:       r.name,
@@ -71,7 +91,7 @@ func NewDemo() *Demo {
 				Controller: "ReplicaSet/" + withoutLastSegment(r.name),
 				QoS:        "Burstable",
 			},
-		}
+		})
 		d.pods[i].containers = demoContainers(r.name, d.pods[i].pod.Image)
 		d.pods[i].pod.Reason, d.pods[i].pod.Ready, d.pods[i].pod.Containers = demoSummary(r.status, d.pods[i].containers)
 		d.pods[i].events = demoPodEvents(d.pods[i].pod)
@@ -81,6 +101,7 @@ func NewDemo() *Demo {
 }
 
 func (d *Demo) Snapshot() Snapshot {
+	namespaces := d.namespaces()
 	pods := make([]Pod, len(d.pods))
 	for i, p := range d.pods {
 		pods[i] = p.pod
@@ -88,12 +109,14 @@ func (d *Demo) Snapshot() Snapshot {
 	return Snapshot{
 		Synthetic: true,
 		Cluster: Cluster{
-			Context:    "demo",
+			Context:    d.context,
 			Version:    "demo",
 			Nodes:      1,
-			Namespaces: 8,
+			Namespaces: len(namespaces),
 			Pods:       len(pods),
 			Uptime:     "119d",
+			Namespace:  d.namespace,
+			Listed:     d.namespace == "",
 		},
 		Node: Node{
 			Name:        demoNode,
@@ -107,28 +130,48 @@ func (d *Demo) Snapshot() Snapshot {
 			Arch:        "amd64",
 			Coverage:    Coverage{State: CoverageComplete},
 		},
-		Pods: pods,
-		Deployments: []Deployment{
-			{"bilibili-raffle", "bilibili-live", 1, 1},
-			{"bilibili-raffle", "bilibili-raffle", 1, 1},
-			{"ys-odoo", "psql", 1, 1},
-			{"ys-odoo", "odoo", 1, 1},
-			{"lgo", "lgo", 1, 1},
-			{"kube-system", "coredns", 1, 1},
-			{"kube-system", "metrics-server", 1, 1},
-			{"kube-system", "traefik", 1, 1},
-		},
-		Namespaces: []Namespace{
-			{"default", 0},
-			{"kube-system", 5},
-			{"kube-public", 0},
-			{"kube-node-lease", 0},
-			{"bilibili-raffle", 2},
-			{"lgo", 1},
-			{"xcx", 3},
-			{"ys-odoo", 2},
-		},
+		Pods:        pods,
+		Deployments: d.scoped(demoDeployments),
+		Namespaces:  namespaces,
 	}
+}
+
+func (d *Demo) scoped(deploys []Deployment) []Deployment {
+	var out []Deployment
+	for _, dep := range deploys {
+		if d.namespace == "" || dep.Namespace == d.namespace {
+			out = append(out, dep)
+		}
+	}
+	return out
+}
+
+func (d *Demo) namespaces() []Namespace {
+	count := map[string]int{}
+	for _, p := range d.pods {
+		count[p.pod.Namespace]++
+	}
+	if d.namespace != "" {
+		return []Namespace{{d.namespace, count[d.namespace]}}
+	}
+	out := make([]Namespace, len(demoNamespaces))
+	for i, name := range demoNamespaces {
+		out[i] = Namespace{name, count[name]}
+	}
+	return out
+}
+
+var demoNamespaces = []string{"default", "kube-system", "kube-public", "kube-node-lease", "bilibili-raffle", "lgo", "xcx", "ys-odoo"}
+
+var demoDeployments = []Deployment{
+	{"bilibili-raffle", "bilibili-live", 1, 1},
+	{"bilibili-raffle", "bilibili-raffle", 1, 1},
+	{"ys-odoo", "psql", 1, 1},
+	{"ys-odoo", "odoo", 1, 1},
+	{"lgo", "lgo", 1, 1},
+	{"kube-system", "coredns", 1, 1},
+	{"kube-system", "metrics-server", 1, 1},
+	{"kube-system", "traefik", 1, 1},
 }
 
 func (d *Demo) index(key string) int {
