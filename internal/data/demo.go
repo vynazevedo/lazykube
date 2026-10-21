@@ -99,6 +99,7 @@ func (d *Demo) Snapshot() Snapshot {
 			Name:        demoNode,
 			Address:     demoNodeAddress,
 			Ready:       true,
+			ReadyKnown:  true,
 			MemUsed:     "1.4Gi",
 			MemTotal:    "3.8Gi",
 			MemFraction: 0.37,
@@ -182,6 +183,8 @@ func (d *Demo) Metrics(tick int, pod string, heatCols int) Metrics {
 		}
 	}
 	m.CPUNow = int(math.Round(m.CPU[cpuWindow-1]))
+	m.CPUKnown = idx >= 0
+	m.MemKnown = idx >= 0
 	m.Samples, m.Window = cpuWindow, cpuWindow
 
 	m.Mem = make([]float64, sparkWindow)
