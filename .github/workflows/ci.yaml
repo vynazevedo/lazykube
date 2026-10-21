@@ -48,7 +48,29 @@ jobs:
           fi
       - run: go build ./...
       - run: go vet ./...
+      - name: Vet para Darwin
+        run: GOOS=darwin go vet ./...
       - run: go test -race -count=1 ./...
+
+  windows:
+    name: Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version: 1.26.x
+          check-latest: true
+          cache: true
+      - run: go vet ./...
+        env:
+          KUBECONFIG: ${{ runner.temp }}/lazykube-test-kubeconfig
+      - run: go test ./cmd/...
+        env:
+          KUBECONFIG: ${{ runner.temp }}/lazykube-test-kubeconfig
 
   lint:
     runs-on: ubuntu-latest
@@ -117,7 +139,7 @@ jobs:
   gate:
     name: CI gate
     if: ${{ always() }}
-    needs: [test, lint, vulnerabilities, installer, integration]
+    needs: [test, windows, lint, vulnerabilities, installer, integration]
     runs-on: ubuntu-latest
     steps:
       - name: Require all checks
