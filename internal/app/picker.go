@@ -69,6 +69,8 @@ type picker struct {
 	inputting bool
 	note      string
 	err       string
+	loading   bool
+	seq       uint64
 }
 
 type pickResult struct {
@@ -144,6 +146,13 @@ func contextPicker(cat data.ContextCatalog, err error, active *data.Target, memo
 	return p
 }
 
+func loadingPicker(seq uint64) *picker {
+	p := newPicker(pickContext, "Contextos do kubeconfig", nil)
+	p.loading, p.seq = true, seq
+	p.note = "lendo os contextos do kubeconfig…"
+	return p
+}
+
 func namespacePicker(active data.Target, snap data.Snapshot) *picker {
 	entries := []pickEntry{{
 		target: data.Target{Context: active.Context},
@@ -195,6 +204,7 @@ func (p *picker) state() ui.PickerState {
 		Inputting: p.inputting,
 		Note:      p.note,
 		Error:     p.err,
+		Loading:   p.loading,
 	}
 }
 
@@ -218,6 +228,8 @@ func (p *picker) confirm() (pickResult, tea.Cmd) {
 func (p *picker) key(msg tea.KeyPressMsg) (pickResult, tea.Cmd) {
 	k := msg.String()
 	switch {
+	case p.loading:
+		return pickResult{close: k == "esc"}, nil
 	case p.inputting:
 		switch k {
 		case "esc":

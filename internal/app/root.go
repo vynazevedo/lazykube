@@ -42,7 +42,14 @@ type Root struct {
 	published uint64
 	memory    map[string]string
 	pick      *picker
+	catalogs  uint64
 	w, h      int
+}
+
+type catalogMsg struct {
+	seq uint64
+	cat data.ContextCatalog
+	err error
 }
 
 func newSession() *session {
@@ -188,7 +195,14 @@ func (r Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if !r.pickAllowed(msg) {
 			return r, nil
 		}
-		return r.openPicker(msg.kind), nil
+		return r.openPicker(msg.kind)
+	case catalogMsg:
+		if r.pick == nil || !r.pick.loading || r.pick.seq != msg.seq {
+			return r, nil
+		}
+		r.pick = contextPicker(msg.cat, msg.err, r.active, r.memory)
+		r.pick.seq = msg.seq
+		return r, nil
 	case choiceMsg:
 		if !r.attemptLive(msg.attempt) {
 			return r, nil
@@ -247,23 +261,27 @@ func (r Root) pickAllowed(msg pickMsg) bool {
 	return ok && r.published == r.attempt && m.session.Generation == msg.session
 }
 
-func (r Root) openPicker(kind pickKind) Root {
+func (r Root) openPicker(kind pickKind) (Root, tea.Cmd) {
 	switch kind {
 	case pickContext:
-		var cat data.ContextCatalog
-		err := errors.New("sem fonte de contextos")
-		if r.catalog != nil {
-			cat, err = r.catalog()
+		r.catalogs++
+		seq, catalog := r.catalogs, r.catalog
+		r.pick = loadingPicker(seq)
+		return r, func() tea.Msg {
+			if catalog == nil {
+				return catalogMsg{seq: seq, err: errors.New("sem fonte de contextos")}
+			}
+			cat, err := catalog()
+			return catalogMsg{seq: seq, cat: cat, err: err}
 		}
-		r.pick = contextPicker(cat, err, r.active, r.memory)
 	case pickNamespace:
 		m, ok := r.model()
 		if !ok || r.active == nil {
-			return r
+			return r, nil
 		}
 		r.pick = namespacePicker(*r.active, m.snap)
 	}
-	return r
+	return r, nil
 }
 
 func (r Root) choose(res pickResult, cmd tea.Cmd) (tea.Model, tea.Cmd) {

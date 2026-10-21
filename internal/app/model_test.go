@@ -39,6 +39,8 @@ func keyPress(s string) tea.KeyPressMsg {
 		return tea.KeyPressMsg{Code: 'p', Mod: tea.ModCtrl}
 	case "alt+n":
 		return tea.KeyPressMsg{Code: 'n', Mod: tea.ModAlt}
+	case "ctrl+c":
+		return tea.KeyPressMsg{Code: 'c', Mod: tea.ModCtrl}
 	case "backspace":
 		return tea.KeyPressMsg{Code: tea.KeyBackspace}
 	}

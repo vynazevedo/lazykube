@@ -22,6 +22,7 @@ type PickerState struct {
 	Inputting bool
 	Note      string
 	Error     string
+	Loading   bool
 }
 
 type PickerGeometry struct {
@@ -82,7 +83,10 @@ func Picker(r draw.Region, st PickerState, ctx Ctx) {
 	inner.Line(0, 0, filter.Truncate(inner.W))
 	inner.HLine(0, 1, inner.W, '─', draw.Fg(theme.BorderSoft))
 	body := inner.Sub(0, 2, inner.W, g.Rows)
-	if len(st.Items) == 0 {
+	switch {
+	case st.Loading:
+		centered(body, "lendo os contextos do kubeconfig…")
+	case len(st.Items) == 0:
 		centeredColor(body, reasonOr(st.Error, "nenhum item corresponde ao filtro"), theme.Warn)
 	}
 	off := ScrollOffset(st.Cursor, len(st.Items), g.Rows)

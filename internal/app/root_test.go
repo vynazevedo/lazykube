@@ -131,11 +131,16 @@ type rootDriver struct {
 
 func newRootDriver(t *testing.T, f *fakeCluster, initial data.Target) *rootDriver {
 	t.Helper()
+	return newRootDriverWith(t, f, initial, fakeCatalog)
+}
+
+func newRootDriverWith(t *testing.T, f *fakeCluster, initial data.Target, catalog func() (data.ContextCatalog, error)) *rootDriver {
+	t.Helper()
 	r := NewRoot(RootOptions{
 		Options: Options{Palette: theme.DefaultPalette(), FPS: 30, NoAnim: true, Now: func() time.Time { return epoch }},
 		Initial: initial,
 		Connect: f.connect,
-		Catalog: fakeCatalog,
+		Catalog: catalog,
 	})
 	d := &rootDriver{t: t, msgs: make(chan tea.Msg, 64), done: make(chan struct{})}
 	next, _ := r.Update(tea.WindowSizeMsg{Width: 160, Height: 48})
@@ -224,7 +229,7 @@ func failed(r Root) bool {
 	return ok && l.err != nil
 }
 
-func picking(r Root) bool { return r.pick != nil }
+func picking(r Root) bool { return r.pick != nil && !r.pick.loading }
 
 func eventually(t *testing.T, what string, ok func() bool) {
 	t.Helper()
@@ -251,7 +256,7 @@ func (d *rootDriver) pickTarget(kind pickKind, label string) {
 	d.t.Helper()
 	key := map[pickKind]string{pickContext: "c", pickNamespace: "n"}[kind]
 	d.press(key)
-	d.until("picker", picking)
+	d.until("picker", func(r Root) bool { return r.pick != nil && !r.pick.loading })
 	if d.r.pick.kind != kind {
 		d.t.Fatalf("%s opens the %v picker", key, kind)
 	}
@@ -293,7 +298,7 @@ func TestRootSwitchesContextsAndRestoresNamespaces(t *testing.T) {
 	}
 	closedOnce(t, f.opened("alpha")...)
 
-	if p, _ := d.r.model(); len(d.r.openPicker(pickNamespace).pick.entries) != 3 || p.snap.Cluster.Listed {
+	if p, _ := d.r.model(); len(namespacePicker(*d.r.active, p.snap).entries) != 3 || p.snap.Cluster.Listed {
 		t.Fatal("a restricted connection offers Todos, its observed namespace and manual entry")
 	}
 	d.pickTarget(pickNamespace, data.AllNamespacesLabel)
@@ -558,4 +563,56 @@ func TestRootRejectsStalePickRequests(t *testing.T) {
 	}
 	d.press("c")
 	d.until("current attempt opens the picker", picking)
+}
+
+func TestRootCatalogReadDoesNotBlock(t *testing.T) {
+	release := make(chan struct{})
+	var reads atomic.Int32
+	catalog := func() (data.ContextCatalog, error) {
+		reads.Add(1)
+		<-release
+		return fakeCatalog()
+	}
+	d := newRootDriverWith(t, newFakeCluster(), data.Target{Context: "alpha"}, catalog)
+	d.until("initial", connectedTo("alpha", ""))
+	pressWithin := func(keys ...string) {
+		t.Helper()
+		done := make(chan struct{})
+		go func() {
+			d.press(keys...)
+			close(done)
+		}()
+		select {
+		case <-done:
+		case <-time.After(3 * time.Second):
+			t.Fatalf("%v blocked the update loop", keys)
+		}
+	}
+	pressWithin("c")
+	if d.r.pick == nil || !d.r.pick.loading || !strings.Contains(d.r.Render().Plain(), "lendo os contextos do kubeconfig") {
+		t.Fatal("the picker opens at once in a loading state")
+	}
+	pressWithin("esc")
+	if d.r.pick != nil {
+		t.Fatal("esc cancels a loading picker")
+	}
+	pressWithin("c")
+	pressWithin("down", "enter")
+	if d.r.pick == nil || d.r.attempt != 1 {
+		t.Fatal("a loading picker ignores navigation and confirmation")
+	}
+	close(release)
+	d.until("the current read fills the picker", func(r Root) bool { return r.pick != nil && !r.pick.loading })
+	if n := len(d.r.pick.entries); n != 3 || reads.Load() != 2 {
+		t.Fatalf("picker entries %d after %d reads", n, reads.Load())
+	}
+	d.press("esc")
+	d.drain()
+	if d.r.pick != nil {
+		t.Fatal("the stale read of the cancelled picker does not reopen it")
+	}
+	d.press("ctrl+c")
+	if !d.quit {
+		t.Fatal("ctrl+c still quits")
+	}
 }
