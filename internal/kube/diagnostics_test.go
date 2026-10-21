@@ -330,7 +330,7 @@ func TestWaitingContainerSkipsAPI(t *testing.T) {
 
 func event(ns, name, kind, obj string, uid types.UID, typ string, at time.Time) *corev1.Event {
 	return &corev1.Event{
-		ObjectMeta:     metav1.ObjectMeta{Namespace: ns, Name: name},
+		ObjectMeta:     metav1.ObjectMeta{Namespace: ns, Name: name, UID: types.UID("ev-" + name)},
 		InvolvedObject: corev1.ObjectReference{Kind: kind, Namespace: ns, Name: obj, UID: uid},
 		Type:           typ,
 		Reason:         "R" + name,
@@ -366,6 +366,26 @@ func TestScopedEvents(t *testing.T) {
 	}
 	if none := s.ScopedEvents(data.EventQuery{Scope: data.ScopeNamespace}); none.State != data.FeedUnavailable || none.Reason != reasonNoNamespace {
 		t.Fatalf("namespace without target = %+v", none)
+	}
+}
+
+func TestEventsCarryStableIdentity(t *testing.T) {
+	objs := []runtime.Object{
+		testPod("apps", "web-1", "node-a", corev1.PodRunning),
+		event("apps", "e1", "Pod", "web-1", "uid-web-1", "Normal", fixedNow.Add(-time.Minute)),
+		event("apps", "e2", "Pod", "web-1", "uid-web-1", "Warning", fixedNow.Add(-time.Hour)),
+	}
+	s := startWith(t, nil, func(s *Source) { s.manualPoll = true }, objs...)
+	for _, q := range []data.EventQuery{{Scope: data.ScopePod, Pod: "apps/web-1"}, {Scope: data.ScopeNamespace, Namespace: "apps"}, {Scope: data.ScopeCluster}} {
+		feed := s.ScopedEvents(q)
+		if len(feed.Items) != 2 {
+			t.Fatalf("%v feed = %+v", q.Scope, feed)
+		}
+		for _, e := range feed.Items {
+			if e.UID != "ev-"+strings.TrimPrefix(e.Reason, "R") {
+				t.Fatalf("%v event %s must carry the object UID, got %q", q.Scope, e.Reason, e.UID)
+			}
+		}
 	}
 }
 

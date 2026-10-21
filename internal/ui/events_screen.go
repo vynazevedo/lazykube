@@ -24,9 +24,14 @@ type EventsScreenState struct {
 	Reading    bool
 	MsgScroll  int
 	Selectable bool
+	Held       *data.Event
+	Gone       bool
 }
 
 func (st EventsScreenState) Selected() *data.Event {
+	if st.Gone && st.Held != nil {
+		return st.Held
+	}
 	if !st.Selectable || st.Cursor < 0 || st.Cursor >= len(st.Feed.Items) {
 		return nil
 	}
@@ -197,10 +202,10 @@ func EventsTable(r draw.Region, st EventsScreenState, ctx Ctx) {
 		for i := 0; i < rows && off+i < len(feed.Items); i++ {
 			idx := off + i
 			style := func(c theme.RGB) draw.Style { return draw.Fg(c) }
-			if idx == st.Cursor {
+			if !st.Gone && idx == st.Cursor {
 				style = func(c theme.RGB) draw.Style { return draw.Fg(c).WithBg(theme.BorderFaint).WithBold() }
 			}
-			body.Line(0, i, eventsRow(cols, inner.W, feed.Items[idx], idx == st.Cursor, style).Truncate(inner.W))
+			body.Line(0, i, eventsRow(cols, inner.W, feed.Items[idx], !st.Gone && idx == st.Cursor, style).Truncate(inner.W))
 		}
 	}
 	if inner.H > rows+EventsTableTop {
@@ -213,11 +218,15 @@ func EventMessageLines(st EventsScreenState, width int) []draw.Line {
 	if e == nil {
 		return []draw.Line{{faint("nenhum evento selecionado")}}
 	}
-	lines := []draw.Line{
+	var lines []draw.Line
+	if st.Gone {
+		lines = append(lines, draw.Line{colored("evento não está mais no feed; exibindo a última leitura", theme.Warn)})
+	}
+	lines = append(lines, []draw.Line{
 		{muted("Evento: "), text(draw.Sanitize(e.Type + " " + e.Reason)), faint(" · "), text(draw.Sanitize(e.Object))},
 		{muted("Namespace: "), text(draw.Sanitize(e.Namespace)), faint(" · "), muted("count "), text(fmt.Sprintf("%d", e.Count)), faint(" · "), muted("idade "), text(draw.Sanitize(e.Age))},
 		nil,
-	}
+	}...)
 	for _, l := range draw.Wrap(draw.Sanitize(e.Message), max(1, width)) {
 		lines = append(lines, draw.Line{text(l)})
 	}

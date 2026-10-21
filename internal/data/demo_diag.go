@@ -112,7 +112,7 @@ func demoSummary(status PodStatus, containers []Container) (string, int, int) {
 func demoPodEvents(p Pod) []Event {
 	obj := "Pod/" + p.Name
 	ev := func(age, typ, reason, msg string, count int) Event {
-		return Event{Age: age, Type: typ, Reason: reason, Object: obj, Namespace: p.Namespace, Count: count, Message: msg}
+		return Event{UID: "demo-" + p.Namespace + "-" + p.Name + "-" + strings.ToLower(reason), Age: age, Type: typ, Reason: reason, Object: obj, Namespace: p.Namespace, Count: count, Message: msg}
 	}
 	switch {
 	case strings.HasPrefix(p.Name, "bilibili-live"):
@@ -148,8 +148,8 @@ func demoPodEvents(p Pod) []Event {
 }
 
 var demoClusterEvents = []Event{
-	{Age: "3d", Type: "Normal", Reason: "NodeReady", Object: "Node/" + demoNode, Count: 1, Message: "Node " + demoNode + " status is now: NodeReady"},
-	{Age: "5m", Type: "Warning", Reason: "FreeDiskSpaceFailed", Object: "Node/" + demoNode, Count: 2, Message: "failed to garbage collect required amount of images"},
+	{UID: "demo-node-nodeready", Age: "3d", Type: "Normal", Reason: "NodeReady", Object: "Node/" + demoNode, Count: 1, Message: "Node " + demoNode + " status is now: NodeReady"},
+	{UID: "demo-node-freediskspacefailed", Age: "5m", Type: "Warning", Reason: "FreeDiskSpaceFailed", Object: "Node/" + demoNode, Count: 2, Message: "failed to garbage collect required amount of images"},
 }
 
 func demoConditions(p Pod) string {

@@ -111,3 +111,13 @@ func TestShortName(t *testing.T) {
 		t.Fatal("short name broken")
 	}
 }
+
+func TestDemoEventsHaveUniqueIdentity(t *testing.T) {
+	seen := map[string]bool{}
+	for _, e := range NewDemo().ScopedEvents(EventQuery{Scope: ScopeCluster}).Items {
+		if e.UID == "" || seen[e.UID] {
+			t.Fatalf("demo event %s %s needs a unique UID, got %q", e.Object, e.Reason, e.UID)
+		}
+		seen[e.UID] = true
+	}
+}

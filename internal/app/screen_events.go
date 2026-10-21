@@ -18,6 +18,7 @@ type eventsFrame struct {
 	Pod       string
 	Namespace string
 	Cursor    int
+	UID       string
 }
 
 type eventsView struct {
@@ -25,6 +26,8 @@ type eventsView struct {
 	feed      data.EventFeed
 	reading   bool
 	msgScroll int
+	held      data.Event
+	gone      bool
 }
 
 func (eventsScreen) ID() ScreenID {
@@ -106,7 +109,17 @@ func (m Model) eventsState() ui.EventsScreenState {
 		Reading:    m.ev.reading,
 		MsgScroll:  m.ev.msgScroll,
 		Selectable: m.eventsSelectable(),
+		Held:       m.heldEvent(),
+		Gone:       m.ev.gone,
 	}
+}
+
+func (m Model) heldEvent() *data.Event {
+	if !m.ev.gone {
+		return nil
+	}
+	e := m.ev.held
+	return &e
 }
 
 func (m Model) eventsSelectable() bool {
@@ -156,7 +169,7 @@ func (m *Model) cycleEventsScope() {
 	}
 	i := slices.Index(scopes, m.ev.Scope)
 	m.ev.Scope = scopes[(i+1)%len(scopes)]
-	m.ev.Cursor, m.ev.msgScroll, m.ev.reading = 0, 0, false
+	m.ev.Cursor, m.ev.UID, m.ev.msgScroll, m.ev.reading, m.ev.gone = 0, "", 0, false, false
 	m.refreshEventsScreen()
 }
 
@@ -176,7 +189,45 @@ func (m *Model) refreshEventsScreen() {
 		return
 	}
 	m.ev.feed = m.dg.diag.ScopedEvents(data.EventQuery{Scope: m.ev.Scope, Pod: m.ev.Pod, Namespace: m.ev.Namespace})
-	m.ev.Cursor = max(0, min(m.ev.Cursor, len(m.ev.feed.Items)-1))
+	m.syncEventSelection()
+}
+
+func (m *Model) syncEventSelection() {
+	items := m.ev.feed.Items
+	if m.ev.UID != "" {
+		if i := slices.IndexFunc(items, func(e data.Event) bool { return e.UID == m.ev.UID }); i >= 0 {
+			m.ev.Cursor, m.ev.gone = i, false
+			m.ev.held = items[i]
+			return
+		}
+		if m.ev.reading {
+			m.ev.gone = true
+			return
+		}
+	}
+	m.ev.gone = false
+	m.ev.Cursor = max(0, min(m.ev.Cursor, len(items)-1))
+	m.adoptEvent()
+}
+
+func (m *Model) adoptEvent() {
+	m.ev.UID, m.ev.held = "", data.Event{}
+	if m.ev.Cursor >= 0 && m.ev.Cursor < len(m.ev.feed.Items) {
+		m.ev.held = m.ev.feed.Items[m.ev.Cursor]
+		m.ev.UID = m.ev.held.UID
+	}
+}
+
+func (m *Model) selectEvent(i int) {
+	m.ev.Cursor, m.ev.msgScroll, m.ev.gone = i, 0, false
+	m.adoptEvent()
+}
+
+func (m *Model) stopReadingEvent() {
+	m.ev.reading = false
+	if m.ev.gone {
+		m.syncEventSelection()
+	}
 }
 
 func (m Model) eventsPage() int {
@@ -189,8 +240,8 @@ func (m *Model) moveEvent(delta int) {
 		return
 	}
 	next := max(0, min(len(m.ev.feed.Items)-1, m.ev.Cursor+delta))
-	if next != m.ev.Cursor {
-		m.ev.Cursor, m.ev.msgScroll = next, 0
+	if next != m.ev.Cursor || m.ev.gone {
+		m.selectEvent(next)
 	}
 }
 
@@ -229,7 +280,7 @@ func (m Model) handleEventsKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 func (m *Model) handleEventsClick(ms tea.Mouse) {
 	switch {
 	case m.layout.Events.Contains(ms.X, ms.Y):
-		m.ev.reading = false
+		m.stopReadingEvent()
 		row := ms.Y - (m.layout.Events.Y + 1 + ui.EventsTableTop)
 		rows := ui.EventsTableRows(m.layout.Events.H)
 		if row < 0 || row >= rows {
@@ -237,7 +288,7 @@ func (m *Model) handleEventsClick(ms tea.Mouse) {
 		}
 		idx := ui.ScrollOffset(m.ev.Cursor, len(m.ev.feed.Items), rows) + row
 		if idx < len(m.ev.feed.Items) && idx != m.ev.Cursor {
-			m.ev.Cursor, m.ev.msgScroll = idx, 0
+			m.selectEvent(idx)
 		}
 	case m.layout.Message.Contains(ms.X, ms.Y) && m.eventsState().Selected() != nil:
 		m.ev.reading = true
@@ -259,7 +310,7 @@ func (m *Model) handleEventsWheel(ms tea.Mouse) {
 		reading := m.ev.reading
 		m.ev.reading = false
 		m.moveEvent(delta)
-		m.ev.reading = reading
+		m.ev.reading = reading && !m.ev.gone
 	case m.layout.Message.Contains(ms.X, ms.Y):
 		m.ev.msgScroll = max(0, min(m.ev.msgScroll+delta, m.maxMsgScroll()))
 	}

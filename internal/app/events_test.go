@@ -361,3 +361,65 @@ func TestEventsGoldens(t *testing.T) {
 		golden(t, fmt.Sprintf("events_denied_%dx%d.txt", size[0], size[1]), d.Plain())
 	}
 }
+
+func TestEventsSelectionFollowsIdentity(t *testing.T) {
+	ev := func(uid string) data.Event {
+		return data.Event{UID: uid, Age: "1m", Type: "Normal", Reason: "Reason" + uid, Object: "Pod/obj-" + uid, Namespace: "kube-system", Count: 1, Message: "mensagem do evento " + uid}
+	}
+	items := []data.Event{ev("a"), ev("b"), ev("c")}
+	src := newEventsSource("", func(q data.EventQuery) data.EventFeed {
+		return data.EventFeed{Scope: q.Scope, Items: append([]data.Event(nil), items...)}
+	})
+	reload := func(m Model, next ...data.Event) Model {
+		items = next
+		out, _ := m.Update(dataMsg{})
+		return out.(Model)
+	}
+	reading := func(t *testing.T, m Model, uid string) {
+		t.Helper()
+		sel := m.eventsState().Selected()
+		if !m.ev.reading || sel == nil || sel.UID != uid || !strings.Contains(m.Render().Plain(), "mensagem do evento "+uid) {
+			t.Fatalf("reading must stay on event %s, got %+v", uid, sel)
+		}
+	}
+	m := press(t, events(t, nodeModel(t, src, 160, 48)), "down", "enter")
+	reading(t, m, "b")
+
+	m = reload(m, ev("x"), ev("a"), ev("b"), ev("c"))
+	reading(t, m, "b")
+	if m.ev.Cursor != 2 || m.eventsState().Gone {
+		t.Fatalf("insertion above keeps the row of the event in reading: cursor %d", m.ev.Cursor)
+	}
+
+	m = reload(m, ev("c"), ev("b"), ev("a"), ev("x"))
+	reading(t, m, "b")
+	if m.ev.Cursor != 1 {
+		t.Fatalf("reordering follows the event in reading: cursor %d", m.ev.Cursor)
+	}
+
+	m = reload(m, ev("c"), ev("a"), ev("x"))
+	reading(t, m, "b")
+	plain := m.Render().Plain()
+	if !m.eventsState().Gone || !strings.Contains(plain, "evento não está mais no feed") {
+		t.Fatal("a removed event stays readable and its absence is signaled")
+	}
+
+	back := reload(m, ev("c"), ev("b"), ev("a"))
+	reading(t, back, "b")
+	if back.eventsState().Gone || back.ev.Cursor != 1 {
+		t.Fatal("the event coming back clears the absence")
+	}
+
+	table := press(t, m, "esc")
+	if table.ev.reading || table.eventsState().Gone {
+		t.Fatal("esc leaves the absent event and returns to the table")
+	}
+	if sel := table.eventsState().Selected(); sel == nil || sel.UID == "b" {
+		t.Fatalf("the table selects a present event after esc, got %+v", sel)
+	}
+
+	browse := reload(press(t, table, "home", "down"), ev("y"), ev("c"), ev("a"), ev("x"))
+	if sel := browse.eventsState().Selected(); sel == nil || sel.UID != "a" || browse.ev.Cursor != 2 {
+		t.Fatalf("the table cursor follows identity outside reading too, got %+v at %d", sel, browse.ev.Cursor)
+	}
+}

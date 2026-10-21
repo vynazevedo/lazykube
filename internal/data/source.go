@@ -114,6 +114,7 @@ type Namespace struct {
 }
 
 type Event struct {
+	UID       string
 	Age       string
 	Type      string
 	Reason    string
