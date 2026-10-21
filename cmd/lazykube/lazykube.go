@@ -72,14 +72,29 @@ func baseOptions(f flags) (app.Options, error) {
 	return app.Options{Palette: pal, FPS: f.fps, NoAnim: f.noAnim}, nil
 }
 
-func clusterConnector(f flags, connect connector) app.Connector {
+func clusterConnector(kubeconfig string, t data.Target, connect connector) app.Connector {
 	return func(ctx context.Context, report func(data.Progress)) (data.Source, func(), error) {
 		return connect(ctx, kube.ConnectOptions{
-			Kubeconfig: f.kubeconfig,
-			Context:    f.context,
-			Namespace:  f.namespace,
+			Kubeconfig: kubeconfig,
+			Context:    t.Context,
+			Namespace:  t.Namespace,
 			Progress:   report,
 		})
+	}
+}
+
+func demoConnector(t data.Target) app.Connector {
+	return func(ctx context.Context, report func(data.Progress)) (data.Source, func(), error) {
+		if _, ok := data.DemoContexts().Find(t.Context); !ok {
+			return nil, nil, fmt.Errorf("contexto sintético %q desconhecido", t.Context)
+		}
+		for _, s := range data.Stages() {
+			report(data.Progress{Stage: s, Done: true, Context: t.Context})
+		}
+		if err := ctx.Err(); err != nil {
+			return nil, nil, err
+		}
+		return data.NewDemoScoped(t.Context, t.Namespace), func() {}, nil
 	}
 }
 
@@ -90,17 +105,26 @@ func newModel(f flags, connect connector) (tea.Model, func(), error) {
 	}
 	if f.demo {
 		opts.Source, opts.InitialPod = data.NewDemo(), 1
-		return app.New(opts), func() {}, nil
+		r := app.NewRoot(app.RootOptions{
+			Options: opts,
+			Connect: demoConnector,
+			Catalog: func() (data.ContextCatalog, error) { return data.DemoContexts(), nil },
+		})
+		return r, r.Shutdown, nil
 	}
-	l := app.NewLoader(app.LoaderOptions{Options: opts, Context: f.context, Connect: clusterConnector(f, connect)})
-	return l, l.Shutdown, nil
+	kubeconfig := f.kubeconfig
+	r := app.NewRoot(app.RootOptions{
+		Options: opts,
+		Initial: data.Target{Context: f.context, Namespace: f.namespace},
+		Connect: func(t data.Target) app.Connector { return clusterConnector(kubeconfig, t, connect) },
+		Catalog: func() (data.ContextCatalog, error) { return kube.Contexts(kubeconfig) },
+	})
+	return r, r.Shutdown, nil
 }
 
 func finish(final tea.Model, stderr io.Writer) int {
-	if l, ok := final.(app.Loader); ok {
-		if stage, msg, failed := l.Failure(); failed {
-			_, _ = fmt.Fprintf(stderr, "lazykube: %s: %s\n", stage, msg)
-		}
+	if stage, msg, failed := app.Failure(final); failed {
+		_, _ = fmt.Fprintf(stderr, "lazykube: %s: %s\n", stage, msg)
 	}
 	return app.ExitCode(final)
 }
