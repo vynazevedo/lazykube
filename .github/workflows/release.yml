@@ -38,6 +38,11 @@ jobs:
       - uses: sigstore/cosign-installer@3454372f43399081ed03b604cb2d021dabca52bb
         with:
           cosign-release: v3.1.4
+      - name: Recusar alteracao de release publica
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: python3 scripts/check-release.py
       - uses: goreleaser/goreleaser-action@9c156ee8a17a598857849441385a2041ef570552
         with:
           distribution: goreleaser

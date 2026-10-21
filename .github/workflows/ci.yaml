@@ -90,6 +90,7 @@ jobs:
           persist-credentials: false
       - run: shellcheck install.sh scripts/test-install.sh scripts/test-integration.sh
       - run: bash scripts/test-install.sh
+      - run: python3 scripts/test-release.py
 
   integration:
     name: Kubernetes ${{ matrix.kubernetes }} (envtest)
