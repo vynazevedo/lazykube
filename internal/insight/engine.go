@@ -8,7 +8,7 @@ import (
 )
 
 type signalKey struct {
-	Entity    EntityKey
+	Entity    *EntityKey
 	Container string
 	Kind      ContainerKind
 	Rule      Rule
@@ -20,28 +20,26 @@ type restartDelta struct {
 }
 
 type signalMachine struct {
-	firstSeen    time.Time
-	signal       Signal
-	episode      uint64
-	seen         bool
-	rv           string
-	priorState   SignalState
-	suspended    bool
-	problem      bool
-	since        time.Time
-	observations int
-	healthy      bool
-	healthySince time.Time
-	counterKnown bool
-	counter      int32
-	deltas       []restartDelta
-	lastRestart  time.Time
-	termKnown    bool
-	termAt       time.Time
-	lastOOM      time.Time
-	wasEvicted   bool
-	lastEviction time.Time
-	rebaseline   bool
+	firstSeen     time.Time
+	signal        machineSignal
+	baseID        string
+	episode       uint64
+	seen          bool
+	rv            string
+	priorState    SignalState
+	suspended     bool
+	problem       bool
+	activitySince time.Time
+	observations  int
+	healthy       bool
+	healthySince  time.Time
+	counterKnown  bool
+	counter       int32
+	deltas        []restartDelta
+	termKnown     bool
+	termAt        time.Time
+	wasEvicted    bool
+	rebaseline    bool
 }
 
 type Engine struct {
@@ -53,6 +51,8 @@ type Engine struct {
 	coverage    Coverage
 	pods        []PodObservation
 	machines    map[signalKey]*signalMachine
+	ruleTotals  map[Rule]int
+	entities    map[EntityKey]*EntityKey
 	now         time.Time
 	blocked     bool
 }
@@ -77,6 +77,8 @@ func (e *Engine) Step(batch ObservationBatch) SignalSnapshot {
 	if sourceChanged {
 		e.machines = make(map[signalKey]*signalMachine)
 		e.pods = nil
+		e.ruleTotals = nil
+		e.entities = nil
 		e.initialized = false
 		e.blocked = false
 	}
@@ -84,7 +86,8 @@ func (e *Engine) Step(batch ObservationBatch) SignalSnapshot {
 		return e.Snapshot()
 	}
 	same := e.initialized && batch.Cursor == e.cursor
-	gap := batch.SkippedInventoryRevisions > 0 || e.initialized && batch.Cursor.Revisions.Inventory > e.cursor.Revisions.Inventory+1
+	reset := batch.Reset && e.initialized && !same
+	gap := reset || batch.SkippedInventoryRevisions > 0 || e.initialized && batch.Cursor.Revisions.Inventory > e.cursor.Revisions.Inventory+1
 	if same && e.blocked {
 		return e.Snapshot()
 	}
@@ -96,6 +99,18 @@ func (e *Engine) Step(batch ObservationBatch) SignalSnapshot {
 		e.suspendAll(SuspensionSourceCoverage, e.coverage)
 		return e.Snapshot()
 	}
+	if reset && batch.FullInventory {
+		present := make(map[EntityKey]bool, len(batch.Pods))
+		for _, p := range batch.Pods {
+			present[p.Entity.EntityKey] = true
+		}
+		for key := range e.machines {
+			if !present[*key.Entity] {
+				delete(e.machines, key)
+			}
+		}
+		e.pods = nil
+	}
 	if gap && !same {
 		e.cursor = batch.Cursor
 		e.initialized = true
@@ -105,10 +120,7 @@ func (e *Engine) Step(batch ObservationBatch) SignalSnapshot {
 		return e.Snapshot()
 	}
 	if !same && batch.FullInventory {
-		e.pods = make([]PodObservation, len(batch.Pods))
-		for i, p := range batch.Pods {
-			e.pods[i] = clonePod(p)
-		}
+		e.selectPods(batch.Pods)
 		e.blocked = false
 	} else if e.blocked || !e.initialized || !same {
 		return e.Snapshot()
@@ -132,8 +144,8 @@ func (e *Engine) Advance() SignalSnapshot {
 
 func (e *Engine) Snapshot() SignalSnapshot {
 	out := SignalSnapshot{Source: e.cursor.Source, ConfigHash: e.configHash, RuleVersion: OperationalRuleVersion, Coverage: e.coverage, Signals: make([]Signal, 0, len(e.machines))}
-	for _, m := range e.machines {
-		out.Signals = append(out.Signals, m.signal)
+	for key, m := range e.machines {
+		out.Signals = append(out.Signals, m.export(key, e.configHash))
 	}
 	slices.SortFunc(out.Signals, func(a, b Signal) int {
 		if n := cmp.Compare(b.Severity, a.Severity); n != 0 {
@@ -145,25 +157,27 @@ func (e *Engine) Snapshot() SignalSnapshot {
 		return cmp.Compare(a.ID, b.ID)
 	})
 
-	out.TotalSignals = len(out.Signals)
 	for _, rule := range []Rule{RuleRestarts, RuleCrashLoop, RuleOOM, RuleImagePull, RulePending, RuleEvicted} {
-		count := SignalCount{Rule: rule}
-		for i, signal := range out.Signals {
+		count := SignalCount{Rule: rule, Total: e.ruleTotals[rule]}
+		selected := 0
+		for _, signal := range out.Signals {
 			if signal.Rule == rule {
-				count.Total++
-				if i >= MaxOperationalSignals {
-					count.Omitted++
-				}
+				selected++
 			}
 		}
+		count.Total = max(count.Total, selected)
+		count.Omitted = count.Total - selected
+		out.TotalSignals += count.Total
+		out.OmittedSignals += count.Omitted
 		out.Counts = append(out.Counts, count)
 	}
-	if len(out.Signals) > MaxOperationalSignals {
-		out.OmittedSignals = len(out.Signals) - MaxOperationalSignals
-		limited := make([]Signal, MaxOperationalSignals)
-		copy(limited, out.Signals)
-		out.Signals = limited
+	if out.OmittedSignals > 0 {
+		if out.Coverage.State == CoverageComplete {
+			out.Coverage.State = CoveragePartial
+		}
+		out.Coverage.Reason = inventoryCoverageReason(out.Coverage.Reason, "operational state budget exceeded; omitted entities not evaluated")
 	}
+
 	return out
 }
 
@@ -185,16 +199,21 @@ func (m *signalMachine) suspend(reason SuspensionReason, coverage Coverage) {
 	m.problem = false
 	m.observations = 0
 	m.deltas = nil
+	m.signal.Evidence.WindowRestarts = 0
 	m.counterKnown = false
 	m.rebaseline = true
 }
 
 func (e *Engine) machine(p PodObservation, c ContainerObservation, rule Rule, newBatch bool) (*signalMachine, bool, bool) {
-	key := signalKey{Entity: p.Entity.EntityKey, Container: c.Name, Kind: c.Kind, Rule: rule}
+	key := signalKey{Entity: e.entities[p.Entity.EntityKey], Container: c.Name, Kind: c.Kind, Rule: rule}
 	m := e.machines[key]
 	if m == nil {
-		m = &signalMachine{firstSeen: e.now, signal: Signal{Rule: rule, RuleVersion: OperationalRuleVersion, ConfigHash: e.configHash, Entity: p.Entity, Container: c.Name, ContainerKind: c.Kind, Coverage: e.coverage}}
-		m.signal.ID = operationalSignalID(key, e.configHash, 0)
+		if len(e.machines) >= MaxOperationalSignals {
+			return nil, false, false
+		}
+		m = &signalMachine{firstSeen: e.now, signal: machineSignal{Coverage: e.coverage}}
+		m.baseID = operationalSignalID(key, e.configHash, 0)
+		m.signal.ID = m.baseID
 		e.machines[key] = m
 	}
 	fresh := !m.seen || m.rv != p.Entity.ResourceVersion
@@ -209,12 +228,10 @@ func (e *Engine) machine(p PodObservation, c ContainerObservation, rule Rule, ne
 		if m.priorState == SignalActive || m.priorState == SignalRecovering {
 			m.signal.State = SignalActive
 		}
-		m.lastRestart = e.now
-		m.lastOOM = e.now
-		m.lastEviction = e.now
+		m.activitySince = e.now
 		fresh = true
 	}
-	m.signal.Entity = p.Entity
+
 	m.signal.Coverage = e.coverage
 	m.signal.Evidence.NodeName = p.NodeName
 	m.signal.Evidence.Phase = p.Phase
@@ -235,8 +252,10 @@ func (m *signalMachine) consumed(p PodObservation) {
 func (e *Engine) begin(m *signalMachine, preexisting bool) {
 	if m.signal.State == SignalNormal || m.signal.State == SignalResolved {
 		m.episode++
-		key := signalKey{Entity: m.signal.Entity.EntityKey, Container: m.signal.Container, Kind: m.signal.ContainerKind, Rule: m.signal.Rule}
-		m.signal.ID = operationalSignalID(key, e.configHash, m.episode)
+		m.signal.ID = operationalHash(struct {
+			Base    string
+			Episode uint64
+		}{m.baseID, m.episode})
 		m.signal.FirstObservedAt = e.now
 		m.signal.ResolvedAt = time.Time{}
 		m.signal.Preexisting = preexisting
@@ -279,7 +298,7 @@ func (e *Engine) persistent(m *signalMachine, bad, healthy, fresh, baseline bool
 		}
 		if !m.problem {
 			m.problem = true
-			m.since = e.now
+			m.activitySince = e.now
 			m.observations = 0
 			e.begin(m, baseline)
 		}
@@ -287,7 +306,7 @@ func (e *Engine) persistent(m *signalMachine, bad, healthy, fresh, baseline bool
 		if fresh {
 			m.observations++
 		}
-		duration := e.now.Sub(m.since)
+		duration := e.now.Sub(m.activitySince)
 		m.signal.Evidence.Duration = duration
 		m.signal.Evidence.Observations = m.observations
 		if duration >= warning && m.observations >= minimum {

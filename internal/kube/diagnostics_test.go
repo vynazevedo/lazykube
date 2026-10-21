@@ -8,6 +8,7 @@ import (
 	"sync"
 	"testing"
 	"time"
+	"unicode/utf8"
 
 	corev1 "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
@@ -330,7 +331,7 @@ func TestWaitingContainerSkipsAPI(t *testing.T) {
 
 func event(ns, name, kind, obj string, uid types.UID, typ string, at time.Time) *corev1.Event {
 	return &corev1.Event{
-		ObjectMeta:     metav1.ObjectMeta{Namespace: ns, Name: name},
+		ObjectMeta:     metav1.ObjectMeta{Namespace: ns, Name: name, UID: types.UID("ev-" + name)},
 		InvolvedObject: corev1.ObjectReference{Kind: kind, Namespace: ns, Name: obj, UID: uid},
 		Type:           typ,
 		Reason:         "R" + name,
@@ -366,6 +367,26 @@ func TestScopedEvents(t *testing.T) {
 	}
 	if none := s.ScopedEvents(data.EventQuery{Scope: data.ScopeNamespace}); none.State != data.FeedUnavailable || none.Reason != reasonNoNamespace {
 		t.Fatalf("namespace without target = %+v", none)
+	}
+}
+
+func TestEventsCarryStableIdentity(t *testing.T) {
+	objs := []runtime.Object{
+		testPod("apps", "web-1", "node-a", corev1.PodRunning),
+		event("apps", "e1", "Pod", "web-1", "uid-web-1", "Normal", fixedNow.Add(-time.Minute)),
+		event("apps", "e2", "Pod", "web-1", "uid-web-1", "Warning", fixedNow.Add(-time.Hour)),
+	}
+	s := startWith(t, nil, func(s *Source) { s.manualPoll = true }, objs...)
+	for _, q := range []data.EventQuery{{Scope: data.ScopePod, Pod: "apps/web-1"}, {Scope: data.ScopeNamespace, Namespace: "apps"}, {Scope: data.ScopeCluster}} {
+		feed := s.ScopedEvents(q)
+		if len(feed.Items) != 2 {
+			t.Fatalf("%v feed = %+v", q.Scope, feed)
+		}
+		for _, e := range feed.Items {
+			if e.UID != "ev-"+strings.TrimPrefix(e.Reason, "R") {
+				t.Fatalf("%v event %s must carry the object UID, got %q", q.Scope, e.Reason, e.UID)
+			}
+		}
 	}
 }
 
@@ -451,5 +472,42 @@ func TestClusterEventsForbiddenWhenNamespaced(t *testing.T) {
 	})
 	if got := s.ScopedEvents(data.EventQuery{Scope: data.ScopeCluster}); got.Reason != reasonClusterDeny {
 		t.Fatalf("reason = %q", got.Reason)
+	}
+}
+
+func TestEventMessageLoadsFullTextOnDemand(t *testing.T) {
+	long := event("apps", "long", "Pod", "web-1", "", "Warning", fixedNow)
+	long.Message = strings.Repeat("palavra\x1b[2J ", 200) + "fim"
+	huge := event("apps", "huge", "Pod", "web-1", "", "Warning", fixedNow)
+	huge.Message = strings.Repeat("é", 12<<10)
+	other := event("other", "far", "Pod", "x", "", "Warning", fixedNow)
+	other.Message = strings.Repeat("distante ", 100)
+	s := namespacedStart(t, nil, testPod("apps", "web-1", "node-a", corev1.PodRunning), long, huge, other)
+
+	feed := s.ScopedEvents(data.EventQuery{Scope: data.ScopeNamespace, Namespace: "apps"})
+	for _, e := range feed.Items {
+		if !e.Truncated || len(e.Message) > data.EventPreviewBytes+len("…") {
+			t.Fatalf("the feed keeps a bounded preview of %s: truncated=%v len=%d", e.UID, e.Truncated, len(e.Message))
+		}
+	}
+	full, ok := s.EventMessage("ev-long")
+	want := strings.TrimSpace(strings.Repeat("palavra ", 200)) + " fim"
+	if !ok || full.Truncated || full.Text != want {
+		t.Fatalf("the opened event loads its whole sanitized message: ok=%v truncated=%v len=%d", ok, full.Truncated, len(full.Text))
+	}
+	capped, ok := s.EventMessage("ev-huge")
+	if !ok || !capped.Truncated || len(capped.Text) > data.EventMessageBytes+len("…") || !utf8.ValidString(capped.Text) {
+		t.Fatalf("the full message is capped explicitly: ok=%v truncated=%v len=%d", ok, capped.Truncated, len(capped.Text))
+	}
+	if _, ok := s.EventMessage("ev-far"); ok {
+		t.Fatal("an event outside the connected namespace is not served before the cluster feed is opened")
+	}
+	if _, ok := s.EventMessage("missing"); ok {
+		t.Fatal("unknown UID")
+	}
+	s.ScopedEvents(data.EventQuery{Scope: data.ScopeCluster})
+	waitFor(t, func() bool { return s.ScopedEvents(data.EventQuery{Scope: data.ScopeCluster}).State == data.FeedReady })
+	if far, ok := s.EventMessage("ev-far"); !ok || far.Text != strings.TrimSpace(other.Message) {
+		t.Fatalf("after the explicit cluster feed the wide cache serves the message: ok=%v", ok)
 	}
 }

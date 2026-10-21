@@ -1,4 +1,4 @@
- lazykube [DEMO]  v2.0   ◎ context demo   k8s demo  nodes 1  ns 8  pods 13  uptime 119d                ⠙ metrics every 5s ● live  
+ lazykube [DEMO] [RO]  v2.0   ◎ context demo   k8s demo  nodes 1  ns 8  pods 13  uptime 119d           ⠙ metrics every 5s ● live  
   2 Dashboard  |  3 Workloads  | [4 Nodes] |  6 Events                                                                    m menu  
  Nodes                                                                                                                            
  ╭─ Node do pod selecionado ──────────────╮ ╭─ Pods · focus ────────────────────────────────────────────────────────────────────╮ 

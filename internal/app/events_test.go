@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 	"testing"
 
@@ -359,5 +360,132 @@ func TestEventsGoldens(t *testing.T) {
 		golden(t, name+".ansi", c.String())
 		d := events(t, nodeModel(t, newEventsSource("bilibili-raffle", denied), size[0], size[1])).Render()
 		golden(t, fmt.Sprintf("events_denied_%dx%d.txt", size[0], size[1]), d.Plain())
+	}
+}
+
+func TestEventsSelectionFollowsIdentity(t *testing.T) {
+	ev := func(uid string) data.Event {
+		return data.Event{UID: uid, Age: "1m", Type: "Normal", Reason: "Reason" + uid, Object: "Pod/obj-" + uid, Namespace: "kube-system", Count: 1, Message: "mensagem do evento " + uid}
+	}
+	items := []data.Event{ev("a"), ev("b"), ev("c")}
+	src := newEventsSource("", func(q data.EventQuery) data.EventFeed {
+		return data.EventFeed{Scope: q.Scope, Items: append([]data.Event(nil), items...)}
+	})
+	reload := func(m Model, next ...data.Event) Model {
+		items = next
+		out, _ := m.Update(dataMsg{})
+		return out.(Model)
+	}
+	reading := func(t *testing.T, m Model, uid string) {
+		t.Helper()
+		sel := m.eventsState().Selected()
+		if !m.ev.reading || sel == nil || sel.UID != uid || !strings.Contains(m.Render().Plain(), "mensagem do evento "+uid) {
+			t.Fatalf("reading must stay on event %s, got %+v", uid, sel)
+		}
+	}
+	m := press(t, events(t, nodeModel(t, src, 160, 48)), "down", "enter")
+	reading(t, m, "b")
+
+	m = reload(m, ev("x"), ev("a"), ev("b"), ev("c"))
+	reading(t, m, "b")
+	if m.ev.Cursor != 2 || m.eventsState().Gone {
+		t.Fatalf("insertion above keeps the row of the event in reading: cursor %d", m.ev.Cursor)
+	}
+
+	m = reload(m, ev("c"), ev("b"), ev("a"), ev("x"))
+	reading(t, m, "b")
+	if m.ev.Cursor != 1 {
+		t.Fatalf("reordering follows the event in reading: cursor %d", m.ev.Cursor)
+	}
+
+	m = reload(m, ev("c"), ev("a"), ev("x"))
+	reading(t, m, "b")
+	plain := m.Render().Plain()
+	if !m.eventsState().Gone || !strings.Contains(plain, "evento não está mais no feed") {
+		t.Fatal("a removed event stays readable and its absence is signaled")
+	}
+
+	back := reload(m, ev("c"), ev("b"), ev("a"))
+	reading(t, back, "b")
+	if back.eventsState().Gone || back.ev.Cursor != 1 {
+		t.Fatal("the event coming back clears the absence")
+	}
+
+	table := press(t, m, "esc")
+	if table.ev.reading || table.eventsState().Gone {
+		t.Fatal("esc leaves the absent event and returns to the table")
+	}
+	if sel := table.eventsState().Selected(); sel == nil || sel.UID == "b" {
+		t.Fatalf("the table selects a present event after esc, got %+v", sel)
+	}
+
+	browse := reload(press(t, table, "home", "down"), ev("y"), ev("c"), ev("a"), ev("x"))
+	if sel := browse.eventsState().Selected(); sel == nil || sel.UID != "a" || browse.ev.Cursor != 2 {
+		t.Fatalf("the table cursor follows identity outside reading too, got %+v at %d", sel, browse.ev.Cursor)
+	}
+}
+
+type messageSource struct {
+	eventsSource
+	full  map[string]data.EventMessage
+	asked *[]string
+}
+
+func (s messageSource) EventMessage(uid string) (data.EventMessage, bool) {
+	*s.asked = append(*s.asked, uid)
+	msg, ok := s.full[uid]
+	return msg, ok
+}
+
+type previewSource struct {
+	data.Source
+	feed eventsSource
+}
+
+func (s previewSource) Snapshot() data.Snapshot { return s.feed.Snapshot() }
+
+func (s previewSource) ScopedEvents(q data.EventQuery) data.EventFeed { return s.feed.ScopedEvents(q) }
+
+func (s previewSource) Containers(pod string) []data.Container { return s.feed.Containers(pod) }
+
+func (s previewSource) PodLogs(req data.LogRequest, tick, n int) data.LogView {
+	return s.feed.PodLogs(req, tick, n)
+}
+
+func TestEventsMessageIsHonestAboutTruncation(t *testing.T) {
+	preview := strings.Repeat("prévia ", 40) + "…"
+	feed := func(q data.EventQuery) data.EventFeed {
+		return data.EventFeed{Scope: q.Scope, Items: []data.Event{
+			{UID: "u1", Age: "1m", Type: "Warning", Reason: "Failed", Object: "Pod/a", Namespace: "kube-system", Count: 1, Message: preview, Truncated: true},
+			{UID: "u2", Age: "2m", Type: "Warning", Reason: "BackOff", Object: "Pod/b", Namespace: "kube-system", Count: 1, Message: preview, Truncated: true},
+		}}
+	}
+	src := messageSource{eventsSource: newEventsSource("", feed), asked: &[]string{}, full: map[string]data.EventMessage{
+		"u1": {Text: "texto integral do evento fim-real"},
+		"u2": {Text: "inicio do texto enorme", Truncated: true},
+	}}
+	m := events(t, nodeModel(t, src, 160, 48))
+	plain := m.Render().Plain()
+	if len(*src.asked) != 0 || strings.Contains(plain, "Mensagem completa") || !strings.Contains(plain, "prévia truncada; enter carrega o texto completo") {
+		t.Fatalf("the preview does not claim to be complete and loads nothing before enter: asked %v", *src.asked)
+	}
+	m = press(t, m, "enter")
+	plain = m.Render().Plain()
+	if !slices.Equal(*src.asked, []string{"u1"}) || !strings.Contains(plain, "fim-real") || !strings.Contains(plain, "Mensagem completa · focus") || strings.Contains(plain, "prévia truncada") {
+		t.Fatalf("enter loads the full message of the opened event only: asked %v", *src.asked)
+	}
+	m = press(t, press(t, m, "esc", "down", "enter"))
+	plain = m.Render().Plain()
+	if !slices.Contains(*src.asked, "u2") || strings.Contains(plain, "Mensagem completa") || !strings.Contains(plain, "truncada no teto de 8 KiB") {
+		t.Fatal("a message above the explicit cap says so")
+	}
+
+	bare := newEventsSource("", feed)
+	plainFeed := events(t, nodeModel(t, previewSource{Source: bare.Demo, feed: bare}, 160, 48))
+	if p := plainFeed.Render().Plain(); !strings.Contains(p, "truncada em 300 bytes pela fonte") || strings.Contains(p, "enter carrega") || strings.Contains(p, "mensagem completa") || !strings.Contains(p, "enter abre a mensagem recebida") {
+		t.Fatal("without full messages the screen does not promise them")
+	}
+	if p := press(t, plainFeed, "enter").Render().Plain(); strings.Contains(p, "Mensagem completa") || !strings.Contains(p, "Mensagem truncada · focus") {
+		t.Fatal("reading a truncated message without the full text is labeled truncated")
 	}
 }
