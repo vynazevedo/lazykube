@@ -24,6 +24,22 @@ import (
 )
 
 func TestEnvtestConnectAndSwitchContexts(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
+	oldDir, oldFile, oldSchema := clientcmd.RecommendedConfigDir, clientcmd.RecommendedHomeFile, clientcmd.RecommendedSchemaFile
+	clientcmd.RecommendedConfigDir = filepath.Join(home, clientcmd.RecommendedHomeDir)
+	clientcmd.RecommendedHomeFile = filepath.Join(clientcmd.RecommendedConfigDir, clientcmd.RecommendedFileName)
+	clientcmd.RecommendedSchemaFile = filepath.Join(clientcmd.RecommendedConfigDir, clientcmd.RecommendedSchemaName)
+	t.Cleanup(func() {
+		clientcmd.RecommendedConfigDir, clientcmd.RecommendedHomeFile, clientcmd.RecommendedSchemaFile = oldDir, oldFile, oldSchema
+		entries, err := os.ReadDir(home)
+		if err != nil {
+			t.Errorf("verificar HOME isolado: %v", err)
+		} else if len(entries) != 0 {
+			t.Errorf("HOME isolado recebeu arquivos: %v", entries)
+		}
+	})
 	assets := os.Getenv("KUBEBUILDER_ASSETS")
 	if assets == "" {
 		t.Fatal("execute scripts/test-integration.sh para fornecer os binarios locais")
