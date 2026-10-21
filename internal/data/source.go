@@ -156,6 +156,7 @@ type Metrics struct {
 	CPUKnown     bool
 	Mem          []float64
 	MemNow       int
+	MemKnown     bool
 	RX           []float64
 	TX           []float64
 	RXNow        float64

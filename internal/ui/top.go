@@ -214,6 +214,10 @@ func memoryCard(r draw.Region, m data.Metrics, p *data.Pod, bar float64, ctx Ctx
 	if c.Empty() {
 		return
 	}
+	if !m.Available || !m.MemKnown {
+		c.Line(0, 0, draw.Fit(c.W, draw.Line{muted("Memory n/a")}, draw.Line{muted("Mem n/a")}))
+		return
+	}
 	limit := "no limit"
 	if p.MemLimit > 0 {
 		limit = fmt.Sprintf("%dMi", p.MemLimit)
