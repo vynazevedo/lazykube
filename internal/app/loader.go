@@ -356,7 +356,7 @@ func (l *Loader) failingStage() data.Stage {
 func (l *Loader) fail(err error) {
 	l.err = err
 	l.failed = l.failingStage()
-	l.errText = errorText(err)
+	l.errText = errorText(data.PublicText(err))
 	l.steps[l.failed].state = ui.StepFailed
 	for i := l.failed + 1; int(i) < len(l.steps); i++ {
 		l.steps[i] = loadStep{}
@@ -364,9 +364,9 @@ func (l *Loader) fail(err error) {
 	l.bar.Snap()
 }
 
-func errorText(err error) string {
+func errorText(text string) string {
 	var b strings.Builder
-	for _, part := range strings.FieldsFunc(err.Error(), func(r rune) bool { return r == '\n' || r == '\r' }) {
+	for _, part := range strings.FieldsFunc(text, func(r rune) bool { return r == '\n' || r == '\r' }) {
 		part = strings.TrimSpace(data.Sanitize(part))
 		if part == "" {
 			continue

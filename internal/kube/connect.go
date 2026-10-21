@@ -42,17 +42,17 @@ func ResolveContext(opts ConnectOptions) (string, error) {
 func resolveContext(opts ConnectOptions) (string, int, error) {
 	raw, err := loadingRules(opts.Kubeconfig).Load()
 	if err != nil {
-		return "", 0, fmt.Errorf("cannot load kubeconfig: %w", err)
+		return "", 0, connectError(ErrorKubeconfig, opts.Context, err)
 	}
 	name := opts.Context
 	if name == "" {
 		name = raw.CurrentContext
 	}
 	if name == "" {
-		return "", 0, fmt.Errorf("no current context in kubeconfig; pass --context")
+		return "", 0, connectError(ErrorNoCurrentContext, "", nil)
 	}
 	if _, ok := raw.Contexts[name]; !ok {
-		return "", 0, fmt.Errorf("context %q not found in kubeconfig", name)
+		return "", 0, connectError(ErrorContextMissing, name, nil)
 	}
 	return name, len(raw.Contexts), nil
 }
@@ -72,31 +72,32 @@ func Connect(ctx context.Context, opts ConnectOptions) (*Source, error) {
 	report(opts.Progress, data.Progress{Stage: data.StageKubeconfig, Done: true, Context: name, Detail: fmt.Sprintf("%d contextos", contexts)})
 	report(opts.Progress, data.Progress{Stage: data.StageConnect, Context: name})
 	if err := ctx.Err(); err != nil {
-		return nil, err
+		return nil, publicError(err, name, false)
 	}
 	cfg, err := restConfig(opts, name)
 	if err != nil {
-		return nil, err
+		return nil, connectError(ErrorClientConfig, name, err)
 	}
+	exec := cfg.ExecProvider != nil
 	client, err := kubernetes.NewForConfig(cfg)
 	if err != nil {
-		return nil, err
+		return nil, connectError(ErrorClientConfig, name, err)
 	}
 	mc, err := metricsclient.NewForConfig(cfg)
 	if err != nil {
-		return nil, err
+		return nil, connectError(ErrorClientConfig, name, err)
 	}
 	timed := rest.CopyConfig(cfg)
 	timed.Timeout = defaultTimeout
 	dc, err := discovery.NewDiscoveryClientForConfig(timed)
 	if err != nil {
-		return nil, err
+		return nil, connectError(ErrorClientConfig, name, err)
 	}
 	s := newSource(client, mc, Options{Context: name, Namespace: opts.Namespace, Progress: opts.Progress})
 	s.version = dc
 	if err := s.start(ctx); err != nil {
 		s.Close()
-		return nil, fmt.Errorf("context %q: %w", name, err)
+		return nil, publicError(err, name, exec)
 	}
 	return s, nil
 }

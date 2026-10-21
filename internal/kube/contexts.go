@@ -2,7 +2,6 @@ package kube
 
 import (
 	"errors"
-	"fmt"
 	"sort"
 
 	"k8s.io/client-go/rest"
@@ -51,7 +50,7 @@ func restConfig(opts ConnectOptions, name string) (*rest.Config, error) {
 	cc := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules(opts.Kubeconfig), &clientcmd.ConfigOverrides{CurrentContext: name})
 	cfg, err := cc.ClientConfig()
 	if err != nil {
-		return nil, fmt.Errorf("invalid client config for context %q: %w", name, err)
+		return nil, connectError(ErrorClientConfig, name, err)
 	}
 	cfg.QPS, cfg.Burst, cfg.UserAgent = clientQPS, clientBurst, userAgent
 	return cfg, nil
