@@ -58,6 +58,7 @@ type Cluster struct {
 	Pods       int
 	Uptime     string
 	Namespace  string
+	Listed     bool
 }
 
 type Node struct {

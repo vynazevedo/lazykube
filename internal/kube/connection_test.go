@@ -16,4 +16,10 @@ func TestSnapshotCarriesConnectedNamespace(t *testing.T) {
 	if got := restricted.Snapshot().Cluster.Namespace; got != "apps" {
 		t.Fatalf("a restricted connection reports its namespace, got %q", got)
 	}
+	if !all.Snapshot().Cluster.Listed {
+		t.Fatal("with list namespaces the catalog of namespaces is complete")
+	}
+	if restricted.Snapshot().Cluster.Listed {
+		t.Fatal("a restricted connection only observes namespaces")
+	}
 }

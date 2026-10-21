@@ -9,7 +9,6 @@ import (
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog/v2"
 	metricsclient "k8s.io/metrics/pkg/client/clientset/versioned"
 
@@ -41,9 +40,7 @@ func ResolveContext(opts ConnectOptions) (string, error) {
 }
 
 func resolveContext(opts ConnectOptions) (string, int, error) {
-	rules := clientcmd.NewDefaultClientConfigLoadingRules()
-	rules.ExplicitPath = opts.Kubeconfig
-	raw, err := rules.Load()
+	raw, err := loadingRules(opts.Kubeconfig).Load()
 	if err != nil {
 		return "", 0, fmt.Errorf("cannot load kubeconfig: %w", err)
 	}
@@ -77,14 +74,10 @@ func Connect(ctx context.Context, opts ConnectOptions) (*Source, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	rules := clientcmd.NewDefaultClientConfigLoadingRules()
-	rules.ExplicitPath = opts.Kubeconfig
-	cc := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(rules, &clientcmd.ConfigOverrides{CurrentContext: name})
-	cfg, err := cc.ClientConfig()
+	cfg, err := restConfig(opts, name)
 	if err != nil {
-		return nil, fmt.Errorf("invalid client config for context %q: %w", name, err)
+		return nil, err
 	}
-	cfg.QPS, cfg.Burst, cfg.UserAgent = clientQPS, clientBurst, userAgent
 	client, err := kubernetes.NewForConfig(cfg)
 	if err != nil {
 		return nil, err
