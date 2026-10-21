@@ -53,3 +53,12 @@ func TestBugbashReadyStatesAndKnownCPU(t *testing.T) {
 		}
 	}
 }
+
+func TestBugbashNodePanelRowsUnknown(t *testing.T) {
+	for _, width := range []int{36, 40, 54} {
+		rows := nodePanelRows(NodeState{Node: data.Node{Name: "node", Coverage: data.Coverage{State: data.CoverageComplete}}}, width)
+		if out := strings.Join(rows, "\n"); !strings.Contains(out, "Unknown") || strings.Contains(out, "NotReady") {
+			t.Fatal(out)
+		}
+	}
+}
