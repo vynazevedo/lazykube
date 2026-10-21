@@ -4,6 +4,7 @@ import (
 	"slices"
 	"time"
 
+	"charm.land/bubbles/v2/key"
 	"charm.land/bubbles/v2/textinput"
 	tea "charm.land/bubbletea/v2"
 
@@ -272,13 +273,29 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.snapMotion()
 		cmd := m.restartTick()
 		return m, cmd
+	case tea.WindowSizeMsg:
+		m.setLayout(msg.Width, msg.Height)
+		if m.layout.TooSmall {
+			m.suspendForSmall()
+		}
+		m.refresh()
+		return m, nil
 	case tea.KeyPressMsg:
 		if msg.String() == "ctrl+c" {
 			return wake(!m.busy(), m, tea.Quit)
 		}
+		if m.layout.TooSmall {
+			return m, m.smallKey(msg)
+		}
 		idle := !m.busy()
 		next, cmd := m.routeKey(msg)
 		return wake(idle, next, cmd)
+	case tea.MouseClickMsg, tea.MouseWheelMsg, tea.MouseMotionMsg:
+		if m.layout.TooSmall {
+			return m, nil
+		}
+	}
+	switch msg := msg.(type) {
 	case tea.MouseClickMsg:
 		idle := !m.busy()
 		if m.dep.open {
@@ -302,6 +319,30 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return wake(idle, next, cmd)
 	}
 	return m.screen().Update(m, msg)
+}
+
+func (m *Model) suspendForSmall() {
+	if m.filtering {
+		m.filtering = false
+		m.filter.Blur()
+	}
+	if m.dg.searching {
+		m.dg.searching = false
+		m.dg.search.Blur()
+	}
+	m.helpOpen, m.menu.open, m.dep.open = false, false, false
+}
+
+func (m Model) smallKey(msg tea.KeyPressMsg) tea.Cmd {
+	switch {
+	case key.Matches(msg, m.keys.Context):
+		return requestPick(pickContext, m.session.Generation)
+	case key.Matches(msg, m.keys.Namespace):
+		return requestPick(pickNamespace, m.session.Generation)
+	case msg.String() == "q":
+		return tea.Quit
+	}
+	return nil
 }
 
 func wake(wasIdle bool, nm Model, cmd tea.Cmd) (tea.Model, tea.Cmd) {

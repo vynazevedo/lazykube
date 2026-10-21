@@ -114,3 +114,62 @@ func TestDetailsEventsTabReleasesClusterFeed(t *testing.T) {
 		t.Fatalf("a screen without details releases the feed, released %d", *src.released)
 	}
 }
+
+func smallOnlyAnnounced(t *testing.T, name string, m Model) {
+	t.Helper()
+	if !m.layout.TooSmall {
+		t.Fatalf("%s: setup is small", name)
+	}
+	if m.filtering || m.dg.searching || m.helpOpen || m.menu.open || m.dep.open {
+		t.Fatalf("%s: no hidden modal or input survives on the small screen", name)
+	}
+	before := m.filter.Value()
+	for _, k := range []string{"/", "x", "enter", "esc", "2", "m", "?", "j"} {
+		next, cmd := m.Update(keyPress(k))
+		got := next.(Model)
+		if cmd != nil || got.filtering || got.helpOpen || got.menu.open || got.filter.Value() != before || got.nav != m.nav || got.selName != m.selName {
+			t.Fatalf("%s: %q is not announced on the small screen and does nothing", name, k)
+		}
+	}
+	if _, cmd := m.Update(keyPress("c")); cmd == nil {
+		t.Fatalf("%s: c opens the context picker", name)
+	}
+	if _, cmd := m.Update(keyPress("n")); cmd == nil {
+		t.Fatalf("%s: n opens the namespace picker", name)
+	}
+	if _, cmd := m.Update(keyPress("q")); cmd == nil || cmd() != tea.Quit() {
+		t.Fatalf("%s: q quits", name)
+	}
+	if _, cmd := m.Update(keyPress("ctrl+c")); cmd == nil || cmd() != tea.Quit() {
+		t.Fatalf("%s: ctrl+c quits", name)
+	}
+	if next, _ := m.Update(tea.MouseClickMsg{X: 5, Y: 5, Button: tea.MouseLeft}); next.(Model).selName != m.selName || next.(Model).focus != m.focus {
+		t.Fatalf("%s: the mouse does not reach the hidden screen", name)
+	}
+}
+
+func TestSmallTerminalIgnoresHiddenState(t *testing.T) {
+	small := demoModel(t, 80, 24)
+	typed := press(t, small, "/", "q", "c", "n")
+	if typed.filtering || typed.filter.Value() != "" {
+		t.Fatal("/ does not open an invisible filter on the small screen")
+	}
+	smallOnlyAnnounced(t, "80x24", small)
+
+	shrink := func(m Model) Model {
+		next, _ := m.Update(tea.WindowSizeMsg{Width: 80, Height: 24})
+		return next.(Model)
+	}
+	filtering := press(t, demoModel(t, 160, 48), "/", "c", "o")
+	smallOnlyAnnounced(t, "resize with filter", shrink(filtering))
+	if got := shrink(filtering); got.filter.Value() != "co" {
+		t.Fatal("the filter text is kept, only its editing is suspended")
+	}
+	smallOnlyAnnounced(t, "resize with help", shrink(press(t, demoModel(t, 160, 48), "?")))
+	smallOnlyAnnounced(t, "resize with menu", shrink(press(t, demoModel(t, 160, 48), "m")))
+	smallOnlyAnnounced(t, "resize with log search", shrink(press(t, detailsModel(t, 1), "l", "/", "h")))
+	grown, _ := shrink(filtering).Update(tea.WindowSizeMsg{Width: 160, Height: 48})
+	if g := grown.(Model); g.layout.TooSmall || g.filtering || g.filter.Value() != "co" {
+		t.Fatal("growing back shows the filter result without resuming hidden editing")
+	}
+}
