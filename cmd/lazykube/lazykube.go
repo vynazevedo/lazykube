@@ -5,8 +5,10 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"github.com/vynazevedo/lazykube/internal/guard"
 	"io"
 	"os"
+	"strings"
 
 	tea "charm.land/bubbletea/v2"
 
@@ -17,13 +19,17 @@ import (
 )
 
 type flags struct {
-	demo       bool
-	context    string
-	kubeconfig string
-	namespace  string
-	palette    string
-	noAnim     bool
-	fps        int
+	readWrite         bool
+	protectedContexts string
+	readOnlyContexts  string
+	auditPath         string
+	demo              bool
+	context           string
+	kubeconfig        string
+	namespace         string
+	palette           string
+	noAnim            bool
+	fps               int
 }
 
 type connector func(ctx context.Context, opts kube.ConnectOptions) (data.Source, func(), error)
@@ -32,6 +38,10 @@ func parseFlags(args []string, out io.Writer) (flags, error) {
 	var f flags
 	fs := flag.NewFlagSet("lazykube", flag.ContinueOnError)
 	fs.SetOutput(out)
+	fs.BoolVar(&f.readWrite, "read-write", false, "enable actions for this process, subject to context policy")
+	fs.StringVar(&f.protectedContexts, "protected-contexts", "", "comma-separated protected context names")
+	fs.StringVar(&f.readOnlyContexts, "read-only-contexts", "", "comma-separated read-only context names")
+	fs.StringVar(&f.auditPath, "audit-file", "", "private local audit JSONL path")
 	fs.BoolVar(&f.demo, "demo", false, "run with deterministic synthetic data")
 	fs.StringVar(&f.context, "context", "", "kubeconfig context to use")
 	fs.StringVar(&f.kubeconfig, "kubeconfig", "", "path to the kubeconfig file")
@@ -75,6 +85,22 @@ func baseOptions(f flags) (app.Options, error) {
 func clusterConnector(f flags, connect connector) app.Connector {
 	return func(ctx context.Context, report func(data.Progress)) (data.Source, func(), error) {
 		return connect(ctx, kube.ConnectOptions{
+			AllowWrites: f.readWrite,
+			AuditPath:   f.auditPath,
+			ResolveEnvironment: func(name string) (guard.Environment, error) {
+				env := guard.DefaultEnvironment(name)
+				for _, context := range strings.Split(f.protectedContexts, ",") {
+					if strings.TrimSpace(context) == name {
+						env.Protected = true
+					}
+				}
+				for _, context := range strings.Split(f.readOnlyContexts, ",") {
+					if strings.TrimSpace(context) == name {
+						env.ReadOnly = true
+					}
+				}
+				return env, nil
+			},
 			Kubeconfig: f.kubeconfig,
 			Context:    f.context,
 			Namespace:  f.namespace,
