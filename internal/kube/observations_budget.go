@@ -4,9 +4,9 @@ import (
 	"cmp"
 	"slices"
 	"strings"
+	"unicode"
 	"unicode/utf8"
 
-	"github.com/vynazevedo/lazykube/internal/data"
 	"github.com/vynazevedo/lazykube/internal/insight"
 	corev1 "k8s.io/api/core/v1"
 )
@@ -35,15 +35,82 @@ func newObservationBudget() observationBudget {
 	return observationBudget{Containers: maxObservationContainers, TextBytes: maxObservationEvidence}
 }
 
+type observationEscape uint8
+
+const (
+	observationPlain observationEscape = iota
+	observationEscapeStart
+	observationCSI
+	observationString
+	observationStringEnd
+)
+
 func (o *observationProjector) text(value string) string {
-	value = strings.Join(strings.Fields(data.Sanitize(value)), " ")
-	limit := min(len(value), maxObservationText, o.budget.TextBytes)
-	for limit > 0 && limit < len(value) && !utf8.RuneStart(value[limit]) {
-		limit--
+	limit := min(maxObservationText, max(0, o.budget.TextBytes))
+	var out strings.Builder
+	out.Grow(min(len(value), limit))
+	state := observationPlain
+	total := 0
+	space := false
+	clipped := false
+	emit := func(r rune) {
+		n := utf8.RuneLen(r)
+		total += n
+		if !clipped && out.Len()+n <= limit {
+			out.WriteRune(r)
+		} else {
+			clipped = true
+		}
 	}
-	o.omissions.TextBytes += len(value) - limit
-	o.budget.TextBytes -= limit
-	return strings.Clone(value[:limit])
+	for _, r := range value {
+		switch state {
+		case observationEscapeStart:
+			switch r {
+			case '[':
+				state = observationCSI
+			case ']', 'P', '_', '^', 'X':
+				state = observationString
+			default:
+				state = observationPlain
+			}
+			continue
+		case observationCSI:
+			if r >= 0x40 && r <= 0x7e {
+				state = observationPlain
+			}
+			continue
+		case observationString:
+			switch r {
+			case 7:
+				state = observationPlain
+			case 0x1b:
+				state = observationStringEnd
+			}
+			continue
+		case observationStringEnd:
+			state = observationPlain
+			continue
+		}
+		if r == 0x1b {
+			state = observationEscapeStart
+			continue
+		}
+		if r != '\t' && (r < 0x20 || r == 0x7f || r >= 0x80 && r < 0xa0) {
+			continue
+		}
+		if unicode.IsSpace(r) {
+			space = total > 0
+			continue
+		}
+		if space {
+			emit(' ')
+			space = false
+		}
+		emit(r)
+	}
+	o.omissions.TextBytes += total - out.Len()
+	o.budget.TextBytes -= out.Len()
+	return out.String()
 }
 
 type observationContainerRef struct {
