@@ -3,8 +3,8 @@
 O processo inicia somente leitura. Apenas `--read-write` habilita a tentativa de
 acoes nesta execucao. Nao existe persistencia nem tecla para alterar a politica.
 `Environment.ReadOnly`, `Environment.Protected` e configuracao invalida prevalecem
-sobre a flag. Nomes contendo `prod` sao protegidos por padrao; nomes exatos podem
-ser acrescentados por `--protected-contexts`. O resolvedor de ambientes e o ponto
+sobre a flag. Somente nomes exatos configurados em `--protected-contexts` sao
+protegidos; nao ha classificacao por substring. O resolvedor de ambientes e o ponto
 de extensao para selecao de contexto.
 
 `Session` fixa contexto, namespace, identidade local da sessao e geracao.
@@ -19,7 +19,23 @@ e executa dry-run server-side. O preview tem prazo de dois minutos e um ID de us
 unico. `Execute` exige confirmacao, repete SSAR e valida a identidade do recurso,
 sincroniza a intencao no audit e faz uma unica requisicao. Delete, edit e scale
 para zero exigem o nome do recurso. Nao existe create. Edit usa PUT de um objeto
-existente com UID e resourceVersion; Secrets nao admitem edicao generica.
+existente com UID e resourceVersion. `SupportsAction` e a allowlist compartilhada
+pelo executor e pelos futuros handlers: todos os GVRs abaixo usam versao v1.
+
+| Grupo | Recurso | Acoes elegiveis |
+| --- | --- | --- |
+| core | pods | delete, edit, exec e port-forward reservados |
+| core | configmaps, services | edit |
+| apps | deployments, statefulsets | delete, edit, scale, restart |
+| apps | daemonsets | delete, edit, restart |
+| batch | jobs, cronjobs | delete, edit |
+
+Grupos, versoes e recursos fora dessa lista sao negados antes de SSAR ou dry-run.
+Nao ha acao generica para Secrets, RBAC, admission, PV ou CRs. Prepare audita
+negativas com ID e desfecho seguro, sem intent mutante. O preflight de Execute
+recebe um contexto limitado ao prazo restante e verifica novamente a expiracao
+depois da autorizacao, da validacao e do intent duravel, imediatamente antes do
+envio. Vencimento antes do envio e cancelamento, nunca sucesso ou tentativa nova.
 
 | Acao | SSAR de leitura | SSAR de escrita | Dry-run |
 | --- | --- | --- | --- |
@@ -42,9 +58,12 @@ comando, resposta do servidor ou credencial. O diretorio e 0700 e cada arquivo e
 0600, com verificacao de proprietario, links e tipo. Sao dez arquivos no total,
 com limite de 10 MiB por arquivo e descarte apos 30 dias. A limpeza ocorre antes
 de gravar cada evento; um processo inativo nao faz limpeza em segundo plano.
-A idade considera o primeiro evento e a data do arquivo, evitando renovar a idade
-pela ultima escrita. A rotacao e o vencimento podem remover eventos mais recentes
-do mesmo segmento. Qualquer falha bloqueia novas acoes neste executor. Falha apos
+Um segmento so e removido quando todos os seus registros e a data de modificacao
+ultrapassam 30 dias. A verificacao de arquivos antigos usa leitura limitada por
+linha e por segmento. Se dez segmentos estiverem ocupados e a rotacao exigir
+sobrescrever registros ainda retidos, o audit falha e bloqueia novas acoes.
+Nao se apagam registros recentes para liberar espaco. Qualquer falha bloqueia
+novas acoes neste executor. Falha apos
 o envio preserva resultado desconhecido quando nao ha confirmacao do servidor;
 nao ha repeticao automatica.
 

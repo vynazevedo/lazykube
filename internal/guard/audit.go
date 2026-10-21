@@ -1,6 +1,7 @@
 package guard
 
 import (
+	"bufio"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -155,7 +156,21 @@ func (a *FileAudit) record(event AuditEvent) (recordErr error) {
 	return directory.Sync()
 }
 func (a *FileAudit) rotate(root *os.Root, name string) error {
-	for i := 9; i >= 1; i-- {
+	slot := 0
+	for i := 1; i < 10; i++ {
+		_, err := root.Lstat(fmt.Sprintf("%s.%d", name, i))
+		if os.IsNotExist(err) {
+			slot = i
+			break
+		}
+		if err != nil {
+			return err
+		}
+	}
+	if slot == 0 {
+		return AuditFailed
+	}
+	for i := slot; i >= 1; i-- {
 		old := name
 		if i > 1 {
 			old = fmt.Sprintf("%s.%d", name, i-1)
@@ -191,28 +206,53 @@ func (a *FileAudit) expire(root *os.Root, name string) error {
 		if err != nil {
 			return err
 		}
-		if !private(info, false) {
+		if !private(info, false) || info.Size() > 10<<20 {
 			return AuditFailed
 		}
-		oldest := info.ModTime()
-		file, openErr := root.OpenFile(entry, os.O_RDONLY|auditNoFollow, 0)
-		if openErr != nil {
-			return openErr
+		if !info.ModTime().Before(cutoff) {
+			continue
 		}
-		var first AuditEvent
-		decodeErr := json.NewDecoder(io.LimitReader(file, 16384)).Decode(&first)
-		closeErr := file.Close()
-		if closeErr != nil {
-			return closeErr
+		expired, scanErr := auditSegmentExpired(root, entry, cutoff)
+		if scanErr != nil {
+			return scanErr
 		}
-		if decodeErr == nil && !first.Timestamp.IsZero() && first.Timestamp.Before(oldest) {
-			oldest = first.Timestamp
-		}
-		if oldest.Before(cutoff) {
+		if expired {
 			if err = root.Remove(entry); err != nil {
 				return err
 			}
 		}
 	}
 	return nil
+}
+
+func auditSegmentExpired(root *os.Root, entry string, cutoff time.Time) (expired bool, scanErr error) {
+	file, err := root.OpenFile(entry, os.O_RDONLY|auditNoFollow, 0)
+	if err != nil {
+		return false, err
+	}
+	defer func() { scanErr = errors.Join(scanErr, file.Close()) }()
+	scanner := bufio.NewScanner(io.LimitReader(file, (10<<20)+1))
+	total, records := 0, 0
+	expired = true
+	for scanner.Scan() {
+		raw := scanner.Bytes()
+		total += len(raw) + 1
+		if total > 10<<20 {
+			return false, AuditFailed
+		}
+		var event struct {
+			Timestamp time.Time `json:"timestamp"`
+		}
+		if err = json.Unmarshal(raw, &event); err != nil || event.Timestamp.IsZero() {
+			return false, AuditFailed
+		}
+		records++
+		if !event.Timestamp.Before(cutoff) {
+			expired = false
+		}
+	}
+	if err = scanner.Err(); err != nil {
+		return false, err
+	}
+	return expired && records > 0, nil
 }

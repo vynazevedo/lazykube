@@ -16,7 +16,7 @@ func TestAuditPrivateRotationAndRetention(t *testing.T) {
 	a.limit = 1
 	now := time.Now()
 	a.clock = ClockFunc(func() time.Time { return now })
-	for range 25 {
+	for range 10 {
 		if err := a.Record(AuditEvent{Context: "dev\x1b\n", Timestamp: now}); err != nil {
 			t.Fatal(err)
 		}
@@ -40,6 +40,13 @@ func TestAuditPrivateRotationAndRetention(t *testing.T) {
 		t.Fatal(e, err)
 	}
 	old := now.Add(-31 * 24 * time.Hour)
+	oldRecord, marshalErr := json.Marshal(AuditEvent{Timestamp: old})
+	if marshalErr != nil {
+		t.Fatal(marshalErr)
+	}
+	if err = os.WriteFile(path+".5", append(oldRecord, '\n'), 0600); err != nil {
+		t.Fatal(err)
+	}
 	if err = os.Chtimes(path+".5", old, old); err != nil {
 		t.Fatal(err)
 	}
@@ -82,7 +89,7 @@ func TestAuditRejectsUnsafeFiles(t *testing.T) {
 	}
 }
 
-func TestAuditExpiresOldEventEvenAfterRecentAppend(t *testing.T) {
+func TestAuditRetainsOldEventUntilEntireSegmentExpires(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "audit", "audit.jsonl")
 	a := NewFileAudit(path)
 	now := time.Now()
@@ -94,7 +101,7 @@ func TestAuditExpiresOldEventEvenAfterRecentAppend(t *testing.T) {
 		t.Fatal(err)
 	}
 	raw, err := os.ReadFile(path)
-	if err != nil || strings.Contains(string(raw), "old") {
+	if err != nil || !strings.Contains(string(raw), "old") {
 		t.Fatal(string(raw), err)
 	}
 }
