@@ -32,7 +32,11 @@ type flags struct {
 	fps               int
 }
 
-var quietStderr = silenceStderr
+var (
+	quietStderr  = silenceStderr
+	buildModel   = newModel
+	errIsolation = errors.New("não foi possível isolar o stderr dos plugins de autenticação")
+)
 
 type connector func(ctx context.Context, opts kube.ConnectOptions) (data.Source, func(), error)
 
@@ -170,13 +174,17 @@ func run(args []string, stderr io.Writer, connect connector, progOpts ...tea.Pro
 		_, _ = fmt.Fprintln(stderr, err)
 		return 2
 	}
-	model, shutdown, err := newModel(f, connect)
+	model, shutdown, err := buildModel(f, connect)
 	if err != nil {
 		_, _ = fmt.Fprintln(stderr, "lazykube:", err)
 		return 1
 	}
 	final, err := func() (tea.Model, error) {
-		restore := quietStderr()
+		restore, err := quietStderr()
+		if err != nil {
+			shutdown()
+			return nil, err
+		}
 		defer restore()
 		defer shutdown()
 		return tea.NewProgram(model, progOpts...).Run()

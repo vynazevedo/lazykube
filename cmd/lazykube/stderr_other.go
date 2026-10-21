@@ -1,7 +1,7 @@
-//go:build !unix
+//go:build !unix && !windows
 
 package main
 
-func silenceStderr() func() {
-	return func() {}
+func silenceStderr() (func(), error) {
+	return nil, errIsolation
 }
