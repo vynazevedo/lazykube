@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"context"
-	"errors"
 	"io"
 	"strings"
 	"sync"
@@ -139,7 +138,7 @@ func TestRunReportsConnectError(t *testing.T) {
 	connect := func(_ context.Context, o kube.ConnectOptions) (data.Source, func(), error) {
 		o.Progress(data.Progress{Stage: data.StageKubeconfig, Done: true, Context: "dev"})
 		o.Progress(data.Progress{Stage: data.StageConnect, Context: "dev"})
-		return nil, nil, errors.New("cannot reach the API server:\n\x1b[31mdial tcp: refused")
+		return nil, nil, data.NewPublicError("cannot reach the API server:\n\x1b[31mdial tcp: refused")
 	}
 	code, stderr := runWith(t, connect, "q")
 	if code != app.ExitFailure {

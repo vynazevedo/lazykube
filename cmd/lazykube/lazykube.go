@@ -26,6 +26,8 @@ type flags struct {
 	fps        int
 }
 
+var quietStderr = silenceStderr
+
 type connector func(ctx context.Context, opts kube.ConnectOptions) (data.Source, func(), error)
 
 func parseFlags(args []string, out io.Writer) (flags, error) {
@@ -86,7 +88,7 @@ func clusterConnector(kubeconfig string, t data.Target, connect connector) app.C
 func demoConnector(t data.Target) app.Connector {
 	return func(ctx context.Context, report func(data.Progress)) (data.Source, func(), error) {
 		if _, ok := data.DemoContexts().Find(t.Context); !ok {
-			return nil, nil, fmt.Errorf("contexto sintético %q desconhecido", t.Context)
+			return nil, nil, data.NewPublicError(fmt.Sprintf("contexto sintético %q desconhecido", t.Context))
 		}
 		for _, s := range data.Stages() {
 			report(data.Progress{Stage: s, Done: true, Context: t.Context})
@@ -143,8 +145,12 @@ func run(args []string, stderr io.Writer, connect connector, progOpts ...tea.Pro
 		_, _ = fmt.Fprintln(stderr, "lazykube:", err)
 		return 1
 	}
-	defer shutdown()
-	final, err := tea.NewProgram(model, progOpts...).Run()
+	final, err := func() (tea.Model, error) {
+		restore := quietStderr()
+		defer restore()
+		defer shutdown()
+		return tea.NewProgram(model, progOpts...).Run()
+	}()
 	if errors.Is(err, tea.ErrInterrupted) {
 		return app.ExitCancelled
 	}
