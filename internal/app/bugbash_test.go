@@ -24,3 +24,20 @@ func TestWheelBehindHelpChangesNothing(t *testing.T) {
 		}
 	}
 }
+
+func TestLogSearchDoesNotSwallowEscElsewhere(t *testing.T) {
+	m := press(t, detailsModel(t, 1), "l", "/", "h", "e", "a", "r", "t", "enter")
+	if m.dg.search.Value() != "heart" {
+		t.Fatal("setup confirms a Log search")
+	}
+	for _, screen := range []string{"4", "6"} {
+		on := press(t, m, screen)
+		back := press(t, on, "esc")
+		if back.onScreen(on.nav.Active().Screen) && back.nav.Depth() == on.nav.Depth() {
+			t.Fatalf("screen %s: esc must act on the screen, not on the hidden Log search", screen)
+		}
+	}
+	if cleared := press(t, m, "esc"); cleared.dg.search.Value() != "" {
+		t.Fatal("on the Dashboard esc still clears the visible Log search")
+	}
+}

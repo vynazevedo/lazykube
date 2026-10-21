@@ -168,7 +168,7 @@ func (m *Model) handleEsc() {
 	switch {
 	case m.onScreen(ScreenEvents) && m.ev.reading:
 		m.stopReadingEvent()
-	case m.tab == ui.TabLog && m.dg.search.Value() != "":
+	case m.screen().ShowsDetails() && m.tab == ui.TabLog && m.dg.search.Value() != "":
 		m.dg.search.SetValue("")
 		m.updateMatches()
 	case m.filter.Value() != m.nav.entryFilter:
