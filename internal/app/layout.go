@@ -52,6 +52,11 @@ type Layout struct {
 	Scope       Rect
 	Events      Rect
 	Message     Rect
+	SecSummary  Rect
+	SecTabs     Rect
+	SecList     Rect
+	SecEvidence Rect
+	SecNotes    Rect
 	DividerY    int
 	FooterY     int
 }
@@ -152,6 +157,31 @@ func ComputeEvents(w, h int) Layout {
 	l.Scope = Rect{X: b.X, Y: b.Y, W: b.W, H: scope}
 	l.Events = Rect{X: b.X, Y: b.Y + scope, W: b.W, H: b.H - scope - message}
 	l.Message = Rect{X: b.X, Y: b.Y + b.H - message, W: b.W, H: message}
+	return l
+}
+
+func ComputeSecurity(w, h int) Layout {
+	l := Layout{W: w, H: h}
+	if w < MinWidth || h < MinHeight {
+		l.TooSmall = true
+		return l
+	}
+	l.shell(w, h)
+	b := l.Body
+	summary, tabs, notes := 6, 2, 3
+	if h < 44 {
+		summary = 5
+	}
+	list := 52
+	if w < 150 {
+		list = 42
+	}
+	body := b.H - summary - tabs - notes
+	l.SecSummary = Rect{X: b.X, Y: b.Y, W: b.W, H: summary}
+	l.SecTabs = Rect{X: b.X, Y: b.Y + summary, W: b.W, H: tabs}
+	l.SecList = Rect{X: b.X, Y: b.Y + summary + tabs, W: list, H: body}
+	l.SecEvidence = Rect{X: b.X + list + 1, Y: b.Y + summary + tabs, W: b.W - list - 1, H: body}
+	l.SecNotes = Rect{X: b.X, Y: b.Y + b.H - notes, W: b.W, H: notes}
 	return l
 }
 

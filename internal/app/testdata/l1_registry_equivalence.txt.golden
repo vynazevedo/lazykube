@@ -40,5 +40,5 @@ custom | Custom Resources | categoria
   custom.definitions | Definitions | futuro
 helm | Helm | categoria
   helm.releases | Releases | futuro
-security | Security | futuro | reservado 5
+security | Security | pronto | atalho 5
 radar | Radar | futuro | reservado 7

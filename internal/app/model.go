@@ -49,6 +49,7 @@ type Model struct {
 	securityKey       string
 	securityNamespace bool
 	securityView      ui.SecurityView
+	sec               securityPage
 
 	w, h     int
 	layout   Layout
@@ -200,6 +201,8 @@ func (m *Model) setLayout(w, h int) {
 		m.layout = ComputeNodes(w, h)
 	case m.onScreen(ScreenEvents):
 		m.layout = ComputeEvents(w, h)
+	case m.onScreen(ScreenSecurity):
+		m.layout = ComputeSecurity(w, h)
 	default:
 		m.layout = Compute(w, h, m.leftMode)
 	}
@@ -232,6 +235,7 @@ func (m *Model) refresh() {
 		m.dg.containers = m.dg.diag.Containers(name)
 	}
 	m.refreshEventsScreen()
+	m.refreshSecurityPage()
 	m.trackClusterFeed()
 	m.updateMatches()
 	m.clampScroll()

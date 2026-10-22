@@ -45,6 +45,7 @@ func (m Model) frame() Frame {
 		Follow:      m.follow,
 		Tab:         m.tab,
 		Events:      m.ev.eventsFrame,
+		Security:    m.sec.securityFrame,
 	}
 }
 
@@ -118,6 +119,7 @@ func (m *Model) restore(f Frame) {
 	m.podOffset, m.nsCursor, m.depCursor = f.PodOffset, f.NSCursor, f.DepCursor
 	m.tab, m.scroll, m.follow = f.Tab, f.Scroll, f.Follow
 	m.restoreEvents(f.Events)
+	m.sec = securityPage{securityFrame: f.Security}
 	m.relayout()
 	m.fixSelection()
 	m.refresh()
@@ -239,7 +241,7 @@ func (m *Model) openTarget(t Destination) {
 }
 
 func (m Model) shortcutDestination(msg tea.KeyPressMsg) DestinationID {
-	for _, b := range []key.Binding{m.keys.Dashboard, m.keys.Workloads, m.keys.Nodes, m.keys.Events} {
+	for _, b := range []key.Binding{m.keys.Dashboard, m.keys.Workloads, m.keys.Nodes, m.keys.Security, m.keys.Events} {
 		if !key.Matches(msg, b) {
 			continue
 		}

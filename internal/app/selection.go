@@ -123,7 +123,7 @@ func (m *Model) focusOrder() []Focus {
 	if m.onScreen(ScreenWorkloads) {
 		return []Focus{FocusPods, FocusDeployments, FocusDetails}
 	}
-	if m.onScreen(ScreenNodes) || m.onScreen(ScreenEvents) {
+	if m.onScreen(ScreenNodes) || m.onScreen(ScreenEvents) || m.onScreen(ScreenSecurity) {
 		return []Focus{FocusPods}
 	}
 	if m.layout.ShowLeft {

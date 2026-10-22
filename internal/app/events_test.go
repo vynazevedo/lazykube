@@ -98,7 +98,7 @@ func TestEventsActivation(t *testing.T) {
 		if !l.Pods.Empty() || !l.Details.Empty() || !l.Node.Empty() {
 			t.Fatal("events shows only scope, table and message")
 		}
-		if navCrumbs(m) != "Events" || m.nav.Depth() != 1 || m.menuActive() != 3 {
+		if navCrumbs(m) != "Events" || m.nav.Depth() != 1 || m.menuActive() != 4 {
 			t.Fatalf("events route, crumbs %q", navCrumbs(m))
 		}
 		plain := m.Render().Plain()
@@ -124,7 +124,7 @@ func TestEventsActivation(t *testing.T) {
 	if menu := press(t, demoModel(t, 160, 48), "m", "6"); !menu.onScreen(ScreenEvents) || menu.menu.open {
 		t.Fatal("6 inside the menu activates Events")
 	}
-	x := ui.MenuSpans(m.menuItems())[3].X + m.layout.Menu.X + 1
+	x := ui.MenuSpans(m.menuItems())[4].X + m.layout.Menu.X + 1
 	if click, _ := demoModel(t, 160, 48).Update(tea.MouseClickMsg{X: x, Y: 1, Button: tea.MouseLeft}); !click.(Model).onScreen(ScreenEvents) {
 		t.Fatal("clicking the menu item activates Events")
 	}
