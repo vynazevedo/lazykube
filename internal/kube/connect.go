@@ -12,7 +12,6 @@ import (
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
-	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/klog/v2"
 	metricsclient "k8s.io/metrics/pkg/client/clientset/versioned"
 
@@ -47,21 +46,19 @@ func ResolveContext(opts ConnectOptions) (string, error) {
 }
 
 func resolveContext(opts ConnectOptions) (string, int, error) {
-	rules := clientcmd.NewDefaultClientConfigLoadingRules()
-	rules.ExplicitPath = opts.Kubeconfig
-	raw, err := rules.Load()
+	raw, err := loadingRules(opts.Kubeconfig).Load()
 	if err != nil {
-		return "", 0, fmt.Errorf("cannot load kubeconfig: %w", err)
+		return "", 0, connectError(ErrorKubeconfig, opts.Context, err)
 	}
 	name := opts.Context
 	if name == "" {
 		name = raw.CurrentContext
 	}
 	if name == "" {
-		return "", 0, fmt.Errorf("no current context in kubeconfig; pass --context")
+		return "", 0, connectError(ErrorNoCurrentContext, "", nil)
 	}
 	if _, ok := raw.Contexts[name]; !ok {
-		return "", 0, fmt.Errorf("context %q not found in kubeconfig", name)
+		return "", 0, connectError(ErrorContextMissing, name, nil)
 	}
 	return name, len(raw.Contexts), nil
 }
@@ -81,29 +78,26 @@ func Connect(ctx context.Context, opts ConnectOptions) (*Source, error) {
 	report(opts.Progress, data.Progress{Stage: data.StageKubeconfig, Done: true, Context: name, Detail: fmt.Sprintf("%d contextos", contexts)})
 	report(opts.Progress, data.Progress{Stage: data.StageConnect, Context: name})
 	if err := ctx.Err(); err != nil {
-		return nil, err
+		return nil, publicError(err, name, false)
 	}
-	rules := clientcmd.NewDefaultClientConfigLoadingRules()
-	rules.ExplicitPath = opts.Kubeconfig
-	cc := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(rules, &clientcmd.ConfigOverrides{CurrentContext: name})
-	cfg, err := cc.ClientConfig()
+	cfg, err := restConfig(opts, name)
 	if err != nil {
-		return nil, fmt.Errorf("invalid client config for context %q: %w", name, err)
+		return nil, connectError(ErrorClientConfig, name, err)
 	}
-	cfg.QPS, cfg.Burst, cfg.UserAgent = clientQPS, clientBurst, userAgent
+	exec := cfg.ExecProvider != nil
 	client, err := kubernetes.NewForConfig(cfg)
 	if err != nil {
-		return nil, err
+		return nil, connectError(ErrorClientConfig, name, err)
 	}
 	mc, err := metricsclient.NewForConfig(cfg)
 	if err != nil {
-		return nil, err
+		return nil, connectError(ErrorClientConfig, name, err)
 	}
 	timed := rest.CopyConfig(cfg)
 	timed.Timeout = defaultTimeout
 	dc, err := discovery.NewDiscoveryClientForConfig(timed)
 	if err != nil {
-		return nil, err
+		return nil, connectError(ErrorClientConfig, name, err)
 	}
 	s := newSource(client, mc, Options{Context: name, Namespace: opts.Namespace, Progress: opts.Progress, DisableNetwork: true})
 	s.version = dc
@@ -124,12 +118,12 @@ func Connect(ctx context.Context, opts ConnectOptions) (*Source, error) {
 	actionClient, clientErr := dynamic.NewForConfig(cfg)
 	if clientErr != nil {
 		s.Close()
-		return nil, guard.Unavailable
+		return nil, connectError(ErrorGuard, name, clientErr)
 	}
 	s.actions, err = NewActionExecutor(s.ctx, s.guardSession, opts.AllowWrites, client, actionClient, guard.NewFileAudit(auditPath), guard.ClockFunc(time.Now), nil)
 	if err != nil {
 		s.Close()
-		return nil, err
+		return nil, connectError(ErrorGuard, name, err)
 	}
 	resourceClient, err := newResourceClient(cfg)
 	if err != nil {
@@ -144,7 +138,7 @@ func Connect(ctx context.Context, opts ConnectOptions) (*Source, error) {
 	s.initResources(resourceClient, catalogClient)
 	if err := s.start(ctx); err != nil {
 		s.Close()
-		return nil, fmt.Errorf("context %q: %w", name, err)
+		return nil, publicError(err, name, exec)
 	}
 	return s, nil
 }

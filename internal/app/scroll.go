@@ -38,6 +38,7 @@ func (m *Model) setTab(t ui.Tab) {
 	m.tab = t
 	m.scroll, m.follow, m.newLines = 0, true, 0
 	m.refreshEvents(m.detailTarget())
+	m.trackClusterFeed()
 	if t == ui.TabLog {
 		m.scroll = m.maxScroll()
 	}

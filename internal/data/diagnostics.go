@@ -167,6 +167,10 @@ type EventMessages interface {
 	EventMessage(uid string) (EventMessage, bool)
 }
 
+type ClusterEventsReleaser interface {
+	ReleaseClusterEvents()
+}
+
 type Diagnostics interface {
 	Containers(pod string) []Container
 	PodLogs(req LogRequest, tick, n int) LogView

@@ -146,3 +146,6 @@ func NewActionExecutor(ctx context.Context, s guard.Session, allowWrites bool, c
 
 func (s *Source) Actions() *guard.Executor { return s.actions }
 func (s *Source) AccessMode() guard.Mode   { return s.guardPolicy.Mode(s.guardSession) }
+func (s *Source) GuardSession() guard.Session {
+	return s.guardSession
+}

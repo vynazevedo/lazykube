@@ -4,6 +4,7 @@ import (
 	"slices"
 	"time"
 
+	"charm.land/bubbles/v2/key"
 	"charm.land/bubbles/v2/textinput"
 	tea "charm.land/bubbletea/v2"
 
@@ -35,6 +36,7 @@ type Options struct {
 	NoAnim     bool
 	InitialPod int
 	Now        func() time.Time
+	Session    data.SessionRef
 }
 
 type Model struct {
@@ -70,12 +72,14 @@ type Model struct {
 	filtering bool
 
 	src      data.Source
+	session  data.SessionRef
 	snap     data.Snapshot
 	metrics  data.Metrics
 	logs     []data.LogLine
 	events   data.EventFeed
 	dg       diagState
 	ev       eventsView
+	wideFeed bool
 	manifest []string
 	describe []data.Field
 
@@ -122,6 +126,7 @@ func New(opts Options) Model {
 		keys:     DefaultKeyMap(),
 		filter:   ti,
 		src:      opts.Source,
+		session:  opts.Session,
 		dg:       newDiagState(opts.Source),
 		follow:   true,
 		motion:   newMotion(fps),
@@ -153,7 +158,7 @@ func (m Model) waitData() tea.Cmd {
 	if !ok {
 		return nil
 	}
-	return waitChange(live.Changes())
+	return waitChange(live.Changes(), m.session.Generation)
 }
 
 func (m *Model) reload() {
@@ -224,6 +229,7 @@ func (m *Model) refresh() {
 		m.dg.containers = m.dg.diag.Containers(name)
 	}
 	m.refreshEventsScreen()
+	m.trackClusterFeed()
 	m.updateMatches()
 	m.clampScroll()
 	m.setBarTargets()
@@ -232,10 +238,13 @@ func (m *Model) refresh() {
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case dataMsg:
+		if msg.session != m.session.Generation {
+			return m, nil
+		}
 		m.reload()
 		return m, m.waitData()
 	case frameMsg:
-		if msg.gen != m.gen || !m.running() {
+		if msg.session != m.session.Generation || msg.gen != m.gen || !m.running() {
 			return m, nil
 		}
 		prev := m.clock.T
@@ -264,18 +273,37 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.snapMotion()
 		cmd := m.restartTick()
 		return m, cmd
+	case tea.WindowSizeMsg:
+		m.setLayout(msg.Width, msg.Height)
+		if m.layout.TooSmall {
+			m.suspendForSmall()
+		}
+		m.refresh()
+		return m, nil
 	case tea.KeyPressMsg:
 		if msg.String() == "ctrl+c" {
 			return wake(!m.busy(), m, tea.Quit)
 		}
+		if m.layout.TooSmall {
+			return m, m.smallKey(msg)
+		}
 		idle := !m.busy()
 		next, cmd := m.routeKey(msg)
 		return wake(idle, next, cmd)
+	case tea.MouseClickMsg, tea.MouseWheelMsg, tea.MouseMotionMsg:
+		if m.layout.TooSmall {
+			return m, nil
+		}
+	}
+	switch msg := msg.(type) {
 	case tea.MouseClickMsg:
 		idle := !m.busy()
 		if m.dep.open {
 			m.dep.open = false
 			return wake(idle, m, nil)
+		}
+		if cmd := m.headerClick(tea.Mouse(msg)); cmd != nil {
+			return wake(idle, m, cmd)
 		}
 		if next, ok := m.handleShellClick(tea.Mouse(msg)); ok {
 			return wake(idle, next, nil)
@@ -283,7 +311,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		next, cmd := m.screen().Update(m, msg)
 		return wake(idle, next, cmd)
 	case tea.MouseWheelMsg:
-		if m.menu.open || m.dep.open {
+		if m.menu.open || m.dep.open || m.helpOpen {
 			return m, nil
 		}
 		idle := !m.busy()
@@ -291,6 +319,30 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return wake(idle, next, cmd)
 	}
 	return m.screen().Update(m, msg)
+}
+
+func (m *Model) suspendForSmall() {
+	if m.filtering {
+		m.filtering = false
+		m.filter.Blur()
+	}
+	if m.dg.searching {
+		m.dg.searching = false
+		m.dg.search.Blur()
+	}
+	m.helpOpen, m.menu.open, m.dep.open = false, false, false
+}
+
+func (m Model) smallKey(msg tea.KeyPressMsg) tea.Cmd {
+	switch {
+	case key.Matches(msg, m.keys.Context):
+		return requestPick(pickContext, m.session.Generation)
+	case key.Matches(msg, m.keys.Namespace):
+		return requestPick(pickNamespace, m.session.Generation)
+	case msg.String() == "q":
+		return tea.Quit
+	}
+	return nil
 }
 
 func wake(wasIdle bool, nm Model, cmd tea.Cmd) (tea.Model, tea.Cmd) {

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	tea "charm.land/bubbletea/v2"
@@ -27,20 +28,30 @@ type Connector func(ctx context.Context, report func(data.Progress)) (data.Sourc
 
 type LoaderOptions struct {
 	Options
-	Context string
-	Connect Connector
+	Context    string
+	Connect    Connector
+	Attempt    uint64
+	Generation uint64
+	Target     *data.Target
+	Previous   *data.Target
+	Choices    bool
 }
 
-type progressMsg struct{ p data.Progress }
+type progressMsg struct {
+	p       data.Progress
+	attempt uint64
+}
 
 type connectedMsg struct {
-	src data.Source
-	err error
+	src     data.Source
+	err     error
+	attempt uint64
 }
 
 type loaderFrameMsg struct {
-	at  time.Time
-	gen int
+	at      time.Time
+	gen     int
+	attempt uint64
 }
 
 type session struct {
@@ -48,6 +59,7 @@ type session struct {
 	cancel  context.CancelFunc
 	closeFn func()
 	ended   bool
+	over    atomic.Bool
 }
 
 func (s *session) adopt(closeFn func()) bool {
@@ -75,6 +87,7 @@ func (s *session) end() {
 		s.closeFn()
 		s.closeFn = nil
 	}
+	s.over.Store(true)
 }
 
 type loadStep struct {
@@ -106,6 +119,12 @@ type Loader struct {
 
 	main *Model
 	fade anim.Fade
+
+	attempt    uint64
+	generation uint64
+	target     *data.Target
+	previous   *data.Target
+	choices    bool
 }
 
 func NewLoader(opts LoaderOptions) Loader {
@@ -136,6 +155,12 @@ func NewLoader(opts LoaderOptions) Loader {
 		now:      now,
 		context:  opts.Context,
 		bar:      anim.NewSpring(fps, 0),
+
+		attempt:    opts.Attempt,
+		generation: opts.Generation,
+		target:     opts.Target,
+		previous:   opts.Previous,
+		choices:    opts.Choices,
 	}
 	if l.animated {
 		l.clock = anim.NewClock(now(), fps)
@@ -155,7 +180,7 @@ func (l Loader) Shutdown() {
 }
 
 func (l Loader) connectCmd() tea.Cmd {
-	ctx, events, sess, connect := l.ctx, l.events, l.sess, l.connect
+	ctx, events, sess, connect, attempt := l.ctx, l.events, l.sess, l.connect, l.attempt
 	return func() tea.Msg {
 		var mu sync.Mutex
 		closed := false
@@ -166,7 +191,7 @@ func (l Loader) connectCmd() tea.Cmd {
 				return
 			}
 			select {
-			case events <- progressMsg{p}:
+			case events <- progressMsg{p: p, attempt: attempt}:
 			case <-ctx.Done():
 			}
 		}
@@ -183,7 +208,7 @@ func (l Loader) connectCmd() tea.Cmd {
 			src, err = nil, context.Canceled
 		}
 		select {
-		case events <- connectedMsg{src: src, err: err}:
+		case events <- connectedMsg{src: src, err: err, attempt: attempt}:
 		case <-ctx.Done():
 		}
 		close(events)
@@ -205,9 +230,9 @@ func (l Loader) tick() tea.Cmd {
 	if !l.animated || l.err != nil || l.cancelled {
 		return nil
 	}
-	gen := l.gen
+	gen, attempt := l.gen, l.attempt
 	return tea.Tick(time.Second/time.Duration(l.fps), func(t time.Time) tea.Msg {
-		return loaderFrameMsg{at: t, gen: gen}
+		return loaderFrameMsg{at: t, gen: gen, attempt: attempt}
 	})
 }
 
@@ -224,13 +249,13 @@ func (l Loader) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return l, nil
 	case progressMsg:
-		if l.finished() {
+		if l.finished() || msg.attempt != l.attempt {
 			return l, nil
 		}
 		l.apply(msg.p)
 		return l, waitEvent(l.events)
 	case connectedMsg:
-		if l.finished() {
+		if l.finished() || msg.attempt != l.attempt {
 			return l, nil
 		}
 		if msg.err != nil {
@@ -239,7 +264,7 @@ func (l Loader) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return l.start(msg.src)
 	case loaderFrameMsg:
-		if msg.gen != l.gen {
+		if msg.gen != l.gen || msg.attempt != l.attempt {
 			return l, nil
 		}
 		l.clock.Advance(msg.at)
@@ -248,15 +273,32 @@ func (l Loader) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return *l.main, nil
 		}
 		return l, l.tick()
+	case tea.MouseClickMsg:
+		if l.main != nil {
+			return l.forward(msg)
+		}
+		if l.choices && msg.Button == tea.MouseLeft {
+			if key, ok := l.hintAt(msg.X, msg.Y); ok {
+				if key == "ctrl+c" {
+					return l.Update(tea.KeyPressMsg{Code: 'c', Mod: tea.ModCtrl})
+				}
+				return l, l.choose(key)
+			}
+		}
+		return l, nil
 	case tea.KeyPressMsg:
 		if l.main != nil {
 			return l.forward(msg)
 		}
-		switch msg.String() {
-		case "ctrl+c":
+		if msg.String() == "ctrl+c" {
 			l.cancelled = true
 			l.sess.cancel()
 			return l, tea.Quit
+		}
+		if l.choices {
+			return l, l.choose(msg.String())
+		}
+		switch msg.String() {
 		case "q", "esc":
 			if l.err != nil {
 				return l, tea.Quit
@@ -327,7 +369,7 @@ func (l *Loader) failingStage() data.Stage {
 func (l *Loader) fail(err error) {
 	l.err = err
 	l.failed = l.failingStage()
-	l.errText = errorText(err)
+	l.errText = errorText(data.PublicText(err))
 	l.steps[l.failed].state = ui.StepFailed
 	for i := l.failed + 1; int(i) < len(l.steps); i++ {
 		l.steps[i] = loadStep{}
@@ -335,9 +377,9 @@ func (l *Loader) fail(err error) {
 	l.bar.Snap()
 }
 
-func errorText(err error) string {
+func errorText(text string) string {
 	var b strings.Builder
-	for _, part := range strings.FieldsFunc(err.Error(), func(r rune) bool { return r == '\n' || r == '\r' }) {
+	for _, part := range strings.FieldsFunc(text, func(r rune) bool { return r == '\n' || r == '\r' }) {
 		part = strings.TrimSpace(data.Sanitize(part))
 		if part == "" {
 			continue
@@ -362,6 +404,10 @@ func (l Loader) start(src data.Source) (tea.Model, tea.Cmd) {
 	opts := l.opts
 	opts.Source = src
 	opts.Palette = l.pal
+	opts.Session = sessionRef(src, l.context, l.generation)
+	if l.target != nil {
+		opts.Session.Namespace = l.target.Namespace
+	}
 	m := New(opts)
 	if l.w > 0 && l.h > 0 {
 		next, _ := m.Update(tea.WindowSizeMsg{Width: l.w, Height: l.h})
@@ -392,7 +438,13 @@ func (l Loader) stageTitle(s data.Stage) string {
 }
 
 func (l Loader) state() ui.LoadingState {
-	st := ui.LoadingState{Progress: l.bar.Pos, Error: l.errText}
+	st := ui.LoadingState{Progress: l.bar.Pos, Error: l.errText, Hints: l.hints()}
+	if l.target != nil {
+		st.Target = targetLabel(*l.target, l.context)
+	}
+	if l.previous != nil {
+		st.Previous = targetLabel(*l.previous, "")
+	}
 	for i, s := range l.steps {
 		st.Steps = append(st.Steps, ui.LoadingStep{Title: l.stageTitle(data.Stage(i)), Detail: s.detail, State: s.state})
 	}
@@ -431,6 +483,61 @@ func (l Loader) View() tea.View {
 	return v
 }
 
+func (l Loader) hintAt(x, y int) (string, bool) {
+	if l.w <= 0 || l.h <= 0 {
+		return "", false
+	}
+	c := draw.NewCanvas(l.w, l.h, theme.BgApp)
+	for _, s := range ui.Loading(c.Region(), l.state(), ui.Ctx{Pal: l.pal, Clock: l.clock}) {
+		if y == s.Y && x >= s.X && x < s.X+s.W {
+			return s.Key, true
+		}
+	}
+	return "", false
+}
+
+func (l Loader) canBack() bool {
+	return l.previous != nil && (l.target == nil || *l.previous != *l.target)
+}
+
+func (l Loader) choose(key string) tea.Cmd {
+	attempt := l.attempt
+	emit := func(msg tea.Msg) tea.Cmd { return func() tea.Msg { return msg } }
+	switch {
+	case key == "esc" && l.err == nil && l.canBack():
+		return emit(choiceMsg{choice: choiceBack, attempt: attempt})
+	case l.err == nil:
+		return nil
+	case key == "r":
+		return emit(choiceMsg{choice: choiceRetry, attempt: attempt})
+	case (key == "b" || key == "esc") && l.canBack():
+		return emit(choiceMsg{choice: choiceBack, attempt: attempt})
+	case key == "c":
+		return emit(pickMsg{kind: pickContext, attempt: attempt, loader: true})
+	case key == "q" || key == "esc":
+		return tea.Quit
+	}
+	return nil
+}
+
+func (l Loader) hints() []ui.KeyHelp {
+	if !l.choices {
+		return nil
+	}
+	if l.err == nil {
+		out := []ui.KeyHelp{{Key: "ctrl+c", Desc: "cancelar e sair"}}
+		if l.canBack() {
+			out = append(out, ui.KeyHelp{Key: "esc", Desc: "voltar ao anterior"})
+		}
+		return out
+	}
+	out := []ui.KeyHelp{{Key: "r", Desc: "repetir"}}
+	if l.canBack() {
+		out = append(out, ui.KeyHelp{Key: "b", Desc: "voltar ao anterior"})
+	}
+	return append(out, ui.KeyHelp{Key: "c", Desc: "escolher contexto"}, ui.KeyHelp{Key: "q", Desc: "sair"})
+}
+
 func (l Loader) Failure() (string, string, bool) {
 	if l.err == nil {
 		return "", "", false
@@ -439,7 +546,7 @@ func (l Loader) Failure() (string, string, bool) {
 }
 
 func ExitCode(final tea.Model) int {
-	l, ok := final.(Loader)
+	l, ok := unwrap(final).(Loader)
 	switch {
 	case !ok:
 		return 0

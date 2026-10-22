@@ -37,6 +37,12 @@ func keyPress(s string) tea.KeyPressMsg {
 		return tea.KeyPressMsg{Code: tea.KeyEnd}
 	case "ctrl+p":
 		return tea.KeyPressMsg{Code: 'p', Mod: tea.ModCtrl}
+	case "alt+n":
+		return tea.KeyPressMsg{Code: 'n', Mod: tea.ModAlt}
+	case "ctrl+c":
+		return tea.KeyPressMsg{Code: 'c', Mod: tea.ModCtrl}
+	case "backspace":
+		return tea.KeyPressMsg{Code: tea.KeyBackspace}
 	}
 	r := []rune(s)[0]
 	return tea.KeyPressMsg{Code: r, Text: s}
@@ -300,7 +306,7 @@ func TestNoAnimFreezesEffects(t *testing.T) {
 }
 
 func TestScrollOrientationPerTab(t *testing.T) {
-	m := press(t, demoModel(t, 160, 36), "tab", "c")
+	m := press(t, demoModel(t, 160, 36), "tab", "l", "]")
 	if m.focus != FocusDetails || m.tab != ui.TabConfig {
 		t.Fatal("setup failed")
 	}
@@ -523,7 +529,7 @@ func TestTabSlide(t *testing.T) {
 	}
 	n := press(t, demoModel(t, 160, 48), "l")
 	n.animated = false
-	n = press(t, n, "c")
+	n = press(t, n, "]")
 	if n.slideOffset() != 0 {
 		t.Fatal("no slide without animations")
 	}

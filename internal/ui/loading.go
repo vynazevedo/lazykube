@@ -24,6 +24,9 @@ type LoadingState struct {
 	Steps    []LoadingStep
 	Progress float64
 	Error    string
+	Target   string
+	Previous string
+	Hints    []KeyHelp
 }
 
 const (
@@ -66,10 +69,16 @@ func (st LoadingState) failed() (LoadingStep, bool) {
 	return LoadingStep{}, false
 }
 
-func Loading(r draw.Region, st LoadingState, ctx Ctx) {
+type HintSpan struct {
+	Key  string
+	X, W int
+	Y    int
+}
+
+func Loading(r draw.Region, st LoadingState, ctx Ctx) []HintSpan {
 	r.Fill(theme.BgApp)
 	if r.Empty() {
-		return
+		return nil
 	}
 	w := min(loadingMaxW, max(0, r.W-4))
 	logo := logoLines("lazykube")
@@ -89,6 +98,9 @@ func Loading(r draw.Region, st LoadingState, ctx Ctx) {
 		logoH = logoRows
 	}
 	body := logoH + 2 + 2 + len(st.Steps) + 2
+	if st.Target != "" {
+		body++
+	}
 	if failed {
 		body += 2 + len(errLines)
 	}
@@ -146,6 +158,15 @@ func Loading(r draw.Region, st LoadingState, ctx Ctx) {
 	sub := draw.Line{muted(Version + "  ·  "), text(subtitle)}.Truncate(r.W)
 	r.Line(max(0, (r.W-sub.Width())/2), y, sub)
 	y += 2
+	if st.Target != "" {
+		dest := draw.Line{muted("destino "), bold(draw.Sanitize(st.Target), ctx.Pal.C)}
+		if st.Previous != "" {
+			dest = append(dest, muted("  ·  anterior "), text(draw.Sanitize(st.Previous)))
+		}
+		dest = dest.Truncate(r.W)
+		r.Line(max(0, (r.W-dest.Width())/2), y-1, dest)
+		y++
+	}
 
 	x := (r.W - w) / 2
 	loadingBar(r.Sub(x, y, w, 1), st.Progress, failed, ctx)
@@ -172,8 +193,32 @@ func Loading(r draw.Region, st LoadingState, ctx Ctx) {
 	if failed {
 		hint = draw.Line{bold("q", ctx.Pal.A), muted(" sair")}
 	}
+	var spans []HintSpan
+	if len(st.Hints) > 0 {
+		hint = nil
+		for i, h := range st.Hints {
+			if i > 0 {
+				hint = append(hint, faint("  ·  "))
+			}
+			at := hint.Width()
+			hint = append(hint, bold(h.Key, ctx.Pal.A), muted(" "+h.Desc))
+			spans = append(spans, HintSpan{Key: h.Key, X: at, W: hint.Width() - at, Y: y})
+		}
+	}
+	full := hint.Width()
 	hint = hint.Truncate(r.W)
-	r.Line(max(0, (r.W-hint.Width())/2), y, hint)
+	x0 := max(0, (r.W-hint.Width())/2)
+	r.Line(x0, y, hint)
+	visible := spans[:0]
+	for _, s := range spans {
+		if full > r.W && s.X+s.W > hint.Width()-1 {
+			break
+		}
+		s.X += r.X + x0
+		s.Y += r.Y
+		visible = append(visible, s)
+	}
+	return visible
 }
 
 func loadingBar(r draw.Region, progress float64, failed bool, ctx Ctx) {

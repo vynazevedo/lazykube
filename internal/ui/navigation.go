@@ -144,10 +144,10 @@ func MenuHelp() []KeyHelp {
 func PodDetailHelp() []KeyHelp {
 	return []KeyHelp{
 		{"esc", "back"},
-		{"l c t d e", "tabs"},
+		{"l t d e", "tabs"},
 		{"S", "security"},
 		{"[ ]", "tab"},
-		{"/ n N", "search"},
+		{"/ alt+n N", "search"},
 		{"C", "container"},
 		{"P", "previous"},
 		{"m", "menu"},

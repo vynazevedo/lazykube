@@ -54,8 +54,6 @@ func (m Model) handleKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 		}
 	case key.Matches(msg, k.TabLog):
 		m.setTab(ui.TabLog)
-	case key.Matches(msg, k.TabConfig):
-		m.setTab(ui.TabConfig)
 	case key.Matches(msg, k.TabTop):
 		m.setTab(ui.TabTop)
 	case key.Matches(msg, k.TabDescribe):
@@ -212,8 +210,11 @@ func (m Model) handleClick(ms tea.Mouse) (Model, tea.Cmd) {
 		}
 	case AreaDetails:
 		m.focus = FocusDetails
+		d := m.layout.Details
 		if t, ok := m.tabAt(ms.X, ms.Y); ok {
 			m.setTab(t)
+		} else if m.tab == ui.TabLog && ui.LogNextHit(ms.X-d.X-m.slideOffset(), ms.Y-d.Y, d.W, d.H, m.logInfo(), ui.Ctx{Pal: m.pal, Clock: m.clock}) {
+			m.stepMatch(1)
 		}
 	}
 	return m, nil

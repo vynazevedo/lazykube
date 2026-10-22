@@ -127,3 +127,29 @@ func TestDemoEventsHaveUniqueIdentity(t *testing.T) {
 		t.Fatal("an empty UID is not an event")
 	}
 }
+
+func TestDemoScopedFollowsTarget(t *testing.T) {
+	full := NewDemo().Snapshot()
+	if full.Cluster.Context != DemoContext || full.Cluster.Namespace != "" || !full.Cluster.Listed || len(full.Namespaces) != 8 || full.Cluster.Namespaces != 8 {
+		t.Fatalf("the default demo covers every namespace: %+v", full.Cluster)
+	}
+	edge := NewDemoScoped("demo-edge", "xcx").Snapshot()
+	if edge.Cluster.Context != "demo-edge" || edge.Cluster.Namespace != "xcx" || edge.Cluster.Listed {
+		t.Fatalf("scoped demo cluster = %+v", edge.Cluster)
+	}
+	if len(edge.Pods) != 3 || len(edge.Deployments) != 0 || len(edge.Namespaces) != 1 || edge.Namespaces[0] != (Namespace{"xcx", 3}) {
+		t.Fatalf("scoped demo only shows its namespace: %d pods %+v %+v", len(edge.Pods), edge.Deployments, edge.Namespaces)
+	}
+	for _, p := range edge.Pods {
+		if p.Namespace != "xcx" {
+			t.Fatalf("pod %s leaked into the scoped demo", p.Key())
+		}
+	}
+	cat := DemoContexts()
+	if !cat.Synthetic || cat.Current != DemoContext || len(cat.Contexts) < 2 {
+		t.Fatalf("demo catalog = %+v", cat)
+	}
+	if k, ok := cat.Find(DemoContext); !ok || !k.Current {
+		t.Fatal("the demo context is the current one")
+	}
+}

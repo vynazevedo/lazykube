@@ -8,16 +8,16 @@
                                                                                                     
                                                                                                     
                                                                                                     
+                                              lazykube                                              
+                                   context demo  namespace Todos                                    
                                                                                                     
+                                      terminal pequeno: 100×30                                      
+                               a interface completa precisa de 120×36                               
+                                    faltam 20 colunas e 6 linhas                                    
                                                                                                     
+                                 13 pods · 8 namespaces observados                                  
                                                                                                     
-                                                                                                    
-                                                                                                    
-                       terminal muito pequeno - mínimo 120×36 (atual 100×30)                        
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
+                                  q sair  c contexto  n namespace                                   
                                                                                                     
                                                                                                     
                                                                                                     
