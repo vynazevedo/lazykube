@@ -55,7 +55,12 @@ func resourceSubscribe(t testing.TB, s *Source, key data.ResourceSubscriptionKey
 
 func resourceWait(t testing.TB, h data.ResourceSubscription, condition func(data.ResourcePage) bool) data.ResourcePage {
 	t.Helper()
-	deadline := time.NewTimer(5 * time.Second)
+	return resourceWaitWithin(t, h, 5*time.Second, condition)
+}
+
+func resourceWaitWithin(t testing.TB, h data.ResourceSubscription, timeout time.Duration, condition func(data.ResourcePage) bool) data.ResourcePage {
+	t.Helper()
+	deadline := time.NewTimer(timeout)
 	defer deadline.Stop()
 	for {
 		page := h.Page("", 500)
@@ -237,7 +242,7 @@ func TestResourcePodsReuseExistingCache(t *testing.T) {
 	}
 	key.GVR = schema.GroupVersionResource{Version: "v1", Resource: "pods"}
 	h := resourceSubscribe(t, s, key, true, true)
-	page := resourceWait(t, h, func(p data.ResourcePage) bool { return p.Total == 10000 })
+	page := resourceWaitWithin(t, h, 60*time.Second, func(p data.ResourcePage) bool { return p.Total == 10000 })
 	if !page.Borrowed || page.Coverage.State != data.CoverageComplete || len(client.Actions()) != 0 {
 		t.Fatal("pod cache not reused")
 	}

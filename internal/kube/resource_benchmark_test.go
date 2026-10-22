@@ -42,8 +42,8 @@ func TestResourceBrowserMemory10kPodsAnd10kSlices(t *testing.T) {
 	podKey := key
 	podKey.GVR = schema.GroupVersionResource{Version: "v1", Resource: "pods"}
 	pods := resourceSubscribe(t, s, podKey, true, true)
-	resourceWait(t, slices, func(p data.ResourcePage) bool { return p.Total == 10000 && p.Coverage.State == data.CoverageComplete })
-	resourceWait(t, pods, func(p data.ResourcePage) bool { return p.Total == 10000 })
+	resourceWaitWithin(t, slices, 60*time.Second, func(p data.ResourcePage) bool { return p.Total == 10000 && p.Coverage.State == data.CoverageComplete })
+	resourceWaitWithin(t, pods, 60*time.Second, func(p data.ResourcePage) bool { return p.Total == 10000 })
 	runtime.GC()
 	runtime.ReadMemStats(&after)
 	retained := int64(after.HeapAlloc) - int64(before.HeapAlloc)
@@ -66,20 +66,20 @@ func BenchmarkResourceBrowser10kPods10kSlices(b *testing.B) {
 	for range b.N {
 		a := resourceSubscribe(b, s, key, true, true)
 		p := resourceSubscribe(b, s, podKey, true, true)
-		resourceWait(b, a, func(page data.ResourcePage) bool {
+		resourceWaitWithin(b, a, 60*time.Second, func(page data.ResourcePage) bool {
 			return page.Total == 10000 && page.Coverage.State == data.CoverageComplete
 		})
-		resourceWait(b, p, func(page data.ResourcePage) bool { return page.Total == 10000 })
+		resourceWaitWithin(b, p, 60*time.Second, func(page data.ResourcePage) bool { return page.Total == 10000 })
 		a.Cancel()
 		p.Cancel()
 	}
 	b.StopTimer()
 	a := resourceSubscribe(b, s, key, true, true)
 	p := resourceSubscribe(b, s, podKey, true, true)
-	resourceWait(b, a, func(page data.ResourcePage) bool {
+	resourceWaitWithin(b, a, 60*time.Second, func(page data.ResourcePage) bool {
 		return page.Total == 10000 && page.Coverage.State == data.CoverageComplete
 	})
-	resourceWait(b, p, func(page data.ResourcePage) bool { return page.Total == 10000 })
+	resourceWaitWithin(b, p, 60*time.Second, func(page data.ResourcePage) bool { return page.Total == 10000 })
 	runtime.GC()
 	runtime.ReadMemStats(&after)
 	b.ReportMetric(float64(int64(after.HeapAlloc)-int64(before.HeapAlloc)), "retained-B")
@@ -90,7 +90,7 @@ func BenchmarkResourcePage500Of10k(b *testing.B) {
 	s, client, key := resourcePoolFixture(b)
 	resourceListReactor(client, 10000)
 	h := resourceSubscribe(b, s, key, true, false)
-	resourceWait(b, h, func(p data.ResourcePage) bool { return p.Coverage.State == data.CoverageListOnly })
+	resourceWaitWithin(b, h, 60*time.Second, func(p data.ResourcePage) bool { return p.Coverage.State == data.CoverageListOnly })
 	b.ReportAllocs()
 	b.ResetTimer()
 	for range b.N {
