@@ -258,3 +258,26 @@ func TestTreeGoldens(t *testing.T) {
 		golden(t, name+".ansi", c.String())
 	}
 }
+
+func TestTreeHelpIsBound(t *testing.T) {
+	m := press(t, demoModel(t, 160, 48), "b")
+	bound := map[string]bool{}
+	for _, b := range m.keys.Bindings() {
+		for _, k := range append(b.Keys(), helpTokens(b.Help().Key)...) {
+			bound[k] = true
+		}
+	}
+	for _, h := range append(ui.TreeHelp(), ui.FullHelpTree()...) {
+		for _, k := range helpTokens(h.Key) {
+			if alias := map[string]string{"↑↓": "up", "←→": "left", "→": "right", "←": "left", "↑": "up", "↓": "down"}[k]; alias != "" {
+				k = alias
+			}
+			if !bound[k] {
+				t.Fatalf("tree help announces %q without a binding", k)
+			}
+		}
+	}
+	if !strings.Contains(m.Render().Plain(), "collapse / expand") {
+		t.Fatal("the footer shows the tree keys while the tree has focus")
+	}
+}
