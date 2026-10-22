@@ -101,7 +101,7 @@ func Compute(w, h int, mode LeftMode) Layout {
 	if l, done := compactLayout(w, h); done {
 		if l.Compact {
 			l.ShowLeft = mode == LeftShown
-			l.Pods, l.Details = l.Body, l.Body
+			l.Pods, l.Details, l.Heatmap = l.Body, l.Body, l.Body
 			if l.ShowLeft {
 				l.Namespaces, l.Deployments = l.Body, l.Body
 			}

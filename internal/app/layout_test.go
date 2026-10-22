@@ -121,7 +121,7 @@ func TestCompactLayouts(t *testing.T) {
 		w, h := size[0], size[1]
 		body := Rect{1, 3, w - 2, h - 5}
 		dash := Compute(w, h, LeftAuto)
-		if dash.TooSmall || !dash.Compact || dash.ShowLeft || dash.Pods != body || dash.Details != body || !dash.Heatmap.Empty() || !dash.Node.Empty() {
+		if dash.TooSmall || !dash.Compact || dash.ShowLeft || dash.Pods != body || dash.Details != body || dash.Heatmap != body || !dash.Node.Empty() {
 			t.Fatalf("%dx%d dashboard compact = %+v", w, h, dash)
 		}
 		if shown := Compute(w, h, LeftShown); !shown.ShowLeft || shown.Namespaces != body || shown.Deployments != body {

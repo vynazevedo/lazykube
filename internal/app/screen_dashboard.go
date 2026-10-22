@@ -23,7 +23,10 @@ func (dashboardScreen) Help(Model) []ui.KeyHelp {
 	return ui.ShortHelp()
 }
 
-func (dashboardScreen) FullHelp(Model) []ui.KeyHelp {
+func (dashboardScreen) FullHelp(m Model) []ui.KeyHelp {
+	if m.layout.Compact {
+		return append([]ui.KeyHelp{{Key: "tab", Desc: "pods heatmap details"}}, ui.FullHelp()...)
+	}
 	return ui.FullHelp()
 }
 

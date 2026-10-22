@@ -296,6 +296,9 @@ func (m *Model) stopReadingEvent() {
 }
 
 func (m Model) eventsPage() int {
+	if m.ev.reading && !m.layout.Message.Empty() {
+		return max(1, ui.EventMessageRows(m.layout.Message.H))
+	}
 	return max(1, ui.EventsTableRows(m.layout.Events.H))
 }
 

@@ -27,6 +27,7 @@ const (
 	FocusDeployments
 	FocusPods
 	FocusDetails
+	FocusHeatmap
 )
 
 type Options struct {
@@ -229,6 +230,17 @@ func (m *Model) setLayout(w, h int) {
 	m.ensurePodVisible()
 }
 
+func (m *Model) setFocus(f Focus) {
+	if m.focus == f {
+		return
+	}
+	m.focus = f
+	if m.layout.Compact {
+		m.relayout()
+		m.refresh()
+	}
+}
+
 func (m *Model) applyCompact() {
 	l := &m.layout
 	if !l.Compact {
@@ -249,7 +261,7 @@ func (m *Model) applyCompact() {
 			l.keepOnly(&l.Pods)
 		}
 	default:
-		keep := map[Focus]*Rect{FocusNamespaces: &l.Namespaces, FocusDeployments: &l.Deployments, FocusPods: &l.Pods, FocusDetails: &l.Details}[m.focus]
+		keep := map[Focus]*Rect{FocusNamespaces: &l.Namespaces, FocusDeployments: &l.Deployments, FocusPods: &l.Pods, FocusDetails: &l.Details, FocusHeatmap: &l.Heatmap}[m.focus]
 		l.keepOnly(keep)
 	}
 }
