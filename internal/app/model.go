@@ -66,6 +66,7 @@ type Model struct {
 	blurred  bool
 	fps      int
 	gen      int
+	auditSeq *uint64
 	now      func() time.Time
 
 	keys      KeyMap
@@ -134,6 +135,7 @@ func New(opts Options) Model {
 		follow:   true,
 		motion:   newMotion(fps),
 		nav:      newRouter(),
+		auditSeq: new(uint64),
 	}
 	if m.animated {
 		m.clock = anim.NewClock(now(), fps)
@@ -243,6 +245,22 @@ func (m *Model) refresh() {
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if msg, ok := msg.(auditPageMsg); ok {
+		m.applyAudit(msg)
+		return m, m.followAudit()
+	}
+	next, cmd := m.update(msg)
+	nm, ok := next.(Model)
+	if !ok {
+		return next, cmd
+	}
+	if follow := nm.followAudit(); follow != nil {
+		return nm, tea.Batch(cmd, follow)
+	}
+	return nm, cmd
+}
+
+func (m Model) update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case dataMsg:
 		if msg.session != m.session.Generation {

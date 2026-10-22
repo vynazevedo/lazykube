@@ -54,6 +54,7 @@ type SecurityPageState struct {
 	Cursor      int
 	Rules       []data.WorkloadRule
 	Scroll      int
+	Audit       SecurityAuditState
 }
 
 func (st SecurityPageState) Selected() *data.WorkloadPosture {
@@ -368,8 +369,6 @@ func SecurityPendingLines(t SecurityPageTab) []string {
 		return []string{"PSS v1.34: verificação local do spec; não é admissão.", "Avaliação PSS ainda indisponível; a nota de segurança não substitui a conformidade.", "Labels pod-security.kubernetes.io dos namespaces não foram lidos."}
 	case SecTabAccepted:
 		return []string{"Aceite de risco local ainda indisponível.", "A reconhece alertas da sessão; não aceita risco nem remove evidência."}
-	case SecTabAudit:
-		return []string{"Audit local indisponível nesta versão; nenhum registro foi carregado."}
 	}
 	return nil
 }
@@ -421,8 +420,8 @@ func SecurityHelp() []KeyHelp {
 func FullHelpSecurity() []KeyHelp {
 	return []KeyHelp{
 		{"↑/↓ k/j", "move workload / scroll evidence"},
-		{"tab shift+tab", "list / evidence panel"},
-		{"enter", "focus evidence"},
+		{"tab shift+tab", "list / evidence or Audit filter"},
+		{"enter", "focus evidence, Audit context filter"},
 		{"[ ]", "previous / next Security tab"},
 		{"H", "list cohort: all / without system"},
 		{"pgup/pgdn", "scroll evidence"},
@@ -440,5 +439,186 @@ func FullHelpSecurity() []KeyHelp {
 		{"ctrl+p", "pause animations"},
 		{"?", "toggle help"},
 		{"q ctrl+c", "quit"},
+	}
+}
+
+const (
+	AuditLoading     = "loading"
+	AuditReady       = "ready"
+	AuditMissing     = "missing"
+	AuditUnavailable = "unavailable"
+	AuditRotated     = "rotated"
+)
+
+type SecurityAuditRow struct {
+	Time        string
+	When        string
+	Context     string
+	Identity    string
+	Action      string
+	Phase       string
+	Outcome     string
+	OperationID string
+	Target      string
+	ReadOnly    bool
+	Protected   bool
+}
+
+type SecurityAuditState struct {
+	State       string
+	Reason      string
+	Context     string
+	Rows        []SecurityAuditRow
+	Cursor      int
+	More        bool
+	Pending     bool
+	Invalid     int
+	Hidden      int
+	AllContexts bool
+}
+
+func (a SecurityAuditState) Selected() *SecurityAuditRow {
+	if a.Cursor < 0 || a.Cursor >= len(a.Rows) {
+		return nil
+	}
+	return &a.Rows[a.Cursor]
+}
+
+const auditListFooter = 4
+
+func SecurityAuditRows(panelH int) int {
+	return max(0, panelH-3-auditListFooter)
+}
+
+func SecurityAuditButtonRow(panelH int) int {
+	return panelH - 3
+}
+
+func outcomeColor(outcome string) theme.RGB {
+	switch outcome {
+	case "succeeded":
+		return theme.OK
+	case "outcome_unknown":
+		return theme.Warn
+	}
+	return theme.Err
+}
+
+func auditStateText(a SecurityAuditState) (string, theme.RGB) {
+	switch a.State {
+	case AuditLoading:
+		return "Lendo o audit local.", theme.Muted
+	case AuditMissing:
+		return "Nenhum registro de audit local encontrado.", theme.Muted
+	case AuditRotated:
+		return "Audit rotacionado durante a leitura; reabra a aba para recarregar.", theme.Warn
+	case AuditUnavailable:
+		return "Audit local indisponível; nenhum registro foi carregado.", theme.Warn
+	}
+	if len(a.Rows) == 0 {
+		return "Nenhum registro neste contexto.", theme.Muted
+	}
+	return "", theme.Muted
+}
+
+func SecurityAuditList(r draw.Region, st SecurityPageState, ctx Ctx) {
+	a := st.Audit
+	inner := Panel(r, fmt.Sprintf("Audit local (%d)", len(a.Rows)), st.Focus == SecurityFocusList, ctx).Inset(1, 0, 1, 0)
+	if inner.Empty() {
+		return
+	}
+	inner.Line(0, 0, draw.Line{muted("HORA      AÇÃO        RESULTADO")}.Truncate(inner.W))
+	rows := SecurityAuditRows(r.H)
+	if msg, color := auditStateText(a); msg != "" {
+		for i, l := range draw.Wrap(msg, max(1, inner.W)) {
+			if i < rows {
+				inner.Line(0, 1+i, draw.Line{colored(l, color)})
+			}
+		}
+	}
+	offset := ScrollOffset(a.Cursor, len(a.Rows), rows)
+	for row := 0; row < rows && offset+row < len(a.Rows); row++ {
+		i := offset + row
+		e := a.Rows[i]
+		if i == a.Cursor {
+			inner.Sub(-1, 1+row, inner.W+2, 1).FillBg(SelectionBg(ctx.Pal, selectionMix))
+		}
+		inner.Line(0, 1+row, draw.Line{text(draw.PadRight(e.Time, 10)), text(draw.PadRight(e.Action, 12)), colored(e.Outcome, outcomeColor(e.Outcome))}.Truncate(inner.W))
+	}
+	counts := fmt.Sprintf("%d de outros contextos ocultos", a.Hidden)
+	if a.AllContexts {
+		counts = "Todos os contextos; sem reuso para ação"
+	}
+	if a.More {
+		counts += " | mais registros abaixo"
+	}
+	status := ""
+	if a.Pending {
+		status = "Linha em gravação: aguardando. "
+	}
+	if a.Invalid > 0 {
+		status += fmt.Sprintf("%d linhas fora do schema ignoradas.", a.Invalid)
+	}
+	label := "[Mostrar outros contextos]"
+	if a.AllContexts {
+		label = "[Somente o contexto atual]"
+	}
+	button := draw.Line{muted(label)}
+	if st.Focus == SecurityFocusEvidence {
+		button = draw.Line{draw.S(label, draw.Fg(ctx.Pal.A).WithBg(theme.BorderFaint).WithBold())}
+	}
+	foot := []draw.Line{{faint(counts)}, {faint(status)}, button, {faint("Sem payload, comando ou credenciais.")}}
+	for i, l := range foot {
+		inner.Line(0, inner.H-len(foot)+i, l.Truncate(inner.W))
+	}
+}
+
+func SecurityAuditDetail(r draw.Region, st SecurityPageState, ctx Ctx) {
+	inner := Panel(r, "Registro", false, ctx).Inset(1, 0, 1, 0)
+	if inner.Empty() {
+		return
+	}
+	e := st.Audit.Selected()
+	var lines []draw.Line
+	if e == nil {
+		msg, color := auditStateText(st.Audit)
+		if msg == "" {
+			msg = "Nenhum registro selecionado."
+		}
+		lines = []draw.Line{{colored(msg, color)}}
+		if st.Audit.Reason != "" {
+			lines = append(lines, draw.Line{muted("Motivo: " + draw.Sanitize(st.Audit.Reason))})
+		}
+	} else {
+		field := func(k, v string) {
+			for i, l := range draw.Wrap(draw.Sanitize(v), max(1, inner.W-14)) {
+				label := ""
+				if i == 0 {
+					label = k
+				}
+				lines = append(lines, draw.Line{muted(draw.PadRight(label, 14)), text(l)})
+			}
+		}
+		field("Horário", e.When)
+		field("Contexto", e.Context)
+		field("Sessão", e.Identity)
+		field("Ação", e.Action)
+		field("Alvo", e.Target)
+		field("Fase", e.Phase)
+		lines = append(lines, draw.Line{muted(draw.PadRight("Resultado", 14)), colored(draw.Sanitize(e.Outcome), outcomeColor(e.Outcome))})
+		field("Operação", e.OperationID)
+		field("Modo", fmt.Sprintf("read-only %t | protegido %t", e.ReadOnly, e.Protected))
+		lines = append(lines, draw.Line{})
+		for _, s := range []string{"Identidade registrada pela sessão do lazykube; não é a identidade autenticada no Kubernetes.", "outcome_unknown preserva resultado sem confirmação do servidor."} {
+			for _, l := range draw.Wrap(s, max(1, inner.W)) {
+				lines = append(lines, draw.Line{faint(l)})
+			}
+		}
+	}
+	for y, l := range lines {
+		if y >= inner.H {
+			break
+		}
+		inner.Line(0, y, l.Truncate(inner.W))
 	}
 }

@@ -31,6 +31,7 @@ type securityPage struct {
 	workloads []data.WorkloadPosture
 	rules     []data.WorkloadRule
 	rulesFor  data.WorkloadKey
+	audit     auditView
 }
 
 func (securityScreen) ID() ScreenID {
@@ -96,10 +97,14 @@ func (securityScreen) View(m Model, body draw.Region, ctx ui.Ctx) {
 	st := m.securityPageState()
 	ui.SecuritySummary(region(body, m.layout.SecSummary), st, ctx)
 	ui.SecurityTabs(region(body, m.layout.SecTabs), st.Tab, ctx)
-	if st.Tab == ui.SecTabWorkloads {
+	switch st.Tab {
+	case ui.SecTabWorkloads:
 		ui.SecurityWorkloadsPanel(region(body, m.layout.SecList), st, ctx)
 		ui.SecurityEvidencePanel(region(body, m.layout.SecEvidence), st, ctx)
-	} else {
+	case ui.SecTabAudit:
+		ui.SecurityAuditList(region(body, m.layout.SecList), st, ctx)
+		ui.SecurityAuditDetail(region(body, m.layout.SecEvidence), st, ctx)
+	default:
 		r := m.layout.SecList
 		r.W = m.layout.SecList.W + 1 + m.layout.SecEvidence.W
 		ui.SecurityPendingPanel(region(body, r), st.Tab, ctx)
@@ -133,6 +138,7 @@ func (m Model) securityPageState() ui.SecurityPageState {
 		Cursor:      m.sec.Cursor,
 		Rules:       m.sec.rules,
 		Scroll:      m.sec.Scroll,
+		Audit:       m.auditState(),
 	}
 }
 
@@ -219,6 +225,12 @@ func (m *Model) clampSecurityScroll() {
 }
 
 func (m *Model) moveSecurity(delta int) {
+	if m.sec.Tab == ui.SecTabAudit {
+		if m.sec.Focus == ui.SecurityFocusList {
+			m.moveAudit(delta)
+		}
+		return
+	}
 	if m.sec.Tab != ui.SecTabWorkloads {
 		return
 	}
@@ -236,6 +248,9 @@ func (m *Model) moveSecurity(delta int) {
 }
 
 func (m Model) securityPageSize() int {
+	if m.sec.Tab == ui.SecTabAudit {
+		return max(1, ui.SecurityAuditRows(m.layout.SecList.H))
+	}
 	if m.sec.Focus == ui.SecurityFocusEvidence {
 		return max(1, ui.SecurityEvidenceRows(m.layout.SecEvidence.H))
 	}
@@ -254,15 +269,18 @@ func (m Model) handleSecurityKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 	case key.Matches(msg, k.PageDown):
 		m.moveSecurity(m.securityPageSize())
 	case key.Matches(msg, k.Home):
-		m.moveSecurity(-len(m.sec.workloads) - m.securityEvidenceMax())
+		m.moveSecurity(-len(m.sec.workloads) - len(m.sec.audit.events) - m.securityEvidenceMax())
 	case key.Matches(msg, k.End):
-		m.moveSecurity(len(m.sec.workloads) + m.securityEvidenceMax())
+		m.moveSecurity(len(m.sec.workloads) + len(m.sec.audit.events) + m.securityEvidenceMax())
 	case key.Matches(msg, k.NextPanel), key.Matches(msg, k.PrevPanel):
-		if m.sec.Tab == ui.SecTabWorkloads {
+		if m.sec.Tab == ui.SecTabWorkloads || m.sec.Tab == ui.SecTabAudit {
 			m.sec.Focus = 1 - m.sec.Focus
 		}
 	case key.Matches(msg, k.Enter):
-		if m.sec.Tab == ui.SecTabWorkloads && len(m.sec.workloads) > 0 {
+		switch {
+		case m.sec.Tab == ui.SecTabAudit && m.sec.Focus == ui.SecurityFocusEvidence:
+			m.toggleAuditContexts()
+		case m.sec.Tab == ui.SecTabWorkloads && len(m.sec.workloads) > 0:
 			m.sec.Focus = ui.SecurityFocusEvidence
 		}
 	case key.Matches(msg, k.TabPrev):
@@ -284,10 +302,10 @@ func (m Model) handleSecurityKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 }
 
 func (m *Model) setSecurityTab(t ui.SecurityPageTab) {
-	m.sec.Tab = t
-	if t != ui.SecTabWorkloads {
+	if t != m.sec.Tab {
 		m.sec.Focus = ui.SecurityFocusList
 	}
+	m.sec.Tab = t
 }
 
 func (m *Model) handleSecurityClick(ms tea.Mouse) {
@@ -297,6 +315,8 @@ func (m *Model) handleSecurityClick(ms tea.Mouse) {
 		if t, ok := ui.SecurityTabAt(l.SecTabs.W-2, ms.X-l.SecTabs.X-1, ms.Y-l.SecTabs.Y); ok {
 			m.setSecurityTab(t)
 		}
+	case m.sec.Tab == ui.SecTabAudit:
+		m.handleAuditClick(ms)
 	case m.sec.Tab != ui.SecTabWorkloads:
 	case l.SecList.Contains(ms.X, ms.Y):
 		m.sec.Focus = ui.SecurityFocusList
@@ -322,6 +342,12 @@ func (m *Model) handleSecurityWheel(ms tea.Mouse) {
 	case tea.MouseWheelDown:
 		delta = 1
 	default:
+		return
+	}
+	if m.sec.Tab == ui.SecTabAudit {
+		if m.layout.SecList.Contains(ms.X, ms.Y) {
+			m.moveAudit(delta)
+		}
 		return
 	}
 	if m.sec.Tab != ui.SecTabWorkloads {
