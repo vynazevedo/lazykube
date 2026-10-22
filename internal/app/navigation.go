@@ -61,7 +61,26 @@ func (m *Model) endEditing() {
 	}
 }
 
+func (m Model) withRouteDefaults(to Route) Route {
+	if to.Generation == 0 {
+		to.Generation = m.session.Generation
+	}
+	if to.Dest == "" && to.Kind != RoutePod {
+		if d, ok := registry.forScreen(to.Screen); ok {
+			if t, ok := m.resolveTarget(d); ok {
+				to.Dest = t.ID
+			}
+		}
+	}
+	if to.Kind == RoutePod && to.Ref.Resource == "" {
+		ns, name, _ := strings.Cut(to.Pod, "/")
+		to.Ref = ResourceRef{Version: "v1", Resource: "pods", Namespace: ns, Name: name}
+	}
+	return to
+}
+
 func (m *Model) navigate(to Route, setup ...func(*Model)) bool {
+	to = m.withRouteDefaults(to)
 	if !m.nav.push(m.frame(), to) {
 		return false
 	}
@@ -146,11 +165,52 @@ func (m *Model) scopeNamespace() string {
 }
 
 func (m *Model) activateScreen(id ScreenID) {
+	if d, ok := registry.forScreen(id); ok {
+		m.activateDestination(d.ID)
+	}
+}
+
+func (m Model) resolveTarget(d Destination) (Destination, bool) {
+	if d.ID == DestWorkloads {
+		if leaf, ok := registry.get(m.workloadsLeaf); ok && leaf.ready() && leaf.Parent == DestWorkloads {
+			return leaf, true
+		}
+	}
+	return registry.target(d)
+}
+
+func (m *Model) activateDestination(id DestinationID) (bool, string) {
+	d, ok := registry.get(id)
+	if !ok {
+		return false, "destino desconhecido"
+	}
+	t, ok := m.resolveTarget(d)
+	if !ok {
+		return false, reasonOr(d.Reason, reasonPlanned)
+	}
+	m.openTarget(t)
+	return true, ""
+}
+
+func reasonOr(reason, fallback string) string {
+	if reason == "" {
+		return fallback
+	}
+	return reason
+}
+
+func (m *Model) openTarget(t Destination) {
+	id := t.Screen
 	if !slices.Contains(registeredScreens(), id) {
 		return
 	}
 	ns, from, node := m.scopeNamespace(), m.mainScreen(), ""
 	var setup []func(*Model)
+	if id == ScreenWorkloads {
+		focus := t.Focus
+		m.workloadsLeaf = t.ID
+		setup = append(setup, func(m *Model) { m.focus = focus })
+	}
 	switch id {
 	case ScreenNodes:
 		node = m.selectedNode()
@@ -158,9 +218,13 @@ func (m *Model) activateScreen(id ScreenID) {
 		anchor := m.eventsAnchor()
 		setup = append(setup, func(m *Model) { m.ev = eventsView{eventsFrame: anchor} })
 	}
-	m.navigate(Route{Kind: RouteScreen, Screen: id, Node: node}, setup...)
+	if ns != "" && from == id && t.ID != m.nav.trail()[m.nav.crumbStart()].Dest {
+		m.navigate(Route{Kind: RouteNamespace, Screen: id, Dest: t.ID, Namespace: ns, Node: node}, setup...)
+		return
+	}
+	m.navigate(Route{Kind: RouteScreen, Screen: id, Dest: t.ID, Node: node}, setup...)
 	if ns != "" && from != id {
-		m.navigate(Route{Kind: RouteNamespace, Screen: id, Namespace: ns, Node: node})
+		m.navigate(Route{Kind: RouteNamespace, Screen: id, Dest: t.ID, Namespace: ns, Node: node})
 	}
 }
 
@@ -174,19 +238,6 @@ func (m Model) shortcutDestination(msg tea.KeyPressMsg) DestinationID {
 		}
 	}
 	return ""
-}
-
-func (m *Model) activateDestination(id DestinationID) bool {
-	d, ok := registry.get(id)
-	if !ok {
-		return false
-	}
-	t, ok := registry.target(d)
-	if !ok {
-		return false
-	}
-	m.activateScreen(t.Screen)
-	return true
 }
 
 func (m *Model) handleEsc() {
