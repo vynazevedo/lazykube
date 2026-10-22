@@ -170,6 +170,16 @@ func (m *Model) activateScreen(id ScreenID) {
 	}
 }
 
+func (m Model) currentLeaf() DestinationID {
+	trail := m.nav.trail()
+	for i := len(trail) - 1; i >= m.nav.crumbStart(); i-- {
+		if trail[i].Kind != RoutePod && trail[i].Dest != "" {
+			return trail[i].Dest
+		}
+	}
+	return ""
+}
+
 func (m Model) resolveTarget(d Destination) (Destination, bool) {
 	if d.ID == DestWorkloads {
 		if leaf, ok := registry.get(m.workloadsLeaf); ok && leaf.ready() && leaf.Parent == DestWorkloads {
@@ -218,7 +228,7 @@ func (m *Model) openTarget(t Destination) {
 		anchor := m.eventsAnchor()
 		setup = append(setup, func(m *Model) { m.ev = eventsView{eventsFrame: anchor} })
 	}
-	if ns != "" && from == id && t.ID != m.nav.trail()[m.nav.crumbStart()].Dest {
+	if ns != "" && from == id && t.ID != m.currentLeaf() {
 		m.navigate(Route{Kind: RouteNamespace, Screen: id, Dest: t.ID, Namespace: ns, Node: node}, setup...)
 		return
 	}

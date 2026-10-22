@@ -74,9 +74,30 @@ func TestNamespaceScopeSurvivesDestinations(t *testing.T) {
 			t.Fatalf("after %s the scoped route keeps its destination: %+v", k, r)
 		}
 	}
-	ok, _ := m.activateDestination(DestDeployments)
-	if !ok || m.scopeNamespace() != "kube-system" || m.focus != FocusDeployments {
-		t.Fatal("a leaf of the current screen keeps the scope")
+	scoped := func(step string, m Model, focus Focus) {
+		t.Helper()
+		if m.scopeNamespace() != "kube-system" || m.nsFilter != "kube-system" || m.focus != focus {
+			t.Fatalf("%s keeps the namespace scope: scope %q filter %q focus %d", step, m.scopeNamespace(), m.nsFilter, m.focus)
+		}
+	}
+	for i, id := range []DestinationID{DestDeployments, DestPods, DestDeployments, DestPods} {
+		ok, _ := m.activateDestination(id)
+		focus := map[DestinationID]Focus{DestPods: FocusPods, DestDeployments: FocusDeployments}[id]
+		if !ok || m.nav.Active().Dest != id {
+			t.Fatalf("switch %d to %s", i, id)
+		}
+		scoped("switch to "+string(id), m, focus)
+	}
+	back := press(t, m, "esc")
+	scoped("esc back to Deployments", back, FocusDeployments)
+	back = press(t, back, "esc")
+	scoped("esc back to Pods", back, FocusPods)
+	root := m
+	if again, _ := root.activateDestination(DestPods); !again || root.nav.Active().Kind != RouteScreen || root.scopeNamespace() != "" || root.nsFilter != "" {
+		t.Fatal("selecting the current leaf again is the explicit reactivation of the screen root")
+	}
+	if back := press(t, root, "esc"); back.scopeNamespace() != "kube-system" {
+		t.Fatal("esc after the reactivation returns to the scoped frame")
 	}
 	for range 40 {
 		m.activateDestination(DestPods)
