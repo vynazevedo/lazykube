@@ -52,7 +52,7 @@ func (t treeState) rows() []treeRow {
 }
 
 func (m Model) activeDestination() DestinationID {
-	return m.nav.trail()[m.nav.crumbStart()].Dest
+	return m.currentLeaf()
 }
 
 func ancestors(id DestinationID) []DestinationID {
@@ -96,20 +96,27 @@ func (m Model) sidebarState() ui.SidebarState {
 		})
 	}
 	out.Cursor = m.treeCursorIndex(rows)
-	out.Offset = m.treeOffset(len(rows), out.Cursor)
+	out.Offset = m.clampTreeOffset(m.tree.offset, len(rows))
 	return out
 }
 
-func (m Model) treeOffset(total, cursor int) int {
+func (m Model) clampTreeOffset(off, total int) int {
 	visible := ui.SidebarRowsVisible(m.layout.Tree.H)
-	off := max(0, min(m.tree.offset, total-visible))
+	return max(0, min(off, total-visible))
+}
+
+func (m *Model) revealTreeCursor() {
+	rows := m.tree.rows()
+	cursor := m.treeCursorIndex(rows)
+	visible := ui.SidebarRowsVisible(m.layout.Tree.H)
+	off := m.clampTreeOffset(m.tree.offset, len(rows))
 	switch {
 	case cursor < off:
 		off = cursor
 	case visible > 0 && cursor >= off+visible:
 		off = cursor - visible + 1
 	}
-	return max(0, off)
+	m.tree.offset = max(0, off)
 }
 
 func (m *Model) showTree() {
@@ -120,7 +127,17 @@ func (m *Model) showTree() {
 	m.tree.visible, m.tree.focused, m.tree.cursor, m.tree.note = true, true, active, ""
 	m.endEditing()
 	m.relayout()
+	m.revealTreeCursor()
 	m.refresh()
+}
+
+func (m *Model) reconcileTree() {
+	if m.tree.visible && m.layout.TreeOverlay && !m.tree.focused {
+		m.tree.focused = true
+		m.endEditing()
+		m.menu.open, m.dep.open = false, false
+		m.revealTreeCursor()
+	}
 }
 
 func (m *Model) hideTree() {
@@ -154,12 +171,13 @@ func (m *Model) moveTree(delta int) {
 	}
 	i := max(0, min(len(rows)-1, m.treeCursorIndex(rows)+delta))
 	m.tree.cursor, m.tree.note = rows[i].dest.ID, ""
-	m.tree.offset = m.treeOffset(len(rows), i)
+	m.revealTreeCursor()
 }
 
 func (m *Model) treeToggle(id DestinationID, open bool) {
 	m.tree = m.tree.withExpanded(id, open)
 	m.tree.note = ""
+	m.tree.offset = m.clampTreeOffset(m.tree.offset, len(m.tree.rows()))
 }
 
 func (m *Model) treeOpen(d Destination) {
@@ -208,6 +226,7 @@ func (m Model) handleTreeKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 			m.treeToggle(cur.ID, false)
 		case cur.Parent != "":
 			m.tree.cursor, m.tree.note = cur.Parent, ""
+			m.revealTreeCursor()
 		}
 	case key.Matches(msg, k.Enter):
 		m.treeOpen(cur)
@@ -230,6 +249,7 @@ func (m Model) handleTreeKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 }
 
 func (m Model) handleTreeClick(ms tea.Mouse) Model {
+	m.endEditing()
 	st := m.sidebarState()
 	idx, ok := ui.SidebarRowAt(st, m.layout.Tree.H, ms.Y-m.layout.Tree.Y)
 	if !ok {
@@ -251,7 +271,7 @@ func (m Model) handleTreeWheel(ms tea.Mouse) Model {
 	rows := m.tree.rows()
 	visible := ui.SidebarRowsVisible(m.layout.Tree.H)
 	delta := map[tea.MouseButton]int{tea.MouseWheelUp: -1, tea.MouseWheelDown: 1}[ms.Button]
-	m.tree.offset = max(0, min(len(rows)-visible, m.sidebarState().Offset+delta))
+	m.tree.offset = max(0, min(len(rows)-visible, m.clampTreeOffset(m.tree.offset, len(rows))+delta))
 	return m
 }
 

@@ -281,3 +281,129 @@ func TestTreeHelpIsBound(t *testing.T) {
 		t.Fatal("the footer shows the tree keys while the tree has focus")
 	}
 }
+
+func TestOverlayAlwaysCapturesInput(t *testing.T) {
+	resize := func(m Model, w, h int) Model {
+		next, _ := m.Update(tea.WindowSizeMsg{Width: w, Height: h})
+		return next.(Model)
+	}
+	docked := press(t, demoModel(t, 160, 48), "b", "esc", "/", "x")
+	if docked.tree.focused || !docked.filtering {
+		t.Fatal("setup: docked tree without focus while the filter is edited")
+	}
+	over := resize(docked, 80, 24)
+	if !over.layout.TreeOverlay || !over.tree.focused || over.filtering || over.filter.Value() != "x" {
+		t.Fatalf("an overlay takes focus and suspends editing: focused %v filtering %v", over.tree.focused, over.filtering)
+	}
+	sel, cursor := over.selName, over.tree.cursor
+	if moved := press(t, over, "down"); moved.selName != sel || moved.tree.cursor == cursor {
+		t.Fatal("keys go to the overlay, not to the body behind it")
+	}
+
+	f := newFakeCluster()
+	d := newRootDriver(t, f, data.Target{Context: "alpha"})
+	d.until("initial", connectedTo("alpha", ""))
+	d.press("b", "esc")
+	d.send(tea.WindowSizeMsg{Width: 80, Height: 24})
+	d.drain()
+	d.press("esc")
+	if m, _ := d.r.model(); m.tree.visible {
+		t.Fatal("esc closes the overlay")
+	}
+	d.press("b")
+	d.pickTarget(pickContext, "beta")
+	d.until("beta", connectedTo("beta", "default"))
+	m, _ := d.r.model()
+	if !m.tree.visible || !m.tree.focused || !m.layout.TreeOverlay {
+		t.Fatal("the restored tree preference is an overlay that captures input")
+	}
+	before := m.selName
+	if moved := press(t, m, "down"); moved.selName != before {
+		t.Fatal("after the switch the body does not receive keys under the overlay")
+	}
+}
+
+func TestTreeClickEndsEditing(t *testing.T) {
+	base := press(t, demoModel(t, 160, 48), "b", "esc")
+	y := treeRowY(t, base, DestWorkloads)
+	click := func(m Model) Model {
+		next, _ := m.Update(tea.MouseClickMsg{X: m.layout.Tree.X + 8, Y: y, Button: tea.MouseLeft})
+		return next.(Model)
+	}
+	filtered := click(press(t, base, "/", "x"))
+	if filtered.filtering || filtered.filter.Value() != "x" || !filtered.tree.focused {
+		t.Fatal("clicking the tree saves the filter and stops editing it")
+	}
+	if typed := press(t, filtered, "b"); typed.tree.visible || typed.filter.Value() != "x" {
+		t.Fatal("b after the click closes the tree instead of typing")
+	}
+	searching := press(t, detailsModel(t, 1), "l", "b", "esc", "/", "h", "e")
+	if !searching.dg.searching {
+		t.Fatal("setup: unconfirmed log search")
+	}
+	ws := treeRowY(t, searching, DestWorkloads)
+	next, _ := searching.Update(tea.MouseClickMsg{X: searching.layout.Tree.X + 8, Y: ws, Button: tea.MouseLeft})
+	got := next.(Model)
+	if got.dg.searching || got.dg.search.Value() != "" || !got.tree.focused {
+		t.Fatal("clicking the tree discards an unconfirmed log search")
+	}
+	if menu := press(t, got, "m"); !menu.menu.open {
+		t.Fatal("m reaches the tree handler after the click")
+	}
+}
+
+func TestTreeWheelScrollsFreely(t *testing.T) {
+	m := press(t, demoModel(t, 130, 40), "b")
+	for _, id := range []DestinationID{DestConfiguration, DestNetwork, DestStorage, DestAccessControl, DestCustomResource, DestHelm} {
+		m.treeToggle(id, true)
+	}
+	rows := len(m.tree.rows())
+	visible := ui.SidebarRowsVisible(m.layout.Tree.H)
+	if rows <= visible {
+		t.Fatalf("setup needs more rows than fit: %d <= %d", rows, visible)
+	}
+	m = press(t, m, "home")
+	wheel := func(m Model, b tea.MouseButton) Model {
+		next, _ := m.Update(tea.MouseWheelMsg{X: m.layout.Tree.X + 4, Y: m.layout.Tree.Y + 2, Button: b})
+		return next.(Model)
+	}
+	for i := 1; i <= 3; i++ {
+		m = wheel(m, tea.MouseWheelDown)
+		if got := m.sidebarState().Offset; got != i {
+			t.Fatalf("wheel %d scrolls the tree to %d, got %d", i, i, got)
+		}
+	}
+	for range rows {
+		m = wheel(m, tea.MouseWheelDown)
+	}
+	if got := m.sidebarState().Offset; got != rows-visible {
+		t.Fatalf("the wheel stops at the last page: %d", got)
+	}
+	m = press(t, m, "home")
+	if m.sidebarState().Offset != 0 {
+		t.Fatal("keyboard moves bring the cursor back into view")
+	}
+}
+
+func TestTreeMarksTheEffectiveLeaf(t *testing.T) {
+	m := press(t, navNamespace(t, demoModel(t, 160, 48)), "3")
+	m.activateDestination(DestDeployments)
+	if m.scopeNamespace() != "kube-system" || m.nav.Active().Dest != DestDeployments {
+		t.Fatal("setup: Deployments inside the namespace scope")
+	}
+	opened := press(t, m, "b")
+	if opened.tree.cursor != DestDeployments || !strings.Contains(opened.Render().Plain(), "›  Deployments") {
+		t.Fatalf("the tree marks and selects the effective leaf, cursor %s", opened.tree.cursor)
+	}
+	back := press(t, press(t, opened, "b"), "esc")
+	if back.nav.Active().Dest != DestPods {
+		t.Fatal("setup: esc returns to Pods")
+	}
+	if reopened := press(t, back, "b"); reopened.tree.cursor != DestPods || !strings.Contains(reopened.Render().Plain(), "›  Pods") {
+		t.Fatal("after esc the tree follows the leaf restored")
+	}
+	pod := press(t, back, "enter", "b")
+	if pod.tree.cursor != DestPods {
+		t.Fatal("on the pod detail the tree points to the leaf that opened it")
+	}
+}

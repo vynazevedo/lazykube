@@ -225,6 +225,7 @@ func (m *Model) setLayout(w, h int) {
 		m.focus = FocusPods
 	}
 	m.applyCompact()
+	m.reconcileTree()
 	m.ensurePodVisible()
 }
 
