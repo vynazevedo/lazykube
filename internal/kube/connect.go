@@ -130,12 +130,8 @@ func Connect(ctx context.Context, opts ConnectOptions) (*Source, error) {
 		s.Close()
 		return nil, err
 	}
-	catalogClient, err := newResourceDiscovery(cfg)
-	if err != nil {
-		s.Close()
-		return nil, err
-	}
-	s.initResources(resourceClient, catalogClient)
+	s.initResources(resourceClient, nil)
+	s.catalog.factory = func(ctx context.Context) (discovery.DiscoveryInterface, error) { return newResourceDiscovery(cfg, ctx) }
 	if err := s.start(ctx); err != nil {
 		s.Close()
 		return nil, publicError(err, name, exec)

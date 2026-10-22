@@ -20,6 +20,7 @@ const catalogLimit = 4096
 type resourceCatalog struct {
 	mu       sync.Mutex
 	client   discovery.DiscoveryInterface
+	factory  func(context.Context) (discovery.DiscoveryInterface, error)
 	now      func() time.Time
 	snapshot data.ResourceCatalogSnapshot
 }
@@ -27,16 +28,27 @@ type resourceCatalog struct {
 func (c *resourceCatalog) get(ctx context.Context, refresh bool) data.ResourceCatalogSnapshot {
 	c.mu.Lock()
 	defer c.mu.Unlock()
+	if ctx.Err() != nil {
+		return data.ResourceCatalogSnapshot{Session: c.snapshot.Session, Generation: c.snapshot.Generation, Coverage: data.Coverage{State: data.CoverageUnavailable, Reason: "discovery canceled"}}
+	}
 	if c.snapshot.Revision != 0 && !refresh && c.now().Sub(c.snapshot.ObservedAt) < catalogTTL {
 		return cloneCatalog(c.snapshot)
 	}
 	next := data.ResourceCatalogSnapshot{Session: c.snapshot.Session, Generation: c.snapshot.Generation, Revision: c.snapshot.Revision + 1, ObservedAt: c.now(), Coverage: data.Coverage{State: data.CoverageComplete}}
-	if ctx.Err() != nil || c.client == nil {
+	client := c.client
+	if c.factory != nil {
+		var err error
+		client, err = c.factory(ctx)
+		if err != nil {
+			client = nil
+		}
+	}
+	if ctx.Err() != nil || client == nil {
 		next.Coverage = data.Coverage{State: data.CoverageUnavailable, Reason: "discovery unavailable"}
 		c.snapshot = next
 		return cloneCatalog(next)
 	}
-	groups, err := c.client.ServerGroups()
+	groups, err := client.ServerGroups()
 	if err != nil {
 		next.Coverage = data.Coverage{State: data.CoverageUnavailable, Reason: "discovery unavailable"}
 		if apierrors.IsForbidden(err) || apierrors.IsUnauthorized(err) {
@@ -47,7 +59,7 @@ func (c *resourceCatalog) get(ctx context.Context, refresh bool) data.ResourceCa
 		versions := make(map[string]bool)
 		for _, g := range groups.Groups {
 			for _, v := range g.Versions {
-				if len(v.GroupVersion) > 320 {
+				if !resourceCatalogIdentity(v.GroupVersion, 320, true) {
 					next.Coverage = data.Coverage{State: data.CoveragePartial, Reason: "invalid discovery identity"}
 					continue
 				}
@@ -68,7 +80,7 @@ func (c *resourceCatalog) get(ctx context.Context, refresh bool) data.ResourceCa
 				next.Coverage = data.Coverage{State: data.CoveragePartial, Reason: "discovery canceled"}
 				break
 			}
-			resources, resourceErr := c.client.ServerResourcesForGroupVersion(v)
+			resources, resourceErr := client.ServerResourcesForGroupVersion(v)
 			state := data.ResourceServed
 			if resourceErr != nil {
 				state = data.ResourcePartial
@@ -92,7 +104,7 @@ func (c *resourceCatalog) get(ctx context.Context, refresh bool) data.ResourceCa
 				if strings.Contains(r.Name, "/") || r.Name == "" {
 					continue
 				}
-				if len(r.Name) > 253 || len(r.Kind) > 253 {
+				if !resourceCatalogIdentity(r.Name, 253, false) || !resourceCatalogIdentity(r.Kind, 253, false) {
 					next.Groups[len(next.Groups)-1].Availability = data.ResourcePartial
 					next.Coverage = data.Coverage{State: data.CoveragePartial, Reason: "invalid discovery identity"}
 					continue
@@ -115,4 +127,17 @@ func cloneCatalog(s data.ResourceCatalogSnapshot) data.ResourceCatalogSnapshot {
 	s.Resources = slices.Clone(s.Resources)
 	s.Groups = slices.Clone(s.Groups)
 	return s
+}
+
+func resourceCatalogIdentity(value string, limit int, slash bool) bool {
+	if len(value) == 0 || len(value) > limit {
+		return false
+	}
+	for _, r := range value {
+		if r >= 'a' && r <= 'z' || r >= 'A' && r <= 'Z' || r >= '0' && r <= '9' || r == '-' || r == '.' || r == '_' || slash && r == '/' {
+			continue
+		}
+		return false
+	}
+	return true
 }

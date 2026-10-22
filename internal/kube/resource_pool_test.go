@@ -286,3 +286,26 @@ func TestResourceUnsupportedAndRepeatedCursor(t *testing.T) {
 		t.Fatal("cursor loop not stopped")
 	}
 }
+
+func TestResourceMissingScopeIsNotAbsentAPI(t *testing.T) {
+	s, client, key := resourcePoolFixture(t)
+	client.PrependReactor("list", "*", func(clienttesting.Action) (bool, runtime.Object, error) {
+		return true, nil, apierrors.NewNotFound(schema.GroupResource{Resource: "namespaces"}, "apps")
+	})
+	h := resourceSubscribe(t, s, key, true, true)
+	resourceWait(t, h, func(p data.ResourcePage) bool { return p.Coverage.State == data.CoverageUnavailable })
+	if len(client.Actions()) != 1 {
+		t.Fatal("missing scope retried automatically")
+	}
+}
+
+func TestResourceBorrowedDenialDoesNotOpenDynamicWatch(t *testing.T) {
+	s, client, key := resourcePoolFixture(t)
+	s.deploymentCoverage = data.Coverage{State: data.CoverageDenied, Reason: "deployments denied"}
+	key.GVR = schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}
+	h := resourceSubscribe(t, s, key, true, true)
+	resourceWait(t, h, func(p data.ResourcePage) bool { return p.Coverage.State == data.CoverageDenied })
+	if len(client.Actions()) != 0 {
+		t.Fatal("borrowed denial retried through dynamic client")
+	}
+}

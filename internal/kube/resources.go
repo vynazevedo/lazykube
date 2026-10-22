@@ -21,7 +21,14 @@ func (s *Source) Catalog(ctx context.Context, refresh bool) data.ResourceCatalog
 	if s.catalog == nil {
 		return data.ResourceCatalogSnapshot{Coverage: data.Coverage{State: data.CoverageUnavailable, Reason: "resource discovery unavailable"}}
 	}
-	return s.catalog.get(ctx, refresh)
+	bound, cancel := context.WithCancel(ctx)
+	stop := context.AfterFunc(s.ctx, cancel)
+	defer stop()
+	defer cancel()
+	if s.ctx.Err() != nil {
+		cancel()
+	}
+	return s.catalog.get(bound, refresh)
 }
 
 func (s *Source) Subscribe(ctx context.Context, key data.ResourceSubscriptionKey) (data.ResourceSubscription, error) {

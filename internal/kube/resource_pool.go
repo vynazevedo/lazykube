@@ -52,6 +52,7 @@ type resourceEntry struct {
 	cancel     context.CancelFunc
 	handles    map[*resourceHandle]struct{}
 	rows       map[string]data.ResourceRow
+	workloads  data.WorkloadDistribution
 	revision   uint64
 	observedAt time.Time
 	coverage   data.Coverage
@@ -88,7 +89,7 @@ func (p *resourcePool) subscribe(ctx context.Context, key data.ResourceSubscript
 		return nil, errResourceScope
 	}
 	if key.GVR.Group == "" && key.GVR.Resource == "secrets" {
-		return nil, errors.New("Secret metadata requires a separate opt-in source")
+		return nil, errors.New("secret metadata requires a separate opt-in source")
 	}
 	if len(key.LabelSelector) > 1024 || len(key.FieldSelector) > 1024 {
 		return nil, errResourceScope
@@ -138,6 +139,7 @@ func (p *resourcePool) close() {
 	p.mu.Lock()
 	for _, e := range p.entries {
 		e.rows = nil
+		e.workloads = data.WorkloadDistribution{}
 		e.coverage = data.Coverage{State: data.CoverageUnavailable, Reason: "session closed"}
 		e.changedLocked()
 	}
@@ -181,7 +183,7 @@ func (h *resourceHandle) Page(cursor string, limit int) data.ResourcePage {
 	if _, ok := e.handles[h]; !ok {
 		return data.ResourcePage{Coverage: data.Coverage{State: data.CoverageUnavailable, Reason: "subscription canceled"}}
 	}
-	out := data.ResourcePage{Revision: e.revision, ObservedAt: e.observedAt, Coverage: e.coverage, Total: len(e.rows), Truncated: e.truncated, Borrowed: e.borrowed}
+	out := data.ResourcePage{Revision: e.revision, ObservedAt: e.observedAt, Coverage: e.coverage, Total: len(e.rows), Truncated: e.truncated, Borrowed: e.borrowed, Workloads: e.workloads}
 	offset := 0
 	if cursor != "" {
 		parts := strings.Split(cursor, ":")
@@ -241,6 +243,7 @@ func (e *resourceEntry) clear() {
 	}
 	p.rows -= len(e.rows)
 	e.rows = make(map[string]data.ResourceRow)
+	e.workloads = data.WorkloadDistribution{}
 	e.truncated = false
 	e.changedLocked()
 }
@@ -263,6 +266,7 @@ func (e *resourceEntry) put(row data.ResourceRow, deleted bool) bool {
 	if deleted {
 		if exists && old.Ref.UID == row.Ref.UID {
 			delete(e.rows, key)
+			e.workloads.Add(old.Workload, -1)
 			p.rows--
 			e.changedLocked()
 		}
@@ -280,6 +284,10 @@ func (e *resourceEntry) put(row data.ResourceRow, deleted bool) bool {
 	if !exists {
 		p.rows++
 	}
+	if exists {
+		e.workloads.Add(old.Workload, -1)
+	}
+	e.workloads.Add(row.Workload, 1)
 	e.rows[key] = row
 	e.observedAt = p.now()
 	e.changedLocked()

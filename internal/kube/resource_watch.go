@@ -132,7 +132,7 @@ func (e *resourceEntry) list() (string, bool, bool, resourceResult) {
 				return "", false, true, resourceStop
 			}
 			if apierrors.IsNotFound(err) {
-				e.state(data.CoverageUnsupported, "resource no longer served; refresh discovery")
+				e.state(data.CoverageUnavailable, "resource or scope unavailable; refresh discovery")
 				return "", false, false, resourceStop
 			}
 			e.state(data.CoverageStale, "list unavailable or cursor expired")
@@ -150,6 +150,8 @@ func (e *resourceEntry) list() (string, bool, bool, resourceResult) {
 		}
 		for i := range page.Items {
 			row, ok := projectResource(&page.Items[i])
+			row.Workload = resourceWorkload(&page.Items[i], e.key.GVR)
+			ok = ok && resourceRowFits(row)
 			if !ok {
 				e.state(data.CoveragePartial, "object exceeds metadata limits")
 				return "", false, false, resourceStop
@@ -235,6 +237,8 @@ func (e *resourceEntry) watch(rv string, complete bool) resourceResult {
 				return resourceStop
 			}
 			row, valid := projectResource(object)
+			row.Workload = resourceWorkload(event.Object, e.key.GVR)
+			valid = valid && resourceRowFits(row)
 			if !valid {
 				e.state(data.CoveragePartial, "object exceeds metadata limits")
 				return resourceStop

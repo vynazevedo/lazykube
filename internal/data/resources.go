@@ -36,6 +36,7 @@ type ResourceGroupStatus struct {
 }
 
 type ResourceCatalogSnapshot struct {
+	Synthetic  bool
 	Session    string
 	Generation uint64
 	Revision   uint64
@@ -93,10 +94,12 @@ type ResourceMetadataRef struct {
 
 type ResourceRow struct {
 	Ref       ResourceMetadataRef
+	Workload  WorkloadSummary
 	Truncated bool
 }
 
 type ResourcePage struct {
+	Synthetic  bool
 	Items      []ResourceRow
 	Continue   string
 	Revision   uint64
@@ -105,6 +108,7 @@ type ResourcePage struct {
 	Total      int
 	Truncated  bool
 	Borrowed   bool
+	Workloads  WorkloadDistribution
 }
 
 type ResourceSubscription interface {

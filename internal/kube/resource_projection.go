@@ -3,6 +3,7 @@ package kube
 import (
 	"strings"
 	"unicode"
+	"unsafe"
 
 	"github.com/vynazevedo/lazykube/internal/data"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -21,4 +22,8 @@ func projectResource(object metav1.Object) (data.ResourceRow, bool) {
 		}
 	}
 	return data.ResourceRow{Ref: data.ResourceMetadataRef{Name: strings.Clone(name), Namespace: strings.Clone(namespace), UID: strings.Clone(uid), ResourceVersion: strings.Clone(rv), CreatedAt: object.GetCreationTimestamp().Time}}, true
+}
+
+func resourceRowFits(row data.ResourceRow) bool {
+	return int(unsafe.Sizeof(row))+len(row.Ref.Name)+len(row.Ref.Namespace)+len(row.Ref.UID)+len(row.Ref.ResourceVersion)+len(row.Workload.Schedule)+len(row.Workload.Reason) <= 1024
 }

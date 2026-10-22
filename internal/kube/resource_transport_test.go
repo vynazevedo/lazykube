@@ -15,6 +15,7 @@ import (
 	"github.com/vynazevedo/lazykube/internal/data"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/rest"
 )
@@ -204,5 +205,42 @@ func TestResourceListCursorLossRelists(t *testing.T) {
 	resourceWait(t, h, func(p data.ResourcePage) bool { return p.Coverage.State == data.CoverageListOnly })
 	if calls.Load() != 3 {
 		t.Fatal(calls.Load())
+	}
+}
+
+func TestResourceDiscoveryCanceledWithSession(t *testing.T) {
+	entered := make(chan struct{}, 2)
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		select {
+		case entered <- struct{}{}:
+		default:
+		}
+		<-r.Context().Done()
+	}))
+	defer server.Close()
+	s := newSource(fake.NewClientset(), nil, Options{})
+	s.initResources(nil, nil)
+	s.catalog.factory = func(ctx context.Context) (discovery.DiscoveryInterface, error) {
+		return newResourceDiscovery(&rest.Config{Host: server.URL}, ctx)
+	}
+	done := make(chan data.ResourceCatalogSnapshot, 1)
+	go func() { done <- s.Catalog(context.Background(), true) }()
+	select {
+	case <-entered:
+	case <-time.After(time.Second):
+		s.Close()
+		t.Fatal("discovery not started")
+	}
+	s.Close()
+	select {
+	case result := <-done:
+		if result.Coverage.State == data.CoverageComplete {
+			t.Fatal("canceled discovery complete")
+		}
+	case <-time.After(time.Second):
+		t.Fatal("discovery survived session close")
+	}
+	if s.Catalog(context.Background(), true).Coverage.State != data.CoverageUnavailable {
+		t.Fatal("closed session discovery reused")
 	}
 }

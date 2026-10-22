@@ -1,6 +1,7 @@
 package kube
 
 import (
+	"context"
 	"errors"
 	"io"
 	"net/http"
@@ -16,25 +17,40 @@ const resourceObjectLimit = 2 << 20
 
 var errResourceResponseLimit = errors.New("resource response budget exceeded")
 
-type resourceTransport struct{ base http.RoundTripper }
+type resourceTransport struct {
+	base http.RoundTripper
+	ctx  context.Context
+}
 
 func (t resourceTransport) RoundTrip(request *http.Request) (*http.Response, error) {
+	cancel := func() {}
+	stop := func() bool { return false }
+	if t.ctx != nil {
+		var ctx context.Context
+		ctx, cancel = context.WithCancel(request.Context())
+		stop = context.AfterFunc(t.ctx, cancel)
+		request = request.Clone(ctx)
+	}
+	release := func() { stop(); cancel() }
 	response, err := t.base.RoundTrip(request)
 	if err != nil {
+		release()
 		return nil, err
 	}
 	watch := request.URL.Query().Get("watch") == "true"
 	if !watch && response.ContentLength > resourceResponseLimit {
 		_ = response.Body.Close()
+		release()
 		return nil, errResourceResponseLimit
 	}
-	response.Body = &resourceBody{ReadCloser: response.Body, watch: watch}
+	response.Body = &resourceBody{ReadCloser: response.Body, watch: watch, release: release}
 	return response, nil
 }
 
 type resourceBody struct {
 	io.ReadCloser
 	watch     bool
+	release   func()
 	bytes     int
 	depth     int
 	itemBytes int
@@ -93,9 +109,16 @@ func newResourceClient(cfg *rest.Config) (dynamic.Interface, error) {
 	return dynamic.NewForConfig(limited)
 }
 
-func newResourceDiscovery(cfg *rest.Config) (discovery.DiscoveryInterface, error) {
+func newResourceDiscovery(cfg *rest.Config, ctx context.Context) (discovery.DiscoveryInterface, error) {
 	limited := rest.CopyConfig(cfg)
 	limited.Timeout = 10 * time.Second
-	limited.Wrap(func(base http.RoundTripper) http.RoundTripper { return resourceTransport{base: base} })
+	limited.Wrap(func(base http.RoundTripper) http.RoundTripper { return resourceTransport{base: base, ctx: ctx} })
 	return discovery.NewDiscoveryClientForConfig(limited)
+}
+
+func (b *resourceBody) Close() error {
+	if b.release != nil {
+		b.release()
+	}
+	return b.ReadCloser.Close()
 }

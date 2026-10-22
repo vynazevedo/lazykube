@@ -42,6 +42,12 @@ func (e *resourceEntry) borrowedCoverage(inf cache.SharedIndexInformer) data.Cov
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 	if inf == nil {
+		if e.key.GVR.Resource == "deployments" && s.deploymentCoverage.State == data.CoverageDenied {
+			return s.deploymentCoverage
+		}
+		if e.key.GVR.Resource == "nodes" && s.nodeHealth.State == data.CoverageDenied {
+			return s.nodeHealth
+		}
 		return data.Coverage{State: data.CoverageUnavailable, Reason: "existing informer unavailable; no additional read"}
 	}
 	switch e.key.GVR.Resource {
@@ -124,6 +130,8 @@ func (e *resourceEntry) projectBorrowed(inf cache.SharedIndexInformer) {
 			break
 		}
 		row, ok := projectResource(m)
+		row.Workload = resourceWorkload(obj, e.key.GVR)
+		ok = ok && resourceRowFits(row)
 		if !ok {
 			truncated = true
 			continue
@@ -151,6 +159,10 @@ func (e *resourceEntry) projectBorrowed(inf cache.SharedIndexInformer) {
 	}
 	p.rows += len(next) - len(e.rows)
 	e.rows = next
+	e.workloads = data.WorkloadDistribution{}
+	for _, row := range next {
+		e.workloads.Add(row.Workload, 1)
+	}
 	e.coverage = cov
 	e.truncated = truncated
 	e.observedAt = p.now()
