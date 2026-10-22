@@ -284,6 +284,15 @@ lazykube nunca escreve no kubeconfig nem altera o `current-context`.
 arquivos segue a precedência nativa do client-go. Cada contexto lembra o
 último namespace usado nesta execução, e `Todos` só vale quando escolhido.
 
+`b` abre a árvore de navegação lateral com todas as famílias de recursos:
+Cluster (Dashboard, Nodes, Namespaces, Events), Workloads, Configuration,
+Network, Storage, Access Control, Custom Resources e Helm. Telas ainda não
+implementadas aparecem como `(futuro)` e nunca como lista vazia; expandir ou
+percorrer a árvore não faz nenhuma consulta ao cluster. Com espaço, a árvore
+fica ao lado do conteúdo; em terminais estreitos ela abre por cima e fecha ao
+escolher um destino. O shell funciona a partir de 80x24: abaixo de 120x36 as
+telas mostram um painel por vez, e `tab` alterna entre eles.
+
 O lazykube só lê o cluster: lista e observa recursos, segue logs e consulta
 métricas. Nenhuma ação de escrita é executada.
 
@@ -323,6 +332,8 @@ os painéis: clique seleciona, a roda rola e o clique na aba troca de aba.
  │  1                 mostra / esconde coluna esquerda   │
  │  c                 troca de contexto do kubeconfig    │
  │  n                 namespace; Todos só se escolhido   │
+ │  b                 árvore de navegação lateral        │
+ │  2 3 4 6           Dashboard, Workloads, Nodes, Events│
  │                                                       │
  ├─ DETALHES ────────────────────────────────────────────┤
  │                                                       │

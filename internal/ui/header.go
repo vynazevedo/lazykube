@@ -31,9 +31,9 @@ func Header(r draw.Region, st HeaderState, ctx Ctx) {
 	}
 	x += len(logo)
 	x += r.Line(x, 0, headerBadges(st))
-	x += r.Line(x, 0, draw.Line{muted("  " + Version + "  ")})
+	x += r.Line(x, 0, draw.Line{muted(headerVersion(r.W))})
 
-	pill := headerPill(st, ctx)
+	pill := headerPill(st, ctx, r.W)
 	g := HeaderLayout(st, r.W)
 	right := g.Right
 	if g.End > g.CtxStart {
@@ -90,8 +90,8 @@ type HeaderGeometry struct {
 	Namespace string
 }
 
-func headerPill(st HeaderState, ctx Ctx) draw.Line {
-	pill := statusPill(st, ctx)
+func headerPill(st HeaderState, ctx Ctx, w int) draw.Line {
+	pill := statusPill(st, ctx, w < headerVersionFrom)
 	if st.SecurityAlerts > 0 {
 		pill = append(draw.Line{draw.S(fmt.Sprintf("! %d high new  ", st.SecurityAlerts), draw.Fg(theme.Err).WithBold())}, pill...)
 	}
@@ -115,10 +115,19 @@ func headerBadges(st HeaderState) draw.Line {
 	return l
 }
 
+const headerVersionFrom = 100
+
+func headerVersion(w int) string {
+	if w < headerVersionFrom {
+		return " "
+	}
+	return "  " + Version + "  "
+}
+
 func HeaderLayout(st HeaderState, w int) HeaderGeometry {
-	start := len("lazykube") + headerBadges(st).Width() + draw.Width("  "+Version+"  ")
+	start := len("lazykube") + headerBadges(st).Width() + draw.Width(headerVersion(w))
 	g := HeaderGeometry{CtxStart: start, NsStart: start, End: start}
-	g.Right = w - headerPill(st, Ctx{Pal: theme.DefaultPalette(), Clock: anim.Fixed(0, 0, 0)}).Width()
+	g.Right = w - headerPill(st, Ctx{Pal: theme.DefaultPalette(), Clock: anim.Fixed(0, 0, 0)}, w).Width()
 	room := g.Right - start - 2 - draw.Width(headerCtxLabel) - draw.Width(headerNsLabel) - 2
 	if room < 2 {
 		return g
@@ -161,17 +170,21 @@ func HeaderTargetAt(st HeaderState, w, x int) int {
 	return HeaderNone
 }
 
-func statusPill(st HeaderState, ctx Ctx) draw.Line {
+func statusPill(st HeaderState, ctx Ctx, narrow bool) draw.Line {
 	bg := theme.BgChip2
 	dot, label := theme.OK, "live"
 	if !st.MetricsOK {
 		dot, label = theme.Err, "stale"
 	}
-	return draw.Line{
-		draw.S(" "+string(ctx.Clock.Spinner()), draw.Fg(ctx.Pal.A).WithBg(bg)),
-		draw.S(" metrics", draw.Fg(theme.TextMid).WithBg(bg)),
-		draw.S(" every 5s", draw.Fg(theme.Muted).WithBg(bg)),
+	line := draw.Line{draw.S(" "+string(ctx.Clock.Spinner()), draw.Fg(ctx.Pal.A).WithBg(bg))}
+	if !narrow {
+		line = append(line,
+			draw.S(" metrics", draw.Fg(theme.TextMid).WithBg(bg)),
+			draw.S(" every 5s", draw.Fg(theme.Muted).WithBg(bg)),
+		)
+	}
+	return append(line,
 		draw.S(" ●", draw.Fg(theme.Pulse(dot, ctx.Clock.Phase)).WithBg(bg)),
 		draw.S(" "+label+" ", draw.Fg(dot).WithBg(bg)),
-	}
+	)
 }

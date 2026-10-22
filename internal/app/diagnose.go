@@ -222,5 +222,5 @@ func (m *Model) cycleScope() {
 }
 
 func (m Model) searchActive() bool {
-	return m.focus == FocusDetails && m.tab == ui.TabLog
+	return m.focus == FocusDetails && m.tab == ui.TabLog && m.screen().ShowsDetails() && !m.layout.Details.Empty()
 }

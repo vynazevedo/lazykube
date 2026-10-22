@@ -1,0 +1,24 @@
+ lazykube [DEMO] [RO]  ◎ context demo namespace Todos   k8s demo      ⠙ ● live  
+  2 Dashboard  |  3 Workloads  |  4 Nodes  | [6 Events]                 m menu  
+ Events                                                                         
+  [-] Cluster           │─────────────────────────────────────────────────────╮ 
+    Dashboard (2)       │bili-raffle | estado: disponível                     │ 
+    Nodes (4)           │spaces                                               │ 
+    Namespaces (futuro) │─────────────────────────────────────────────────────╯ 
+ ›  Events (6)          │─────────────────────────────────────────────────────╮ 
+  [-] Workloads (3)     │      OBJETO                            COUNT  IDADE │ 
+    Overview (futuro)   │      Pod/bilibili-live-7f6b8d9c5-mn4tz     3    17m │ 
+    Pods                │      Pod/bilibili-live-7f6b8d9c5-mn4tz     2    17m │ 
+    Deployments         │      Pod/bilibili-live-7f6b8d9c5-mn4tz     2    17m │ 
+    StatefulSets (futur…│                                                     │ 
+    DaemonSets (futuro) │                                                     │ 
+    Jobs (futuro)       │                                                     │ 
+    CronJobs (futuro)   │                                                     │ 
+    ReplicaSets (futuro)│                                                     │ 
+  [+] Configuration     │                                                     │ 
+  [+] Network           │                                                     │ 
+                        │                                                     │ 
+                        │ a mensagem completa, sem resolver o objeto pelo te… │ 
+  enter abre · b fecha  │─────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   ←→  collapse / expand   enter  open              bubbletea · 0 fps 

@@ -1,30 +1,23 @@
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                          lazykube [DEMO]                                           
-                                   context demo  namespace Todos                                    
-                                                                                                    
-                                      terminal pequeno: 100×30                                      
-                               a interface completa precisa de 120×36                               
-                                    faltam 20 colunas e 6 linhas                                    
-                                                                                                    
-                                 13 pods · 8 namespaces observados                                  
-                                                                                                    
-                                  q sair  c contexto  n namespace                                   
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
-                                                                                                    
+                                                                               
+                                                                               
+                                                                               
+                                                                               
+                                                                               
+                                                                               
+                                lazykube [DEMO]                                
+                         context demo  namespace Todos                         
+                                                                               
+                            terminal pequeno: 79×23                            
+                    o lazykube precisa de pelo menos 80×24                     
+                          faltam 1 colunas e 1 linhas                          
+                                                                               
+                       13 pods · 8 namespaces observados                       
+                                                                               
+                        q sair  c contexto  n namespace                        
+                                                                               
+                                                                               
+                                                                               
+                                                                               
+                                                                               
+                                                                               
+                                                                               

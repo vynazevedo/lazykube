@@ -34,8 +34,8 @@ func TestComputeSizes(t *testing.T) {
 		small    bool
 		showLeft bool
 	}{
-		{119, 48, LeftAuto, true, false},
-		{160, 35, LeftAuto, true, false},
+		{79, 48, LeftAuto, true, false},
+		{160, 23, LeftAuto, true, false},
 		{120, 36, LeftAuto, false, false},
 		{139, 40, LeftAuto, false, false},
 		{140, 40, LeftAuto, false, true},
@@ -90,7 +90,7 @@ func TestHit(t *testing.T) {
 			t.Fatalf("hit %v got %d want %d", p, got, want)
 		}
 	}
-	if Compute(100, 30, LeftAuto).Hit(5, 5) != AreaNone {
+	if Compute(79, 23, LeftAuto).Hit(5, 5) != AreaNone {
 		t.Fatal("too small layout has no areas")
 	}
 }
@@ -108,7 +108,37 @@ func TestComputeDetailUsesWholeBody(t *testing.T) {
 			t.Fatalf("%v: detail hit areas", size)
 		}
 	}
-	if !ComputeDetail(100, 30).TooSmall {
-		t.Fatal("detail keeps the global minimum")
+	if !ComputeDetail(79, 23).TooSmall {
+		t.Fatal("detail keeps the shell minimum")
+	}
+	if c := ComputeDetail(100, 30); c.TooSmall || !c.Compact || c.Details != c.Body {
+		t.Fatal("below 120x36 the detail is compact over the whole body")
+	}
+}
+
+func TestCompactLayouts(t *testing.T) {
+	for _, size := range [][2]int{{80, 24}, {119, 48}, {160, 35}, {100, 30}} {
+		w, h := size[0], size[1]
+		body := Rect{1, 3, w - 2, h - 5}
+		dash := Compute(w, h, LeftAuto)
+		if dash.TooSmall || !dash.Compact || dash.ShowLeft || dash.Pods != body || dash.Details != body || dash.Heatmap != body || !dash.Node.Empty() {
+			t.Fatalf("%dx%d dashboard compact = %+v", w, h, dash)
+		}
+		if shown := Compute(w, h, LeftShown); !shown.ShowLeft || shown.Namespaces != body || shown.Deployments != body {
+			t.Fatalf("%dx%d: 1 makes the left panels available one at a time", w, h)
+		}
+		if wl := ComputeWorkloads(w, h); !wl.Compact || wl.Pods != body || wl.Deployments != body || wl.Details != body {
+			t.Fatalf("%dx%d workloads compact = %+v", w, h, wl)
+		}
+		if n := ComputeNodes(w, h); !n.Compact || n.Node != body || n.Pods != body {
+			t.Fatalf("%dx%d nodes compact = %+v", w, h, n)
+		}
+		ev := ComputeEvents(w, h)
+		if !ev.Compact || ev.Scope.H != compactScope || ev.Events.Y != body.Y+compactScope || ev.Events.H != body.H-compactScope || ev.Message != ev.Events {
+			t.Fatalf("%dx%d events compact = %+v", w, h, ev)
+		}
+	}
+	if Compute(120, 36, LeftAuto).Compact {
+		t.Fatal("120x36 keeps the full layout")
 	}
 }

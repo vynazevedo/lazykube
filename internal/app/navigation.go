@@ -333,9 +333,15 @@ func (m Model) routeKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 			return m, requestPick(pickNamespace, m.session.Generation)
 		}
 	}
+	if m.tree.visible && m.tree.focused && !m.helpOpen && !m.filtering && !m.dg.searching && !m.layout.TooSmall {
+		return m.handleTreeKey(msg)
+	}
 	if !m.helpOpen && !m.filtering && !m.dg.searching && !m.layout.TooSmall {
 		k := m.keys
 		switch {
+		case key.Matches(msg, k.Tree):
+			m.toggleTreeKey()
+			return m, nil
 		case key.Matches(msg, k.Menu):
 			m.openMenu()
 			return m, nil

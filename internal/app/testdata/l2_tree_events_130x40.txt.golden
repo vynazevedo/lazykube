@@ -1,0 +1,40 @@
+ lazykube [DEMO] [RO]  v2.0   ◎ context demo namespace Todos   k8s demo  nodes 1  ns 8  pods 13        ⠙ metrics every 5s ● live  
+  2 Dashboard  |  3 Workloads  |  4 Nodes  | [6 Events]                                                                   m menu  
+ Events                                                                                                                           
+  [-] Cluster           │ ╭─ Escopo e cobertura ────────────────────────────────────────────────────────────────────────────────╮ 
+    Dashboard (2)       │ │ Escopo: namespace bilibili-raffle | estado: disponível                                              │ 
+    Nodes (4)           │ │ Conexão: todos os namespaces                                                                        │ 
+    Namespaces (futuro) │ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+ ›  Events (6)          │ ╭─ Eventos · focus ───────────────────────────────────────────────────────────────────────────────────╮ 
+  [-] Workloads (3)     │ │   TIPO     MOTIVO           OBJETO                                                     COUNT  IDADE │ 
+    Overview (futuro)   │ │ › Warning  BackOff          Pod/bilibili-live-7f6b8d9c5-mn4tz                              3    17m │ 
+    Pods                │ │   Normal   Pulled           Pod/bilibili-live-7f6b8d9c5-mn4tz                              2    17m │ 
+    Deployments         │ │   Normal   Started          Pod/bilibili-live-7f6b8d9c5-mn4tz                              2    17m │ 
+    StatefulSets (futur…│ │                                                                                                     │ 
+    DaemonSets (futuro) │ │                                                                                                     │ 
+    Jobs (futuro)       │ │                                                                                                     │ 
+    CronJobs (futuro)   │ │                                                                                                     │ 
+    ReplicaSets (futuro)│ │                                                                                                     │ 
+  [+] Configuration     │ │                                                                                                     │ 
+  [+] Network           │ │                                                                                                     │ 
+  [+] Storage           │ │                                                                                                     │ 
+  [+] Access Control    │ │                                                                                                     │ 
+  [+] Custom Resources  │ │                                                                                                     │ 
+  [+] Helm              │ │                                                                                                     │ 
+  Security (futuro)     │ │                                                                                                     │ 
+  Radar (futuro)        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │ 3 eventos · enter abre a mensagem completa, sem resolver o objeto pelo texto                        │ 
+  enter abre · b fecha  │ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   ←→  collapse / expand   enter  open   b  close tree   esc  body   ?  help   q  quit                bubbletea · 0 fps 

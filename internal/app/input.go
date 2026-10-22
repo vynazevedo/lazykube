@@ -39,7 +39,7 @@ func (m Model) handleKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 		cmd := m.startSearch()
 		return m, cmd
 	case key.Matches(msg, k.Filter) && !m.inDetail():
-		m.focus = FocusPods
+		m.setFocus(FocusPods)
 		m.filtering = true
 		cmd := m.filter.Focus()
 		return m, cmd
@@ -86,7 +86,7 @@ func (m Model) handleKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 	case key.Matches(msg, k.Palette):
 		m.pal = theme.NextPalette(m.pal)
 	case key.Matches(msg, k.ToggleLeft) && m.onScreen(ScreenDashboard):
-		if LeftVisible(m.w, m.leftMode) {
+		if LeftVisible(m.layout.ContentW, m.leftMode) {
 			m.leftMode = LeftHidden
 		} else {
 			m.leftMode = LeftShown
@@ -192,24 +192,24 @@ func (m Model) handleClick(ms tea.Mouse) (Model, tea.Cmd) {
 	}
 	switch m.layout.Hit(ms.X, ms.Y) {
 	case AreaNamespaces:
-		m.focus = FocusNamespaces
+		m.setFocus(FocusNamespaces)
 		top, rows := ui.NamespacesRows(m.layout.Namespaces.H)
 		if idx, ok := ui.ListRowAt(ms.Y-m.layout.Namespaces.Y, top, rows, m.nsCursor, len(m.snap.Namespaces)); ok {
 			m.nsCursor = idx
 		}
 	case AreaDeployments:
-		m.focus = FocusDeployments
+		m.setFocus(FocusDeployments)
 		top, rows := ui.DeploymentsRows(m.layout.Deployments.H)
 		if idx, ok := ui.ListRowAt(ms.Y-m.layout.Deployments.Y, top, rows, m.depCursor, len(m.visibleDeployments())); ok {
 			m.depCursor = idx
 		}
 	case AreaPods:
-		m.focus = FocusPods
+		m.setFocus(FocusPods)
 		if idx, ok := m.podRowAt(ms.Y); ok {
 			m.selectPod(idx)
 		}
 	case AreaDetails:
-		m.focus = FocusDetails
+		m.setFocus(FocusDetails)
 		d := m.layout.Details
 		if t, ok := m.tabAt(ms.X, ms.Y); ok {
 			m.setTab(t)

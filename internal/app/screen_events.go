@@ -57,10 +57,14 @@ func (s eventsScreen) Update(m Model, msg tea.Msg) (Model, tea.Cmd) {
 		if !slices.ContainsFunc(s.Keys(m), func(b key.Binding) bool { return key.Matches(msg, b) }) {
 			return m, nil
 		}
-		return m.handleEventsKey(msg)
+		next, cmd := m.handleEventsKey(msg)
+		next.syncCompactReading(m.ev.reading)
+		return next, cmd
 	case tea.MouseClickMsg:
 		if !m.helpOpen && msg.Button == tea.MouseLeft {
+			reading := m.ev.reading
 			m.handleEventsClick(tea.Mouse(msg))
+			m.syncCompactReading(reading)
 			return m, nil
 		}
 	case tea.MouseWheelMsg:
@@ -81,7 +85,7 @@ func (eventsScreen) Keys(m Model) []key.Binding {
 	return append(out,
 		k.SecurityAck, k.Palette, k.Pause, k.Help, k.Quit,
 		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads, k.Nodes, k.Events,
-		k.Context, k.Namespace,
+		k.Context, k.Namespace, k.Tree,
 	)
 }
 
@@ -277,7 +281,14 @@ func (m *Model) selectEvent(i int) {
 	m.adoptEvent()
 }
 
+func (m *Model) syncCompactReading(before bool) {
+	if m.layout.Compact && m.ev.reading != before {
+		m.relayout()
+	}
+}
+
 func (m *Model) stopReadingEvent() {
+	defer m.syncCompactReading(m.ev.reading)
 	m.ev.reading = false
 	if m.ev.gone {
 		m.syncEventSelection()
@@ -285,6 +296,9 @@ func (m *Model) stopReadingEvent() {
 }
 
 func (m Model) eventsPage() int {
+	if m.ev.reading && !m.layout.Message.Empty() {
+		return max(1, ui.EventMessageRows(m.layout.Message.H))
+	}
 	return max(1, ui.EventsTableRows(m.layout.Events.H))
 }
 

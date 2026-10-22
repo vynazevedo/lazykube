@@ -5,6 +5,10 @@ import "math"
 const (
 	MinWidth       = 120
 	MinHeight      = 36
+	ShellMinWidth  = 80
+	ShellMinHeight = 24
+	dockMinContent = 100
+	compactScope   = 4
 	wideThreshold  = 140
 	nodeHeight     = 16
 	nsHeight       = 11
@@ -37,7 +41,11 @@ const (
 
 type Layout struct {
 	W, H        int
+	ContentW    int
 	TooSmall    bool
+	Compact     bool
+	Tree        Rect
+	TreeOverlay bool
 	ShowLeft    bool
 	Header      Rect
 	Menu        Rect
@@ -67,12 +75,40 @@ func LeftVisible(w int, mode LeftMode) bool {
 	}
 }
 
-func Compute(w, h int, mode LeftMode) Layout {
+func shellTooSmall(w, h int) bool {
+	return w < ShellMinWidth || h < ShellMinHeight
+}
+
+func compactSize(w, h int) bool {
+	return w < MinWidth || h < MinHeight
+}
+
+func compactLayout(w, h int) (Layout, bool) {
 	l := Layout{W: w, H: h}
-	if w < MinWidth || h < MinHeight {
+	if shellTooSmall(w, h) {
 		l.TooSmall = true
+		return l, true
+	}
+	if !compactSize(w, h) {
+		return l, false
+	}
+	l.shell(w, h)
+	l.Compact = true
+	return l, true
+}
+
+func Compute(w, h int, mode LeftMode) Layout {
+	if l, done := compactLayout(w, h); done {
+		if l.Compact {
+			l.ShowLeft = mode == LeftShown
+			l.Pods, l.Details, l.Heatmap = l.Body, l.Body, l.Body
+			if l.ShowLeft {
+				l.Namespaces, l.Deployments = l.Body, l.Body
+			}
+		}
 		return l
 	}
+	l := Layout{W: w, H: h}
 	l.ShowLeft = LeftVisible(w, mode)
 	l.shell(w, h)
 	top, m, u := l.Body.Y, l.Body.H, l.Body.W
@@ -110,11 +146,13 @@ func Compute(w, h int, mode LeftMode) Layout {
 }
 
 func ComputeWorkloads(w, h int) Layout {
-	l := Layout{W: w, H: h}
-	if w < MinWidth || h < MinHeight {
-		l.TooSmall = true
+	if l, done := compactLayout(w, h); done {
+		if l.Compact {
+			l.Pods, l.Deployments, l.Details = l.Body, l.Body, l.Body
+		}
 		return l
 	}
+	l := Layout{W: w, H: h}
 	l.shell(w, h)
 	top, m, u := l.Body.Y, l.Body.H, l.Body.W
 	preview := max(minRightWidth, round(float64(u)*0.2+31.4))
@@ -127,11 +165,13 @@ func ComputeWorkloads(w, h int) Layout {
 }
 
 func ComputeNodes(w, h int) Layout {
-	l := Layout{W: w, H: h}
-	if w < MinWidth || h < MinHeight {
-		l.TooSmall = true
+	if l, done := compactLayout(w, h); done {
+		if l.Compact {
+			l.Node, l.Pods = l.Body, l.Body
+		}
 		return l
 	}
+	l := Layout{W: w, H: h}
 	l.shell(w, h)
 	summary := round(float64(l.Body.W)*0.4 - 9.2)
 	l.Node = Rect{X: l.Body.X, Y: l.Body.Y, W: summary, H: l.Body.H}
@@ -140,11 +180,16 @@ func ComputeNodes(w, h int) Layout {
 }
 
 func ComputeEvents(w, h int) Layout {
-	l := Layout{W: w, H: h}
-	if w < MinWidth || h < MinHeight {
-		l.TooSmall = true
+	if l, done := compactLayout(w, h); done {
+		if l.Compact {
+			b := l.Body
+			l.Scope = Rect{X: b.X, Y: b.Y, W: b.W, H: compactScope}
+			l.Events = Rect{X: b.X, Y: b.Y + compactScope, W: b.W, H: b.H - compactScope}
+			l.Message = l.Events
+		}
 		return l
 	}
+	l := Layout{W: w, H: h}
 	l.shell(w, h)
 	b := l.Body
 	extra := max(0, h-40) / 4
@@ -156,23 +201,79 @@ func ComputeEvents(w, h int) Layout {
 }
 
 func ComputeDetail(w, h int) Layout {
-	l := Layout{W: w, H: h}
-	if w < MinWidth || h < MinHeight {
-		l.TooSmall = true
+	if l, done := compactLayout(w, h); done {
+		l.Details = l.Body
 		return l
 	}
+	l := Layout{W: w, H: h}
 	l.shell(w, h)
 	l.Details = l.Body
 	return l
 }
 
 func (l *Layout) shell(w, h int) {
+	l.ContentW = w
+	l.shellBars(w, h)
+	l.Body = Rect{X: 1, Y: bodyTop, W: w - 2, H: h - bodyTop - 2}
+}
+
+func (l *Layout) shellBars(w, h int) {
 	l.Header = Rect{X: 1, Y: 0, W: w - 2, H: 1}
 	l.Menu = Rect{X: 1, Y: 1, W: w - 2, H: 1}
 	l.Crumbs = Rect{X: 1, Y: 2, W: w - 2, H: 1}
-	l.Body = Rect{X: 1, Y: bodyTop, W: w - 2, H: h - bodyTop - 2}
 	l.DividerY = h - 2
 	l.FooterY = h - 1
+}
+
+const (
+	treeWide     = 26
+	treeNarrow   = 24
+	treeWideFrom = 150
+)
+
+func TreeWidth(w int) int {
+	if w >= treeWideFrom {
+		return treeWide
+	}
+	return treeNarrow
+}
+
+func withTree(w, h int, compute func(w, h int) Layout) Layout {
+	tw := TreeWidth(w)
+	inner := w - tw - 1
+	if inner >= dockMinContent {
+		l := compute(inner, h)
+		if !l.TooSmall {
+			l.dock(w, h, tw)
+			return l
+		}
+	}
+	l := compute(w, h)
+	if !l.TooSmall {
+		l.Tree = Rect{X: l.Body.X, Y: l.Body.Y, W: min(tw, l.Body.W), H: l.Body.H}
+		l.TreeOverlay = true
+	}
+	return l
+}
+
+func (l *Layout) keepOnly(keep *Rect) {
+	for _, r := range []*Rect{&l.Node, &l.Namespaces, &l.Deployments, &l.Pods, &l.Heatmap, &l.Details, &l.Scope, &l.Events, &l.Message} {
+		if r != keep && r != &l.Scope {
+			*r = Rect{}
+		}
+	}
+}
+
+func (l *Layout) dock(w, h, tw int) {
+	dx := tw + 1
+	for _, r := range []*Rect{&l.Body, &l.Node, &l.Namespaces, &l.Deployments, &l.Pods, &l.Heatmap, &l.Details, &l.Scope, &l.Events, &l.Message} {
+		if !r.Empty() {
+			r.X += dx
+		}
+	}
+	l.W, l.ContentW = w, l.W
+	l.shellBars(w, h)
+	l.Tree = Rect{X: 1, Y: bodyTop, W: tw, H: h - bodyTop - 2}
 }
 
 func round(v float64) int {
@@ -191,11 +292,15 @@ const (
 	AreaDetails
 	AreaMenu
 	AreaCrumbs
+	AreaTree
 )
 
 func (l Layout) Hit(x, y int) Area {
 	if l.TooSmall {
 		return AreaNone
+	}
+	if !l.Tree.Empty() && l.Tree.Contains(x, y) {
+		return AreaTree
 	}
 	for _, c := range []struct {
 		r Rect
