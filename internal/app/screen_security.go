@@ -182,6 +182,7 @@ func (m *Model) rebuildSecurityPage(scope string) {
 		}
 		return !noSystem || !data.IsSystemNamespace(p.Target.Namespace)
 	})
+	m.sec.rules = nil
 	if i := slices.IndexFunc(m.sec.workloads, func(w data.WorkloadPosture) bool { return w.Key == m.sec.Selected }); i >= 0 {
 		m.sec.Cursor = i
 	}

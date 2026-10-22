@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 	"testing"
 
@@ -122,6 +123,44 @@ func TestSecurityPageCohortAndSelection(t *testing.T) {
 	}
 	if adv.sec.Selected != key || adv.sec.workloads[adv.sec.Cursor].Key != key {
 		t.Fatal("selection follows the workload identity across revisions")
+	}
+}
+
+func TestSecurityPageRulesFollowRevision(t *testing.T) {
+	m := onSecurity(t, demoModel(t, 160, 48))
+	target := data.PodKey("bilibili-raffle", "bilibili-raffle-5d8f9c7b4-x2kqp")
+	i := slices.IndexFunc(m.sec.workloads, func(w data.WorkloadPosture) bool { return slices.Contains(w.Pods, target) })
+	if i < 0 {
+		t.Fatal("demo workload missing")
+	}
+	m = press(t, m, "home")
+	for range i {
+		m = press(t, m, "down")
+	}
+	key := m.sec.Selected
+	hasRule := func(m Model, rule string) bool {
+		return slices.ContainsFunc(m.sec.rules, func(r data.WorkloadRule) bool { return r.Rule == rule })
+	}
+	if hasRule(m, "hostPID") {
+		t.Fatal("hostPID appears only after the demo revision")
+	}
+	m.clock = anim.Fixed(240, goldenPhase, 30)
+	next, _ := m.Update(tea.WindowSizeMsg{Width: 160, Height: 48})
+	adv := next.(Model)
+	if adv.sec.Selected != key || !hasRule(adv, "hostPID") || !strings.Contains(adv.Render().Plain(), "hostPID") {
+		t.Fatal("a new revision with the same selection refreshes rules and evidence")
+	}
+	renewed := adv
+	renewed.security = renewed.security.Clone()
+	p := renewed.security.Pods[target]
+	delete(renewed.security.Pods, target)
+	p.Target.Name, p.Target.UID, p.Findings = "bilibili-raffle-5d8f9c7b4-zz9zz", "renewed", nil
+	renewed.security.Pods[data.PodKey(p.Target.Namespace, p.Target.Name)] = p
+	renewed.security.Revision++
+	renewed.securitySession.Update(renewed.security)
+	renewed.refreshSecurityPage()
+	if renewed.sec.Selected != key || hasRule(renewed, "hostPID") || slices.Contains(renewed.sec.workloads[renewed.sec.Cursor].Pods, target) {
+		t.Fatal("a renewed pod under the same owner UID drops the removed finding")
 	}
 }
 
