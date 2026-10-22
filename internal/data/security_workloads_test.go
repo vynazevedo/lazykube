@@ -130,6 +130,15 @@ func TestRemediationTargetsAndContainers(t *testing.T) {
 	if r.YAML != nil {
 		t.Fatal("ephemeral containers get no YAML")
 	}
+	for _, added := range []string{"ALL", "SYS_ADMIN"} {
+		f := high("capabilitiesAdded", "app", "spec.containers[0].securityContext.capabilities.add")
+		f.Evidence = added + "; drop: none"
+		r := RemediationFor(WorkloadRule{Rule: "capabilitiesAdded", Evidence: f}, w)
+		yaml := strings.Join(r.YAML, "\n")
+		if !strings.Contains(yaml, "    add: []") || !strings.Contains(yaml, `drop: ["ALL"]`) || strings.Contains(yaml, "add: [\""+added) || !strings.Contains(r.Caution, "allowlist mínima") {
+			t.Fatalf("add %s must be removed explicitly, not only dropped: %+v", added, r)
+		}
+	}
 	rs := WorkloadPosture{Key: WorkloadKey{Kind: "ReplicaSet"}, Name: "api", Resolution: OwnerDirect}
 	if r := RemediationFor(WorkloadRule{Rule: "hostNetwork"}, rs); !strings.Contains(r.Target, "não observado") || r.YAML[0] != "hostNetwork: false" {
 		t.Fatalf("ReplicaSet does not imply a Deployment: %+v", r)

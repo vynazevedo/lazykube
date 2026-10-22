@@ -70,8 +70,10 @@ func RemediationFor(r WorkloadRule, w WorkloadPosture) Remediation {
 		return container("A imagem precisa funcionar com um usuário sem privilégios.", "securityContext:", "  runAsNonRoot: true", "  runAsUser: 10001")
 	case "seccomp":
 		return container("Perfis Localhost revisados também são aceitos.", "securityContext:", "  seccompProfile:", "    type: RuntimeDefault")
-	case "capabilitiesAdded", "capabilitiesDrop":
-		return container("Mantenha em capabilities.add apenas o que for necessário.", "securityContext:", "  capabilities:", "    drop: [\"ALL\"]")
+	case "capabilitiesAdded":
+		return container("Substitui capabilities por completo: add vazio remove o que foi concedido, inclusive ALL e SYS_ADMIN; reconstrua em add apenas a allowlist mínima necessária.", "securityContext:", "  capabilities:", "    add: []", "    drop: [\"ALL\"]")
+	case "capabilitiesDrop":
+		return container("Drop ALL não basta se capabilities.add conceder ALL ou SYS_ADMIN; mantenha em add apenas o necessário.", "securityContext:", "  capabilities:", "    drop: [\"ALL\"]")
 	case "imageDigest", "imageLatest":
 		return container("Use o digest verificado no registry; o valor acima é um marcador.", "image: <repositorio>@sha256:<digest>")
 	case "limit-cpu":
