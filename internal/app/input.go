@@ -86,7 +86,7 @@ func (m Model) handleKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 	case key.Matches(msg, k.Palette):
 		m.pal = theme.NextPalette(m.pal)
 	case key.Matches(msg, k.ToggleLeft) && m.onScreen(ScreenDashboard):
-		if LeftVisible(m.w, m.leftMode) {
+		if LeftVisible(m.layout.ContentW, m.leftMode) {
 			m.leftMode = LeftHidden
 		} else {
 			m.leftMode = LeftShown

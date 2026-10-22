@@ -148,6 +148,7 @@ func (r Root) begin(t data.Target) (tea.Model, tea.Cmd) {
 	opts := r.base
 	if m, ok := r.model(); ok {
 		opts.Palette = m.pal
+		opts.ShowTree = m.tree.visible
 	}
 	var prev *data.Target
 	if r.active != nil {

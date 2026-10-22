@@ -27,6 +27,9 @@ func (m Model) Render() *draw.Canvas {
 
 	active := m.screen()
 	active.View(m, screen, ctx)
+	if m.tree.visible && !m.layout.Tree.Empty() {
+		ui.Sidebar(region(screen, m.layout.Tree), m.sidebarState(), ctx)
+	}
 
 	if m.dep.open {
 		ui.DeploymentOverlay(screen, m.deploymentOverlayState(), ctx)
@@ -34,6 +37,8 @@ func (m Model) Render() *draw.Canvas {
 
 	keys := active.Help(m)
 	switch {
+	case m.tree.visible && m.tree.focused:
+		keys = ui.TreeHelp()
 	case m.menu.open:
 		keys = ui.MenuHelp()
 	case m.dep.open:
@@ -42,7 +47,11 @@ func (m Model) Render() *draw.Canvas {
 	ui.Footer(screen.Sub(0, m.layout.DividerY, m.w, 1), screen.Sub(0, m.layout.FooterY, m.w, 1), ui.FooterState{FPS: m.displayFPS(), Keys: keys})
 
 	if m.helpOpen {
-		ui.HelpOverlay(screen, active.FullHelp(m), ctx)
+		full := active.FullHelp(m)
+		if m.tree.visible && m.tree.focused {
+			full = ui.FullHelpTree()
+		}
+		ui.HelpOverlay(screen, full, ctx)
 	}
 	return c
 }

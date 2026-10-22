@@ -321,6 +321,7 @@ func FullHelpEvents(full bool) []KeyHelp {
 		KeyHelp{"4", "Nodes screen"},
 		KeyHelp{"6", "Events screen"},
 		KeyHelp{"c n", "switch context / namespace"},
+		KeyHelp{"b", "navigation tree"},
 		KeyHelp{"A", "ack all Security alerts"},
 		KeyHelp{"p", "cycle palette"},
 		KeyHelp{"ctrl+p", "pause animations"},

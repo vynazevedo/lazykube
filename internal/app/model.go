@@ -37,6 +37,7 @@ type Options struct {
 	InitialPod int
 	Now        func() time.Time
 	Session    data.SessionRef
+	ShowTree   bool
 }
 
 type Model struct {
@@ -82,6 +83,7 @@ type Model struct {
 	wideFeed bool
 
 	workloadsLeaf DestinationID
+	tree          treeState
 	manifest      []string
 	describe      []data.Field
 
@@ -140,6 +142,13 @@ func New(opts Options) Model {
 		m.clock = anim.Fixed(0, 0, 0)
 	}
 	m.nav.active.Generation = m.session.Generation
+	if opts.ShowTree {
+		m.tree.visible = true
+		for _, a := range ancestors(DestDashboard) {
+			m.tree = m.tree.withExpanded(a, true)
+		}
+		m.tree.cursor = DestDashboard
+	}
 	m.snap = m.src.Snapshot()
 	m.loadSecurity()
 	if opts.InitialPod >= 0 && opts.InitialPod < len(m.snap.Pods) {
@@ -189,19 +198,28 @@ func (m *Model) relayout() {
 	m.setLayout(m.w, m.h)
 }
 
-func (m *Model) setLayout(w, h int) {
-	m.w, m.h = w, h
+func (m *Model) screenLayout() func(w, h int) Layout {
 	switch {
 	case m.inDetail():
-		m.layout = ComputeDetail(w, h)
+		return ComputeDetail
 	case m.onScreen(ScreenWorkloads):
-		m.layout = ComputeWorkloads(w, h)
+		return ComputeWorkloads
 	case m.onScreen(ScreenNodes):
-		m.layout = ComputeNodes(w, h)
+		return ComputeNodes
 	case m.onScreen(ScreenEvents):
-		m.layout = ComputeEvents(w, h)
-	default:
-		m.layout = Compute(w, h, m.leftMode)
+		return ComputeEvents
+	}
+	mode := m.leftMode
+	return func(w, h int) Layout { return Compute(w, h, mode) }
+}
+
+func (m *Model) setLayout(w, h int) {
+	m.w, m.h = w, h
+	compute := m.screenLayout()
+	if m.tree.visible {
+		m.layout = withTree(w, h, compute)
+	} else {
+		m.layout = compute(w, h)
 	}
 	if !slices.Contains(m.focusOrder(), m.focus) {
 		m.focus = FocusPods
@@ -297,6 +315,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if m.layout.TooSmall {
 			return m, nil
 		}
+		if _, motion := msg.(tea.MouseMotionMsg); motion && m.tree.visible && m.layout.TreeOverlay {
+			return m, nil
+		}
 	}
 	switch msg := msg.(type) {
 	case tea.MouseClickMsg:
@@ -305,6 +326,11 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.dep.open = false
 			return wake(idle, m, nil)
 		}
+		next, consumed := m.treeMouse(tea.Mouse(msg))
+		if consumed {
+			return wake(idle, next, nil)
+		}
+		m = next
 		if cmd := m.headerClick(tea.Mouse(msg)); cmd != nil {
 			return wake(idle, m, cmd)
 		}
@@ -315,6 +341,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return wake(idle, next, cmd)
 	case tea.MouseWheelMsg:
 		if m.menu.open || m.dep.open || m.helpOpen {
+			return m, nil
+		}
+		if m.tree.visible && m.layout.Hit(msg.X, msg.Y) == AreaTree {
+			return m.handleTreeWheel(tea.Mouse(msg)), nil
+		}
+		if m.tree.visible && m.layout.TreeOverlay {
 			return m, nil
 		}
 		idle := !m.busy()

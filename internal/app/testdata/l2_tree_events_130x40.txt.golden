@@ -1,0 +1,40 @@
+ lazykube [DEMO] [RO]  v2.0   ◎ context demo namespace Todos   k8s demo  nodes 1  ns 8  pods 13        ⠙ metrics every 5s ● live  
+  2 Dashboard  |  3 Workloads  |  4 Nodes  | [6 Events]                                                                   m menu  
+ Events                                                                                                                           
+  [-] Cluster           │───────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+    Dashboard (2)       │bili-raffle | estado: disponível                                                                       │ 
+    Nodes (4)           │spaces                                                                                                 │ 
+    Namespaces (futuro) │pod   ns   cluster                                                                                     │ 
+ ›  Events (6)          │ eventos de namespace/cluster; não é histórico durável                                                 │ 
+  [-] Workloads (3)     │───────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+    Overview (futuro)   │───────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+    Pods                │                                             NAMESPACE        TIPO     OBJETO                   COUNT  │ 
+    Deployments         │failed container app in pod bilibili-live-7… bilibili-raffle  Warning  Pod/bilibili-live-7f6b8…     3  │ 
+    StatefulSets (futur…│istry.local/bilibili-raffle:1.4.2" already … bilibili-raffle  Normal   Pod/bilibili-live-7f6b8…     2  │ 
+    DaemonSets (futuro) │p                                            bilibili-raffle  Normal   Pod/bilibili-live-7f6b8…     2  │ 
+    Jobs (futuro)       │                                                                                                       │ 
+    CronJobs (futuro)   │                                                                                                       │ 
+    ReplicaSets (futuro)│                                                                                                       │ 
+  [+] Configuration     │                                                                                                       │ 
+  [+] Network           │                                                                                                       │ 
+  [+] Storage           │                                                                                                       │ 
+  [+] Access Control    │                                                                                                       │ 
+  [+] Custom Resources  │                                                                                                       │ 
+  [+] Helm              │                                                                                                       │ 
+  Security (futuro)     │                                                                                                       │ 
+  Radar (futuro)        │                                                                                                       │ 
+                        │ a mensagem completa, sem resolver o objeto pelo texto                                                 │ 
+                        │───────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+                        │───────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+                        │f · Pod/bilibili-live-7f6b8d9c5-mn4tz                                                                  │ 
+                        │ffle · count 3 · idade 17m                                                                             │ 
+                        │                                                                                                       │ 
+                        │iled container app in pod bilibili-live-7f6b8d9c5-mn4tz                                                │ 
+                        │                                                                                                       │ 
+                        │or referência tipada: fase futura                                                                      │ 
+                        │                                                                                                       │ 
+                        │                                                                                                       │ 
+                        │                                                                                                       │ 
+  enter abre · b fecha  │───────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   ←→  collapse / expand   enter  open   b  close tree   esc  body   ?  help   q  quit                bubbletea · 0 fps 

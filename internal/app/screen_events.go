@@ -81,7 +81,7 @@ func (eventsScreen) Keys(m Model) []key.Binding {
 	return append(out,
 		k.SecurityAck, k.Palette, k.Pause, k.Help, k.Quit,
 		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads, k.Nodes, k.Events,
-		k.Context, k.Namespace,
+		k.Context, k.Namespace, k.Tree,
 	)
 }
 
