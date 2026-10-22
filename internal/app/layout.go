@@ -52,6 +52,7 @@ type Layout struct {
 	Scope       Rect
 	Events      Rect
 	Message     Rect
+	Coverage    Rect
 	DividerY    int
 	FooterY     int
 }
@@ -152,6 +153,26 @@ func ComputeEvents(w, h int) Layout {
 	l.Scope = Rect{X: b.X, Y: b.Y, W: b.W, H: scope}
 	l.Events = Rect{X: b.X, Y: b.Y + scope, W: b.W, H: b.H - scope - message}
 	l.Message = Rect{X: b.X, Y: b.Y + b.H - message, W: b.W, H: message}
+	return l
+}
+
+func ComputeRadar(w, h int) Layout {
+	l := Layout{W: w, H: h}
+	if w < MinWidth || h < MinHeight {
+		l.TooSmall = true
+		return l
+	}
+	l.shell(w, h)
+	b := l.Body
+	summary, coverage, list := 5, 4, 38
+	if w >= wideThreshold {
+		list = 46
+	}
+	mid := b.H - summary - coverage
+	l.Scope = Rect{X: b.X, Y: b.Y, W: b.W, H: summary}
+	l.Events = Rect{X: b.X, Y: b.Y + summary, W: list, H: mid}
+	l.Message = Rect{X: b.X + list + 1, Y: b.Y + summary, W: b.W - list - 1, H: mid}
+	l.Coverage = Rect{X: b.X, Y: b.Y + b.H - coverage, W: b.W, H: coverage}
 	return l
 }
 

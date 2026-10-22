@@ -43,12 +43,12 @@ func TestHelpIsHonest(t *testing.T) {
 			keys[k] = true
 		}
 	}
-	for _, k := range []string{"c", "n", "C", "P", "alt+n", "N", "E", "S", "w", "g", "G", "m", "2", "3", "4", "6", "enter", "esc"} {
+	for _, k := range []string{"c", "n", "C", "P", "alt+n", "N", "E", "S", "w", "g", "G", "m", "2", "3", "4", "6", "7", "enter", "esc"} {
 		if !keys[k] {
 			t.Fatalf("implemented key %q missing from help", k)
 		}
 	}
-	for _, list := range [][]ui.KeyHelp{ui.FullHelp(), ui.ShortHelp(), ui.PodDetailHelp(), ui.MenuHelp(), ui.NodesHelp(), ui.FullHelpNodes(), ui.EventsHelp(true), ui.FullHelpEvents(true), ui.EventsHelp(false), ui.FullHelpEvents(false)} {
+	for _, list := range [][]ui.KeyHelp{ui.FullHelp(), ui.ShortHelp(), ui.PodDetailHelp(), ui.MenuHelp(), ui.NodesHelp(), ui.FullHelpNodes(), ui.EventsHelp(true), ui.FullHelpEvents(true), ui.EventsHelp(false), ui.FullHelpEvents(false), ui.RadarHelp(), ui.FullHelpRadar()} {
 		for _, h := range list {
 			for _, k := range strings.Fields(h.Key) {
 				if k == "5" {

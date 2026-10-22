@@ -36,13 +36,13 @@ func TestRoutesCarryDestinationAndGeneration(t *testing.T) {
 	if r := m.nav.Active(); r.Dest != DestDeployments || m.focus != FocusDeployments {
 		t.Fatalf("3 restores the last Workloads leaf: %+v", r)
 	}
-	for _, id := range []DestinationID{DestJobs, DestWorkloadsOver, DestSecurity, DestRadar, DestNamespaces, DestConfiguration, "nope"} {
+	for _, id := range []DestinationID{DestJobs, DestWorkloadsOver, DestSecurity, DestNamespaces, DestConfiguration, "nope"} {
 		before := m.nav
 		if ok, reason := m.activateDestination(id); ok || reason == "" || m.nav != before {
 			t.Fatalf("%s does not navigate and explains why", id)
 		}
 	}
-	for _, k := range []string{"5", "7"} {
+	for _, k := range []string{"5"} {
 		if got := press(t, m, k); got.nav != m.nav {
 			t.Fatalf("%s is reserved, not active", k)
 		}

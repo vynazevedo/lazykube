@@ -239,7 +239,7 @@ func (m *Model) openTarget(t Destination) {
 }
 
 func (m Model) shortcutDestination(msg tea.KeyPressMsg) DestinationID {
-	for _, b := range []key.Binding{m.keys.Dashboard, m.keys.Workloads, m.keys.Nodes, m.keys.Events} {
+	for _, b := range []key.Binding{m.keys.Dashboard, m.keys.Workloads, m.keys.Nodes, m.keys.Events, m.keys.Radar} {
 		if !key.Matches(msg, b) {
 			continue
 		}

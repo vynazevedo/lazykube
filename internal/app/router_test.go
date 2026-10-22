@@ -16,7 +16,7 @@ func TestRouterRegistersOnlyFunctionalDestinations(t *testing.T) {
 	if r.Active() != (Route{Kind: RouteScreen, Screen: ScreenDashboard, Dest: DestDashboard}) || r.Depth() != 0 {
 		t.Fatalf("initial route = %+v", r.Active())
 	}
-	if got := registeredScreens(); !reflect.DeepEqual(got, []ScreenID{ScreenDashboard, ScreenWorkloads, ScreenNodes, ScreenEvents}) {
+	if got := registeredScreens(); !reflect.DeepEqual(got, []ScreenID{ScreenDashboard, ScreenWorkloads, ScreenNodes, ScreenEvents, ScreenRadar}) {
 		t.Fatalf("registered screens = %v", got)
 	}
 	s, ok := screenFor(ScreenDashboard)
@@ -35,14 +35,17 @@ func TestRouterRegistersOnlyFunctionalDestinations(t *testing.T) {
 	if s, ok := screenFor(ScreenEvents); !ok || s.ID() != ScreenEvents {
 		t.Fatal("events is a functional destination")
 	}
-	if _, ok := screenFor(ScreenEvents + 1); ok {
+	if s, ok := screenFor(ScreenRadar); !ok || s.ID() != ScreenRadar {
+		t.Fatal("radar is a functional destination")
+	}
+	if _, ok := screenFor(ScreenRadar + 1); ok {
 		t.Fatal("no other screen may be registered before it works")
 	}
 	m := demoModel(t, 160, 48)
 	if m.nav.Active().Screen != ScreenDashboard || m.screen().ID() != ScreenDashboard {
 		t.Fatalf("model route = %+v", m.nav.Active())
 	}
-	if got := m.menuItems(); !reflect.DeepEqual(got, []ui.MenuItem{{Key: "2", Title: "Dashboard"}, {Key: "3", Title: "Workloads"}, {Key: "4", Title: "Nodes"}, {Key: "6", Title: "Events"}}) {
+	if got := m.menuItems(); !reflect.DeepEqual(got, []ui.MenuItem{{Key: "2", Title: "Dashboard"}, {Key: "3", Title: "Workloads"}, {Key: "4", Title: "Nodes"}, {Key: "6", Title: "Events"}, {Key: "7", Title: "Radar"}}) {
 		t.Fatalf("menu lists only functional destinations: %+v", got)
 	}
 }
