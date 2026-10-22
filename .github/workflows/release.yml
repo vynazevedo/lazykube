@@ -32,7 +32,7 @@ jobs:
           go-version: 1.26.x
           check-latest: true
           cache: true
-      - uses: anchore/sbom-action/download-syft@f8bdd1d8ac5e901a77a92f111440fdb1b593736b
+      - uses: anchore/sbom-action/download-syft@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c
         with:
           syft-version: v1.55.0
       - uses: sigstore/cosign-installer@3454372f43399081ed03b604cb2d021dabca52bb
