@@ -234,7 +234,7 @@ func (e *resourceEntry) state(state data.CoverageState, reason string) {
 	e.changedLocked()
 }
 
-func (e *resourceEntry) clear() {
+func (e *resourceEntry) clear(state data.CoverageState, reason string) {
 	p := e.pool
 	p.mu.Lock()
 	defer p.mu.Unlock()
@@ -245,6 +245,7 @@ func (e *resourceEntry) clear() {
 	e.rows = make(map[string]data.ResourceRow)
 	e.workloads = data.WorkloadDistribution{}
 	e.truncated = false
+	e.coverage = data.Coverage{State: state, Reason: reason}
 	e.changedLocked()
 }
 

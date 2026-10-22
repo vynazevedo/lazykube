@@ -18,7 +18,7 @@ Pods and deployments use existing informer adapters, as do nodes, namespaces and
 
 - Six new dynamic watches, two concurrent LISTs, twelve active subscription keys.
 - LIST pages of 500, request deadline ten seconds, retries with bounded backoff and jitter up to thirty seconds. Forbidden does not loop automatically.
-- Ten thousand retained rows per subscription, thirty thousand across the pool, including borrowed projections. Overflow stops that subscription's watch and exposes partial coverage. There is no unbounded raw informer store behind the displayed limit.
+- Ten thousand retained rows per subscription key, not per GVR. Distinct keys for the same GVR share the global pool budget of thirty thousand across the pool, including borrowed projections. Overflow stops that subscription's watch and exposes partial coverage. There is no unbounded raw informer store behind the displayed limit.
 - A projected row, including its owned strings, is at most 1 KiB. Raw objects, annotations, ConfigMap values, event messages and arbitrary CR columns are not retained in these rows.
 - Production transport limits LIST/discovery bodies to 8 MiB and individual JSON objects or watch envelopes to 2 MiB while reading. An oversized response is rejected before unbounded decoding. These limits do not apply to the independent, already existing informer caches.
 - The resource browser has a separate 64 MiB incremental memory target. Row caps include map/key overhead headroom; the 10k pods plus 10k EndpointSlices benchmark measures retained heap and allocation volume. This is not a promise that the entire application, Radar or preexisting caches occupy 64 MiB.

@@ -18,6 +18,7 @@ type resourceResult uint8
 const (
 	resourceStop resourceResult = iota
 	resourceRetry
+	resourceRefresh
 )
 
 func (e *resourceEntry) run() {
@@ -28,6 +29,10 @@ func (e *resourceEntry) run() {
 	failures := 0
 	for e.ctx.Err() == nil {
 		result := e.load()
+		if result == resourceRefresh {
+			failures = 0
+			continue
+		}
 		if result == resourceStop {
 			select {
 			case <-e.ctx.Done():
@@ -81,8 +86,7 @@ func (e *resourceEntry) load() resourceResult {
 			return resourceStop
 		}
 	} else {
-		e.clear()
-		e.state(data.CoveragePartial, "watch-only; initial inventory unknown")
+		e.clear(data.CoveragePartial, "watch-only; initial inventory unknown")
 	}
 	if !e.descriptor.Watch {
 		e.state(data.CoverageListOnly, "watch unsupported; refresh for a new snapshot")
@@ -106,8 +110,7 @@ func (e *resourceEntry) load() resourceResult {
 }
 
 func (e *resourceEntry) list() (string, bool, bool, resourceResult) {
-	e.clear()
-	e.state(data.CoverageCollecting, "loading resource pages")
+	e.clear(data.CoverageCollecting, "loading resource pages")
 	cursor, rv := "", ""
 	seen := make(map[string]struct{})
 	for e.ctx.Err() == nil {
@@ -209,7 +212,8 @@ func (e *resourceEntry) watch(rv string, complete bool) resourceResult {
 		case <-e.ctx.Done():
 			return resourceStop
 		case <-e.refresh:
-			return resourceRetry
+			e.state(data.CoverageCollecting, "refresh requested; relist required")
+			return resourceRefresh
 		case event, ok := <-stream.ResultChan():
 			if !ok {
 				e.state(data.CoverageStale, "watch closed; relist required")

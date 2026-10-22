@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -308,4 +309,79 @@ func TestResourceBorrowedDenialDoesNotOpenDynamicWatch(t *testing.T) {
 	if len(client.Actions()) != 0 {
 		t.Fatal("borrowed denial retried through dynamic client")
 	}
+}
+
+type resourceRefreshWatch struct {
+	watch.Interface
+	stopped chan struct{}
+	release chan struct{}
+}
+
+func (w *resourceRefreshWatch) Stop() {
+	close(w.stopped)
+	<-w.release
+	w.Interface.Stop()
+}
+
+func TestResourceRefreshCollectingWithoutBackoff(t *testing.T) {
+	s, client, key := resourcePoolFixture(t)
+	s.resources.retry = func(int) time.Duration { return time.Hour }
+	stopped, stopRelease := make(chan struct{}), make(chan struct{})
+	stream := &resourceRefreshWatch{Interface: watch.NewRaceFreeFake(), stopped: stopped, release: stopRelease}
+	watchEntered, watchRelease := make(chan struct{}), make(chan struct{})
+	var watches int
+	client.PrependWatchReactor("*", func(clienttesting.Action) (bool, watch.Interface, error) {
+		watches++
+		if watches == 1 {
+			return true, stream, nil
+		}
+		close(watchEntered)
+		<-watchRelease
+		return true, watch.NewRaceFreeFake(), nil
+	})
+	resourceListReactor(client, 1)
+	h := resourceSubscribe(t, s, key, true, true)
+	resourceWait(t, h, func(p data.ResourcePage) bool { return p.Coverage.State == data.CoverageComplete })
+	entered, release := make(chan struct{}), make(chan struct{})
+	var stopOnce, listOnce, watchOnce sync.Once
+	defer stopOnce.Do(func() { close(stopRelease) })
+	defer listOnce.Do(func() { close(release) })
+	defer watchOnce.Do(func() { close(watchRelease) })
+	client.PrependReactor("list", "*", func(clienttesting.Action) (bool, runtime.Object, error) {
+		close(entered)
+		<-release
+		page := &unstructured.UnstructuredList{}
+		page.SetResourceVersion("20")
+		page.Items = []unstructured.Unstructured{resourceObject(2)}
+		return true, page, nil
+	})
+	h.Refresh()
+	select {
+	case <-stopped:
+	case <-time.After(time.Second):
+		t.Fatal("watch not stopped")
+	}
+	if page := h.Page("", 10); page.Coverage.State != data.CoverageCollecting || page.Total != 1 {
+		t.Fatalf("stopping coverage: %+v", page)
+	}
+	stopOnce.Do(func() { close(stopRelease) })
+	select {
+	case <-entered:
+	case <-time.After(time.Second):
+		t.Fatal("explicit refresh entered failure backoff")
+	}
+	if page := h.Page("", 10); page.Coverage.State != data.CoverageCollecting || page.Total != 0 {
+		t.Fatalf("relist coverage: %+v", page)
+	}
+	listOnce.Do(func() { close(release) })
+	select {
+	case <-watchEntered:
+	case <-time.After(time.Second):
+		t.Fatal("new watch not requested")
+	}
+	if page := h.Page("", 10); page.Coverage.State != data.CoverageCollecting || page.Total != 1 {
+		t.Fatalf("handshake coverage: %+v", page)
+	}
+	watchOnce.Do(func() { close(watchRelease) })
+	resourceWait(t, h, func(p data.ResourcePage) bool { return p.Coverage.State == data.CoverageComplete && p.Total == 1 })
 }
