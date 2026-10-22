@@ -65,7 +65,8 @@ func TestScreenGolden(t *testing.T) {
 	}{
 		{"screen_160x48", 160, 48},
 		{"screen_130x40", 130, 40},
-		{"screen_too_small", 100, 30},
+		{"screen_too_small", 79, 23},
+		{"screen_compact_100x30", 100, 30},
 	} {
 		t.Run(size.name, func(t *testing.T) {
 			c := demoModel(t, size.w, size.h).Render()

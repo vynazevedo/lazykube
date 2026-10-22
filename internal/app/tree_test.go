@@ -127,18 +127,22 @@ func TestTreeKeyCyclesVisibilityAndFocus(t *testing.T) {
 }
 
 func TestTreeOverlayWhenTheBodyDoesNotFit(t *testing.T) {
-	m := press(t, demoModel(t, 130, 40), "b")
-	full := demoModel(t, 130, 40).layout
-	if !m.layout.TreeOverlay || m.layout.Tree != (Rect{X: 1, Y: 3, W: 24, H: 35}) || m.layout.Pods != full.Pods {
-		t.Fatalf("130x40 opens the tree as an overlay over the unchanged body: %+v", m.layout.Tree)
+	docked := press(t, demoModel(t, 130, 40), "b")
+	if docked.layout.TreeOverlay || docked.layout.Tree != (Rect{X: 1, Y: 3, W: 24, H: 35}) || !docked.layout.Compact || docked.layout.ContentW != 105 {
+		t.Fatalf("130x40 docks the tree next to a compact body: %+v", docked.layout.Tree)
+	}
+	m := press(t, demoModel(t, 80, 24), "b")
+	full := demoModel(t, 80, 24).layout
+	if !m.layout.TreeOverlay || m.layout.Tree != (Rect{X: 1, Y: 3, W: 24, H: 19}) || m.layout.Pods != full.Pods {
+		t.Fatalf("80x24 opens the tree as an overlay over the unchanged body: %+v", m.layout.Tree)
 	}
 	sel := m.selName
-	next, _ := m.Update(tea.MouseClickMsg{X: 100, Y: 10, Button: tea.MouseLeft})
+	next, _ := m.Update(tea.MouseClickMsg{X: 60, Y: 10, Button: tea.MouseLeft})
 	closed := next.(Model)
 	if closed.tree.visible || closed.selName != sel || closed.focus != m.focus {
 		t.Fatal("a click outside the overlay closes it and is consumed")
 	}
-	next, _ = m.Update(tea.MouseWheelMsg{X: 100, Y: 10, Button: tea.MouseWheelDown})
+	next, _ = m.Update(tea.MouseWheelMsg{X: 60, Y: 10, Button: tea.MouseWheelDown})
 	if w := next.(Model); w.selName != sel || !w.tree.visible {
 		t.Fatal("the wheel outside the overlay does not reach the body")
 	}
@@ -245,11 +249,11 @@ func TestTreeMouse(t *testing.T) {
 
 func TestTreeGoldens(t *testing.T) {
 	src := newEventsSource("", nil)
-	for _, size := range [][2]int{{160, 48}, {130, 40}} {
+	for _, size := range [][2]int{{160, 48}, {130, 40}, {80, 24}} {
 		m := press(t, events(t, nodeModel(t, src, size[0], size[1])), "b")
 		m = press(t, treeTo(t, m, DestWorkloads), "right")
 		c := m.Render()
-		name := "l2_tree_events_" + map[int]string{160: "160x48", 130: "130x40"}[size[0]]
+		name := "l2_tree_events_" + map[int]string{160: "160x48", 130: "130x40", 80: "overlay_80x24"}[size[0]]
 		golden(t, name+".txt", c.Plain())
 		golden(t, name+".ansi", c.String())
 	}

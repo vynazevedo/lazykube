@@ -47,22 +47,20 @@ func TestLogSearchDoesNotSwallowEscElsewhere(t *testing.T) {
 }
 
 func TestSmallTerminalIsClearAndUsable(t *testing.T) {
-	for _, size := range [][2]int{{80, 24}, {100, 30}, {44, 12}} {
+	for _, size := range [][2]int{{79, 23}, {60, 20}, {44, 12}} {
 		m := demoModel(t, size[0], size[1])
 		if !m.layout.TooSmall {
 			t.Fatalf("%dx%d is below the minimum", size[0], size[1])
 		}
 		plain := m.Render().Plain()
-		for _, want := range []string{"lazykube", "120×36", fmt.Sprintf("%d×%d", size[0], size[1]), "q sair"} {
+		for _, want := range []string{"lazykube", "80×24", fmt.Sprintf("%d×%d", size[0], size[1]), "q sair"} {
 			if !strings.Contains(plain, want) {
 				t.Fatalf("%dx%d small screen misses %q:\n%s", size[0], size[1], want, plain)
 			}
 		}
-		if size[0] >= 80 {
-			for _, want := range []string{"context demo", "namespace Todos", "faltam 40 colunas e 12 linhas", "c contexto", "n namespace"} {
-				if size[0] == 100 {
-					want = strings.Replace(want, "faltam 40 colunas e 12 linhas", "faltam 20 colunas e 6 linhas", 1)
-				}
+		if size[0] >= 60 {
+			missing := map[int]string{79: "faltam 1 colunas e 1 linhas", 60: "faltam 20 colunas e 4 linhas"}[size[0]]
+			for _, want := range []string{"context demo", "namespace Todos", missing, "c contexto", "n namespace"} {
 				if !strings.Contains(plain, want) {
 					t.Fatalf("%dx%d small screen misses %q:\n%s", size[0], size[1], want, plain)
 				}
@@ -80,8 +78,8 @@ func TestSmallTerminalIsClearAndUsable(t *testing.T) {
 			t.Fatalf("%dx%d: q quits", size[0], size[1])
 		}
 	}
-	golden(t, "too_small_80x24.txt", demoModel(t, 80, 24).Render().Plain())
-	grown, _ := demoModel(t, 80, 24).Update(tea.WindowSizeMsg{Width: 160, Height: 48})
+	golden(t, "too_small_79x23.txt", demoModel(t, 79, 23).Render().Plain())
+	grown, _ := demoModel(t, 79, 23).Update(tea.WindowSizeMsg{Width: 160, Height: 48})
 	if grown.(Model).layout.TooSmall || !strings.Contains(grown.(Model).Render().Plain(), "Pods") {
 		t.Fatal("growing the terminal restores the full interface")
 	}
@@ -149,15 +147,15 @@ func smallOnlyAnnounced(t *testing.T, name string, m Model) {
 }
 
 func TestSmallTerminalIgnoresHiddenState(t *testing.T) {
-	small := demoModel(t, 80, 24)
+	small := demoModel(t, 79, 23)
 	typed := press(t, small, "/", "q", "c", "n")
 	if typed.filtering || typed.filter.Value() != "" {
 		t.Fatal("/ does not open an invisible filter on the small screen")
 	}
-	smallOnlyAnnounced(t, "80x24", small)
+	smallOnlyAnnounced(t, "79x23", small)
 
 	shrink := func(m Model) Model {
-		next, _ := m.Update(tea.WindowSizeMsg{Width: 80, Height: 24})
+		next, _ := m.Update(tea.WindowSizeMsg{Width: 79, Height: 23})
 		return next.(Model)
 	}
 	filtering := press(t, demoModel(t, 160, 48), "/", "c", "o")

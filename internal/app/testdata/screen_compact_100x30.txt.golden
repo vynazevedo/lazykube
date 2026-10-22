@@ -1,0 +1,30 @@
+ lazykube [DEMO] [RO]  ◎ context demo namespace Todos   k8s demo  nodes 1  ns 8  pods 13  ⠙ ● live  
+ [2 Dashboard] |  3 Workloads  |  4 Nodes  |  6 Events                                      m menu  
+ Dashboard                                                                                          
+ ╭─ Pods · focus ─────────────────────────────────────────────────────────────────────────────────╮ 
+ │                                                                                                │ 
+ │ / filter pods…▌                                                                       13 items │ 
+ │                                                                                                │ 
+ │   NAME                                                      NAMESPACE    RST   SEC CPU/STATUS  │ 
+ │ ● bilibili-raffle-5d8f9c7b4-x2kqp                           bilibili-r…    0  75 C █░░░░░░     │ 
+ │ ● bilibili-live-7f6b8d9c5-mn4tz                             bilibili-r…    2  20 F ████░░░     │ 
+ │ ● lgo-7c5d97584-hq8wd                                       lgo            0  20 F ██░░░░░     │ 
+ │ ● psql-6bc7744f9-r7zlc                                      ys-odoo        0 100 A ████░░░     │ 
+ │ ● odoo-7575bf6d8-9wjvk                                      ys-odoo        1  75 C ██████░     │ 
+ │ ○ qiandao-1605400800-k8f2m                                  xcx            0  20 F Completed   │ 
+ │ ○ lingqu-1605486000-4tq8n                                   xcx            0  20 F Completed   │ 
+ │ ⠙ lingqu-1605489600-b7xsd                                   xcx            0 100 A Init:0/1    │ 
+ │ ● coredns-6799fbcd5-w9t4p                                   kube-system    0  75 C █░░░░░░     │ 
+ │ ● metrics-server-67c658944b-lm2x                            kube-system    0  20 F ready 0/1   │ 
+ │ ● traefik-f4564c4f4-zq7rn                                   kube-system    0  20 F ░░░░░░░     │ 
+ │ ● local-path-provisioner-84db5d-h4                          kube-system    0 100 A ImagePullB… │ 
+ │ ● svclb-traefik-8c2f1-6n2vb                                 kube-system    7  75 C CrashLoopB… │ 
+ │                                                                                                │ 
+ │                                                                                                │ 
+ │                                                                                                │ 
+ │                                                                                                │ 
+ │                                                                                                │ 
+ │                                                                                                │ 
+ ╰────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   tab  panel   /  filter   enter  open   m  menu   l  logs             bubbletea · 0 fps 

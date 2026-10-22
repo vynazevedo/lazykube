@@ -44,19 +44,29 @@ func (s nodesScreen) handles(m Model, msg tea.KeyPressMsg) bool {
 
 func (nodesScreen) Keys(m Model) []key.Binding {
 	k := m.keys
-	return []key.Binding{
+	keys := []key.Binding{
 		k.Up, k.Down, k.Filter, k.Enter, k.Esc, k.SecurityAck,
 		k.Palette, k.Pause, k.Help, k.Quit,
 		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads, k.Nodes, k.Events,
 		k.Context, k.Namespace, k.Tree,
 	}
+	if m.layout.Compact {
+		keys = append(keys, k.NextPanel, k.PrevPanel)
+	}
+	return keys
 }
 
-func (nodesScreen) Help(Model) []ui.KeyHelp {
+func (nodesScreen) Help(m Model) []ui.KeyHelp {
+	if m.layout.Compact {
+		return append([]ui.KeyHelp{{Key: "tab", Desc: "summary / pods"}}, ui.NodesHelp()...)
+	}
 	return ui.NodesHelp()
 }
 
-func (nodesScreen) FullHelp(Model) []ui.KeyHelp {
+func (nodesScreen) FullHelp(m Model) []ui.KeyHelp {
+	if m.layout.Compact {
+		return append([]ui.KeyHelp{{Key: "tab", Desc: "summary / pods"}}, ui.FullHelpNodes()...)
+	}
 	return ui.FullHelpNodes()
 }
 

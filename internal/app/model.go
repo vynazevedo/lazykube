@@ -224,7 +224,33 @@ func (m *Model) setLayout(w, h int) {
 	if !slices.Contains(m.focusOrder(), m.focus) {
 		m.focus = FocusPods
 	}
+	m.applyCompact()
 	m.ensurePodVisible()
+}
+
+func (m *Model) applyCompact() {
+	l := &m.layout
+	if !l.Compact {
+		return
+	}
+	switch {
+	case m.inDetail():
+	case m.onScreen(ScreenEvents):
+		if m.ev.reading {
+			l.Events = Rect{}
+		} else {
+			l.Message = Rect{}
+		}
+	case m.onScreen(ScreenNodes):
+		if m.focus == FocusDetails {
+			l.keepOnly(&l.Node)
+		} else {
+			l.keepOnly(&l.Pods)
+		}
+	default:
+		keep := map[Focus]*Rect{FocusNamespaces: &l.Namespaces, FocusDeployments: &l.Deployments, FocusPods: &l.Pods, FocusDetails: &l.Details}[m.focus]
+		l.keepOnly(keep)
+	}
 }
 
 func (m *Model) heatCols() int {

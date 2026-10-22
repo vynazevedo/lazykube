@@ -158,6 +158,53 @@ func eventsRow(c eventColumns, w int, e data.Event, selected bool, style func(th
 	return line
 }
 
+const (
+	eventsCompactW      = 100
+	eventsCompactKind   = 8
+	eventsCompactReason = 16
+	eventsCompactCount  = 5
+	eventsCompactAge    = 6
+)
+
+func eventsCompactObject(w int) int {
+	return max(8, w-2-eventsCompactKind-eventsCompactReason-eventsCompactCount-eventsCompactAge-4)
+}
+
+func eventsCompactHeader(w int) draw.Line {
+	hdr := func(s string, width int) draw.Span { return muted(draw.PadRight(s, width)) }
+	return draw.Line{
+		muted("  "),
+		hdr("TIPO", eventsCompactKind), muted(" "),
+		hdr("MOTIVO", eventsCompactReason), muted(" "),
+		hdr("OBJETO", eventsCompactObject(w)), muted(" "),
+		muted(draw.PadLeft("COUNT", eventsCompactCount)), muted(" "),
+		muted(draw.PadLeft("IDADE", eventsCompactAge)),
+	}
+}
+
+func eventsCompactRow(w int, e data.Event, selected bool, style func(theme.RGB) draw.Style) draw.Line {
+	mark := "  "
+	if selected {
+		mark = "› "
+	}
+	typeColor := theme.OK
+	if e.Type == "Warning" {
+		typeColor = theme.Warn
+	}
+	cell := func(s string, width int, color theme.RGB) draw.Span {
+		return draw.S(draw.PadRight(draw.Truncate(draw.Sanitize(s), width), width), style(color))
+	}
+	gap := draw.S(" ", style(theme.Text))
+	return draw.Line{
+		draw.S(mark, style(theme.Text)),
+		cell(e.Type, eventsCompactKind, typeColor), gap,
+		cell(e.Reason, eventsCompactReason, theme.TextSoft), gap,
+		cell(e.Object, eventsCompactObject(w), theme.Text), gap,
+		draw.S(draw.PadLeft(fmt.Sprintf("%d", e.Count), eventsCompactCount), style(theme.Text)), gap,
+		draw.S(draw.PadLeft(draw.Truncate(draw.Sanitize(e.Age), eventsCompactAge), eventsCompactAge), style(theme.Muted)),
+	}
+}
+
 func eventsHeader(c eventColumns, w int) draw.Line {
 	hdr := func(s string, width int) draw.Span { return muted(draw.PadRight(s, width)) }
 	line := draw.Line{
@@ -184,7 +231,12 @@ func EventsTable(r draw.Region, st EventsScreenState, ctx Ctx) {
 		return
 	}
 	cols := eventsColumns(inner.W)
-	inner.Line(0, 0, eventsHeader(cols, inner.W).Truncate(inner.W))
+	compact := inner.W < eventsCompactW
+	if compact {
+		inner.Line(0, 0, eventsCompactHeader(inner.W).Truncate(inner.W))
+	} else {
+		inner.Line(0, 0, eventsHeader(cols, inner.W).Truncate(inner.W))
+	}
 	rows := EventsTableRows(r.H)
 	body := inner.Sub(0, EventsTableTop, inner.W, rows)
 	feed := st.Feed
@@ -207,7 +259,11 @@ func EventsTable(r draw.Region, st EventsScreenState, ctx Ctx) {
 			if !st.Gone && idx == st.Cursor {
 				style = func(c theme.RGB) draw.Style { return draw.Fg(c).WithBg(theme.BorderFaint).WithBold() }
 			}
-			body.Line(0, i, eventsRow(cols, inner.W, feed.Items[idx], !st.Gone && idx == st.Cursor, style).Truncate(inner.W))
+			row := eventsRow(cols, inner.W, feed.Items[idx], !st.Gone && idx == st.Cursor, style)
+			if compact {
+				row = eventsCompactRow(inner.W, feed.Items[idx], !st.Gone && idx == st.Cursor, style)
+			}
+			body.Line(0, i, row.Truncate(inner.W))
 		}
 	}
 	if inner.H > rows+EventsTableTop {

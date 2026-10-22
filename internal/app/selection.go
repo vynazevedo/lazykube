@@ -123,6 +123,9 @@ func (m *Model) focusOrder() []Focus {
 	if m.onScreen(ScreenWorkloads) {
 		return []Focus{FocusPods, FocusDeployments, FocusDetails}
 	}
+	if m.onScreen(ScreenNodes) && m.layout.Compact {
+		return []Focus{FocusPods, FocusDetails}
+	}
 	if m.onScreen(ScreenNodes) || m.onScreen(ScreenEvents) {
 		return []Focus{FocusPods}
 	}
@@ -141,6 +144,9 @@ func (m *Model) cycleFocus(delta int) {
 		}
 	}
 	m.focus = order[((idx+delta)%len(order)+len(order))%len(order)]
+	if m.layout.Compact {
+		m.relayout()
+	}
 }
 
 func (m Model) selectionKs(pods []data.Pod) map[int]float64 {

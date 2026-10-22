@@ -235,7 +235,7 @@ func TooSmall(screen draw.Region, st SmallState, ctx Ctx) {
 		{target, 1},
 		{nil, 0},
 		{draw.Line{colored(fmt.Sprintf("terminal pequeno: %d×%d", st.W, st.H), theme.Warn)}, 3},
-		{draw.Line{text(fmt.Sprintf("a interface completa precisa de %d×%d", st.MinW, st.MinH))}, 3},
+		{draw.Line{text(fmt.Sprintf("o lazykube precisa de pelo menos %d×%d", st.MinW, st.MinH))}, 3},
 		{draw.Line{muted(missingText(st))}, 2},
 		{nil, 0},
 		{summary, 1},
