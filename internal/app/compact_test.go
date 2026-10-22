@@ -113,15 +113,18 @@ func TestCompactFilterFollowsTheVisiblePanel(t *testing.T) {
 	for _, tc := range []struct {
 		name string
 		keys []string
-	}{{"workloads deployments", []string{"3", "tab"}}, {"nodes summary", []string{"4", "tab"}}, {"dashboard heatmap", []string{"tab"}}} {
+	}{{"workloads deployments", []string{"3", "tab"}}, {"nodes summary", []string{"4", "tab"}}, {"dashboard heatmap", []string{"tab"}}, {"nodes summary after log", []string{"l", "4", "tab"}}} {
 		m := press(t, demoModel(t, 80, 24), tc.keys...)
 		if m.focus == FocusPods {
 			t.Fatalf("%s: setup leaves pods", tc.name)
 		}
 		m = press(t, m, "/", "c", "o", "r", "e")
 		onePanel(t, tc.name+" filtering", m, "pods")
-		if !m.filtering || m.focus != FocusPods {
-			t.Fatalf("%s: the filter edits the visible pods panel", tc.name)
+		if !m.filtering || m.dg.searching || m.focus != FocusPods || m.filter.Value() != "core" {
+			t.Fatalf("%s: the filter edits the visible pods panel, not a hidden log search", tc.name)
+		}
+		if !strings.Contains(m.Render().Plain(), "core") {
+			t.Fatalf("%s: the typed text is visible", tc.name)
 		}
 		m = press(t, m, "enter")
 		onePanel(t, tc.name+" confirmed", m, "pods")
