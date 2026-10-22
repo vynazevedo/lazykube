@@ -57,6 +57,8 @@ type caps struct {
 }
 
 type Source struct {
+	catalog            *resourceCatalog
+	resources          *resourcePool
 	guardSession       guard.Session
 	guardPolicy        guard.Policy
 	actions            *guard.Executor
@@ -399,6 +401,9 @@ func (s *Source) Changes() <-chan struct{} {
 func (s *Source) Close() {
 	s.closeOnce.Do(func() {
 		s.cancel()
+		if s.resources != nil {
+			s.resources.close()
+		}
 		s.mu.Lock()
 		if s.stream != nil {
 			s.stream.cancel()

@@ -131,6 +131,17 @@ func Connect(ctx context.Context, opts ConnectOptions) (*Source, error) {
 		s.Close()
 		return nil, err
 	}
+	resourceClient, err := newResourceClient(cfg)
+	if err != nil {
+		s.Close()
+		return nil, err
+	}
+	catalogClient, err := newResourceDiscovery(cfg)
+	if err != nil {
+		s.Close()
+		return nil, err
+	}
+	s.initResources(resourceClient, catalogClient)
 	if err := s.start(ctx); err != nil {
 		s.Close()
 		return nil, fmt.Errorf("context %q: %w", name, err)
