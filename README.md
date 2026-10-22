@@ -1,4 +1,3 @@
-<!-- ANSI Shadow Font -->
 ```
  ██╗      █████╗ ███████╗██╗   ██╗██╗  ██╗██╗   ██╗██████╗ ███████╗
  ██║     ██╔══██╗╚══███╔╝╚██╗ ██╔╝██║ ██╔╝██║   ██║██╔══██╗██╔════╝
@@ -17,6 +16,7 @@
  └──────────────────────────────────────────────────────────────┘
 ```
 
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![CI](https://github.com/vynazevedo/lazykube/actions/workflows/ci.yaml/badge.svg)](https://github.com/vynazevedo/lazykube/actions/workflows/ci.yaml)
 [![GitHub stars](https://img.shields.io/github/stars/vynazevedo/lazykube?style=social)](https://github.com/vynazevedo/lazykube/stargazers)
 
@@ -149,6 +149,40 @@ Prossiga apenas se a verificação terminar com sucesso (`OK`). Extraia com
 compare `(Get-FileHash .\lazykube_X.Y.Z_windows_amd64.zip -Algorithm SHA256).Hash`
 com a entrada correspondente em `checksums.txt` antes de usar `Expand-Archive`.
 
+### Instalar com Go
+
+Com Go 1.26 ou superior:
+
+```bash
+go install github.com/vynazevedo/lazykube/cmd/lazykube@latest
+```
+
+O binário fica em `GOBIN` ou em `$(go env GOPATH)/bin`. Adicione esse diretório
+ao `PATH`. Para fixar uma versão, substitua `@latest` por uma tag publicada.
+Essa instalação compila o código e não usa os arquivos de checksum das releases.
+A versão no cabeçalho pode diferir da tag, pois `go install` não usa os ldflags
+do GoReleaser. Para identificação da versão e verificação dos pacotes publicados,
+prefira os binários da release.
+
+### SBOM e assinatura da release
+
+Releases geradas pelo workflow incluem um SBOM por pacote e
+`checksums.txt.sigstore.json`, um bundle de assinatura keyless do manifesto.
+Após baixar esses arquivos da mesma tag, verifique com Cosign 3.1.4:
+
+```bash
+VERSION=vX.Y.Z
+cosign verify-blob checksums.txt \
+  --bundle checksums.txt.sigstore.json \
+  --certificate-identity "https://github.com/vynazevedo/lazykube/.github/workflows/release.yml@refs/tags/$VERSION" \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+```
+
+Só depois confira o checksum do pacote conforme o download manual. O instalador
+Bash verifica SHA-256, mas não verifica a assinatura Sigstore automaticamente.
+Releases anteriores podem não ter SBOM ou assinatura. Snapshots locais não são
+assinados. [Referência do fluxo de assinatura](https://goreleaser.com/customization/sign/sign/).
+
 ### Compilar a partir do código
 
 Requer Go 1.26 ou superior:
@@ -177,6 +211,44 @@ para futuros handlers de acoes estao descritos em
 `--protected-contexts` e `--read-only-contexts` recebem nomes exatos separados
 por virgula. `--audit-file` permite escolher um caminho absoluto para o audit
 privado. Nenhuma tecla desativa a politica.
+
+---
+
+## Comparação de escopo
+
+O quadro descreve o código disponível nesta revisão, sem atribuir ao lazykube
+as ações planejadas para a 1.0 ou prometer vantagem de desempenho.
+
+| Aspecto | lazykube | k9s | Lens |
+| --- | --- | --- | --- |
+| Interface | TUI no terminal | TUI no terminal | Aplicativo gráfico |
+| Pods, deployments e logs | Visualização no terminal | Navegação de recursos e logs | Visualização de workloads e logs |
+| Alterar recursos | Não exposto na TUI desta revisão | Operações de gestão; modo `--readonly` disponível | Edição disponível conforme RBAC |
+| Foco | Inspeção, diagnóstico e contexto em uma tela | Gestão de recursos pelo terminal | Gestão por interface gráfica |
+
+Fontes: [k9s](https://k9scli.io/),
+[modo somente leitura do k9s](https://k9scli.io/topics/commands/),
+[pods no Lens](https://docs.lenshq.io/k8slens/using-lens/workloads/pods/).
+Não há benchmark comparativo neste repositório. Exec, port-forward e edição
+planejados para a 1.0 dependem de implementação e validação próprias.
+
+## Matriz de suporte da 1.0
+
+A matriz alvo é Kubernetes 1.34 a 1.36. O CI usa envtest para validar conexão,
+leitura de pods/deployments/events e alternância entre dois servidores isolados.
+
+| Linha | API local testada | Estado além desse teste |
+| --- | --- | --- |
+| Kubernetes 1.34 | envtest 1.34.1 | Preview até validar os demais fluxos |
+| Kubernetes 1.35 | envtest 1.35.0 | Preview até validar os demais fluxos |
+| Kubernetes 1.36 | envtest 1.36.2 | Preview até validar os demais fluxos |
+
+São gerados seis artefatos: Linux, macOS e Windows em amd64 e arm64.
+Cross-build não equivale a teste nativo: Linux amd64 tem validação local;
+Linux arm64, macOS e Windows permanecem preview quanto à execução nativa.
+Envtest não inclui kubelet, scheduler ou execução de containers e não valida
+exec, port-forward ou metrics-server. Não se concede `nodes/proxy` para ampliar
+a cobertura; sua ausência deve resultar em degradação explícita da funcionalidade.
 
 ---
 
@@ -310,7 +382,6 @@ lazykube/
 │   ├── draw/            # canvas, braille, larguras de grafema
 │   ├── anim/            # relógio, springs e fades
 │   └── theme/           # paletas e gradientes
-├── pkg/                 # utilitários herdados
 └── assets/              # imagens do README
 ```
 
@@ -338,6 +409,10 @@ para usar o mouse.
 ---
 
 ## `[0x08]` Contribuindo
+
+Veja [CONTRIBUTING.md](CONTRIBUTING.md), [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+e [SECURITY.md](SECURITY.md). O projeto é distribuído sob
+[Apache-2.0](LICENSE), com os créditos de origem em [NOTICE](NOTICE).
 
 ```
  1. Fork o repo

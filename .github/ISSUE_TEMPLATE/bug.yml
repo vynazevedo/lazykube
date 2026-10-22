@@ -1,0 +1,36 @@
+name: Relatar bug
+description: Comportamento incorreto com reprodução segura.
+title: 'bug: '
+body:
+  - type: markdown
+    attributes:
+      value: 'Para vulnerabilidades, use SECURITY.md. Não inclua kubeconfig, tokens, dados privados ou logs sem revisão.'
+  - type: input
+    id: version
+    attributes:
+      label: Versão ou SHA do lazykube
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Sistema, arquitetura, terminal e versão do Kubernetes, se aplicável
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reprodução com demo, fixtures ou envtest
+      description: Não é necessário conceder acesso a um cluster real.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Resultado esperado e resultado observado
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidências sanitizadas e frequência do problema

@@ -21,6 +21,8 @@ archives:
         formats: [zip]
     files:
       - README.md
+      - LICENSE
+      - NOTICE
 
 checksum:
   name_template: checksums.txt
@@ -31,8 +33,30 @@ snapshot:
 
 changelog:
   sort: asc
+  groups:
+    - title: Funcionalidades
+      regexp: '^feat(\([^)]*\))?!?:'
+      order: 0
+    - title: Correções
+      regexp: '^fix(\([^)]*\))?!?:'
+      order: 1
+    - title: Desempenho
+      regexp: '^perf(\([^)]*\))?!?:'
+      order: 2
+    - title: Documentação
+      regexp: '^docs(\([^)]*\))?!?:'
+      order: 3
+    - title: Manutenção e testes
+      regexp: '^(build|chore|ci|refactor|style|test)(\([^)]*\))?!?:'
+      order: 4
+    - title: Outras mudanças
+      order: 5
+
+sboms:
+  - artifacts: archive
 
 release:
+  draft: true
   github:
     owner: vynazevedo
     name: lazykube

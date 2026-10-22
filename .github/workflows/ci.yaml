@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  workflow_call:
   push:
     branches: [main]
   pull_request:
@@ -25,10 +26,11 @@ jobs:
       matrix:
         go: [1.26.x, stable]
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
+          ref: ${{ github.sha }}
           persist-credentials: false
-      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
         with:
           go-version: ${{ matrix.go }}
           check-latest: true
@@ -46,20 +48,43 @@ jobs:
           fi
       - run: go build ./...
       - run: go vet ./...
+      - name: Vet para Darwin
+        run: GOOS=darwin go vet ./...
       - run: go test -race -count=1 ./...
 
-  lint:
-    runs-on: ubuntu-latest
+  windows:
+    name: Windows
+    runs-on: windows-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
+          ref: ${{ github.sha }}
           persist-credentials: false
-      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
         with:
           go-version: 1.26.x
           check-latest: true
           cache: true
-      - uses: golangci/golangci-lint-action@1481404843c368bc19ca9406f87d6e0fc97bdcfd # v7.0.0
+      - run: go vet ./...
+        env:
+          KUBECONFIG: ${{ runner.temp }}/lazykube-test-kubeconfig
+      - run: go test ./cmd/...
+        env:
+          KUBECONFIG: ${{ runner.temp }}/lazykube-test-kubeconfig
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version: 1.26.x
+          check-latest: true
+          cache: true
+      - uses: golangci/golangci-lint-action@1481404843c368bc19ca9406f87d6e0fc97bdcfd
         with:
           version: v2.13.2
           args: --timeout=10m
@@ -67,10 +92,11 @@ jobs:
   vulnerabilities:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
+          ref: ${{ github.sha }}
           persist-credentials: false
-      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
         with:
           go-version: stable
           check-latest: true
@@ -80,16 +106,40 @@ jobs:
   installer:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
         with:
+          ref: ${{ github.sha }}
           persist-credentials: false
-      - run: shellcheck install.sh scripts/test-install.sh
+      - run: shellcheck install.sh scripts/test-install.sh scripts/test-integration.sh
       - run: bash scripts/test-install.sh
+      - run: python3 scripts/test-release.py
+
+  integration:
+    name: Kubernetes ${{ matrix.kubernetes }} (envtest)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        kubernetes: ['1.34.1', '1.35.0', '1.36.2']
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5
+        with:
+          go-version: 1.26.x
+          check-latest: true
+          cache: true
+      - name: Testar APIs locais e troca de contexto
+        env:
+          ENVTEST_VERSION: ${{ matrix.kubernetes }}
+        run: bash scripts/test-integration.sh "$ENVTEST_VERSION"
 
   gate:
     name: CI gate
     if: ${{ always() }}
-    needs: [test, lint, vulnerabilities, installer]
+    needs: [test, windows, lint, vulnerabilities, installer, integration]
     runs-on: ubuntu-latest
     steps:
       - name: Require all checks
