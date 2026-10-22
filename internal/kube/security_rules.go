@@ -21,6 +21,7 @@ type podEvaluator struct {
 
 func evaluatePod(p *corev1.Pod, context string, generation uint64, now time.Time) data.PodPosture {
 	e := podEvaluator{now: now, posture: data.PodPosture{
+		Owner:       controllerOwner(p),
 		RuleVersion: securityRuleVersion,
 		Target:      data.ResourceRef{Context: context, Generation: generation, Version: "v1", Resource: "pods", Namespace: p.Namespace, Name: p.Name, UID: string(p.UID), ResourceVersion: p.ResourceVersion},
 		Coverage:    data.Coverage{State: data.CoverageComplete, Evaluated: 1, Total: 1, ObservedAt: now},
@@ -55,6 +56,15 @@ func evaluatePod(p *corev1.Pod, context string, generation uint64, now time.Time
 	}
 	e.finishAssessments(p)
 	return e.posture
+}
+
+func controllerOwner(p *corev1.Pod) *data.OwnerRef {
+	for _, o := range p.OwnerReferences {
+		if o.Controller != nil && *o.Controller {
+			return &data.OwnerRef{APIVersion: o.APIVersion, Kind: o.Kind, Name: o.Name, UID: string(o.UID)}
+		}
+	}
+	return nil
 }
 
 func (e *podEvaluator) add(rule, field, evidence string, severity data.Severity, result data.RuleResult, why, recommendation string, states ...data.AssessmentState) {
