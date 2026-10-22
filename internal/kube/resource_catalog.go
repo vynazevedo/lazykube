@@ -18,23 +18,51 @@ const catalogTTL = 5 * time.Minute
 const catalogLimit = 4096
 
 type resourceCatalog struct {
-	mu       sync.Mutex
-	client   discovery.DiscoveryInterface
-	factory  func(context.Context) (discovery.DiscoveryInterface, error)
-	now      func() time.Time
-	snapshot data.ResourceCatalogSnapshot
+	mu         sync.Mutex
+	refreshing chan struct{}
+	client     discovery.DiscoveryInterface
+	factory    func(context.Context) (discovery.DiscoveryInterface, error)
+	now        func() time.Time
+	snapshot   data.ResourceCatalogSnapshot
 }
 
 func (c *resourceCatalog) get(ctx context.Context, refresh bool) data.ResourceCatalogSnapshot {
 	c.mu.Lock()
-	defer c.mu.Unlock()
 	if ctx.Err() != nil {
-		return data.ResourceCatalogSnapshot{Session: c.snapshot.Session, Generation: c.snapshot.Generation, Coverage: data.Coverage{State: data.CoverageUnavailable, Reason: "discovery canceled"}}
+		canceled := data.ResourceCatalogSnapshot{Session: c.snapshot.Session, Generation: c.snapshot.Generation, Coverage: data.Coverage{State: data.CoverageUnavailable, Reason: "discovery canceled"}}
+		c.mu.Unlock()
+		return canceled
 	}
 	if c.snapshot.Revision != 0 && !refresh && c.now().Sub(c.snapshot.ObservedAt) < catalogTTL {
-		return cloneCatalog(c.snapshot)
+		cached := cloneCatalog(c.snapshot)
+		c.mu.Unlock()
+		return cached
 	}
+	if done := c.refreshing; done != nil {
+		c.mu.Unlock()
+		select {
+		case <-ctx.Done():
+			return c.get(ctx, false)
+		case <-done:
+			c.mu.Lock()
+			cached := cloneCatalog(c.snapshot)
+			c.mu.Unlock()
+			return cached
+		}
+	}
+	c.refreshing = make(chan struct{})
 	next := data.ResourceCatalogSnapshot{Session: c.snapshot.Session, Generation: c.snapshot.Generation, Revision: c.snapshot.Revision + 1, ObservedAt: c.now(), Coverage: data.Coverage{State: data.CoverageComplete}}
+	c.mu.Unlock()
+	next = c.discover(ctx, next)
+	c.mu.Lock()
+	c.snapshot = next
+	close(c.refreshing)
+	c.refreshing = nil
+	c.mu.Unlock()
+	return cloneCatalog(next)
+}
+
+func (c *resourceCatalog) discover(ctx context.Context, next data.ResourceCatalogSnapshot) data.ResourceCatalogSnapshot {
 	client := c.client
 	if c.factory != nil {
 		var err error
@@ -45,8 +73,7 @@ func (c *resourceCatalog) get(ctx context.Context, refresh bool) data.ResourceCa
 	}
 	if ctx.Err() != nil || client == nil {
 		next.Coverage = data.Coverage{State: data.CoverageUnavailable, Reason: "discovery unavailable"}
-		c.snapshot = next
-		return cloneCatalog(next)
+		return next
 	}
 	groups, err := client.ServerGroups()
 	if err != nil {
@@ -119,8 +146,7 @@ func (c *resourceCatalog) get(ctx context.Context, refresh bool) data.ResourceCa
 		}
 	}
 	sort.Slice(next.Resources, func(i, j int) bool { return next.Resources[i].GVR.String() < next.Resources[j].GVR.String() })
-	c.snapshot = next
-	return cloneCatalog(next)
+	return next
 }
 
 func cloneCatalog(s data.ResourceCatalogSnapshot) data.ResourceCatalogSnapshot {

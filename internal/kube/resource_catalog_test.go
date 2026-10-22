@@ -10,6 +10,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/client-go/discovery"
 	discoveryfake "k8s.io/client-go/discovery/fake"
 	clienttesting "k8s.io/client-go/testing"
 )
@@ -80,5 +81,40 @@ func TestResourceCatalogDeniedAndCanceled(t *testing.T) {
 	calls := f.calls
 	if c.get(ctx, true).Coverage.State != data.CoverageUnavailable || f.calls != calls {
 		t.Fatal("canceled discovery issued a request")
+	}
+}
+
+func TestResourceCatalogConcurrentCancellation(t *testing.T) {
+	s, _, key := resourcePoolFixture(t)
+	entered, release, done := make(chan struct{}), make(chan struct{}), make(chan struct{})
+	s.catalog.factory = func(context.Context) (discovery.DiscoveryInterface, error) {
+		close(entered)
+		<-release
+		return nil, errors.New("unavailable")
+	}
+	go func() { defer close(done); s.Catalog(context.Background(), true) }()
+	<-entered
+	defer func() { close(release); <-done }()
+	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
+	defer cancel()
+	returned := make(chan struct{})
+	go func() { defer close(returned); s.Catalog(ctx, true) }()
+	select {
+	case <-returned:
+	case <-time.After(time.Second):
+		t.Error("second catalog caller ignored cancellation")
+	}
+	subscribed := make(chan struct{})
+	go func() {
+		defer close(subscribed)
+		h, _ := s.Subscribe(context.Background(), key)
+		if h != nil {
+			h.Cancel()
+		}
+	}()
+	select {
+	case <-subscribed:
+	case <-time.After(time.Second):
+		t.Error("subscribe waited for remote discovery")
 	}
 }
