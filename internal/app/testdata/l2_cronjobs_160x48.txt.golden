@@ -1,0 +1,48 @@
+ lazykube [DEMO] [RO]  v2.0   ◎ context demo namespace Todos   k8s demo  nodes 1  ns 8  pods 13  uptime 119d                         ⠙ metrics every 5s ● live  
+  2 Dashboard  | [3 Workloads] |  4 Nodes  |  6 Events                                                                                                  m menu  
+ Workloads · CronJobs                                                                                                                                           
+ ╭─ CronJobs · focus ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ │ escopo todos os namespaces  ·  cobertura completa no escopo  ·  3 itens  ·  [DEMO]                                                                         │ 
+ │   NAME                                                                                 NAMESPACE        SCHEDULE       ACTIVE   LAST STATE            AGE  │ 
+ │ › demo-cronjob-1                                                                       apps             */5 * * * *         0      - scheduled         1h  │ 
+ │   demo-cronjob-2                                                                       apps             */5 * * * *         1      - progressing       1h  │ 
+ │   demo-cronjob-3                                                                       apps             */5 * * * *         0      - suspended         1h  │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │ detalhe, YAML e relações: contrato futuro · r recarrega                                                                                                    │ 
+ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   r  reload   esc  back   b  tree   m  menu   ?  help   q  quit                                                                    bubbletea · 0 fps 

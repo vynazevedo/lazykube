@@ -16,6 +16,8 @@ const (
 	ScreenWorkloads
 	ScreenNodes
 	ScreenEvents
+	ScreenResources
+	ScreenOverview
 )
 
 type Screen interface {
@@ -42,6 +44,10 @@ func screenFor(id ScreenID) (Screen, bool) {
 		return nodesScreen{}, true
 	case ScreenEvents:
 		return eventsScreen{}, true
+	case ScreenResources:
+		return resourcesScreen{}, true
+	case ScreenOverview:
+		return overviewScreen{}, true
 	}
 	return nil, false
 }

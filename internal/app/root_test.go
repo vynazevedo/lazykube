@@ -21,6 +21,25 @@ import (
 type fakeLive struct {
 	*data.Demo
 	changes chan struct{}
+	cancels *atomic.Int32
+}
+
+type countedHandle struct {
+	data.ResourceSubscription
+	cancels *atomic.Int32
+}
+
+func (h countedHandle) Cancel() {
+	h.cancels.Add(1)
+	h.ResourceSubscription.Cancel()
+}
+
+func (s fakeLive) Subscribe(ctx context.Context, key data.ResourceSubscriptionKey) (data.ResourceSubscription, error) {
+	h, err := s.Demo.Subscribe(ctx, key)
+	if err != nil || s.cancels == nil {
+		return h, err
+	}
+	return countedHandle{ResourceSubscription: h, cancels: s.cancels}, nil
 }
 
 func (s fakeLive) Changes() <-chan struct{} { return s.changes }
@@ -47,6 +66,7 @@ type fakeCluster struct {
 	holdClose map[string]chan struct{}
 	ignoreCtx bool
 	live      atomic.Int32
+	cancels   atomic.Int32
 }
 
 func newFakeCluster() *fakeCluster {
@@ -112,7 +132,7 @@ func (f *fakeCluster) connect(t data.Target) Connector {
 		f.mu.Lock()
 		f.sources = append(f.sources, src)
 		f.mu.Unlock()
-		live := fakeLive{Demo: data.NewDemoScoped(t.Context, t.Namespace), changes: make(chan struct{}, 1)}
+		live := fakeLive{Demo: data.NewDemoScoped(t.Context, t.Namespace), changes: make(chan struct{}, 1), cancels: &f.cancels}
 		stop := make(chan struct{})
 		f.live.Add(1)
 		go func() { <-stop }()
@@ -729,5 +749,29 @@ func TestRootSessionFollowsGuardPolicy(t *testing.T) {
 	line := []rune(strings.Split(plain, "\n")[0])
 	if !strings.HasPrefix(string(line[m.layout.Header.X+g.CtxStart:]), " ◎ context gamma") {
 		t.Fatal("the badges are part of the header geometry")
+	}
+}
+
+func TestRootSwitchReleasesResourceSubscriptions(t *testing.T) {
+	f := newFakeCluster()
+	d := newRootDriver(t, f, data.Target{Context: "alpha"})
+	d.until("initial", connectedTo("alpha", ""))
+	m, _ := d.r.model()
+	m.activateDestination(DestWorkloadsOver)
+	d.r.cur = m
+	d.send(tea.FocusMsg{})
+	d.until("overview subscribed", func(r Root) bool {
+		m, _ := r.model()
+		for _, s := range m.res.subs {
+			if s.handle == nil {
+				return false
+			}
+		}
+		return len(m.res.subs) == len(workloadLeaves)
+	})
+	d.pickTarget(pickContext, "beta")
+	d.until("beta", connectedTo("beta", "default"))
+	if got := f.cancels.Load(); got != int32(len(workloadLeaves)) {
+		t.Fatalf("a context switch cancels every subscription of the old session, got %d", got)
 	}
 }

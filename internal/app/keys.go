@@ -46,6 +46,7 @@ type KeyMap struct {
 	Context     key.Binding
 	Namespace   key.Binding
 	Tree        key.Binding
+	Refresh     key.Binding
 }
 
 func DefaultKeyMap() KeyMap {
@@ -96,6 +97,7 @@ func DefaultKeyMap() KeyMap {
 		Context:     b("c", "switch context", "c"),
 		Namespace:   b("n", "switch namespace", "n"),
 		Tree:        b("b", "navigation tree", "b"),
+		Refresh:     b("r", "reload list", "r"),
 	}
 }
 
@@ -107,6 +109,6 @@ func (k KeyMap) Bindings() []key.Binding {
 		k.Palette, k.ToggleLeft, k.Pause, k.Help, k.Quit,
 		k.PageUp, k.PageDown, k.Home, k.End, k.Follow, k.Wrap, k.Top, k.Bottom,
 		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads, k.Nodes, k.Events,
-		k.Context, k.Namespace, k.Tree,
+		k.Context, k.Namespace, k.Tree, k.Refresh,
 	}
 }

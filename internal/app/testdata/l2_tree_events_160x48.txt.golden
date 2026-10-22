@@ -7,14 +7,14 @@
     Namespaces (futuro)   │ │ Escolha explícita: E  pod   ns   cluster                                                                                        │ 
  ›  Events (6)            │ │ Feed limitado: até 200 eventos de namespace/cluster; não é histórico durável                                                    │ 
   [-] Workloads (3)       │ │ Acesso negado e feed vazio são estados diferentes                                                                               │ 
-    Overview (futuro)     │ │                                                                                                                                 │ 
+    Overview              │ │                                                                                                                                 │ 
     Pods                  │ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
     Deployments           │ ╭─ Eventos · focus ───────────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
-    StatefulSets (futuro) │ │   MENSAGEM                                                           NAMESPACE        TIPO     OBJETO                    COUNT  │ 
-    DaemonSets (futuro)   │ │ › Back-off restarting failed container app in pod bilibili-live-7f6… bilibili-raffle  Warning  Pod/bilibili-live-7f6b8d…     3  │ 
-    Jobs (futuro)         │ │   Container image "registry.local/bilibili-raffle:1.4.2" already pr… bilibili-raffle  Normal   Pod/bilibili-live-7f6b8d…     2  │ 
-    CronJobs (futuro)     │ │   Started container app                                              bilibili-raffle  Normal   Pod/bilibili-live-7f6b8d…     2  │ 
-    ReplicaSets (futuro)  │ │                                                                                                                                 │ 
+    StatefulSets          │ │   MENSAGEM                                                           NAMESPACE        TIPO     OBJETO                    COUNT  │ 
+    DaemonSets            │ │ › Back-off restarting failed container app in pod bilibili-live-7f6… bilibili-raffle  Warning  Pod/bilibili-live-7f6b8d…     3  │ 
+    Jobs                  │ │   Container image "registry.local/bilibili-raffle:1.4.2" already pr… bilibili-raffle  Normal   Pod/bilibili-live-7f6b8d…     2  │ 
+    CronJobs              │ │   Started container app                                              bilibili-raffle  Normal   Pod/bilibili-live-7f6b8d…     2  │ 
+    ReplicaSets           │ │                                                                                                                                 │ 
   [+] Configuration       │ │                                                                                                                                 │ 
   [+] Network             │ │                                                                                                                                 │ 
   [+] Storage             │ │                                                                                                                                 │ 

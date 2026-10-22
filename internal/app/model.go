@@ -85,6 +85,7 @@ type Model struct {
 
 	workloadsLeaf DestinationID
 	tree          treeState
+	res           resourceState
 	manifest      []string
 	describe      []data.Field
 
@@ -209,6 +210,8 @@ func (m *Model) screenLayout() func(w, h int) Layout {
 		return ComputeNodes
 	case m.onScreen(ScreenEvents):
 		return ComputeEvents
+	case m.onScreen(ScreenResources), m.onScreen(ScreenOverview):
+		return ComputeTable
 	}
 	mode := m.leftMode
 	return func(w, h int) Layout { return Compute(w, h, mode) }
@@ -247,7 +250,7 @@ func (m *Model) applyCompact() {
 		return
 	}
 	switch {
-	case m.inDetail():
+	case m.inDetail(), m.onScreen(ScreenResources), m.onScreen(ScreenOverview):
 	case m.onScreen(ScreenEvents):
 		if m.ev.reading {
 			l.Events = Rect{}
@@ -296,6 +299,24 @@ func (m *Model) refresh() {
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if next, cmd, ok := m.handleResourceMsg(msg); ok {
+		return next.withResources(cmd)
+	}
+	next, cmd := m.update(msg)
+	if nm, ok := next.(Model); ok {
+		return nm.withResources(cmd)
+	}
+	return next, cmd
+}
+
+func (m Model) withResources(cmd tea.Cmd) (tea.Model, tea.Cmd) {
+	if sync := m.syncResources(); sync != nil {
+		return m, tea.Batch(cmd, sync)
+	}
+	return m, cmd
+}
+
+func (m Model) update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case dataMsg:
 		if msg.session != m.session.Generation {
