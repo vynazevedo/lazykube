@@ -12,12 +12,28 @@ const (
 	RoutePod
 )
 
-type Route struct {
-	Kind      RouteKind
-	Screen    ScreenID
+type ResourceRef struct {
+	Group     string
+	Version   string
+	Resource  string
 	Namespace string
-	Pod       string
-	Node      string
+	Name      string
+	UID       string
+}
+
+type Route struct {
+	Kind       RouteKind
+	Screen     ScreenID
+	Dest       DestinationID
+	Namespace  string
+	Pod        string
+	Node       string
+	Ref        ResourceRef
+	Generation uint64
+}
+
+func (r Route) Key() Route {
+	return r
 }
 
 type Frame struct {
@@ -44,7 +60,7 @@ type router struct {
 }
 
 func newRouter() router {
-	return router{active: Route{Kind: RouteScreen, Screen: ScreenDashboard}}
+	return router{active: Route{Kind: RouteScreen, Screen: ScreenDashboard, Dest: DestDashboard}}
 }
 
 func (r router) Active() Route {
@@ -63,7 +79,7 @@ func (r router) Frame(i int) (Frame, bool) {
 }
 
 func (r *router) push(current Frame, to Route) bool {
-	if to == r.active {
+	if to.Key() == r.active.Key() {
 		return false
 	}
 	if r.depth == maxFrames {
@@ -111,8 +127,4 @@ func (r router) crumbStart() int {
 		}
 	}
 	return 0
-}
-
-func registeredScreens() []ScreenID {
-	return []ScreenID{ScreenDashboard, ScreenWorkloads, ScreenNodes, ScreenEvents}
 }

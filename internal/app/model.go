@@ -80,8 +80,10 @@ type Model struct {
 	dg       diagState
 	ev       eventsView
 	wideFeed bool
-	manifest []string
-	describe []data.Field
+
+	workloadsLeaf DestinationID
+	manifest      []string
+	describe      []data.Field
 
 	selName   string
 	podOffset int
@@ -137,6 +139,7 @@ func New(opts Options) Model {
 	} else {
 		m.clock = anim.Fixed(0, 0, 0)
 	}
+	m.nav.active.Generation = m.session.Generation
 	m.snap = m.src.Snapshot()
 	m.loadSecurity()
 	if opts.InitialPod >= 0 && opts.InitialPod < len(m.snap.Pods) {

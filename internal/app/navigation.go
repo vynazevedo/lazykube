@@ -61,7 +61,26 @@ func (m *Model) endEditing() {
 	}
 }
 
+func (m Model) withRouteDefaults(to Route) Route {
+	if to.Generation == 0 {
+		to.Generation = m.session.Generation
+	}
+	if to.Dest == "" && to.Kind != RoutePod {
+		if d, ok := registry.forScreen(to.Screen); ok {
+			if t, ok := m.resolveTarget(d); ok {
+				to.Dest = t.ID
+			}
+		}
+	}
+	if to.Kind == RoutePod && to.Ref.Resource == "" {
+		ns, name, _ := strings.Cut(to.Pod, "/")
+		to.Ref = ResourceRef{Version: "v1", Resource: "pods", Namespace: ns, Name: name}
+	}
+	return to
+}
+
 func (m *Model) navigate(to Route, setup ...func(*Model)) bool {
+	to = m.withRouteDefaults(to)
 	if !m.nav.push(m.frame(), to) {
 		return false
 	}
@@ -146,11 +165,62 @@ func (m *Model) scopeNamespace() string {
 }
 
 func (m *Model) activateScreen(id ScreenID) {
+	if d, ok := registry.forScreen(id); ok {
+		m.activateDestination(d.ID)
+	}
+}
+
+func (m Model) currentLeaf() DestinationID {
+	trail := m.nav.trail()
+	for i := len(trail) - 1; i >= m.nav.crumbStart(); i-- {
+		if trail[i].Kind != RoutePod && trail[i].Dest != "" {
+			return trail[i].Dest
+		}
+	}
+	return ""
+}
+
+func (m Model) resolveTarget(d Destination) (Destination, bool) {
+	if d.ID == DestWorkloads {
+		if leaf, ok := registry.get(m.workloadsLeaf); ok && leaf.ready() && leaf.Parent == DestWorkloads {
+			return leaf, true
+		}
+	}
+	return registry.target(d)
+}
+
+func (m *Model) activateDestination(id DestinationID) (bool, string) {
+	d, ok := registry.get(id)
+	if !ok {
+		return false, "destino desconhecido"
+	}
+	t, ok := m.resolveTarget(d)
+	if !ok {
+		return false, reasonOr(d.Reason, reasonPlanned)
+	}
+	m.openTarget(t)
+	return true, ""
+}
+
+func reasonOr(reason, fallback string) string {
+	if reason == "" {
+		return fallback
+	}
+	return reason
+}
+
+func (m *Model) openTarget(t Destination) {
+	id := t.Screen
 	if !slices.Contains(registeredScreens(), id) {
 		return
 	}
 	ns, from, node := m.scopeNamespace(), m.mainScreen(), ""
 	var setup []func(*Model)
+	if id == ScreenWorkloads {
+		focus := t.Focus
+		m.workloadsLeaf = t.ID
+		setup = append(setup, func(m *Model) { m.focus = focus })
+	}
 	switch id {
 	case ScreenNodes:
 		node = m.selectedNode()
@@ -158,10 +228,26 @@ func (m *Model) activateScreen(id ScreenID) {
 		anchor := m.eventsAnchor()
 		setup = append(setup, func(m *Model) { m.ev = eventsView{eventsFrame: anchor} })
 	}
-	m.navigate(Route{Kind: RouteScreen, Screen: id, Node: node}, setup...)
-	if ns != "" && from != id {
-		m.navigate(Route{Kind: RouteNamespace, Screen: id, Namespace: ns, Node: node})
+	if ns != "" && from == id && t.ID != m.currentLeaf() {
+		m.navigate(Route{Kind: RouteNamespace, Screen: id, Dest: t.ID, Namespace: ns, Node: node}, setup...)
+		return
 	}
+	m.navigate(Route{Kind: RouteScreen, Screen: id, Dest: t.ID, Node: node}, setup...)
+	if ns != "" && from != id {
+		m.navigate(Route{Kind: RouteNamespace, Screen: id, Dest: t.ID, Namespace: ns, Node: node})
+	}
+}
+
+func (m Model) shortcutDestination(msg tea.KeyPressMsg) DestinationID {
+	for _, b := range []key.Binding{m.keys.Dashboard, m.keys.Workloads, m.keys.Nodes, m.keys.Events} {
+		if !key.Matches(msg, b) {
+			continue
+		}
+		if d, ok := registry.shortcut(b.Keys()[0]); ok {
+			return d.ID
+		}
+	}
+	return ""
 }
 
 func (m *Model) handleEsc() {
@@ -190,20 +276,6 @@ func (m Model) menuItems() []ui.MenuItem {
 		items[i] = ui.MenuItem{Key: menuKey(id), Title: s.Title()}
 	}
 	return items
-}
-
-func menuKey(id ScreenID) string {
-	switch id {
-	case ScreenDashboard:
-		return "2"
-	case ScreenWorkloads:
-		return "3"
-	case ScreenNodes:
-		return "4"
-	case ScreenEvents:
-		return "6"
-	}
-	return ""
 }
 
 func (m Model) menuActive() int {
@@ -237,18 +309,9 @@ func (m Model) handleMenuKey(msg tea.KeyPressMsg) Model {
 	case key.Matches(msg, k.Enter):
 		m.menu.open = false
 		m.activateScreen(registeredScreens()[m.menu.cursor])
-	case key.Matches(msg, k.Dashboard):
+	case m.shortcutDestination(msg) != "":
 		m.menu.open = false
-		m.activateScreen(ScreenDashboard)
-	case key.Matches(msg, k.Workloads):
-		m.menu.open = false
-		m.activateScreen(ScreenWorkloads)
-	case key.Matches(msg, k.Nodes):
-		m.menu.open = false
-		m.activateScreen(ScreenNodes)
-	case key.Matches(msg, k.Events):
-		m.menu.open = false
-		m.activateScreen(ScreenEvents)
+		m.activateDestination(m.shortcutDestination(msg))
 	case key.Matches(msg, k.Esc), key.Matches(msg, k.Menu), key.Matches(msg, k.NextPanel), key.Matches(msg, k.PrevPanel):
 		m.menu.open = false
 	}
@@ -276,17 +339,8 @@ func (m Model) routeKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 		case key.Matches(msg, k.Menu):
 			m.openMenu()
 			return m, nil
-		case key.Matches(msg, k.Dashboard):
-			m.activateScreen(ScreenDashboard)
-			return m, nil
-		case key.Matches(msg, k.Workloads):
-			m.activateScreen(ScreenWorkloads)
-			return m, nil
-		case key.Matches(msg, k.Nodes):
-			m.activateScreen(ScreenNodes)
-			return m, nil
-		case key.Matches(msg, k.Events):
-			m.activateScreen(ScreenEvents)
+		case m.shortcutDestination(msg) != "":
+			m.activateDestination(m.shortcutDestination(msg))
 			return m, nil
 		case key.Matches(msg, k.Esc):
 			m.handleEsc()

@@ -13,7 +13,7 @@ import (
 
 func TestRouterRegistersOnlyFunctionalDestinations(t *testing.T) {
 	r := newRouter()
-	if r.Active() != (Route{Kind: RouteScreen, Screen: ScreenDashboard}) || r.Depth() != 0 {
+	if r.Active() != (Route{Kind: RouteScreen, Screen: ScreenDashboard, Dest: DestDashboard}) || r.Depth() != 0 {
 		t.Fatalf("initial route = %+v", r.Active())
 	}
 	if got := registeredScreens(); !reflect.DeepEqual(got, []ScreenID{ScreenDashboard, ScreenWorkloads, ScreenNodes, ScreenEvents}) {

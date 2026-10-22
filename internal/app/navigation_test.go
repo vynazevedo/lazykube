@@ -226,7 +226,7 @@ func TestMenuByKeyboard(t *testing.T) {
 		}
 	}
 	m = press(t, m, "m", "enter")
-	if m.menu.open || m.nav.Active() != (Route{Kind: RouteScreen, Screen: ScreenDashboard}) || m.nav.Depth() != 2 || navCrumbs(m) != "Dashboard" || m.nsFilter != "" {
+	if m.menu.open || m.nav.Active() != (Route{Kind: RouteScreen, Screen: ScreenDashboard, Dest: DestDashboard}) || m.nav.Depth() != 2 || navCrumbs(m) != "Dashboard" || m.nsFilter != "" {
 		t.Fatalf("enter activates Dashboard, pushes the return and restarts the crumbs, got %+v depth %d %q", m.nav.Active(), m.nav.Depth(), navCrumbs(m))
 	}
 	m = press(t, m, "esc")
@@ -294,7 +294,7 @@ func TestMenuAndCrumbsByMouse(t *testing.T) {
 		t.Fatal("clicking the root crumb pops every frame and restores the dashboard")
 	}
 	dash := click(m, m.layout.Menu.X+span.X+1, m.layout.Menu.Y)
-	if dash.nav.Active() != (Route{Kind: RouteScreen, Screen: ScreenDashboard}) || dash.nav.Depth() != 3 {
+	if dash.nav.Active() != (Route{Kind: RouteScreen, Screen: ScreenDashboard, Dest: DestDashboard}) || dash.nav.Depth() != 3 {
 		t.Fatal("clicking a menu title activates the screen")
 	}
 	if gap := click(m, m.layout.Menu.X+span.X+span.W+1, m.layout.Menu.Y); gap.nav != m.nav {
@@ -586,7 +586,7 @@ func TestNavigationEndsActiveInputs(t *testing.T) {
 	t.Run("search then menu title", func(t *testing.T) {
 		s := searching(t)
 		m := navClick(s, navMenuX(s), s.layout.Menu.Y)
-		if m.nav.Active() != (Route{Kind: RouteScreen, Screen: ScreenDashboard}) {
+		if m.nav.Active() != (Route{Kind: RouteScreen, Screen: ScreenDashboard, Dest: DestDashboard}) {
 			t.Fatal("menu title activates the Dashboard")
 		}
 		navAssertKeysWork(t, m)
@@ -602,7 +602,7 @@ func TestNavigationEndsActiveInputs(t *testing.T) {
 	t.Run("filter then menu title", func(t *testing.T) {
 		f := filtering(t)
 		m := navClick(f, navMenuX(f), f.layout.Menu.Y)
-		if m.nav.Active() != (Route{Kind: RouteScreen, Screen: ScreenDashboard}) || m.nav.Depth() != 2 {
+		if m.nav.Active() != (Route{Kind: RouteScreen, Screen: ScreenDashboard, Dest: DestDashboard}) || m.nav.Depth() != 2 {
 			t.Fatal("menu title activates the Dashboard")
 		}
 		if back := press(t, m, "esc"); back.filter.Value() != "xm2" || back.filtering {

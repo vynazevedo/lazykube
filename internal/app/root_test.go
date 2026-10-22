@@ -300,6 +300,9 @@ func TestRootSwitchesContextsAndRestoresNamespaces(t *testing.T) {
 	if d.r.gen <= first || m.session.Generation != d.r.gen || m.session.Context != "beta" {
 		t.Fatalf("a switch publishes a new generation: root %d model %+v", d.r.gen, m.session)
 	}
+	if r := m.nav.Active(); r.Generation != m.session.Generation || r.Dest != DestDashboard {
+		t.Fatalf("the route of the new session carries its generation: %+v", r)
+	}
 	if !m.onScreen(ScreenDashboard) || m.nav.Depth() != 0 || m.filter.Value() != "" || m.selName != "" {
 		t.Fatal("the new session starts on the Dashboard without inherited frames, filters or selection")
 	}
