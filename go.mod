@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	charm.land/bubbles/v2 v2.2.1
-	charm.land/bubbletea/v2 v2.1.0
+	charm.land/bubbletea/v2 v2.1.1
 	github.com/charmbracelet/harmonica v0.2.0
 	github.com/go-logr/logr v1.4.4
 	github.com/rivo/uniseg v0.4.7
