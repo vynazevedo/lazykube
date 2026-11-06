@@ -118,3 +118,31 @@ func TestResourceCatalogConcurrentCancellation(t *testing.T) {
 		t.Error("subscribe waited for remote discovery")
 	}
 }
+
+type cancelingDiscovery struct {
+	*resourceDiscoveryFixture
+	cancel context.CancelFunc
+}
+
+func (d cancelingDiscovery) ServerGroups() (*metav1.APIGroupList, error) {
+	if d.cancel != nil {
+		d.cancel()
+	}
+	return d.resourceDiscoveryFixture.ServerGroups()
+}
+
+func TestResourceCatalogDoesNotCacheCanceledDiscovery(t *testing.T) {
+	groups := []metav1.APIGroup{{Versions: []metav1.GroupVersionForDiscovery{{GroupVersion: "v1"}}, PreferredVersion: metav1.GroupVersionForDiscovery{GroupVersion: "v1"}}}
+	fixture := &resourceDiscoveryFixture{FakeDiscovery: &discoveryfake.FakeDiscovery{Fake: &clienttesting.Fake{}}, groups: &metav1.APIGroupList{Groups: groups}, resources: map[string]*metav1.APIResourceList{"v1": {APIResources: []metav1.APIResource{{Name: "pods", Kind: "Pod", Namespaced: true, Verbs: []string{"list", "watch"}}}}}}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	c := &resourceCatalog{now: func() time.Time { return fixedNow }, client: cancelingDiscovery{resourceDiscoveryFixture: fixture, cancel: cancel}}
+	if got := c.get(ctx, false); got.Coverage.State == data.CoverageComplete {
+		t.Fatalf("a canceled discovery is not complete: %+v", got.Coverage)
+	}
+	c.client = fixture
+	got := c.get(context.Background(), false)
+	if got.Coverage.State != data.CoverageComplete || got.Lookup(schema.GroupVersionResource{Version: "v1", Resource: "pods"}).Availability != data.ResourceServed {
+		t.Fatalf("a canceled discovery never poisons the next read: %+v", got.Coverage)
+	}
+}

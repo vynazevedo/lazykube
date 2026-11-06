@@ -44,10 +44,7 @@ func (c *resourceCatalog) get(ctx context.Context, refresh bool) data.ResourceCa
 		case <-ctx.Done():
 			return c.get(ctx, false)
 		case <-done:
-			c.mu.Lock()
-			cached := cloneCatalog(c.snapshot)
-			c.mu.Unlock()
-			return cached
+			return c.get(ctx, false)
 		}
 	}
 	c.refreshing = make(chan struct{})
@@ -55,7 +52,9 @@ func (c *resourceCatalog) get(ctx context.Context, refresh bool) data.ResourceCa
 	c.mu.Unlock()
 	next = c.discover(ctx, next)
 	c.mu.Lock()
-	c.snapshot = next
+	if ctx.Err() == nil {
+		c.snapshot = next
+	}
 	close(c.refreshing)
 	c.refreshing = nil
 	c.mu.Unlock()
