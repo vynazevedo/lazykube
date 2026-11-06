@@ -80,6 +80,10 @@ func (m Model) withRouteDefaults(to Route) Route {
 
 func (m *Model) navigate(to Route, setup ...func(*Model)) bool {
 	to = m.withRouteDefaults(to)
+	var marks nsSet
+	if m.scopeNamespace() == "" {
+		marks = m.nsFilter
+	}
 	if !m.nav.push(m.frame(), to) {
 		return false
 	}
@@ -91,9 +95,9 @@ func (m *Model) navigate(to Route, setup ...func(*Model)) bool {
 	m.nav.entryFilter = m.filter.Value()
 	switch to.Kind {
 	case RouteNamespace:
-		m.nsFilter = to.Namespace
+		m.nsFilter = nsSet(to.Namespace)
 	case RouteScreen:
-		m.nsFilter = ""
+		m.nsFilter = marks
 	case RoutePod:
 		m.focus = FocusDetails
 	}
@@ -145,6 +149,55 @@ func (m *Model) mainScreen() ScreenID {
 
 func (m *Model) openNamespace(name string) {
 	m.navigate(Route{Kind: RouteNamespace, Screen: m.mainScreen(), Namespace: name})
+}
+
+func (m Model) nsScope() string {
+	if m.nav.Active().Kind == RouteNamespace {
+		return string(m.nsFilter)
+	}
+	return ""
+}
+
+func (m Model) marks() nsSet {
+	if m.nav.Active().Kind == RouteNamespace {
+		return ""
+	}
+	return m.nsFilter
+}
+
+func (m Model) hasMarks() bool {
+	if m.nsFilter == "" || m.nav.Active().Kind != RouteScreen {
+		return false
+	}
+	return m.onScreen(ScreenDashboard) || m.onScreen(ScreenWorkloads) || m.onScreen(ScreenNodes)
+}
+
+func (m *Model) setMarks(marks nsSet) {
+	m.nsFilter = marks
+	scoped := false
+	for i := range m.nav.depth {
+		f := &m.nav.frames[i]
+		switch f.Route.Kind {
+		case RouteNamespace:
+			scoped = true
+		case RouteScreen:
+			scoped = false
+		}
+		if !scoped {
+			f.NSFilter = marks
+		}
+	}
+}
+
+func (m *Model) toggleNamespace(name string) {
+	next := m.nsFilter.toggle(name)
+	cursor := m.nsCursor
+	for m.nav.Active().Kind == RouteNamespace && m.back() {
+	}
+	m.setFocus(FocusNamespaces)
+	m.nsCursor = cursor
+	m.setMarks(next)
+	m.syncSelection()
 }
 
 func (m *Model) openPod() {
@@ -265,9 +318,12 @@ func (m *Model) handleEsc() {
 	case m.filter.Value() != m.nav.entryFilter:
 		m.filter.SetValue(m.nav.entryFilter)
 		m.syncSelection()
+	case m.hasMarks():
+		m.setMarks("")
+		m.syncSelection()
 	case m.back():
 	default:
-		m.nsFilter = ""
+		m.setMarks("")
 		m.filter.SetValue("")
 		m.syncSelection()
 	}

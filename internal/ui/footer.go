@@ -36,7 +36,8 @@ func FullHelp() []KeyHelp {
 		{"shift+tab", "previous panel"},
 		{"/", "filter pods"},
 		{"enter", "open pod / namespace scope"},
-		{"esc", "clear search/filter, back"},
+		{"space", "mark namespace, several"},
+		{"esc", "clear filters/marks, back"},
 		{"m", "screens menu ← → enter"},
 		{"2", "Dashboard screen"},
 		{"3", "Workloads screen"},
@@ -98,7 +99,7 @@ func Footer(divider, help draw.Region, st FooterState) {
 }
 
 func FullHelpDetail() []KeyHelp {
-	dashboardOnly := map[string]bool{"tab": true, "shift+tab": true, "/": true, "enter": true, "1": true}
+	dashboardOnly := map[string]bool{"tab": true, "shift+tab": true, "/": true, "enter": true, "1": true, "space": true}
 	var out []KeyHelp
 	for _, h := range FullHelp() {
 		if dashboardOnly[h.Key] {
@@ -116,7 +117,7 @@ func FullHelpWorkloads() []KeyHelp {
 	var out []KeyHelp
 	for _, h := range FullHelp() {
 		switch h.Key {
-		case "1":
+		case "1", "space":
 			continue
 		case "enter":
 			h.Desc = "open pod / deployment replicas"

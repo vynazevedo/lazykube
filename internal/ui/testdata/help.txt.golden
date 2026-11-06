@@ -12,12 +12,13 @@
                                                                                                                                                                 
                                    ╭─ Help ────────────────────────────────────────────────────────────────────────────────╮                                    
                                    │                                                                                       │                                    
-                                   │  ↑/↓ k/j    move selection                 [ ]        previous / next tab, Config     │                                    
-                                   │  tab        next panel                     pgup/pgdn  scroll viewport                 │                                    
-                                   │  shift+tab  previous panel                 home/end   top / bottom                    │                                    
-                                   │  /          filter pods                    g G        top / bottom (details)          │                                    
-                                   │  enter      open pod / namespace scope     f          toggle follow (Log)             │                                    
-                                   │  esc        clear search/filter, back      w          toggle wrap (Log)               │                                    
+                                   │  ↑/↓ k/j    move selection                 A          ack all Security alerts         │                                    
+                                   │  tab        next panel                     [ ]        previous / next tab, Config     │                                    
+                                   │  shift+tab  previous panel                 pgup/pgdn  scroll viewport                 │                                    
+                                   │  /          filter pods                    home/end   top / bottom                    │                                    
+                                   │  enter      open pod / namespace scope     g G        top / bottom (details)          │                                    
+                                   │  space      mark namespace, several        f          toggle follow (Log)             │                                    
+                                   │  esc        clear filters/marks, back      w          toggle wrap (Log)               │                                    
                                    │  m          screens menu ← → enter         C          next log container              │                                    
                                    │  2          Dashboard screen               P          current / previous logs         │                                    
                                    │  3          Workloads screen               / alt+n N  search Log (details focus)      │                                    
@@ -27,7 +28,6 @@
                                    │  b          navigation tree                ctrl+p     pause animations                │                                    
                                    │  l t d e    Log Top Describe Events        ?          toggle help                     │                                    
                                    │  S          Security / namespace posture   q ctrl+c   quit                            │                                    
-                                   │  A          ack all Security alerts                                                   │                                    
                                    │  Security score v2: max(0,100-40H-6M-I), per pod and dimension.                       │                                    
                                    │  Each rule once at worst severity; Security and Hygiene are separate.                 │                                    
                                    │  Scope: mean, median, lowest ceil(N/10) mean. SEC = Security; p = partial.            │                                    

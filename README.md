@@ -333,7 +333,8 @@ os painéis: clique seleciona, a roda rola e o clique na aba troca de aba.
  │  tab / shift+tab   próximo / anterior painel          │
  │  /                 filtra pods (nome e namespace)     │
  │  enter             filtra pods pelo namespace         │
- │  esc               limpa filtros                      │
+ │  espaço            marca namespaces, vários de uma vez│
+ │  esc               limpa filtros e marcas             │
  │  1                 mostra / esconde coluna esquerda   │
  │  c                 troca de contexto do kubeconfig    │
  │  n                 namespace; Todos só se escolhido   │

@@ -32,7 +32,7 @@ type PodsState struct {
 	Filtering  bool
 	Focused    bool
 	SelectionK map[int]float64
-	NSFilter   string
+	NSFilter   []string
 }
 
 func StatusGlyph(s data.PodStatus, ctx Ctx) (rune, theme.RGB) {
@@ -167,14 +167,26 @@ func PodsPanel(r draw.Region, st PodsState, ctx Ctx) {
 	}
 }
 
+const namespaceLabelWidth = 20
+
+func namespaceSelection(names []string) string {
+	switch len(names) {
+	case 0:
+		return ""
+	case 1:
+		return "ns:" + names[0]
+	}
+	return fmt.Sprintf("ns:%s +%d", draw.Truncate(draw.Sanitize(names[0]), namespaceLabelWidth), len(names)-1)
+}
+
 func filterLine(r draw.Region, st PodsState, ctx Ctx) {
 	r.FillBg(theme.BgChip)
 	x := r.Text(0, 0, "/", draw.Fg(ctx.Pal.A))
 	x += r.Text(x, 0, " ", draw.Fg(theme.Muted))
 	cursorOn := (st.Filtering || st.Focused) && ctx.Clock.CursorVisible()
 	count := fmt.Sprintf("%d items", len(st.Pods))
-	if st.NSFilter != "" {
-		count = "ns:" + st.NSFilter + "  " + count
+	if label := namespaceSelection(st.NSFilter); label != "" {
+		count = label + "  " + count
 	}
 	maxText := r.W - x - draw.Width(count) - 2
 	if st.Filter == "" && !st.Filtering {

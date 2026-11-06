@@ -73,9 +73,10 @@ func (m Model) visibleDeployments() []data.Deployment {
 	if !m.onScreen(ScreenWorkloads) || m.nsFilter == "" {
 		return m.snap.Deployments
 	}
+	allowed := m.nsFilter.matcher()
 	out := make([]data.Deployment, 0, len(m.snap.Deployments))
 	for _, d := range m.snap.Deployments {
-		if d.Namespace == m.nsFilter {
+		if allowed(d.Namespace) {
 			out = append(out, d)
 		}
 	}

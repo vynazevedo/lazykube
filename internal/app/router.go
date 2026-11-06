@@ -42,7 +42,7 @@ type Frame struct {
 	Selected    string
 	Focus       Focus
 	Filter      string
-	NSFilter    string
+	NSFilter    nsSet
 	PodOffset   int
 	NSCursor    int
 	DepCursor   int

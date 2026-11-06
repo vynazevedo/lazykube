@@ -52,6 +52,10 @@ func (m Model) handleKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 		case m.focus == FocusDeployments && m.onScreen(ScreenWorkloads):
 			m.openDeployment()
 		}
+	case key.Matches(msg, k.MarkNS):
+		if m.focus == FocusNamespaces && !m.inDetail() && m.nsCursor < len(m.snap.Namespaces) {
+			m.toggleNamespace(m.snap.Namespaces[m.nsCursor].Name)
+		}
 	case key.Matches(msg, k.TabLog):
 		m.setTab(ui.TabLog)
 	case key.Matches(msg, k.TabTop):
