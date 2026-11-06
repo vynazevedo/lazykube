@@ -3,6 +3,8 @@ package kube
 import (
 	"context"
 	"errors"
+	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -144,5 +146,78 @@ func TestResourceCatalogDoesNotCacheCanceledDiscovery(t *testing.T) {
 	got := c.get(context.Background(), false)
 	if got.Coverage.State != data.CoverageComplete || got.Lookup(schema.GroupVersionResource{Version: "v1", Resource: "pods"}).Availability != data.ResourceServed {
 		t.Fatalf("a canceled discovery never poisons the next read: %+v", got.Coverage)
+	}
+}
+
+type waitSignalContext struct {
+	context.Context
+	once    sync.Once
+	waiting chan struct{}
+}
+
+func (c *waitSignalContext) Done() <-chan struct{} {
+	c.once.Do(func() { close(c.waiting) })
+	return c.Context.Done()
+}
+
+func refreshFixture() *resourceDiscoveryFixture {
+	groups := []metav1.APIGroup{{Versions: []metav1.GroupVersionForDiscovery{{GroupVersion: "v1"}}, PreferredVersion: metav1.GroupVersionForDiscovery{GroupVersion: "v1"}}}
+	return &resourceDiscoveryFixture{FakeDiscovery: &discoveryfake.FakeDiscovery{Fake: &clienttesting.Fake{}}, groups: &metav1.APIGroupList{Groups: groups}, resources: map[string]*metav1.APIResourceList{"v1": {APIResources: []metav1.APIResource{{Name: "pods", Kind: "Pod", Namespaced: true, Verbs: []string{"list", "watch"}}}}}}
+}
+
+func concurrentRefreshCatalog() (*resourceCatalog, *atomic.Int32, chan struct{}, chan struct{}) {
+	calls := &atomic.Int32{}
+	entered, release := make(chan struct{}), make(chan struct{})
+	fixture := refreshFixture()
+	c := &resourceCatalog{now: func() time.Time { return fixedNow }, snapshot: data.ResourceCatalogSnapshot{Session: "s", Generation: 1, Revision: 1, ObservedAt: fixedNow, Coverage: data.Coverage{State: data.CoverageDenied, Reason: "discovery denied"}}}
+	c.factory = func(context.Context) (discovery.DiscoveryInterface, error) {
+		if calls.Add(1) == 1 {
+			close(entered)
+			<-release
+		}
+		return fixture, nil
+	}
+	return c, calls, entered, release
+}
+
+func TestResourceCatalogRefreshRepeatsAfterCanceledRefresh(t *testing.T) {
+	c, calls, entered, release := concurrentRefreshCatalog()
+	ctxA, cancelA := context.WithCancel(context.Background())
+	defer cancelA()
+	leader := make(chan data.ResourceCatalogSnapshot, 1)
+	go func() { leader <- c.get(ctxA, true) }()
+	<-entered
+	ctxB := &waitSignalContext{Context: context.Background(), waiting: make(chan struct{})}
+	waiter := make(chan data.ResourceCatalogSnapshot, 1)
+	go func() { waiter <- c.get(ctxB, true) }()
+	<-ctxB.waiting
+	cancelA()
+	close(release)
+	<-leader
+	got := <-waiter
+	if calls.Load() != 2 {
+		t.Fatalf("a refresh that waited on a canceled one runs its own discovery, factory calls %d", calls.Load())
+	}
+	if got.Revision != 2 || got.Coverage.State != data.CoverageComplete {
+		t.Fatalf("the waiter receives the new discovery: revision %d coverage %+v", got.Revision, got.Coverage)
+	}
+}
+
+func TestResourceCatalogConcurrentRefreshesShareDiscovery(t *testing.T) {
+	c, calls, entered, release := concurrentRefreshCatalog()
+	leader := make(chan data.ResourceCatalogSnapshot, 1)
+	go func() { leader <- c.get(context.Background(), true) }()
+	<-entered
+	ctxB := &waitSignalContext{Context: context.Background(), waiting: make(chan struct{})}
+	waiter := make(chan data.ResourceCatalogSnapshot, 1)
+	go func() { waiter <- c.get(ctxB, true) }()
+	<-ctxB.waiting
+	close(release)
+	first, second := <-leader, <-waiter
+	if calls.Load() != 1 {
+		t.Fatalf("two successful refreshes share one discovery, factory calls %d", calls.Load())
+	}
+	if first.Revision != 2 || second.Revision != 2 || second.Coverage.State != data.CoverageComplete {
+		t.Fatalf("both callers receive the published result: %d %d %+v", first.Revision, second.Revision, second.Coverage)
 	}
 }

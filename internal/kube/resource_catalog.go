@@ -17,9 +17,14 @@ import (
 const catalogTTL = 5 * time.Minute
 const catalogLimit = 4096
 
+type catalogRun struct {
+	done      chan struct{}
+	published bool
+}
+
 type resourceCatalog struct {
 	mu         sync.Mutex
-	refreshing chan struct{}
+	refreshing *catalogRun
 	client     discovery.DiscoveryInterface
 	factory    func(context.Context) (discovery.DiscoveryInterface, error)
 	now        func() time.Time
@@ -38,24 +43,33 @@ func (c *resourceCatalog) get(ctx context.Context, refresh bool) data.ResourceCa
 		c.mu.Unlock()
 		return cached
 	}
-	if done := c.refreshing; done != nil {
+	if run := c.refreshing; run != nil {
 		c.mu.Unlock()
 		select {
 		case <-ctx.Done():
 			return c.get(ctx, false)
-		case <-done:
-			return c.get(ctx, false)
+		case <-run.done:
 		}
+		c.mu.Lock()
+		if !run.published {
+			c.mu.Unlock()
+			return c.get(ctx, refresh)
+		}
+		cached := cloneCatalog(c.snapshot)
+		c.mu.Unlock()
+		return cached
 	}
-	c.refreshing = make(chan struct{})
+	run := &catalogRun{done: make(chan struct{})}
+	c.refreshing = run
 	next := data.ResourceCatalogSnapshot{Session: c.snapshot.Session, Generation: c.snapshot.Generation, Revision: c.snapshot.Revision + 1, ObservedAt: c.now(), Coverage: data.Coverage{State: data.CoverageComplete}}
 	c.mu.Unlock()
 	next = c.discover(ctx, next)
 	c.mu.Lock()
 	if ctx.Err() == nil {
 		c.snapshot = next
+		run.published = true
 	}
-	close(c.refreshing)
+	close(run.done)
 	c.refreshing = nil
 	c.mu.Unlock()
 	return cloneCatalog(next)
