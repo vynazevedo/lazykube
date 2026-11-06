@@ -131,9 +131,13 @@ func (d SecurityDashboard) MergeNamespaces(names []string) SecurityAggregate {
 			rules[rule.Rule] += rule.Count
 		}
 	}
+	marked := make(map[string]struct{}, len(names))
+	for _, name := range names {
+		marked[name] = struct{}{}
+	}
 	for key, score := range d.Pods {
 		namespace, _, _ := strings.Cut(key, "/")
-		if slices.Contains(names, namespace) {
+		if _, ok := marked[namespace]; ok {
 			merged.Distribution.add(score)
 			merged.HygieneDistribution.add(d.PodHygiene[key])
 		}
