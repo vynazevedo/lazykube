@@ -1,6 +1,7 @@
 package app
 
 import (
+	"math"
 	"slices"
 
 	"charm.land/bubbles/v2/key"
@@ -52,11 +53,12 @@ func (s resourcesScreen) Update(m Model, msg tea.Msg) (Model, tea.Cmd) {
 	case tea.MouseClickMsg:
 		if !m.helpOpen && msg.Button == tea.MouseLeft && m.layout.Table.Contains(msg.X, msg.Y) {
 			row := msg.Y - (m.layout.Table.Y + 1 + ui.ResourceTableTop)
-			items := len(m.tableState().Page.Items)
+			st := m.tableState()
+			items := len(st.Page.Items)
 			rows := ui.ResourceTableRows(m.layout.Table.H)
 			if row >= 0 && row < rows {
-				if idx := ui.ScrollOffset(m.res.cursor, items, rows) + row; idx < items {
-					m.res.cursor = idx
+				if idx := ui.ScrollOffset(st.Cursor, items, rows) + row; idx < items {
+					m.res.cursor = st.Offset + idx
 				}
 			}
 		}
@@ -85,7 +87,7 @@ func (m Model) scopeLabel() string {
 
 func (m Model) leafTable(w workloadLeaf) ui.ResourceTableState {
 	_, supported := m.browser()
-	st := ui.ResourceTableState{Label: w.label, Kind: w.kind, Supported: supported, Scope: m.scopeLabel(), Cursor: m.res.cursor}
+	st := ui.ResourceTableState{Label: w.label, Kind: w.kind, Supported: supported, Scope: m.scopeLabel(), Cursor: m.res.cursor, AllNamespaces: m.resourceNamespace() == ""}
 	if !supported {
 		return st
 	}
@@ -95,7 +97,8 @@ func (m Model) leafTable(w workloadLeaf) ui.ResourceTableState {
 	}
 	st.Availability = m.res.catalog.Lookup(w.gvr).Availability
 	if s, ok := m.res.subs[w.gvr]; ok {
-		st.Loading, st.Err, st.Page = s.loading, s.err, s.page
+		st.Loading, st.Err, st.Page, st.Offset, st.Restarted = s.loading, s.err, s.page, s.offset, s.restarted
+		st.Cursor = m.res.cursor - s.offset
 	} else {
 		st.Loading = true
 	}
@@ -108,8 +111,7 @@ func (m Model) tableState() ui.ResourceTableState {
 }
 
 func (m *Model) moveTable(delta int) {
-	items := len(m.tableState().Page.Items)
-	m.res.cursor = max(0, min(items-1, m.res.cursor+delta))
+	m.seekTable(m.res.cursor + delta)
 }
 
 func (m Model) handleTableKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
@@ -125,11 +127,12 @@ func (m Model) handleTableKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 	case key.Matches(msg, k.PageDown):
 		m.moveTable(page)
 	case key.Matches(msg, k.Home):
-		m.res.cursor = 0
+		m.seekTable(0)
 	case key.Matches(msg, k.End):
-		m.moveTable(len(m.tableState().Page.Items))
+		m.seekTable(math.MaxInt)
 	case key.Matches(msg, k.Refresh):
-		m.refreshResource()
+		cmd := m.refreshResources()
+		return m, cmd
 	case key.Matches(msg, k.Enter):
 	default:
 		return updateBody(m, msg)
@@ -186,7 +189,8 @@ func (s overviewScreen) Update(m Model, msg tea.Msg) (Model, tea.Cmd) {
 		case key.Matches(msg, k.End):
 			m.res.card = last
 		case key.Matches(msg, k.Refresh):
-			m.refreshResource()
+			cmd := m.refreshResources()
+			return m, cmd
 		case key.Matches(msg, k.Enter):
 			m.activateDestination(workloadLeaves[m.res.card].dest)
 		default:
@@ -196,13 +200,19 @@ func (s overviewScreen) Update(m Model, msg tea.Msg) (Model, tea.Cmd) {
 	case tea.MouseClickMsg:
 		t := m.layout.Table
 		if !m.helpOpen && msg.Button == tea.MouseLeft && t.Contains(msg.X, msg.Y) {
-			if idx, ok := ui.OverviewCardAt(t.W, t.H, len(workloadLeaves), msg.X-t.X, msg.Y-t.Y); ok {
+			if idx, ok := ui.OverviewCardAt(t.W, t.H, len(workloadLeaves), m.res.card, msg.X-t.X, msg.Y-t.Y); ok {
 				m.res.card = idx
 				m.activateDestination(workloadLeaves[idx].dest)
 			}
 		}
 		return m, nil
-	case tea.MouseWheelMsg, tea.MouseMotionMsg:
+	case tea.MouseWheelMsg:
+		if m.layout.Table.Contains(msg.X, msg.Y) {
+			step := ui.OverviewColumns(m.layout.Table.W) * map[tea.MouseButton]int{tea.MouseWheelUp: -1, tea.MouseWheelDown: 1}[msg.Button]
+			m.res.card = max(0, min(len(workloadLeaves)-1, m.res.card+step))
+		}
+		return m, nil
+	case tea.MouseMotionMsg:
 		return m, nil
 	}
 	return updateBody(m, msg)

@@ -309,6 +309,9 @@ func (l Loader) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if l.main != nil {
 		return l.forward(msg)
 	}
+	if late, ok := msg.(resourceSubMsg); ok && late.handle != nil {
+		late.handle.Cancel()
+	}
 	return l, nil
 }
 

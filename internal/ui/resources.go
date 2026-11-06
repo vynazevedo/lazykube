@@ -20,6 +20,9 @@ type ResourceTableState struct {
 	Err            string
 	Page           data.ResourcePage
 	Cursor         int
+	Offset         int
+	Restarted      bool
+	AllNamespaces  bool
 	Scope          string
 }
 
@@ -187,7 +190,14 @@ func ResourceTable(r draw.Region, st ResourceTableState, ctx Ctx) {
 		return
 	}
 	page := st.Page
-	status := draw.Line{muted("escopo "), text(draw.Sanitize(st.Scope))}
+	var status draw.Line
+	if st.Restarted {
+		status = append(status, colored("posição reiniciada", theme.Warn), faint("  ·  "))
+	}
+	if st.Offset > 0 || page.Continue != "" {
+		status = append(status, text(fmt.Sprintf("%d-%d de %d", st.Offset+1, st.Offset+len(page.Items), page.Total)), faint("  ·  "))
+	}
+	status = append(status, muted("escopo "), text(draw.Sanitize(st.Scope)))
 	if _, _, blocked := st.blocked(); !blocked || page.Coverage.State != "" {
 		cov, color := resourceCoverageText(page.Coverage)
 		status = append(status, faint("  ·  "), colored(cov, color), faint("  ·  "), muted(fmt.Sprintf("%d itens", page.Total)))
@@ -200,7 +210,12 @@ func ResourceTable(r draw.Region, st ResourceTableState, ctx Ctx) {
 	}
 	inner.Line(0, 0, status.Truncate(inner.W))
 	nameW, nsW, cols := resourceLayout(st.Kind, inner.W)
-	hdr := draw.Line{muted("  "), muted(draw.PadRight("NAME", nameW)), muted(" ")}
+	qualified := nsW == 0 && st.AllNamespaces
+	nameTitle := "NAME"
+	if qualified {
+		nameTitle = "NAMESPACE/NAME"
+	}
+	hdr := draw.Line{muted("  "), muted(draw.PadRight(nameTitle, nameW)), muted(" ")}
 	if nsW > 0 {
 		hdr = append(hdr, muted(draw.PadRight("NAMESPACE", nsW)), muted(" "))
 	}
@@ -229,7 +244,11 @@ func ResourceTable(r draw.Region, st ResourceTableState, ctx Ctx) {
 			style = func(c theme.RGB) draw.Style { return draw.Fg(c).WithBg(theme.BorderFaint).WithBold() }
 			mark = "› "
 		}
-		line := draw.Line{draw.S(mark, style(theme.Text)), draw.S(draw.PadRight(draw.Truncate(draw.Sanitize(row.Ref.Name), nameW), nameW), style(theme.Text)), draw.S(" ", style(theme.Text))}
+		name := draw.Sanitize(row.Ref.Name)
+		if qualified {
+			name = qualifiedName(row)
+		}
+		line := draw.Line{draw.S(mark, style(theme.Text)), draw.S(draw.PadRight(draw.Truncate(name, nameW), nameW), style(theme.Text)), draw.S(" ", style(theme.Text))}
 		if nsW > 0 {
 			line = append(line, draw.S(draw.PadRight(draw.Truncate(draw.Sanitize(row.Ref.Namespace), nsW), nsW), style(theme.TextMid)), draw.S(" ", style(theme.Text)))
 		}
@@ -249,11 +268,23 @@ func ResourceTable(r draw.Region, st ResourceTableState, ctx Ctx) {
 	}
 	if inner.H > rows+ResourceTableTop {
 		foot := "detalhe, YAML e relações: contrato futuro · r recarrega"
-		if sel := st.selected(); sel != nil && sel.Workload.Reason != "" {
+		sel := st.selected()
+		if sel != nil && sel.Workload.Reason != "" {
 			foot = "motivo: " + draw.Sanitize(sel.Workload.Reason)
+		}
+		if sel != nil && qualified {
+			detail := "r recarrega"
+			if sel.Workload.Reason != "" {
+				detail = foot
+			}
+			foot = "selecionado " + qualifiedName(*sel) + " · " + detail
 		}
 		inner.Line(0, inner.H-1, draw.Line{faint(foot)}.Truncate(inner.W))
 	}
+}
+
+func qualifiedName(row data.ResourceRow) string {
+	return draw.Sanitize(row.Ref.Namespace) + "/" + draw.Sanitize(row.Ref.Name)
 }
 
 func (st ResourceTableState) selected() *data.ResourceRow {
@@ -286,14 +317,27 @@ func OverviewColumns(w int) int {
 	return 1
 }
 
-func OverviewCardAt(w, h, total, x, y int) (int, bool) {
+type overviewView struct {
+	cols, cardW, first, visible, rows int
+}
+
+func newOverviewView(w, h, total, cursor int) overviewView {
 	cols := OverviewColumns(w)
-	cw := w / cols
-	row, col := (y-1)/overviewCardH, x/max(1, cw)
-	if y < 1 || col >= cols {
+	rows := (total + cols - 1) / cols
+	visible := max(1, (h-1)/overviewCardH)
+	return overviewView{cols: cols, cardW: w / cols, first: ScrollOffset(cursor/cols, rows, visible), visible: visible, rows: rows}
+}
+
+func OverviewCardAt(w, h, total, cursor, x, y int) (int, bool) {
+	v := newOverviewView(w, h, total, cursor)
+	if y < 1 || x < 0 || v.cardW <= 0 {
 		return 0, false
 	}
-	idx := row*cols + col
+	row, col := (y-1)/overviewCardH, x/v.cardW
+	if row >= v.visible || col >= v.cols {
+		return 0, false
+	}
+	idx := (v.first+row)*v.cols + col
 	return idx, idx < total
 }
 
@@ -357,16 +401,20 @@ func overviewCard(r draw.Region, c OverviewCard, selected bool, ctx Ctx) {
 }
 
 func WorkloadOverview(r draw.Region, st OverviewState, ctx Ctx) {
-	r.Line(1, 0, draw.Line{muted("Workloads · escopo "), text(draw.Sanitize(st.Scope)), faint("  ·  contagens por objeto, não por réplica; enter abre a lista")}.Truncate(r.W-2))
-	cols := OverviewColumns(r.W)
-	cw := r.W / cols
+	v := newOverviewView(r.W, r.H, len(st.Cards), st.Cursor)
+	var head draw.Line
+	if v.rows > v.visible {
+		last := min(len(st.Cards), (v.first+v.visible)*v.cols)
+		head = append(head, text(fmt.Sprintf("cards %d-%d de %d", v.first*v.cols+1, last, len(st.Cards))), faint("  ·  "))
+	}
+	head = append(head, muted("Workloads · escopo "), text(draw.Sanitize(st.Scope)), faint("  ·  contagens por objeto, não por réplica; enter abre a lista"))
+	r.Line(1, 0, head.Truncate(r.W-2))
 	for i, c := range st.Cards {
-		row, col := i/cols, i%cols
-		y := 1 + row*overviewCardH
-		if y+overviewCardH > r.H {
-			break
+		row, col := i/v.cols-v.first, i%v.cols
+		if row < 0 || row >= v.visible {
+			continue
 		}
-		overviewCard(r.Sub(col*cw, y, cw, overviewCardH), c, i == st.Cursor, ctx)
+		overviewCard(r.Sub(col*v.cardW, 1+row*overviewCardH, v.cardW, overviewCardH), c, i == st.Cursor, ctx)
 	}
 }
 

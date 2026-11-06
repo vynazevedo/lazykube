@@ -3,10 +3,10 @@
  Workloads · Jobs                                                               
  ╭─ Jobs · focus ─────────────────────────────────────────────────────────────╮ 
  │ escopo todos os namespaces  ·  cobertura completa no escopo  ·  3 itens  … │ 
- │   NAME                                  COMPLETIONS ACTIVE STATE           │ 
- │ › demo-job-1                                    1/?      0 completed       │ 
- │   demo-job-2                                    0/?      1 progressing     │ 
- │   demo-job-3                                    0/?      0 failed          │ 
+ │   NAMESPACE/NAME                        COMPLETIONS ACTIVE STATE           │ 
+ │ › apps/demo-job-1                               1/?      0 completed       │ 
+ │   apps/demo-job-2                               0/?      1 progressing     │ 
+ │   apps/demo-job-3                               0/?      0 failed          │ 
  │                                                                            │ 
  │                                                                            │ 
  │                                                                            │ 
@@ -18,7 +18,7 @@
  │                                                                            │ 
  │                                                                            │ 
  │                                                                            │ 
- │ detalhe, YAML e relações: contrato futuro · r recarrega                    │ 
+ │ selecionado apps/demo-job-1 · r recarrega                                  │ 
  ╰────────────────────────────────────────────────────────────────────────────╯ 
 ────────────────────────────────────────────────────────────────────────────────
   ↑↓  move   r  reload   esc  back   b  tree   m  menu        bubbletea · 0 fps 

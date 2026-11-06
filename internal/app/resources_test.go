@@ -18,12 +18,16 @@ type fakeHandle struct {
 	changes   chan struct{}
 	cancels   *atomic.Int32
 	refreshes *atomic.Int32
+	reads     atomic.Int32
 }
 
-func (h *fakeHandle) Page(string, int) data.ResourcePage { return h.page }
-func (h *fakeHandle) Changes() <-chan struct{}           { return h.changes }
-func (h *fakeHandle) Refresh()                           { h.refreshes.Add(1) }
-func (h *fakeHandle) Cancel()                            { h.cancels.Add(1) }
+func (h *fakeHandle) Page(string, int) data.ResourcePage {
+	h.reads.Add(1)
+	return h.page
+}
+func (h *fakeHandle) Changes() <-chan struct{} { return h.changes }
+func (h *fakeHandle) Refresh()                 { h.refreshes.Add(1) }
+func (h *fakeHandle) Cancel()                  { h.cancels.Add(1) }
 
 type fakeBrowser struct {
 	*data.Demo
@@ -208,7 +212,7 @@ func TestStaleSubscriptionIsCancelled(t *testing.T) {
 	sts := schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "statefulsets"}
 	cancels := &atomic.Int32{}
 	late := &fakeHandle{changes: make(chan struct{}), cancels: cancels, refreshes: &atomic.Int32{}}
-	next, _ := m.Update(resourceSubMsg{seq: 999, gvr: sts, handle: late})
+	next, _ := m.Update(resourceSubMsg{tag: resourceTag{session: m.session.Generation, seq: 999, key: m.res.subs[sts].key}, handle: late})
 	if cancels.Load() != 1 || next.(Model).res.subs[sts].handle == late {
 		t.Fatal("a late subscription of an older request is cancelled and ignored")
 	}
