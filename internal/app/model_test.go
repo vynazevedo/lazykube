@@ -15,6 +15,8 @@ import (
 
 func keyPress(s string) tea.KeyPressMsg {
 	switch s {
+	case "space":
+		return tea.KeyPressMsg{Code: tea.KeySpace, Text: " "}
 	case "tab":
 		return tea.KeyPressMsg{Code: tea.KeyTab}
 	case "shift+tab":

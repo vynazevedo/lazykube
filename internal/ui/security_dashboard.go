@@ -2,6 +2,7 @@ package ui
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/vynazevedo/lazykube/internal/data"
@@ -31,17 +32,25 @@ func securityBar(value, maximum, width int) string {
 	return strings.Repeat("█", filled) + strings.Repeat("░", width-filled)
 }
 
-func DashboardSecurityView(detail SecurityView, session data.SecuritySession, scope, pod string, width int) SecurityView {
+func DashboardSecurityView(detail SecurityView, session data.SecuritySession, scopes []string, pod string, width int) SecurityView {
 	a := session.Dashboard.Cluster
 	scopeLabel := "Cluster"
-	if scope != "" {
+	scope := ""
+	switch len(scopes) {
+	case 0:
+	case 1:
+		scope = scopes[0]
 		scopeLabel = "Namespace: " + scope
 		var ok bool
 		a, ok = session.Dashboard.Namespaces[scope]
 		if !ok {
 			a.Score.Coverage = data.Coverage{State: data.CoverageUnavailable, Reason: "namespace not observed"}
 		}
+	default:
+		scopeLabel = "Namespaces: " + strings.Join(scopes, ", ")
+		a = session.Dashboard.MergeNamespaces(scopes)
 	}
+	inScope := func(namespace string) bool { return len(scopes) == 0 || slices.Contains(scopes, namespace) }
 	detail.Coverage = fmt.Sprintf("Dashboard coverage: %s | pods %d/%d", a.Score.Coverage.State, a.Score.Coverage.Evaluated, a.Score.Coverage.Total)
 	rows := make([]string, 0, 64+len(detail.Rows))
 	add := func(s string) { rows = append(rows, draw.Wrap(s, max(1, width))...) }
@@ -97,15 +106,18 @@ func DashboardSecurityView(detail SecurityView, session data.SecuritySession, sc
 	if len(history) > width-9 && width > 9 {
 		history = history[len(history)-(width-9):]
 	}
-	if !a.Score.Available {
+	switch {
+	case len(scopes) > 1:
+		add("Trend: only per namespace")
+	case !a.Score.Available:
 		add("Trend: paused until coverage is evaluable")
-	} else {
+	default:
 		add("Trend: " + draw.Sparkline(history, 100) + " (revision samples)")
 	}
 	add("ALERTS | new high since baseline / last ack | A: ack all")
 	count := 0
 	for _, f := range session.Alerts {
-		if scope != "" && f.Target.Namespace != scope {
+		if !inScope(f.Target.Namespace) {
 			continue
 		}
 		count++
@@ -136,7 +148,7 @@ func DashboardSecurityView(detail SecurityView, session data.SecuritySession, sc
 	add("NAMESPACES | lowest scores first")
 	shown := 0
 	for _, ns := range session.Dashboard.Ranking {
-		if scope != "" && ns.Name != scope {
+		if !inScope(ns.Name) {
 			continue
 		}
 		if shown == 5 {
@@ -153,7 +165,7 @@ func DashboardSecurityView(detail SecurityView, session data.SecuritySession, sc
 			add(ns.Name + " | " + securityScoreLabel(ns.Score))
 		}
 	}
-	if scope == "" && len(session.Dashboard.Ranking) > 5 {
+	if len(scopes) == 0 && len(session.Dashboard.Ranking) > 5 {
 		add("More namespaces: use the namespace filter.")
 	}
 	add("Score: " + data.SecurityScoreFormula)
@@ -163,7 +175,7 @@ func DashboardSecurityView(detail SecurityView, session data.SecuritySession, sc
 		add("MORE ALERTS | pending since baseline / last ack")
 		seen := 0
 		for _, f := range session.Alerts {
-			if scope != "" && f.Target.Namespace != scope {
+			if !inScope(f.Target.Namespace) {
 				continue
 			}
 			seen++

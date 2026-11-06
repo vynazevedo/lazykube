@@ -93,7 +93,7 @@ type Model struct {
 	podOffset int
 	hover     int
 	nsCursor  int
-	nsFilter  string
+	nsFilter  nsSet
 	depCursor int
 
 	scroll   int

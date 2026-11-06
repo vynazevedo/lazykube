@@ -10,8 +10,9 @@ import (
 func (m Model) visiblePods() []data.Pod {
 	pods := make([]data.Pod, 0, len(m.snap.Pods))
 	node, byNode := m.nodeScope()
+	allowed := m.nsFilter.matcher()
 	for _, p := range m.snap.Pods {
-		if (m.nsFilter == "" || p.Namespace == m.nsFilter) && (!byNode || (node != "" && p.Node == node)) {
+		if allowed(p.Namespace) && (!byNode || (node != "" && p.Node == node)) {
 			pods = append(pods, p)
 		}
 	}

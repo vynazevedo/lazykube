@@ -19,7 +19,10 @@ func (dashboardScreen) Title() string {
 	return "Dashboard"
 }
 
-func (dashboardScreen) Help(Model) []ui.KeyHelp {
+func (dashboardScreen) Help(m Model) []ui.KeyHelp {
+	if m.focus == FocusNamespaces {
+		return append([]ui.KeyHelp{{Key: "space", Desc: "mark"}}, ui.ShortHelp()...)
+	}
 	return ui.ShortHelp()
 }
 
@@ -91,7 +94,8 @@ func (dashboardScreen) View(m Model, body draw.Region, ctx ui.Ctx) {
 		ui.NamespacesPanel(region(body, m.layout.Namespaces), ui.NamespacesState{
 			Items:     m.snap.Namespaces,
 			Highlight: highlight,
-			Filter:    m.nsFilter,
+			Scope:     m.nsScope(),
+			Marked:    m.marks().names(),
 			Cursor:    m.nsCursor,
 			Focused:   m.focus == FocusNamespaces,
 		}, ctx)

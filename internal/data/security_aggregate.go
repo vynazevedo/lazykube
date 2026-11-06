@@ -4,6 +4,7 @@ import (
 	"cmp"
 	"math"
 	"slices"
+	"strings"
 )
 
 type ScoreDistribution struct {
@@ -79,6 +80,77 @@ func distributionScore(c Coverage, d ScoreDistribution) PostureScore {
 	}
 	return s
 }
+func rankRules(rules map[string]int) []RuleCount {
+	var out []RuleCount
+	for rule, count := range rules {
+		out = append(out, RuleCount{rule, count})
+	}
+	slices.SortFunc(out, func(a, b RuleCount) int {
+		if n := cmp.Compare(b.Count, a.Count); n != 0 {
+			return n
+		}
+		return cmp.Compare(a.Rule, b.Rule)
+	})
+	return out
+}
+
+func mergeCoverage(d SecurityDashboard, names []string) Coverage {
+	merged := Coverage{State: CoverageComplete}
+	observed := false
+	for _, name := range names {
+		a, ok := d.Namespaces[name]
+		if !ok {
+			if merged.State == CoverageComplete {
+				merged.State, merged.Reason = CoveragePartial, "namespace not observed"
+			}
+			continue
+		}
+		observed = true
+		c := a.Score.Coverage
+		merged.Total += c.Total
+		if c.State != CoverageComplete && merged.State == CoverageComplete {
+			merged.State, merged.Reason = CoveragePartial, c.Reason
+		}
+	}
+	if !observed {
+		return Coverage{State: CoverageUnavailable, Reason: "namespace not observed"}
+	}
+	return merged
+}
+
+func (d SecurityDashboard) MergeNamespaces(names []string) SecurityAggregate {
+	merged := SecurityAggregate{Name: strings.Join(names, ", ")}
+	rules := make(map[string]int)
+	for _, name := range names {
+		a := d.Namespaces[name]
+		merged.High += a.High
+		merged.Medium += a.Medium
+		merged.Info += a.Info
+		merged.Unknown += a.Unknown
+		for _, rule := range a.Rules {
+			rules[rule.Rule] += rule.Count
+		}
+	}
+	marked := make(map[string]struct{}, len(names))
+	for _, name := range names {
+		marked[name] = struct{}{}
+	}
+	for key, score := range d.Pods {
+		namespace, _, _ := strings.Cut(key, "/")
+		if _, ok := marked[namespace]; ok {
+			merged.Distribution.add(score)
+			merged.HygieneDistribution.add(d.PodHygiene[key])
+		}
+	}
+	merged.Distribution.finish()
+	merged.HygieneDistribution.finish()
+	coverage := mergeCoverage(d, names)
+	merged.Score = distributionScore(coverage, merged.Distribution)
+	merged.Hygiene = distributionScore(coverage, merged.HygieneDistribution)
+	merged.Rules = rankRules(rules)
+	return merged
+}
+
 func AggregateSecurity(s SecuritySnapshot) SecurityDashboard {
 	d := SecurityDashboard{Namespaces: make(map[string]SecurityAggregate), Pods: make(map[string]PostureScore, len(s.Pods)), PodHygiene: make(map[string]PostureScore, len(s.Pods))}
 	counts := make(map[string]map[string]int)
@@ -128,15 +200,7 @@ func AggregateSecurity(s SecuritySnapshot) SecurityDashboard {
 		a.HygieneDistribution.finish()
 		a.Score = distributionScore(c, a.Distribution)
 		a.Hygiene = distributionScore(c, a.HygieneDistribution)
-		for rule, count := range rules {
-			a.Rules = append(a.Rules, RuleCount{rule, count})
-		}
-		slices.SortFunc(a.Rules, func(a, b RuleCount) int {
-			if n := cmp.Compare(b.Count, a.Count); n != 0 {
-				return n
-			}
-			return cmp.Compare(a.Rule, b.Rule)
-		})
+		a.Rules = rankRules(rules)
 		return a
 	}
 	d.Cluster.Name = "Cluster"

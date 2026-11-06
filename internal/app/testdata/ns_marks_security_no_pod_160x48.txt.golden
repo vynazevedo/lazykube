@@ -1,0 +1,48 @@
+ lazykube [DEMO] [RO]  v2.0   ◎ context demo namespace Todos   k8s demo  nodes 1  ns 8  pods 13  uptime 119d                         ⠙ metrics every 5s ● live  
+ [2 Dashboard] |  3 Workloads  |  4 Nodes  |  6 Events                                                                                                  m menu  
+ Dashboard                                                                                                                                                      
+ ╭─ Node ────────────────────────────╮ ╭─ Pods ─────────────────────────────────────────────╮ ╭───────────────────────────────────────────────────────────────╮ 
+ │                                   │ │                                                    │ │  Log   Config   Top   Describe   Events   Security            │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  demo-node-01 │ │ / -pod-match-zzzz   ns:bilibili-raffle +1  0 items │ │ ───────────────────────────────────────────────────────────── │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   ● Ready      │ │                                                    │ │ ╭───────────────────────────────────────────────────────────╮ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀    cpu 25%      │ │   NAME          NAMESPACE    RST   SEC CPU/STATUS  │ │ │ S: pod | Namespaces: bilibili-raffle, kube-system         │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   █████████████│ │   no pods match the filter                         │ │ │ Dashboard coverage: complete in scope | pods 7/7          │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   mem 1.4/3.8Gi│ │                                                    │ │ │ No findings does not mean safe                            │ │ 
+ │    ▀    ▀▀▀▀▀▀▀▀▀    █████████████│ │                                                    │ │ │ Local checks only; not PSS compliance.                    │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   pods 13 / 110│ │                                                    │ │ │ Security /100: Pod - | Namespace - | Cluster 55 E         │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀   arch amd64   │ │                                                    │ │ │ Hygiene /100: Pod - | Namespace - | Cluster 97 A          │ │ 
+ │    ▀ ▀  ▀▀▀▀▀▀▀▀▀                 │ │                                                    │ │ │ Namespace mean (0 pods) | Cluster mean (13 pods)          │ │ 
+ │   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀                │ │                                                    │ │ │ Selected pod security: not rated | ; no evaluated pods    │ │ 
+ │  ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀               │ │                                                    │ │ │ Synthetic data (demo)                                     │ │ 
+ │                                   │ │                                                    │ │ │ No pod selected in the marked namespaces.                 │ │ 
+ │                                   │ │                                                    │ │ │ POSTURE | Namespaces: bilibili-raffle, kube-system |      │ │ 
+ ╰───────────────────────────────────╯ │                                                    │ │ │ 55/100 (E) | 7/7 pods                                     │ │ 
+ ╭─ Namespaces · 2 ──────────────────╮ │                                                    │ │ │ Score ████████████████████░░░░░░░░░░░░░░░░                │ │ 
+ │                                   │ │                                                    │ │ │ SEC column: Security; p = partial. Hygiene scored         │ │ 
+ │   default               ·····   0 │ ╰────────────────────────────────────────────────────╯ │ │ separately.                                               │ │ 
+ │ ● kube-system           █████   5 │ ╭─ CPU heatmap · last 2 min ─────────────────────────╮ │ │ Security mean 55 | median 75 | worst decile 20            │ │ 
+ │   kube-public           ·····   0 │ │                                                    │ │ │ A    1 ███░░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ │   kube-node-lease       ·····   0 │ │ bilibili-raf… ████████████████████████████████████ │ │ │ B    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ │ ● bilibili-raffle       ██░░░   2 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ C    3 ██████████░░░░░░░░░░░░░░                           │ │ 
+ │   lgo                   █░░░░   1 │ │ bilibili-live ████████████████████████████████████ │ │ │ D    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ │   xcx                   ███░░   3 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ E    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ │                                   │ │ lgo-7c5d97584 ████████████████████████████████████ │ │ │ F    3 ██████████░░░░░░░░░░░░░░                           │ │ 
+ ╰───────────────────────────────────╯ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ Hygiene mean 97 | median 100 | worst decile 88            │ │ 
+ ╭─ Deployments ─────────────────────╮ │ psql-6bc7744… ████████████████████████████████████ │ │ │ A    5 █████████████████░░░░░░░                           │ │ 
+ │                                   │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ B    2 ███████░░░░░░░░░░░░░░░░░                           │ │ 
+ │ bilibili-raffle/bilibili-l… ● 1/1 │ │ odoo-7575bf6… ████████████████████████████████████ │ │ │ C    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ │ bilibili-raffle/bilibili-r… ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ D    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ │ ys-odoo/psql                ● 1/1 │ │ coredns-6799… ████████████████████████████████████ │ │ │ E    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ │ ys-odoo/odoo                ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ F    0 ░░░░░░░░░░░░░░░░░░░░░░░░                           │ │ 
+ │ lgo/lgo                     ● 1/1 │ │ metrics-serv… ████████████████████████████████████ │ │ │ Worst decile = mean of lowest ceil(N/10) pod scores.      │ │ 
+ │ kube-system/coredns         ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ high      6 █████████░░░░░░░░░░░░░░░                      │ │ 
+ │ kube-system/metrics-server  ● 1/1 │ │ traefik-f456… ████████████████████████████████████ │ │ │ medium   16 ████████████████████████                      │ │ 
+ │ kube-system/traefik         ● 1/1 │ │               ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ │ │ │ info      3 █████░░░░░░░░░░░░░░░░░░░                      │ │ 
+ │                                   │ │                                                    │ │ │ Unknown checks: 3 | confirmed findings only in score      │ │ 
+ │                                   │ │                                                    │ │ │ Trend: only per namespace                                 │ │ 
+ │                                   │ │                                                    │ │ │ ALERTS | new high since baseline / last ack | A: ack all  │ │ 
+ │                                   │ │                                                    │ │ │ No unacknowledged high alerts.                            │ │ 
+ │                                   │ │               -2m ████████████████████████████ now │ │ ╰───────────────────────────────────────────────────────────╯ │ 
+ ╰───────────────────────────────────╯ ╰────────────────────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  space  mark   ↑↓  move   tab  panel   /  filter   enter  open   m  menu   l  logs   d  describe   e  events   ?  help   q  quit             bubbletea · 0 fps 

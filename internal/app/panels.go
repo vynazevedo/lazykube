@@ -18,6 +18,6 @@ func (m Model) podsPanelState(pods []data.Pod) ui.PodsState {
 		Filtering:  m.filtering,
 		Focused:    m.focus == FocusPods,
 		SelectionK: m.selectionKs(pods),
-		NSFilter:   m.nsFilter,
+		NSFilter:   m.nsFilter.names(),
 	}
 }

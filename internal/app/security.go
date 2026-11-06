@@ -20,7 +20,8 @@ func (m *Model) loadSecurity() {
 }
 
 func (m *Model) refreshSecurity() {
-	pod, namespace := m.activeName(), m.nsFilter
+	pod := m.activeName()
+	namespace, _ := m.nsFilter.single()
 	if p := m.selectedPod(); p != nil {
 		namespace = p.Namespace
 	}
@@ -30,9 +31,13 @@ func (m *Model) refreshSecurity() {
 		return
 	}
 	m.securityKey = key
-	m.securityView = ui.BuildSecurityView(m.security, pod, namespace, m.securityNamespace || pod == "", max(1, width-4))
+	if names := m.nsFilter.names(); pod == "" && len(names) > 1 {
+		m.securityView = ui.NoSelectionSecurityView(names, max(1, width-4))
+	} else {
+		m.securityView = ui.BuildSecurityView(m.security, pod, namespace, m.securityNamespace || pod == "", max(1, width-4))
+	}
 	m.securityView.Synthetic = m.snap.Synthetic
-	m.securityView = ui.DashboardSecurityView(m.securityView, m.securitySession, m.nsFilter, pod, max(1, width-4))
+	m.securityView = ui.DashboardSecurityView(m.securityView, m.securitySession, m.nsFilter.names(), pod, max(1, width-4))
 }
 
 func (m *Model) acknowledgeSecurity() {

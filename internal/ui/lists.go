@@ -2,6 +2,7 @@ package ui
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/vynazevedo/lazykube/internal/data"
@@ -18,17 +19,27 @@ func SelectionBg(pal theme.Palette, k float64) theme.RGB {
 type NamespacesState struct {
 	Items     []data.Namespace
 	Highlight string
-	Filter    string
+	Scope     string
+	Marked    []string
 	Cursor    int
 	Focused   bool
 }
 
 func NamespacesPanel(r draw.Region, st NamespacesState, ctx Ctx) {
-	inner := Panel(r, "Namespaces", st.Focused, ctx)
+	title := "Namespaces"
+	if len(st.Marked) > 0 {
+		title = fmt.Sprintf("Namespaces · %d", len(st.Marked))
+	}
+	inner := Panel(r, title, st.Focused, ctx)
 	top, _ := NamespacesRows(r.H)
 	c := inner.Inset(1, top-1, 1, 1)
 	const countW, barW = 3, 5
 	nameW := c.W - barW - countW - 2
+	nameX := 0
+	if len(st.Marked) > 0 {
+		nameX = 2
+		nameW -= nameX
+	}
 	offset := ScrollOffset(st.Cursor, len(st.Items), c.H)
 	for row := 0; row < c.H && offset+row < len(st.Items); row++ {
 		i := offset + row
@@ -37,13 +48,17 @@ func NamespacesPanel(r draw.Region, st NamespacesState, ctx Ctx) {
 			inner.Sub(0, top-1+row, inner.W, 1).FillBg(SelectionBg(ctx.Pal, selectionMix))
 		}
 		nameStyle := draw.Fg(theme.Text)
-		if ns.Name == st.Highlight || ns.Name == st.Filter {
+		marked := slices.Contains(st.Marked, ns.Name)
+		if ns.Name == st.Highlight || ns.Name == st.Scope || marked {
 			nameStyle = draw.Fg(ctx.Pal.A)
 		}
-		if ns.Name == st.Filter {
+		if ns.Name == st.Scope || marked {
 			nameStyle = nameStyle.WithBold()
 		}
-		c.Text(0, row, draw.Truncate(ns.Name, nameW), nameStyle)
+		if marked {
+			c.Text(0, row, "●", draw.Fg(ctx.Pal.A))
+		}
+		c.Text(nameX, row, draw.Truncate(ns.Name, nameW), nameStyle)
 		bar := "·····"
 		if ns.Pods > 0 {
 			full := draw.Filled(float64(ns.Pods), 5, barW)

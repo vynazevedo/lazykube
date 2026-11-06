@@ -42,7 +42,7 @@ type Frame struct {
 	Selected    string
 	Focus       Focus
 	Filter      string
-	NSFilter    string
+	NSFilter    nsSet
 	PodOffset   int
 	NSCursor    int
 	DepCursor   int
@@ -91,6 +91,10 @@ func (r *router) push(current Frame, to Route) bool {
 	r.depth++
 	r.active = to
 	return true
+}
+
+func (r *router) replaceActive(to Route) {
+	r.active = to
 }
 
 func (r *router) popTo(depth int) (Frame, bool) {

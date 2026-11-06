@@ -141,7 +141,7 @@ func TestEventsOpenInScopedNamespace(t *testing.T) {
 		}
 	}
 	scoped := events(t, navNamespace(t, demoModel(t, 160, 48)))
-	if scoped.ev.Scope != data.ScopeNamespace || scoped.ev.Namespace != scoped.nsFilter || navCrumbs(scoped) != "Events > "+scoped.nsFilter {
+	if scoped.ev.Scope != data.ScopeNamespace || nsSet(scoped.ev.Namespace) != scoped.nsFilter || navCrumbs(scoped) != "Events > "+string(scoped.nsFilter) {
 		t.Fatalf("events keeps the filtered namespace: %+v crumbs %q", scoped.ev.eventsFrame, navCrumbs(scoped))
 	}
 	none := press(t, demoModel(t, 160, 48), "/", "z", "z", "z", "q", "enter")

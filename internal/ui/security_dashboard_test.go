@@ -14,7 +14,7 @@ func TestSecurityDashboardCoverage(t *testing.T) {
 		snapshot.Coverage = data.Coverage{State: state, Evaluated: 40, Total: 55, Reason: "test coverage reason"}
 		var session data.SecuritySession
 		session.Update(snapshot)
-		view := DashboardSecurityView(SecurityView{}, session, "", "", 45)
+		view := DashboardSecurityView(SecurityView{}, session, nil, "", 45)
 		text := strings.Join(view.Rows, " ")
 		if state == data.CoveragePartial {
 			if !strings.Contains(text, "partial | 13/55 pods") {
@@ -40,7 +40,7 @@ func TestSecurityDashboardVisualGolden(t *testing.T) {
 	for _, width := range []int{45, 65} {
 		detail := BuildSecurityView(demo.Security(), selectedPod, "bilibili-raffle", false, width-8)
 		detail.Synthetic = demo.Snapshot().Synthetic
-		view := DashboardSecurityView(detail, session, "", selectedPod, width-8)
+		view := DashboardSecurityView(detail, session, nil, selectedPod, width-8)
 		name := "security_dashboard_narrow"
 		if width == 65 {
 			name = "security_dashboard_wide"
@@ -68,7 +68,7 @@ func TestSecurityDashboardAlertOverflow(t *testing.T) {
 	for i := range 8 {
 		session.Alerts = append(session.Alerts, data.Finding{Rule: strings.Repeat("x", i+1), Target: data.ResourceRef{Name: "pod", Namespace: "apps"}})
 	}
-	view := DashboardSecurityView(SecurityView{}, session, "", "", 60)
+	view := DashboardSecurityView(SecurityView{}, session, nil, "", 60)
 	text := strings.Join(view.Rows, " ")
 	if !strings.Contains(text, "3 more alerts below pod details") || !strings.Contains(text, "MORE ALERTS") || !strings.Contains(text, "xxxxxxxx") {
 		t.Fatal("overflow alerts inaccessible")
@@ -88,7 +88,7 @@ func TestSecurityDashboardSingularFinding(t *testing.T) {
 		}
 	}
 	session.Update(snapshot)
-	view := DashboardSecurityView(SecurityView{}, session, "ys-odoo", "", 80)
+	view := DashboardSecurityView(SecurityView{}, session, []string{"ys-odoo"}, "", 80)
 	text := strings.Join(view.Rows, " ")
 	if strings.Contains(text, "1 findings") || !strings.Contains(text, "1 finding") {
 		t.Fatalf("singular missing: %s", text)
@@ -121,7 +121,7 @@ func TestSecurityDashboardReservesAggregateBudget(t *testing.T) {
 	if len(detail.Rows) != maxSecurityRows {
 		t.Fatalf("fixture has %d rows", len(detail.Rows))
 	}
-	view := DashboardSecurityView(detail, session, p.Target.Namespace, selectedPod, 80)
+	view := DashboardSecurityView(detail, session, []string{p.Target.Namespace}, selectedPod, 80)
 	text := strings.Join(view.Rows, "\n")
 	for _, want := range []string{"POSTURE", "median", "ALERTS", "new-high", "TOP RULES", "NAMESPACES"} {
 		if !strings.Contains(text, want) {
@@ -149,7 +149,7 @@ func TestSecurityDashboardOtherPodsAfterSummary(t *testing.T) {
 	if len(detail.Rows) != maxSecurityRows {
 		t.Fatal("fixture must exhaust budget")
 	}
-	view := DashboardSecurityView(detail, session, selected.Target.Namespace, selectedPod, 80)
+	view := DashboardSecurityView(detail, session, []string{selected.Target.Namespace}, selectedPod, 80)
 	text := strings.Join(view.Rows, "\n")
 	selectedAt := strings.Index(text, "Pod "+selectedPod+" |")
 	summaryAt := strings.Index(text, "POSTURE")

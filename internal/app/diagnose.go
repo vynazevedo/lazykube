@@ -57,8 +57,8 @@ func (m *Model) refreshLogs(pod string) {
 }
 
 func (m Model) eventNamespace() string {
-	if m.nsFilter != "" {
-		return m.nsFilter
+	if ns, ok := m.nsFilter.single(); ok {
+		return ns
 	}
 	if p := m.selectedPod(); p != nil {
 		return p.Namespace
