@@ -23,6 +23,11 @@ type SecurityView struct {
 	Rows         []string
 }
 
+func NoSelectionSecurityView(namespaces []string, width int) SecurityView {
+	rows := draw.Wrap("No pod selected in the marked namespaces.", max(1, width))
+	return SecurityView{Scope: "S: pod | Namespaces: " + strings.Join(namespaces, ", "), Rows: rows, SelectedRows: len(rows)}
+}
+
 func BuildSecurityView(s data.SecuritySnapshot, key, namespace string, namespaceView bool, width int) SecurityView {
 	v := SecurityView{Scope: "S: namespace | Pod: " + key}
 	coverage := data.Coverage{State: data.CoverageUnavailable, Reason: "no selected pod"}

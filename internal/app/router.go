@@ -93,6 +93,10 @@ func (r *router) push(current Frame, to Route) bool {
 	return true
 }
 
+func (r *router) replaceActive(to Route) {
+	r.active = to
+}
+
 func (r *router) popTo(depth int) (Frame, bool) {
 	if depth < 0 || depth >= r.depth {
 		return Frame{}, false

@@ -191,8 +191,12 @@ func (m *Model) setMarks(marks nsSet) {
 
 func (m *Model) toggleNamespace(name string) {
 	next := m.nsFilter.toggle(name)
-	cursor := m.nsCursor
+	cursor, origin := m.nsCursor, m.nav.Active()
 	for m.nav.Active().Kind == RouteNamespace && m.back() {
+	}
+	if m.nav.Active().Kind != RouteScreen {
+		m.nav.replaceActive(Route{Kind: RouteScreen, Screen: origin.Screen, Dest: origin.Dest, Generation: origin.Generation})
+		m.relayout()
 	}
 	m.setFocus(FocusNamespaces)
 	m.nsCursor = cursor

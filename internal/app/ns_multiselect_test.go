@@ -348,3 +348,83 @@ func TestNSSetIsOrderedAndComparable(t *testing.T) {
 		t.Fatal("the matcher follows the set")
 	}
 }
+
+func TestSecurityWithoutSelectedPodKeepsSetAggregate(t *testing.T) {
+	m := demoModel(t, 160, 48)
+	a, b := namespacesWithPods(t, m)
+	m = press(t, mark(t, m, a, b), "S")
+	m.filter.SetValue("zzzz-no-pod-match-zzzz")
+	m.syncSelection()
+	if m.selectedPod() != nil {
+		t.Fatal("the fixture selects no pod")
+	}
+	rows := strings.Join(m.securityView.Rows, "\n")
+	for _, wrong := range []string{"namespace not observed", "No pod observations in this scope."} {
+		if strings.Contains(rows, wrong) {
+			t.Fatalf("observed namespaces never read %q:\n%s", wrong, rows)
+		}
+	}
+	want := []string{a, b}
+	slices.Sort(want)
+	if !strings.Contains(rows, "POSTURE | Namespaces: "+want[0]+", "+want[1]) {
+		t.Fatalf("the aggregate of the set stays:\n%s", rows)
+	}
+	if !strings.Contains(rows, "No pod selected in the marked namespaces.") {
+		t.Fatalf("the missing selection is stated:\n%s", rows)
+	}
+	if !strings.Contains(m.securityView.Scope, "Namespaces: "+want[0]+", "+want[1]) {
+		t.Fatalf("the scope names the set: %q", m.securityView.Scope)
+	}
+	c := m.Render()
+	golden(t, "ns_marks_security_no_pod_160x48.txt", c.Plain())
+	golden(t, "ns_marks_security_no_pod_160x48.ansi", c.String())
+}
+
+func TestMarkAfterHistoryOverflowLeavesScope(t *testing.T) {
+	m := demoModel(t, 160, 48)
+	total := len(m.visiblePods())
+	a, b := namespacesWithPods(t, m)
+	for i := range maxFrames + 2 {
+		ns := a
+		if i%2 == 1 {
+			ns = b
+		}
+		m = press(t, focusNamespace(t, m, ns), "enter")
+	}
+	m = mark(t, m, a)
+	if m.nav.Active().Kind != RouteScreen || m.nav.Active().Screen != ScreenDashboard || m.scopeNamespace() != "" {
+		t.Fatalf("the mark leaves the namespace route: %+v scope %q", m.nav.Active(), m.scopeNamespace())
+	}
+	if !m.onScreen(ScreenDashboard) || m.nav.Active().Dest != DestDashboard {
+		t.Fatalf("the screen stays the Dashboard: %+v", m.nav.Active())
+	}
+	plain := m.Render().Plain()
+	if !strings.Contains(plain, "● "+a) || !strings.Contains(plain, "● "+b) || !strings.Contains(plain, "Namespaces · 2") {
+		t.Fatalf("the marks are visible:\n%s", plain)
+	}
+	if got := podNamespaces(m); len(got) != 2 {
+		t.Fatalf("the pods follow the set: %v", got)
+	}
+	m = press(t, m, "esc")
+	if len(m.visiblePods()) != total || strings.Contains(m.Render().Plain(), "Namespaces · ") {
+		t.Fatal("esc clears the marks after the overflow")
+	}
+}
+
+func TestMarkOverPodFrameLeavesScope(t *testing.T) {
+	m := demoModel(t, 160, 48)
+	a, b := namespacesWithPods(t, m)
+	m.setFocus(FocusPods)
+	m = press(t, m, "enter")
+	if m.nav.Active().Kind != RoutePod {
+		t.Fatal("the fixture opens a pod")
+	}
+	m.navigate(Route{Kind: RouteNamespace, Screen: ScreenDashboard, Namespace: a})
+	m = mark(t, m, b)
+	if m.nav.Active().Kind != RouteScreen || m.nav.Active().Screen != ScreenDashboard || m.scopeNamespace() != "" {
+		t.Fatalf("a pod below the scope never becomes the active route: %+v", m.nav.Active())
+	}
+	if got := podNamespaces(m); len(got) != 2 {
+		t.Fatalf("the set is applied: %v", got)
+	}
+}
