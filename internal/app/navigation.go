@@ -1,7 +1,6 @@
 package app
 
 import (
-	"slices"
 	"strings"
 
 	"charm.land/bubbles/v2/key"
@@ -211,11 +210,17 @@ func reasonOr(reason, fallback string) string {
 
 func (m *Model) openTarget(t Destination) {
 	id := t.Screen
-	if !slices.Contains(registeredScreens(), id) {
+	if _, ok := screenFor(id); !ok {
 		return
 	}
 	ns, from, node := m.scopeNamespace(), m.mainScreen(), ""
 	var setup []func(*Model)
+	if t.Parent == DestWorkloads {
+		m.workloadsLeaf = t.ID
+	}
+	if id == ScreenResources || id == ScreenOverview {
+		m.res.cursor, m.res.card = 0, 0
+	}
 	if id == ScreenWorkloads {
 		focus := t.Focus
 		m.workloadsLeaf = t.ID
@@ -279,6 +284,14 @@ func (m Model) menuItems() []ui.MenuItem {
 }
 
 func (m Model) menuActive() int {
+	leaf := m.currentLeaf()
+	for _, id := range append([]DestinationID{leaf}, ancestors(leaf)...) {
+		for i, d := range registry.main() {
+			if d.ID == id {
+				return i
+			}
+		}
+	}
 	main := m.mainScreen()
 	for i, id := range registeredScreens() {
 		if id == main {
@@ -375,6 +388,11 @@ func routeLabel(r Route) string {
 			return name
 		}
 		return r.Pod
+	}
+	if r.Screen == ScreenResources || r.Screen == ScreenOverview {
+		if d, ok := registry.get(r.Dest); ok {
+			return r.screen().Title() + " · " + d.Label
+		}
 	}
 	return r.screen().Title()
 }

@@ -58,6 +58,7 @@ type Layout struct {
 	Heatmap     Rect
 	Details     Rect
 	Scope       Rect
+	Table       Rect
 	Events      Rect
 	Message     Rect
 	DividerY    int
@@ -200,6 +201,17 @@ func ComputeEvents(w, h int) Layout {
 	return l
 }
 
+func ComputeTable(w, h int) Layout {
+	if l, done := compactLayout(w, h); done {
+		l.Table = l.Body
+		return l
+	}
+	l := Layout{W: w, H: h}
+	l.shell(w, h)
+	l.Table = l.Body
+	return l
+}
+
 func ComputeDetail(w, h int) Layout {
 	if l, done := compactLayout(w, h); done {
 		l.Details = l.Body
@@ -266,7 +278,7 @@ func (l *Layout) keepOnly(keep *Rect) {
 
 func (l *Layout) dock(w, h, tw int) {
 	dx := tw + 1
-	for _, r := range []*Rect{&l.Body, &l.Node, &l.Namespaces, &l.Deployments, &l.Pods, &l.Heatmap, &l.Details, &l.Scope, &l.Events, &l.Message} {
+	for _, r := range []*Rect{&l.Body, &l.Node, &l.Namespaces, &l.Deployments, &l.Pods, &l.Heatmap, &l.Details, &l.Scope, &l.Table, &l.Events, &l.Message} {
 		if !r.Empty() {
 			r.X += dx
 		}
@@ -293,6 +305,7 @@ const (
 	AreaMenu
 	AreaCrumbs
 	AreaTree
+	AreaTable
 )
 
 func (l Layout) Hit(x, y int) Area {
@@ -314,6 +327,7 @@ func (l Layout) Hit(x, y int) Area {
 		{l.Details, AreaDetails},
 		{l.Menu, AreaMenu},
 		{l.Crumbs, AreaCrumbs},
+		{l.Table, AreaTable},
 	} {
 		if !c.r.Empty() && c.r.Contains(x, y) {
 			return c.a

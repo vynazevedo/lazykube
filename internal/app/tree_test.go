@@ -160,23 +160,23 @@ func TestTreeNavigatesWithoutTouchingTheSource(t *testing.T) {
 	calls.Store(0)
 	m = treeTo(t, m, DestWorkloads)
 	m = press(t, m, "left", "right", "enter", "enter", "right", "down", "up", "pgdn", "pgup", "end", "home")
-	m = treeTo(t, press(t, m, "right"), DestJobs)
+	m = treeTo(t, press(t, m, "home"), DestNamespaces)
 	m = press(t, m, "enter")
 	st := m.sidebarState()
 	_ = ui.SidebarRowText(st.Rows[0])
 	if n := calls.Load(); n != 0 {
 		t.Fatalf("moving, expanding and collapsing the tree made %d source calls", n)
 	}
-	if m.nav.Depth() != 0 || !strings.Contains(m.tree.note, "Jobs: tela ainda não implementada") {
+	if m.nav.Depth() != 0 || !strings.Contains(m.tree.note, "Namespaces: tela ainda não implementada") {
 		t.Fatalf("a planned leaf explains itself without navigating: %q", m.tree.note)
 	}
 	plain := m.Render().Plain()
-	for _, want := range []string{"Jobs (futuro)", "Overview (futuro)", "Pods", "Deployments", "Jobs: tela ainda não", "implementada"} {
+	for _, want := range []string{"Namespaces (futuro)", "Overview", "Jobs", "Pods", "Deployments", "Namespaces: tela ainda", "implementada"} {
 		if !strings.Contains(plain, want) {
 			t.Fatalf("tree shows %q", want)
 		}
 	}
-	if strings.Contains(plain, "Pods (futuro)") || strings.Contains(plain, "Jobs (0)") {
+	if strings.Contains(plain, "Pods (futuro)") || strings.Contains(plain, "Jobs (futuro)") || strings.Contains(plain, "Overview (futuro)") || strings.Contains(plain, "Jobs (0)") {
 		t.Fatal("ready leaves are not planned and planned leaves never claim zero")
 	}
 }
@@ -228,8 +228,8 @@ func TestTreeMouse(t *testing.T) {
 	if label.nav.Active().Dest != DestPods || !label.tree.visible {
 		t.Fatal("clicking a ready leaf opens it and keeps the docked tree")
 	}
-	planned := click(opened, m.layout.Tree.X+8, treeRowY(t, opened, DestCronJobs))
-	if planned.nav != opened.nav || !strings.Contains(planned.tree.note, "CronJobs") {
+	planned := click(opened, m.layout.Tree.X+8, treeRowY(t, opened, DestNamespaces))
+	if planned.nav != opened.nav || !strings.Contains(planned.tree.note, "Namespaces") {
 		t.Fatal("clicking a planned leaf explains instead of navigating")
 	}
 	toggle := click(opened, m.layout.Tree.X+8, treeRowY(t, opened, DestWorkloads))

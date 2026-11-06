@@ -288,7 +288,12 @@ arquivos segue a precedência nativa do client-go. Cada contexto lembra o
 Cluster (Dashboard, Nodes, Namespaces, Events), Workloads, Configuration,
 Network, Storage, Access Control, Custom Resources e Helm. Telas ainda não
 implementadas aparecem como `(futuro)` e nunca como lista vazia; expandir ou
-percorrer a árvore não faz nenhuma consulta ao cluster. Com espaço, a árvore
+percorrer a árvore não faz nenhuma consulta ao cluster. Em Workloads, o
+Overview resume cada tipo por estado (contagem por objeto, não por réplica) e
+StatefulSets, DaemonSets, Jobs, CronJobs e ReplicaSets abrem listas com
+colunas próprias. Contadores desconhecidos aparecem como `?`, nunca como zero;
+sem permissão, não servido, cobertura parcial e lista vazia são estados
+distintos, e `r` pede uma nova leitura explícita. Com espaço, a árvore
 fica ao lado do conteúdo; em terminais estreitos ela abre por cima e fecha ao
 escolher um destino. O shell funciona a partir de 80x24: abaixo de 120x36 as
 telas mostram um painel por vez, e `tab` alterna entre eles.

@@ -35,7 +35,12 @@ func TestRouterRegistersOnlyFunctionalDestinations(t *testing.T) {
 	if s, ok := screenFor(ScreenEvents); !ok || s.ID() != ScreenEvents {
 		t.Fatal("events is a functional destination")
 	}
-	if _, ok := screenFor(ScreenEvents + 1); ok {
+	for _, id := range []ScreenID{ScreenResources, ScreenOverview} {
+		if s, ok := screenFor(id); !ok || s.ID() != id {
+			t.Fatalf("screen %d is a functional destination", id)
+		}
+	}
+	if _, ok := screenFor(ScreenOverview + 1); ok {
 		t.Fatal("no other screen may be registered before it works")
 	}
 	m := demoModel(t, 160, 48)
