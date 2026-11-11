@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"slices"
 	"time"
 
@@ -39,6 +40,7 @@ type Options struct {
 	Now        func() time.Time
 	Session    data.SessionRef
 	ShowTree   bool
+	Context    context.Context
 }
 
 type Model struct {
@@ -103,6 +105,7 @@ type Model struct {
 	helpOpen bool
 	notice   notice
 	after    func(time.Duration, func(time.Time) tea.Msg) tea.Cmd
+	life     context.Context
 }
 
 func New(opts Options) Model {
@@ -140,6 +143,10 @@ func New(opts Options) Model {
 		motion:   newMotion(fps),
 		nav:      newRouter(),
 		after:    tea.Tick,
+		life:     opts.Context,
+	}
+	if m.life == nil {
+		m.life = context.Background()
 	}
 	if m.animated {
 		m.clock = anim.NewClock(now(), fps)

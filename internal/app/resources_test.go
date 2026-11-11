@@ -68,6 +68,13 @@ func (b fakeBrowser) Subscribe(_ context.Context, key data.ResourceSubscriptionK
 
 func pump(t *testing.T, m Model, cmd tea.Cmd) Model {
 	t.Helper()
+	final := drive(t, m, cmd)
+	t.Cleanup(final.releaseResources)
+	return final
+}
+
+func drive(t *testing.T, m Model, cmd tea.Cmd) Model {
+	t.Helper()
 	queue := []tea.Cmd{cmd}
 	for len(queue) > 0 {
 		c := queue[0]
@@ -94,8 +101,6 @@ func pump(t *testing.T, m Model, cmd tea.Cmd) Model {
 		m = next.(Model)
 		queue = append(queue, more)
 	}
-	final := m
-	t.Cleanup(final.releaseResources)
 	return m
 }
 
