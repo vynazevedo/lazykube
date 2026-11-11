@@ -9,7 +9,7 @@ before:
     - sh -c 'go run ./cmd/lazykube completion zsh > completions/_lazykube'
     - sh -c 'go run ./cmd/lazykube completion fish > completions/lazykube.fish'
     - sh -c 'go run ./cmd/lazykube completion powershell > completions/lazykube.ps1'
-    - sh -c 'go run ./cmd/lazykube man | gzip -9 -n > manpages/lazykube.1.gz'
+    - sh -c 'set -eu; rm -f manpages/lazykube.1.gz; SOURCE_DATE_EPOCH={{ .CommitTimestamp }} go run ./cmd/lazykube man > manpages/lazykube.1.tmp && test -s manpages/lazykube.1.tmp && gzip -9 -n -c manpages/lazykube.1.tmp > manpages/lazykube.1.gz && rm manpages/lazykube.1.tmp'
 
 builds:
   - id: lazykube
