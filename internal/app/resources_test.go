@@ -94,6 +94,8 @@ func pump(t *testing.T, m Model, cmd tea.Cmd) Model {
 		m = next.(Model)
 		queue = append(queue, more)
 	}
+	final := m
+	t.Cleanup(final.releaseResources)
 	return m
 }
 
