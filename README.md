@@ -291,6 +291,10 @@ lazykube man | gzip -c > ~/.local/share/man/man1/lazykube.1.gz
 
 `lazykube completion <shell> --help` mostra as instruções de cada shell.
 
+A data no cabeçalho da man page vem de `SOURCE_DATE_EPOCH` (segundos Unix, em UTC)
+quando definida; sem ela, usa a data atual em UTC. A release fixa essa variável
+na data do commit, então a man page sai idêntica em qualquer fuso.
+
 Ao iniciar, uma tela de loading animada mostra cada etapa da conexão:
 kubeconfig, contexto e versão do servidor, permissões e sincronização do
 cache. Se uma etapa falhar, a tela aponta qual foi e por quê e oferece `r`

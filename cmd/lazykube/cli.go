@@ -49,6 +49,7 @@ func newCommand(f *flags) *cobra.Command {
 	fs.StringVar(&f.palette, "palette", "charm", "accent palette: charm, ocean or matrix")
 	fs.BoolVar(&f.noAnim, "no-anim", false, "disable animations")
 	fs.IntVar(&f.fps, "fps", app.DefaultFPS, "animation frames per second (max 60)")
+	cmd.AddCommand(manCommand())
 	cmd.InitDefaultHelpFlag()
 	cmd.InitDefaultVersionFlag()
 	return cmd
@@ -138,7 +139,7 @@ func execute(ctx context.Context, args []string, stdout, stderr io.Writer, start
 	cmd.SetArgs(normalizeArgs(cmd, args))
 	cmd.SetOut(stdout)
 	cmd.SetErr(stderr)
-	if err := fang.Execute(ctx, cmd, fang.WithVersion(ui.Version), fang.WithCommit(commit), fang.WithColorSchemeFunc(helpColors), fang.WithErrorHandler(printError)); err != nil {
+	if err := fang.Execute(ctx, cmd, fang.WithVersion(ui.Version), fang.WithCommit(commit), fang.WithColorSchemeFunc(helpColors), fang.WithErrorHandler(printError), fang.WithoutManpage()); err != nil {
 		return exitUsage
 	}
 	return code
