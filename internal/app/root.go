@@ -53,9 +53,9 @@ type catalogMsg struct {
 	err error
 }
 
-func newSession() *session {
-	_, cancel := context.WithCancel(context.Background())
-	return &session{cancel: cancel}
+func newSession() (*session, context.Context) {
+	ctx, cancel := context.WithCancel(context.Background())
+	return &session{cancel: cancel}, ctx
 }
 
 func NewRoot(opts RootOptions) Root {
@@ -73,10 +73,12 @@ func NewRoot(opts RootOptions) Root {
 	r.attempt, r.gen = 1, 1
 	base := r.base
 	base.Session = sessionRef(base.Source, "", r.gen)
+	sess, life := newSession()
+	base.Context = life
 	m := New(base)
 	m.session.Context, m.session.Namespace = m.snap.Cluster.Context, m.snap.Cluster.Namespace
 	r.cur, r.pending = m, data.Target{Context: m.snap.Cluster.Context, Namespace: m.snap.Cluster.Namespace}
-	r.shared.current = newSession()
+	r.shared.current = sess
 	r.publish()
 	return r
 }

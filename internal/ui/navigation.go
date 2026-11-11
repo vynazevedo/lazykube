@@ -153,5 +153,6 @@ func PodDetailHelp() []KeyHelp {
 		{"m", "menu"},
 		{"?", "help"},
 		{"q", "quit"},
+		{"y", "copy"},
 	}
 }

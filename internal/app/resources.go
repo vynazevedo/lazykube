@@ -149,7 +149,7 @@ func (m *Model) cancelCatalog() {
 
 func (m *Model) loadCatalog(b data.ResourceBrowser, refresh bool) tea.Cmd {
 	m.cancelCatalog()
-	ctx, cancel := context.WithTimeout(context.Background(), catalogTimeout)
+	ctx, cancel := context.WithTimeout(m.life, catalogTimeout)
 	m.res.catalogLoading, m.res.catalogCancel = true, cancel
 	session, seq := m.session.Generation, m.res.catalogSeq
 	return func() tea.Msg {
@@ -193,7 +193,7 @@ func (m *Model) syncResources() tea.Cmd {
 		key := m.resourceKey(w)
 		tag := resourceTag{session: m.session.Generation, seq: m.res.seq, key: key}
 		served := m.res.catalog.Lookup(w.gvr).Availability == data.ResourceServed
-		ctx, cancel := context.WithCancel(context.Background())
+		ctx, cancel := context.WithCancel(m.life)
 		subs[w.gvr] = &resourceSub{key: key, seq: tag.seq, served: served, cancel: cancel, done: ctx.Done(), loading: served}
 		if !served {
 			continue

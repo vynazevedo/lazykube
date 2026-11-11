@@ -356,6 +356,7 @@ func EventsHelp(full bool) []KeyHelp {
 		KeyHelp{"m", "menu"},
 		KeyHelp{"?", "help"},
 		KeyHelp{"q", "quit"},
+		KeyHelp{"y", "copy"},
 	)
 }
 
@@ -366,6 +367,7 @@ func FullHelpEvents(full bool) []KeyHelp {
 		{"home/end", "first / last"},
 		{"enter", "read full message"},
 		{"esc", "table, back"},
+		{"y", "copy object / message"},
 	}
 	if full {
 		out = append(out, KeyHelp{"E", "scope pod / ns / cluster"})

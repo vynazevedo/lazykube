@@ -26,6 +26,7 @@ func ShortHelp() []KeyHelp {
 		{"e", "events"},
 		{"?", "help"},
 		{"q", "quit"},
+		{"y", "copy"},
 	}
 }
 
@@ -58,6 +59,7 @@ func FullHelp() []KeyHelp {
 		{"P", "current / previous logs"},
 		{"/ alt+n N", "search Log (details focus)"},
 		{"E", "events pod / ns / cluster"},
+		{"y", "copy name / YAML / log line"},
 		{"p", "cycle palette"},
 		{"1", "toggle left column"},
 		{"ctrl+p", "pause animations"},
@@ -67,8 +69,9 @@ func FullHelp() []KeyHelp {
 }
 
 type FooterState struct {
-	FPS  float64
-	Keys []KeyHelp
+	FPS    float64
+	Keys   []KeyHelp
+	Notice string
 }
 
 func Footer(divider, help draw.Region, st FooterState) {
@@ -76,6 +79,9 @@ func Footer(divider, help draw.Region, st FooterState) {
 	divider.HLine(0, 0, divider.W, '─', draw.Fg(theme.BorderFaint))
 	help.Fill(theme.BgApp)
 	right := draw.Line{faint(fmt.Sprintf("bubbletea · %d fps", int(math.Round(st.FPS))))}
+	if st.Notice != "" {
+		right = draw.Line{colored(draw.Truncate(draw.Sanitize(st.Notice), max(1, help.W/2)), theme.OK)}
+	}
 	limit := help.W - right.Width() - 2
 	x := 1
 	keys := st.Keys
@@ -136,6 +142,7 @@ func NodesHelp() []KeyHelp {
 		{"m", "menu"},
 		{"?", "help"},
 		{"q", "quit"},
+		{"y", "copy"},
 	}
 }
 
@@ -153,6 +160,7 @@ func FullHelpNodes() []KeyHelp {
 		{"c n", "switch context / namespace"},
 		{"b", "navigation tree"},
 		{"A", "ack all Security alerts"},
+		{"y", "copy pod name"},
 		{"p", "cycle palette"},
 		{"ctrl+p", "pause animations"},
 		{"?", "toggle help"},

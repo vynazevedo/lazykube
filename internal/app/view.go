@@ -44,7 +44,7 @@ func (m Model) Render() *draw.Canvas {
 	case m.dep.open:
 		keys = ui.OverlayHelp()
 	}
-	ui.Footer(screen.Sub(0, m.layout.DividerY, m.w, 1), screen.Sub(0, m.layout.FooterY, m.w, 1), ui.FooterState{FPS: m.displayFPS(), Keys: keys})
+	ui.Footer(screen.Sub(0, m.layout.DividerY, m.w, 1), screen.Sub(0, m.layout.FooterY, m.w, 1), ui.FooterState{FPS: m.displayFPS(), Keys: keys, Notice: m.notice.text})
 
 	if m.helpOpen {
 		full := active.FullHelp(m)
