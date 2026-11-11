@@ -1,0 +1,39 @@
+
+  lazykube shows pods, workloads, nodes, events and security posture of a Kubernetes cluster in the 
+  terminal.                                                                                         
+  It is read-only by default; --read-write enables actions for this process, subject to context     
+  policy.                                                                                           
+         
+  USAGE  
+         
+    lazykube [command] [--flags]                       
+            
+  EXAMPLES  
+            
+    lazykube --demo                                    
+    lazykube --context staging -n apps                 
+    lazykube --read-write --protected-contexts prod    
+    lazykube completion zsh > "${fpath[1]}/_lazykube"  
+    lazykube man > lazykube.1                          
+            
+  COMMANDS  
+            
+    completion [command]  Generate the autocompletion script for the specified shell
+    help [command]        Help about any command
+         
+  FLAGS  
+         
+    --read-write          Enable actions for this process, subject to context policy
+    --protected-contexts  Context names treated as protected, comma-separated
+    --read-only-contexts  Context names forced to read-only, comma-separated
+    --audit-file          Private local audit JSONL path
+    --demo                Run with deterministic synthetic data
+    --context             Kubeconfig context to use
+    --kubeconfig          Path to the kubeconfig file
+    -n --namespace        Limit the view to one namespace (default: all)
+    --palette             Accent palette: charm, ocean or matrix (charm)
+    --no-anim             Disable animations
+    --fps                 Animation frames per second (max 60) (30)
+    -h --help             Help for lazykube
+    -v --version          Version for lazykube
+

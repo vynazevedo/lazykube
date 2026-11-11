@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -39,37 +38,6 @@ var (
 )
 
 type connector func(ctx context.Context, opts kube.ConnectOptions) (data.Source, func(), error)
-
-func parseFlags(args []string, out io.Writer) (flags, error) {
-	var f flags
-	fs := flag.NewFlagSet("lazykube", flag.ContinueOnError)
-	fs.SetOutput(out)
-	fs.BoolVar(&f.readWrite, "read-write", false, "enable actions for this process, subject to context policy")
-	fs.StringVar(&f.protectedContexts, "protected-contexts", "", "comma-separated protected context names")
-	fs.StringVar(&f.readOnlyContexts, "read-only-contexts", "", "comma-separated read-only context names")
-	fs.StringVar(&f.auditPath, "audit-file", "", "private local audit JSONL path")
-	fs.BoolVar(&f.demo, "demo", false, "run with deterministic synthetic data")
-	fs.StringVar(&f.context, "context", "", "kubeconfig context to use")
-	fs.StringVar(&f.kubeconfig, "kubeconfig", "", "path to the kubeconfig file")
-	fs.StringVar(&f.namespace, "namespace", "", "limit the view to one namespace (default: all)")
-	fs.StringVar(&f.namespace, "n", "", "shorthand for --namespace")
-	fs.StringVar(&f.palette, "palette", "charm", "accent palette: charm, ocean or matrix")
-	fs.BoolVar(&f.noAnim, "no-anim", false, "disable animations")
-	fs.IntVar(&f.fps, "fps", app.DefaultFPS, "animation frames per second (max 60)")
-	if err := fs.Parse(args); err != nil {
-		return f, err
-	}
-	if fs.NArg() > 0 {
-		return f, fmt.Errorf("unexpected argument %q", fs.Arg(0))
-	}
-	if f.fps < 1 || f.fps > app.MaxFPS {
-		return f, fmt.Errorf("--fps must be between 1 and %d", app.MaxFPS)
-	}
-	if _, err := theme.PaletteByName(f.palette); err != nil {
-		return f, err
-	}
-	return f, nil
-}
 
 func connectCluster(ctx context.Context, opts kube.ConnectOptions) (data.Source, func(), error) {
 	kube.SilenceClientLogs()
@@ -166,14 +134,12 @@ func finish(final tea.Model, stderr io.Writer) int {
 }
 
 func run(args []string, stderr io.Writer, connect connector, progOpts ...tea.ProgramOption) int {
-	f, err := parseFlags(args, stderr)
-	if err != nil {
-		if errors.Is(err, flag.ErrHelp) {
-			return 0
-		}
-		_, _ = fmt.Fprintln(stderr, err)
-		return 2
-	}
+	return execute(context.Background(), args, os.Stdout, stderr, func(f flags) int {
+		return start(f, stderr, connect, progOpts...)
+	})
+}
+
+func start(f flags, stderr io.Writer, connect connector, progOpts ...tea.ProgramOption) int {
 	model, shutdown, err := buildModel(f, connect)
 	if err != nil {
 		_, _ = fmt.Fprintln(stderr, "lazykube:", err)
