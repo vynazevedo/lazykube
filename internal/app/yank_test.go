@@ -1,6 +1,8 @@
 package app
 
 import (
+	"encoding/base64"
+	"fmt"
 	"reflect"
 	"strings"
 	"testing"
@@ -68,7 +70,7 @@ func TestYankCopiesTheListSelection(t *testing.T) {
 	if !ok || text != pod.Key() {
 		t.Fatalf("clipboard = %q (%v), want %q", text, ok, pod.Key())
 	}
-	if got.notice.text != "copiado: "+pod.Key() {
+	if got.notice.text != "enviado ao clipboard: "+pod.Key() {
 		t.Fatalf("notice = %q", got.notice.text)
 	}
 
@@ -116,7 +118,7 @@ func TestYankCopiesTheWholeManifest(t *testing.T) {
 			if !ok || text != want {
 				t.Fatalf("clipboard must hold the whole manifest, got %d bytes", len(text))
 			}
-			if !strings.HasPrefix(got.notice.text, "copiado: YAML de ") {
+			if !strings.HasPrefix(got.notice.text, "enviado ao clipboard: YAML de ") {
 				t.Fatalf("notice = %q", got.notice.text)
 			}
 		})
@@ -145,7 +147,7 @@ func TestYankCopiesTheLogLine(t *testing.T) {
 	if text, _ := clipboardOf(msgs); text != match {
 		t.Fatalf("with a search the current match is copied, got %q want %q", text, match)
 	}
-	if got.notice.text != "copiado: linha do log: "+match {
+	if got.notice.text != "enviado ao clipboard: linha do log: "+match {
 		t.Fatalf("notice = %q", got.notice.text)
 	}
 }
@@ -183,6 +185,44 @@ func TestYankWithoutTargetOnlyWarns(t *testing.T) {
 	}
 	if got.notice.text != "nada para copiar" {
 		t.Fatalf("notice = %q", got.notice.text)
+	}
+}
+
+func manifestModel(t *testing.T, payload int) Model {
+	t.Helper()
+	m := yankModel(t, 160, 48)
+	m.focus = FocusDetails
+	m.tab = ui.TabConfig
+	m.manifest = []string{strings.Repeat("x", payload-1)}
+	return m
+}
+
+func TestYankAcceptsPayloadAtTheLimit(t *testing.T) {
+	raw := clipboardLimit / 4 * 3
+	if base64.StdEncoding.EncodedLen(raw) != clipboardLimit {
+		t.Fatalf("fixture must encode to exactly the limit, got %d", base64.StdEncoding.EncodedLen(raw))
+	}
+	got, msgs := pressYank(t, manifestModel(t, raw))
+	text, ok := clipboardOf(msgs)
+	if !ok || len(text) != raw {
+		t.Fatalf("payload at the limit must be sent whole, got %d bytes (%v)", len(text), ok)
+	}
+	if !strings.HasPrefix(got.notice.text, "enviado ao clipboard: YAML de ") {
+		t.Fatalf("notice = %q", got.notice.text)
+	}
+}
+
+func TestYankRefusesPayloadAboveTheLimit(t *testing.T) {
+	for _, raw := range []int{clipboardLimit/4*3 + 1, 1 << 20} {
+		got, msgs := pressYank(t, manifestModel(t, raw))
+		if text, ok := clipboardOf(msgs); ok {
+			t.Fatalf("payload of %d bytes must not be sent, got %d bytes", raw, len(text))
+		}
+		size := (base64.StdEncoding.EncodedLen(raw) + 1023) / 1024
+		want := fmt.Sprintf("grande demais para copiar (%d KiB, limite %d KiB)", size, clipboardLimit/1024)
+		if got.notice.text != want {
+			t.Fatalf("notice = %q, want %q", got.notice.text, want)
+		}
 	}
 }
 

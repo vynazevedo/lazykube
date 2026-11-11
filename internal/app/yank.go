@@ -1,6 +1,7 @@
 package app
 
 import (
+	"encoding/base64"
 	"fmt"
 	"strings"
 	"time"
@@ -10,7 +11,10 @@ import (
 	"github.com/vynazevedo/lazykube/internal/ui"
 )
 
-const noticeTTL = 2 * time.Second
+const (
+	noticeTTL      = 2 * time.Second
+	clipboardLimit = 100000
+)
 
 type yank struct {
 	label string
@@ -129,7 +133,10 @@ func (m Model) yank() (Model, tea.Cmd) {
 	if !ok {
 		return m, m.showNotice("nada para copiar")
 	}
-	return m, tea.Batch(tea.SetClipboard(y.text), m.showNotice("copiado: "+y.label))
+	if size := base64.StdEncoding.EncodedLen(len(y.text)); size > clipboardLimit {
+		return m, m.showNotice(fmt.Sprintf("grande demais para copiar (%d KiB, limite %d KiB)", (size+1023)/1024, clipboardLimit/1024))
+	}
+	return m, tea.Batch(tea.SetClipboard(y.text), m.showNotice("enviado ao clipboard: "+y.label))
 }
 
 func (m *Model) showNotice(text string) tea.Cmd {
