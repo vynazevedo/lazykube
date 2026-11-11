@@ -186,3 +186,78 @@ func TestHelpGolden(t *testing.T) {
 		t.Fatalf("help differs from golden; run go test ./cmd/lazykube -update and review the diff\n%s", got)
 	}
 }
+
+func TestNormalizeArgsKeepsFlagValues(t *testing.T) {
+	cmd := newCommand(&flags{})
+	for _, tc := range []struct {
+		args []string
+		want []string
+	}{
+		{[]string{"-demo", "-fps=12", "-context", "dev"}, []string{"--demo", "--fps=12", "--context", "dev"}},
+		{[]string{"-fps", "12"}, []string{"--fps", "12"}},
+		{[]string{"--context", "-demo"}, []string{"--context", "-demo"}},
+		{[]string{"-context", "-demo"}, []string{"--context", "-demo"}},
+		{[]string{"--context", "-fps=12"}, []string{"--context", "-fps=12"}},
+		{[]string{"--context=-demo", "-demo"}, []string{"--context=-demo", "--demo"}},
+		{[]string{"--kubeconfig", "-demo"}, []string{"--kubeconfig", "-demo"}},
+		{[]string{"-kubeconfig", "-no-anim"}, []string{"--kubeconfig", "-no-anim"}},
+		{[]string{"--namespace", "-demo"}, []string{"--namespace", "-demo"}},
+		{[]string{"-n", "-demo"}, []string{"-n", "-demo"}},
+		{[]string{"-n", "-fps=12", "-demo"}, []string{"-n", "-fps=12", "--demo"}},
+		{[]string{"-n=-demo", "-demo"}, []string{"-n=-demo", "--demo"}},
+		{[]string{"--palette", "-ocean"}, []string{"--palette", "-ocean"}},
+		{[]string{"-palette", "-demo"}, []string{"--palette", "-demo"}},
+		{[]string{"--audit-file", "-demo"}, []string{"--audit-file", "-demo"}},
+		{[]string{"-audit-file", "-x.jsonl"}, []string{"--audit-file", "-x.jsonl"}},
+		{[]string{"--protected-contexts", "-demo"}, []string{"--protected-contexts", "-demo"}},
+		{[]string{"-protected-contexts", "-fps=12"}, []string{"--protected-contexts", "-fps=12"}},
+		{[]string{"--read-only-contexts", "-demo"}, []string{"--read-only-contexts", "-demo"}},
+		{[]string{"-read-only-contexts", "-context"}, []string{"--read-only-contexts", "-context"}},
+		{[]string{"--fps", "-demo"}, []string{"--fps", "-demo"}},
+		{[]string{"-fps", "-12"}, []string{"--fps", "-12"}},
+		{[]string{"--demo", "-no-anim"}, []string{"--demo", "--no-anim"}},
+		{[]string{"-read-write", "-demo"}, []string{"--read-write", "--demo"}},
+		{[]string{"-demo", "--", "-fps=12", "-context"}, []string{"--demo", "--", "-fps=12", "-context"}},
+		{[]string{"--context", "--", "-demo"}, []string{"--context", "--", "--demo"}},
+		{[]string{"-x", "-demo"}, []string{"-x", "--demo"}},
+		{[]string{"-nope", "-demo"}, []string{"-nope", "--demo"}},
+	} {
+		t.Run(strings.Join(tc.args, " "), func(t *testing.T) {
+			if got := normalizeArgs(cmd, tc.args); !reflect.DeepEqual(got, tc.want) {
+				t.Fatalf("got %q want %q", got, tc.want)
+			}
+		})
+	}
+}
+
+func TestFlagValuesStartingWithDash(t *testing.T) {
+	with := func(change func(*flags)) flags {
+		f := defaults()
+		change(&f)
+		return f
+	}
+	for _, tc := range []struct {
+		args []string
+		want flags
+	}{
+		{[]string{"--context", "-demo"}, with(func(f *flags) { f.context = "-demo" })},
+		{[]string{"-context", "-demo"}, with(func(f *flags) { f.context = "-demo" })},
+		{[]string{"--context", "-fps=12"}, with(func(f *flags) { f.context = "-fps=12" })},
+		{[]string{"-kubeconfig", "-demo"}, with(func(f *flags) { f.kubeconfig = "-demo" })},
+		{[]string{"-n", "-demo", "-demo"}, with(func(f *flags) { f.namespace, f.demo = "-demo", true })},
+		{[]string{"-namespace", "-fps=12"}, with(func(f *flags) { f.namespace = "-fps=12" })},
+		{[]string{"-audit-file", "-demo"}, with(func(f *flags) { f.auditPath = "-demo" })},
+		{[]string{"-protected-contexts", "-demo"}, with(func(f *flags) { f.protectedContexts = "-demo" })},
+		{[]string{"-read-only-contexts", "-demo"}, with(func(f *flags) { f.readOnlyContexts = "-demo" })},
+	} {
+		t.Run(strings.Join(tc.args, " "), func(t *testing.T) {
+			got, err := parseFlags(tc.args, &bytes.Buffer{})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, tc.want) {
+				t.Fatalf("got %+v want %+v", got, tc.want)
+			}
+		})
+	}
+}

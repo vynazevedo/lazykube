@@ -10,6 +10,7 @@ import (
 	"charm.land/fang/v2"
 	"charm.land/lipgloss/v2"
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 
 	"github.com/vynazevedo/lazykube/internal/app"
 	"github.com/vynazevedo/lazykube/internal/theme"
@@ -64,20 +65,34 @@ func validate(f flags) error {
 }
 
 func normalizeArgs(cmd *cobra.Command, args []string) []string {
+	fs := cmd.Flags()
 	out := make([]string, 0, len(args))
+	value := false
 	for i, a := range args {
-		if a == "--" {
+		switch {
+		case value:
+			value = false
+		case a == "--":
 			return append(out, args[i:]...)
-		}
-		if strings.HasPrefix(a, "-") && !strings.HasPrefix(a, "--") {
-			name, _, _ := strings.Cut(a[1:], "=")
-			if len(name) > 1 && cmd.Flags().Lookup(name) != nil {
+		case strings.HasPrefix(a, "--"):
+			name, _, inline := strings.Cut(a[2:], "=")
+			value = !inline && takesValue(fs.Lookup(name))
+		case len(a) > 1 && a[0] == '-':
+			name, _, inline := strings.Cut(a[1:], "=")
+			if f := fs.Lookup(name); len(name) > 1 && f != nil {
 				a = "-" + a
+				value = !inline && takesValue(f)
+			} else {
+				value = len(a) == 2 && takesValue(fs.ShorthandLookup(a[1:2]))
 			}
 		}
 		out = append(out, a)
 	}
 	return out
+}
+
+func takesValue(f *pflag.Flag) bool {
+	return f != nil && f.NoOptDefVal == ""
 }
 
 func helpColors(c lipgloss.LightDarkFunc) fang.ColorScheme {

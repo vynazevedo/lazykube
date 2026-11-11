@@ -271,7 +271,9 @@ a cobertura; sua ausência deve resultar em degradação explícita da funcional
  └──────────────────────────────────────────────────────────────────────┘
 ```
 
-Flags longas aceitam `--flag` e, por compatibilidade, `-flag`; erros de flag,
+Flags longas aceitam `--flag` e, por compatibilidade, `-flag`; o token logo
+após uma flag que recebe valor é sempre o valor (`--context -demo` usa o
+contexto `-demo`) e nada depois de `--` é reescrito; erros de flag,
 argumento inesperado ou valor inválido saem com código 2.
 
 ### Completions e man page
