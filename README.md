@@ -353,6 +353,7 @@ os painéis: clique seleciona, a roda rola e o clique na aba troca de aba.
  │                                                       │
  ├─ GERAL ───────────────────────────────────────────────┤
  │                                                       │
+ │  y                 copia nome, YAML ou linha do log   │
  │  p                 troca a paleta de cores            │
  │  ctrl+p            pausa / retoma animações           │
  │  ?                 ajuda                              │
@@ -360,6 +361,13 @@ os painéis: clique seleciona, a roda rola e o clique na aba troca de aba.
  │                                                       │
  └───────────────────────────────────────────────────────┘
 ```
+
+A tecla `y` copia para a área de transferência via OSC52, sem dependência do
+sistema: nas listas vai o nome do recurso (`namespace/nome` quando houver
+namespace), no detalhe e no manifest vai o YAML inteiro, e no Log vai a linha do
+match atual da busca ou a última linha visível. O rodapé confirma com
+`copiado: ...`. O terminal precisa aceitar OSC52 (dentro do tmux, habilite
+`set -g set-clipboard on`).
 
 ---
 

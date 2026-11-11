@@ -21,7 +21,7 @@ func tableKeys(m Model) []key.Binding {
 		k.Up, k.Down, k.PageUp, k.PageDown, k.Home, k.End, k.Enter, k.Esc, k.Refresh,
 		k.SecurityAck, k.Palette, k.Pause, k.Help, k.Quit,
 		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads, k.Nodes, k.Events,
-		k.Context, k.Namespace, k.Tree,
+		k.Context, k.Namespace, k.Tree, k.Yank,
 	}
 }
 

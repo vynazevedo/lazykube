@@ -424,6 +424,8 @@ func (m Model) routeKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 		case key.Matches(msg, k.Esc):
 			m.handleEsc()
 			return m, nil
+		case key.Matches(msg, k.Yank):
+			return m.yank()
 		}
 	}
 	return m.screen().Update(m, msg)

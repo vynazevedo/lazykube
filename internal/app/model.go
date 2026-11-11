@@ -101,6 +101,8 @@ type Model struct {
 	wrap     bool
 	newLines int
 	helpOpen bool
+	notice   notice
+	after    func(time.Duration, func(time.Time) tea.Msg) tea.Cmd
 }
 
 func New(opts Options) Model {
@@ -137,6 +139,7 @@ func New(opts Options) Model {
 		follow:   true,
 		motion:   newMotion(fps),
 		nav:      newRouter(),
+		after:    tea.Tick,
 	}
 	if m.animated {
 		m.clock = anim.NewClock(now(), fps)
@@ -318,6 +321,9 @@ func (m Model) withResources(cmd tea.Cmd) (tea.Model, tea.Cmd) {
 
 func (m Model) update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
+	case noticeExpiredMsg:
+		m.expireNotice(msg)
+		return m, nil
 	case dataMsg:
 		if msg.session != m.session.Generation {
 			return m, nil

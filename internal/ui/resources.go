@@ -419,7 +419,7 @@ func WorkloadOverview(r draw.Region, st OverviewState, ctx Ctx) {
 }
 
 func ResourceHelp() []KeyHelp {
-	return []KeyHelp{{"↑↓", "move"}, {"r", "reload"}, {"esc", "back"}, {"b", "tree"}, {"m", "menu"}, {"?", "help"}, {"q", "quit"}}
+	return []KeyHelp{{"↑↓", "move"}, {"r", "reload"}, {"esc", "back"}, {"b", "tree"}, {"m", "menu"}, {"?", "help"}, {"q", "quit"}, {"y", "copy"}}
 }
 
 func FullHelpResources() []KeyHelp {
@@ -428,6 +428,7 @@ func FullHelpResources() []KeyHelp {
 		{"pgup/pgdn", "page"},
 		{"home/end", "first / last"},
 		{"r", "reload list (retry denied or list-only)"},
+		{"y", "copy namespace/name"},
 		{"esc", "back"},
 		{"b", "navigation tree"},
 		{"m", "screens menu ← → enter"},
