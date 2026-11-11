@@ -13,6 +13,7 @@ import (
 	"testing"
 
 	"github.com/vynazevedo/lazykube/internal/app"
+	"github.com/vynazevedo/lazykube/internal/theme"
 	"github.com/vynazevedo/lazykube/internal/ui"
 )
 
@@ -204,7 +205,7 @@ func TestNormalizeArgsKeepsFlagValues(t *testing.T) {
 		{[]string{"--namespace", "-demo"}, []string{"--namespace", "-demo"}},
 		{[]string{"-n", "-demo"}, []string{"-n", "-demo"}},
 		{[]string{"-n", "-fps=12", "-demo"}, []string{"-n", "-fps=12", "--demo"}},
-		{[]string{"-n=-demo", "-demo"}, []string{"-n=-demo", "--demo"}},
+		{[]string{"-n=-demo", "-demo"}, []string{"--namespace=-demo", "--demo"}},
 		{[]string{"--palette", "-ocean"}, []string{"--palette", "-ocean"}},
 		{[]string{"-palette", "-demo"}, []string{"--palette", "-demo"}},
 		{[]string{"--audit-file", "-demo"}, []string{"--audit-file", "-demo"}},
@@ -273,6 +274,11 @@ var namespaceAliasCases = [][]string{
 	{"--context", "--n"},
 	{"--context=dev", "--n", "-demo"},
 	{"-palette", "ocean", "--n", "apps", "-demo"},
+	{"--n="},
+	{"-n="},
+	{"--namespace", "apps", "--n="},
+	{"--namespace", "apps", "-n="},
+	{"--n=", "--namespace", "apps"},
 }
 
 func legacyParse(args []string) (flags, error) {
@@ -297,6 +303,12 @@ func legacyParse(args []string) (flags, error) {
 	if fs.NArg() > 0 {
 		return f, errParse
 	}
+	if f.fps < 1 || f.fps > app.MaxFPS {
+		return f, errParse
+	}
+	if _, err := theme.PaletteByName(f.palette); err != nil {
+		return f, err
+	}
 	return f, nil
 }
 
@@ -317,6 +329,11 @@ func TestNamespaceLongAliasN(t *testing.T) {
 		with(func(f *flags) { f.context = "--n" }),
 		with(func(f *flags) { f.context, f.namespace, f.demo = "dev", "-demo", false }),
 		with(func(f *flags) { f.palette, f.namespace, f.demo = "ocean", "apps", true }),
+		defaults(),
+		defaults(),
+		defaults(),
+		defaults(),
+		with(func(f *flags) { f.namespace = "apps" }),
 	} {
 		args := namespaceAliasCases[i]
 		t.Run(strings.Join(args, " "), func(t *testing.T) {
@@ -374,8 +391,12 @@ func TestDoubleDashShorthandOnlyForValueFlags(t *testing.T) {
 		args []string
 		want []string
 	}{
-		{[]string{"--n", "a"}, []string{"-n", "a"}},
-		{[]string{"--n=a"}, []string{"-n=a"}},
+		{[]string{"--n", "a"}, []string{"--namespace", "a"}},
+		{[]string{"-n", "a"}, []string{"-n", "a"}},
+		{[]string{"-na"}, []string{"-na"}},
+		{[]string{"-n="}, []string{"--namespace="}},
+		{[]string{"--n=a"}, []string{"--namespace=a"}},
+		{[]string{"--n="}, []string{"--namespace="}},
 		{[]string{"--h"}, []string{"--h"}},
 		{[]string{"--v"}, []string{"--v"}},
 		{[]string{"--x", "-demo"}, []string{"--x", "--demo"}},
@@ -384,5 +405,44 @@ func TestDoubleDashShorthandOnlyForValueFlags(t *testing.T) {
 		if got := normalizeArgs(cmd, tc.args); !reflect.DeepEqual(got, tc.want) {
 			t.Fatalf("%q: got %q want %q", tc.args, got, tc.want)
 		}
+	}
+}
+
+func TestShorthandNKeepsAttachedValue(t *testing.T) {
+	for args, want := range map[string]string{"-n x": "x", "-nx": "x", "-n=x": "x", "--n=x": "x", "-n=": "", "--n=": ""} {
+		got, err := parseFlags(strings.Fields(args), &bytes.Buffer{})
+		if err != nil || got.namespace != want {
+			t.Fatalf("%q: namespace=%q err=%v want %q", args, got.namespace, err, want)
+		}
+	}
+}
+
+func TestNamespaceAliasMatchesLegacyGrid(t *testing.T) {
+	values := []string{"default", "", "--n", "--n=x", "-n", "-n=", "--n=", "--", "-", "-demo", "-fps=12", "help", "man"}
+	tails := [][]string{nil, {"--n=last"}, {"--n="}, {"-n="}, {"-n", "last", "--namespace", "last2"}, {"--namespace", "apps", "--n="}, {"-demo=false"}, {"--fps=0"}, {"--palette=nope"}}
+	count := 0
+	for _, prefix := range []string{"--n", "-n", "--namespace", "-namespace", "--context", "-context", "--audit-file", "--kubeconfig"} {
+		for _, value := range values {
+			for _, tail := range tails {
+				args := append([]string{prefix, value}, tail...)
+				want, wantErr := legacyParse(args)
+				got, err := parseFlags(args, &bytes.Buffer{})
+				if (err != nil) != (wantErr != nil) || (err == nil && !reflect.DeepEqual(got, want)) {
+					t.Errorf("%q: got %+v err=%v legacy %+v err=%v", args, got, err, want, wantErr)
+				}
+				count++
+			}
+		}
+	}
+	for _, args := range [][]string{{"--n="}, {"-n="}, {"--n=="}, {"--n"}, {"--n", ""}, {"--namespace="}, {"--namespace", "apps", "--n="}, {"--namespace", "apps", "-n="}, {"--", "--n", "x"}} {
+		want, wantErr := legacyParse(args)
+		got, err := parseFlags(args, &bytes.Buffer{})
+		if (err != nil) != (wantErr != nil) || (err == nil && !reflect.DeepEqual(got, want)) {
+			t.Errorf("%q: got %+v err=%v legacy %+v err=%v", args, got, err, want, wantErr)
+		}
+		count++
+	}
+	if count < 900 {
+		t.Fatalf("grid shrank to %d cases", count)
 	}
 }
