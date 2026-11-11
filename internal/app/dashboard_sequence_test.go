@@ -164,10 +164,11 @@ func TestDashboardInteractionSequence(t *testing.T) {
 				}
 				return
 			}
-			if got == string(want) {
+			text := strings.ReplaceAll(string(want), "\r\n", "\n")
+			if got == text {
 				return
 			}
-			gl, wl := strings.Split(got, "\n"), strings.Split(string(want), "\n")
+			gl, wl := strings.Split(got, "\n"), strings.Split(text, "\n")
 			for i := range min(len(gl), len(wl)) {
 				if gl[i] != wl[i] {
 					t.Fatalf("dashboard interaction sequence differs at line %d:\n got %q\nwant %q", i+1, gl[i], wl[i])

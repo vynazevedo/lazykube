@@ -182,7 +182,7 @@ func TestHelpGolden(t *testing.T) {
 	if err != nil {
 		t.Fatalf("missing golden %s, run go test -update: %v", path, err)
 	}
-	if string(want) != got {
+	if strings.ReplaceAll(string(want), "\r\n", "\n") != got {
 		t.Fatalf("help differs from golden; run go test ./cmd/lazykube -update and review the diff\n%s", got)
 	}
 }

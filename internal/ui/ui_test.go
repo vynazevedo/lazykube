@@ -39,7 +39,7 @@ func check(t *testing.T, name string, c *draw.Canvas) {
 		if err != nil {
 			t.Fatalf("missing golden %s, run go test -update: %v", path, err)
 		}
-		if !bytes.Equal(want, []byte(got)) {
+		if !bytes.Equal(bytes.ReplaceAll(want, []byte("\r\n"), []byte("\n")), []byte(got)) {
 			t.Fatalf("%s differs from golden", path)
 		}
 	}

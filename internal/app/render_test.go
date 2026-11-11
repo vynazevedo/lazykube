@@ -53,7 +53,7 @@ func golden(t *testing.T, name string, got string) {
 	if err != nil {
 		t.Fatalf("missing golden %s, run go test -update: %v", path, err)
 	}
-	if !bytes.Equal(want, []byte(got)) {
+	if !bytes.Equal(bytes.ReplaceAll(want, []byte("\r\n"), []byte("\n")), []byte(got)) {
 		t.Fatalf("%s differs from golden; run go test ./internal/app -update and review the diff", name)
 	}
 }
