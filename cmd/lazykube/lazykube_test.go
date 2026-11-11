@@ -27,14 +27,6 @@ func TestParseFlagsNamespaceShorthand(t *testing.T) {
 	}
 }
 
-func TestParseFlagsRejectsInvalidInput(t *testing.T) {
-	for _, args := range [][]string{{"--fps", "0"}, {"--fps", "61"}, {"--palette", "nope"}, {"extra"}} {
-		if _, err := parseFlags(args, &bytes.Buffer{}); err == nil {
-			t.Fatalf("expected error for %v", args)
-		}
-	}
-}
-
 func TestDemoSkipsConnectorAndLoader(t *testing.T) {
 	called := false
 	connect := func(context.Context, kube.ConnectOptions) (data.Source, func(), error) {

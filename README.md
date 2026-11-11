@@ -265,9 +265,35 @@ a cobertura; sua ausência deve resultar em degradação explícita da funcional
  │  lazykube --fps 30               # quadros por segundo (1 a 60)      │
  │  lazykube --no-anim              # desliga animações                 │
  │  lazykube --demo                 # dados sintéticos determinísticos  │
+ │  lazykube --version              # versão e commit do build          │
+ │  lazykube --help                 # ajuda com todas as flags          │
  │                                                                      │
  └──────────────────────────────────────────────────────────────────────┘
 ```
+
+Flags longas aceitam `--flag` e, por compatibilidade, `-flag`; o token logo
+após uma flag que recebe valor é sempre o valor (`--context -demo` usa o
+contexto `-demo`) e nada depois de `--` é reescrito; erros de flag,
+argumento inesperado ou valor inválido saem com código 2.
+
+### Completions e man page
+
+Os pacotes da release trazem `completions/` (bash, zsh, fish e PowerShell) e
+`manpages/lazykube.1.gz`. Para gerar a partir do binário:
+
+```bash
+lazykube completion bash > ~/.local/share/bash-completion/completions/lazykube
+lazykube completion zsh > "${fpath[1]}/_lazykube"
+lazykube completion fish > ~/.config/fish/completions/lazykube.fish
+lazykube completion powershell | Out-String | Invoke-Expression
+lazykube man | gzip -c > ~/.local/share/man/man1/lazykube.1.gz
+```
+
+`lazykube completion <shell> --help` mostra as instruções de cada shell.
+
+A data no cabeçalho da man page vem de `SOURCE_DATE_EPOCH` (segundos Unix, em UTC)
+quando definida; sem ela, usa a data atual em UTC. A release fixa essa variável
+na data do commit, então a man page sai idêntica em qualquer fuso.
 
 Ao iniciar, uma tela de loading animada mostra cada etapa da conexão:
 kubeconfig, contexto e versão do servidor, permissões e sincronização do

@@ -57,3 +57,5 @@ Temporary Items
 # Local validation and release artifacts
 .local/
 dist/
+completions/
+manpages/
