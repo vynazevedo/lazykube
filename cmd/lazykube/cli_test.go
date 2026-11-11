@@ -261,3 +261,128 @@ func TestFlagValuesStartingWithDash(t *testing.T) {
 		})
 	}
 }
+
+var namespaceAliasCases = [][]string{
+	{"--n", "default"},
+	{"--n=default"},
+	{"-n", "default"},
+	{"-n=default"},
+	{"--namespace", "x", "--n", "y"},
+	{"--n", "y", "--namespace", "x"},
+	{"-n", "a", "--n=b"},
+	{"--context", "--n"},
+	{"--context=dev", "--n", "-demo"},
+	{"-palette", "ocean", "--n", "apps", "-demo"},
+}
+
+func legacyParse(args []string) (flags, error) {
+	f := defaults()
+	fs := flag.NewFlagSet("lazykube", flag.ContinueOnError)
+	fs.SetOutput(io.Discard)
+	fs.BoolVar(&f.readWrite, "read-write", false, "")
+	fs.StringVar(&f.protectedContexts, "protected-contexts", "", "")
+	fs.StringVar(&f.readOnlyContexts, "read-only-contexts", "", "")
+	fs.StringVar(&f.auditPath, "audit-file", "", "")
+	fs.BoolVar(&f.demo, "demo", false, "")
+	fs.StringVar(&f.context, "context", "", "")
+	fs.StringVar(&f.kubeconfig, "kubeconfig", "", "")
+	fs.StringVar(&f.namespace, "namespace", "", "")
+	fs.StringVar(&f.namespace, "n", "", "")
+	fs.StringVar(&f.palette, "palette", "charm", "")
+	fs.BoolVar(&f.noAnim, "no-anim", false, "")
+	fs.IntVar(&f.fps, "fps", app.DefaultFPS, "")
+	if err := fs.Parse(args); err != nil {
+		return f, err
+	}
+	if fs.NArg() > 0 {
+		return f, errParse
+	}
+	return f, nil
+}
+
+func TestNamespaceLongAliasN(t *testing.T) {
+	with := func(change func(*flags)) flags {
+		f := defaults()
+		change(&f)
+		return f
+	}
+	for i, want := range []flags{
+		with(func(f *flags) { f.namespace = "default" }),
+		with(func(f *flags) { f.namespace = "default" }),
+		with(func(f *flags) { f.namespace = "default" }),
+		with(func(f *flags) { f.namespace = "default" }),
+		with(func(f *flags) { f.namespace = "y" }),
+		with(func(f *flags) { f.namespace = "x" }),
+		with(func(f *flags) { f.namespace = "b" }),
+		with(func(f *flags) { f.context = "--n" }),
+		with(func(f *flags) { f.context, f.namespace, f.demo = "dev", "-demo", false }),
+		with(func(f *flags) { f.palette, f.namespace, f.demo = "ocean", "apps", true }),
+	} {
+		args := namespaceAliasCases[i]
+		t.Run(strings.Join(args, " "), func(t *testing.T) {
+			got, err := parseFlags(args, &bytes.Buffer{})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, want) {
+				t.Fatalf("got %+v want %+v", got, want)
+			}
+		})
+	}
+}
+
+func TestNamespaceAliasMatchesLegacyFlag(t *testing.T) {
+	for _, args := range namespaceAliasCases {
+		t.Run(strings.Join(args, " "), func(t *testing.T) {
+			want, wantErr := legacyParse(args)
+			got, err := parseFlags(args, &bytes.Buffer{})
+			if (err != nil) != (wantErr != nil) {
+				t.Fatalf("err=%v legacy err=%v", err, wantErr)
+			}
+			if err == nil && !reflect.DeepEqual(got, want) {
+				t.Fatalf("got %+v legacy %+v", got, want)
+			}
+		})
+	}
+}
+
+func TestNamespaceAliasStaysOutOfHelpAndCompletions(t *testing.T) {
+	var help bytes.Buffer
+	if code := execute(context.Background(), []string{"--help"}, &help, io.Discard, func(flags) int { return 1 }); code != 0 {
+		t.Fatal(code)
+	}
+	if strings.Contains(help.String(), "--n ") || strings.Contains(help.String(), "--n=") {
+		t.Fatalf("help lists --n as a long flag:\n%s", help.String())
+	}
+	var comp bytes.Buffer
+	if code := execute(context.Background(), []string{"__complete", "--"}, &comp, io.Discard, func(flags) int { return 1 }); code != 0 {
+		t.Fatal(code)
+	}
+	for _, line := range strings.Split(comp.String(), "\n") {
+		if name, _, _ := strings.Cut(line, "\t"); name == "--n" {
+			t.Fatalf("completions offer --n:\n%s", comp.String())
+		}
+	}
+	if !strings.Contains(comp.String(), "--namespace") {
+		t.Fatalf("completions lost --namespace:\n%s", comp.String())
+	}
+}
+
+func TestDoubleDashShorthandOnlyForValueFlags(t *testing.T) {
+	cmd := newCommand(&flags{})
+	for _, tc := range []struct {
+		args []string
+		want []string
+	}{
+		{[]string{"--n", "a"}, []string{"-n", "a"}},
+		{[]string{"--n=a"}, []string{"-n=a"}},
+		{[]string{"--h"}, []string{"--h"}},
+		{[]string{"--v"}, []string{"--v"}},
+		{[]string{"--x", "-demo"}, []string{"--x", "--demo"}},
+		{[]string{"-demo", "--", "--n", "a"}, []string{"--demo", "--", "--n", "a"}},
+	} {
+		if got := normalizeArgs(cmd, tc.args); !reflect.DeepEqual(got, tc.want) {
+			t.Fatalf("%q: got %q want %q", tc.args, got, tc.want)
+		}
+	}
+}

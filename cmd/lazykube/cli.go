@@ -77,7 +77,13 @@ func normalizeArgs(cmd *cobra.Command, args []string) []string {
 			return append(out, args[i:]...)
 		case strings.HasPrefix(a, "--"):
 			name, _, inline := strings.Cut(a[2:], "=")
-			value = !inline && takesValue(fs.Lookup(name))
+			f := fs.Lookup(name)
+			if f == nil && len(name) == 1 {
+				if short := fs.ShorthandLookup(name); takesValue(short) {
+					a, f = a[1:], short
+				}
+			}
+			value = !inline && takesValue(f)
 		case len(a) > 1 && a[0] == '-':
 			name, _, inline := strings.Cut(a[1:], "=")
 			if f := fs.Lookup(name); len(name) > 1 && f != nil {
