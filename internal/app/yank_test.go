@@ -251,9 +251,30 @@ func TestNoticeExpiresOnlyForItsOwnSeq(t *testing.T) {
 	if m.notice.text == "" {
 		t.Fatal("an older expiry must not clear a newer notice")
 	}
-	next, _ = m.Update(noticeExpiredMsg{seq: m.notice.seq})
+	next, _ = m.Update(noticeExpiredMsg{seq: m.notice.seq, session: m.session.Generation})
 	if next.(Model).notice.text != "" {
 		t.Fatal("the current expiry clears the notice")
+	}
+}
+
+func TestNoticeIgnoresExpiryFromAnotherSession(t *testing.T) {
+	old := yankModel(t, 160, 48)
+	_, msgs := pressYank(t, old)
+	var stale noticeExpiredMsg
+	for _, msg := range msgs {
+		if e, ok := msg.(noticeExpiredMsg); ok {
+			stale = e
+		}
+	}
+	fresh := yankModel(t, 160, 48)
+	fresh.session.Generation = old.session.Generation + 1
+	fresh, _ = pressYank(t, fresh)
+	if fresh.notice.seq != stale.seq {
+		t.Fatalf("fixture needs colliding seqs, got %d and %d", fresh.notice.seq, stale.seq)
+	}
+	next, _ := fresh.Update(stale)
+	if next.(Model).notice.text == "" {
+		t.Fatal("an expiry from a previous session must not clear the new session notice")
 	}
 }
 

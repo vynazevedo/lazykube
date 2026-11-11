@@ -26,7 +26,10 @@ type notice struct {
 	seq  int
 }
 
-type noticeExpiredMsg struct{ seq int }
+type noticeExpiredMsg struct {
+	seq     int
+	session uint64
+}
 
 func (m Model) yankTarget() (yank, bool) {
 	switch {
@@ -142,16 +145,16 @@ func (m Model) yank() (Model, tea.Cmd) {
 func (m *Model) showNotice(text string) tea.Cmd {
 	m.notice.seq++
 	m.notice.text = text
-	seq := m.notice.seq
+	seq, session := m.notice.seq, m.session.Generation
 	after := m.after
 	if after == nil {
 		after = tea.Tick
 	}
-	return after(noticeTTL, func(time.Time) tea.Msg { return noticeExpiredMsg{seq: seq} })
+	return after(noticeTTL, func(time.Time) tea.Msg { return noticeExpiredMsg{seq: seq, session: session} })
 }
 
 func (m *Model) expireNotice(msg noticeExpiredMsg) {
-	if msg.seq == m.notice.seq {
+	if msg.session == m.session.Generation && msg.seq == m.notice.seq {
 		m.notice.text = ""
 	}
 }
