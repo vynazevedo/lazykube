@@ -171,7 +171,7 @@ func (m Model) hasMarks() bool {
 	if m.nsFilter == "" || m.nav.Active().Kind != RouteScreen {
 		return false
 	}
-	return m.onScreen(ScreenDashboard) || m.onScreen(ScreenWorkloads) || m.onScreen(ScreenNodes)
+	return m.onScreen(ScreenDashboard) || m.onScreen(ScreenWorkloads) || m.onScreen(ScreenNodes) || m.onScreen(ScreenSecurity) || m.onScreen(ScreenRadar)
 }
 
 func (m *Model) setMarks(marks nsSet) {

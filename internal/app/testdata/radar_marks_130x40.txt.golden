@@ -1,0 +1,40 @@
+ lazykube [DEMO] [RO]  v2.0   ◎ context demo namespace Todos   k8s demo  nodes 1  ns 8  pods 13        ⠙ metrics every 5s ● live  
+  2 Dashboard  |  3 Workloads  |  4 Nodes  |  5 Security  |  6 Events  | [7 Radar]                                        m menu  
+ Radar                                                                                                                            
+ ╭─ Radar | Namespaces (2) kube-system, ys-odoo ────────────────────────────────────────────────────────────────────────────────╮ 
+ │ Sinais ativos: 3 (High 1, Warning 2) | recuperando 0 | observando 0 | suspensos 0 | resolvidos 1 | normais 38                │ 
+ │ Saúde: indisponível - o motor ainda não publica a fórmula; nenhum número é estimado aqui.                                    │ 
+ │ Cada linha é um sinal por pod/container, não um incidente correlacionado. Ack e silêncio ainda não existem.                  │ 
+ ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+ ╭─ Sinais · focus ───────────────────╮ ╭─ Evidências do sinal ─────────────────────────────────────────────────────────────────╮ 
+ │   EST  SINAL     POD/CONTAINER     │ │ Sinal: CrashLoop | regra v1                                                           │ 
+ │ > High CrashLoop svclb-traefik-8c… │ │ Alvo: Pod kube-system/svclb-traefik-8c2f1-6n2vb                                       │ 
+ │   Warn ImagePull local-path-provi… │ │ Container: lb-tcp-80 (regular)                                                        │ 
+ │   Warn Pending   local-path-provi… │ │ Estado: ativo | severidade High | pico High                                           │ 
+ │   res. OOMKilled odoo-7575bf6d8-9… │ │ Preexistente: sim (já presente na primeira observação desta sessão)                   │ 
+ │                                    │ │ Primeira observação: 20:15:00 | última: 20:21:40                                      │ 
+ │                                    │ │                                                                                       │ 
+ │                                    │ │ EVIDÊNCIAS                                                                            │ 
+ │                                    │ │ Motivo de espera: CrashLoopBackOff                                                    │ 
+ │                                    │ │ Observações distintas: 3 (exige 2 versões do pod)                                     │ 
+ │                                    │ │ Duração observada: 6m40s                                                              │ 
+ │                                    │ │                                                                                       │ 
+ │                                    │ │ EXPLICAÇÃO                                                                            │ 
+ │                                    │ │ Causa provável e próximo passo ainda não são publicados pelo motor.                   │ 
+ │                                    │ │ Os campos acima são observações, não causa confirmada.                                │ 
+ │                                    │ │                                                                                       │ 
+ │                                    │ │ [Abrir pod] enter                                                                     │ 
+ │                                    │ │                                                                                       │ 
+ │                                    │ │                                                                                       │ 
+ │                                    │ │                                                                                       │ 
+ │                                    │ │                                                                                       │ 
+ │                                    │ │                                                                                       │ 
+ │                                    │ │                                                                                       │ 
+ │ 4 sinais no escopo, 1 fora dele    │ │                                                                                       │ 
+ ╰────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────────────────────────────╯ 
+ ╭─ Cobertura ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ │ Cobertura: inventário de pods completa 13/13 | eventos, owners, nodes e métricas: ainda não consumidos pelo Radar            │ 
+ │ Rede indisponível; nodes/proxy não é utilizado. Histórico limitado a esta sessão.                                            │ 
+ ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   enter  open pod   esc  back   m  menu   ?  help   q  quit   y  copy                                bubbletea · 0 fps 

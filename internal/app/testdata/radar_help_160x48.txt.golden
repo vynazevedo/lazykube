@@ -17,18 +17,18 @@
  │                                            │ │ EVIDÊNCIAS                                                                                                  │ 
  │                                 ╭─ Help ────────────────────────────────────────────────────────────────────────────────╮                                  │ 
  │                                 │                                                                                       │                                  │ 
- │                                 │  ↑/↓ k/j    move selection                 5          Security screen                 │                                  │ 
- │                                 │  pgup/pgdn  scroll evidence                6          Events screen                   │                                  │ 
- │                                 │  home/end   first / last signal            7          Radar screen                    │                                  │ 
- │                                 │  enter      open pod of the signal         c n        switch context / namespace      │                                  │ 
- │                                 │  esc        back                           A          ack all Security alerts         │                                  │ 
- │                                 │  m          screens menu ← → enter         p          cycle palette                   │                                  │ 
- │                                 │  2          Dashboard screen               ctrl+p     pause animations                │                                  │ 
- │                                 │  3          Workloads screen               ?          toggle help                     │                                  │ 
- │                                 │  4          Nodes screen                   q ctrl+c   quit                            │                                  │ 
+ │                                 │  ↑/↓ k/j    move selection                 6          Events screen                   │                                  │ 
+ │                                 │  pgup/pgdn  scroll evidence                7          Radar screen                    │                                  │ 
+ │                                 │  home/end   first / last signal            c n        switch context / namespace      │                                  │ 
+ │                                 │  enter      open pod of the signal         b          navigation tree                 │                                  │ 
+ │                                 │  esc        back                           y          copy namespace/pod              │                                  │ 
+ │                                 │  m          screens menu ← → enter         A          ack all Security alerts         │                                  │ 
+ │                                 │  2          Dashboard screen               p          cycle palette                   │                                  │ 
+ │                                 │  3          Workloads screen               ctrl+p     pause animations                │                                  │ 
+ │                                 │  4          Nodes screen                   ?          toggle help                     │                                  │ 
+ │                                 │  5          Security screen                q ctrl+c   quit                            │                                  │ 
  │                                 │                                                                                       │                                  │ 
  │                                 ╰───────────────────────────────────────────────────────────────────────────────────────╯                                  │ 
- │                                            │ │                                                                                                             │ 
  │                                            │ │                                                                                                             │ 
  │                                            │ │                                                                                                             │ 
  │                                            │ │                                                                                                             │ 
@@ -45,4 +45,4 @@
  │ Rede indisponível; nodes/proxy não é utilizado. Histórico limitado a esta sessão.                                                                          │ 
  ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  ↑↓  move   enter  open pod   esc  back   m  menu   ?  help   q  quit                                                                        bubbletea · 0 fps 
+  ↑↓  move   enter  open pod   esc  back   m  menu   ?  help   q  quit   y  copy                                                              bubbletea · 0 fps 

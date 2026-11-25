@@ -319,6 +319,7 @@ func (m *Model) refresh() {
 		demo.AdvanceObservations(m.clock.T)
 	}
 	m.refreshSecurity()
+	m.followRadarScope()
 	m.metrics = m.src.Metrics(m.clock.T, m.activeName(), m.heatCols())
 	name := m.detailTarget()
 	m.refreshLogs(name)

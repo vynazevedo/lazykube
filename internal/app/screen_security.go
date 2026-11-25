@@ -83,7 +83,7 @@ func (securityScreen) Keys(m Model) []key.Binding {
 		k.PageUp, k.PageDown, k.Home, k.End,
 		k.SecurityAck, k.Palette, k.Pause, k.Help, k.Quit,
 		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads, k.Nodes, k.Security, k.Events, k.Radar,
-		k.Context, k.Namespace, k.Tree,
+		k.Context, k.Namespace, k.Tree, k.Yank,
 	}
 }
 
@@ -165,6 +165,14 @@ func (m Model) securityPageState() ui.SecurityPageState {
 		Scroll:      m.sec.Scroll,
 		Audit:       m.auditState(),
 	}
+}
+
+func (m Model) yankWorkload() (yank, bool) {
+	if m.sec.Tab != ui.SecTabWorkloads || m.sec.Cursor >= len(m.sec.result.workloads) {
+		return yank{}, false
+	}
+	w := m.sec.result.workloads[m.sec.Cursor]
+	return exact(w.Key.Namespace + "/" + w.Name)
 }
 
 func (m Model) securityAlerts(scope nsSet) int {

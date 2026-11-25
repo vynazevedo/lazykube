@@ -37,7 +37,10 @@ type radarState struct {
 	err     string
 	have    bool
 	snap    insight.SignalSnapshot
+	listed  []insight.Signal
 	rows    []insight.Signal
+	scope   nsSet
+	counts  ui.RadarCounts
 	cursor  int
 	id      string
 	held    insight.Signal
@@ -69,8 +72,9 @@ func newRadar(src data.Source, now func() time.Time) radarState {
 	return radarState{feed: &radarFeed{src: obs, engine: engine}, live: live}
 }
 
-func radarTick(session uint64) tea.Cmd {
-	return tea.Tick(radarInterval, func(time.Time) tea.Msg { return radarTickMsg{session: session} })
+func (m Model) radarTick() tea.Cmd {
+	session := m.session.Generation
+	return m.after(radarInterval, func(time.Time) tea.Msg { return radarTickMsg{session: session} })
 }
 
 func (m Model) radarCmd() tea.Cmd {
@@ -78,7 +82,14 @@ func (m Model) radarCmd() tea.Cmd {
 		return nil
 	}
 	feed, session := m.radar.feed, m.session.Generation
-	return func() tea.Msg { return radarMsg{session: session, snap: feed.run()} }
+	life := m.life
+	return func() tea.Msg {
+		if life.Err() != nil {
+			feed.busy.Store(false)
+			return nil
+		}
+		return radarMsg{session: session, snap: feed.run()}
+	}
 }
 
 func (m Model) radarInit() tea.Cmd {
@@ -99,19 +110,19 @@ func (m *Model) armRadarTick() tea.Cmd {
 		return nil
 	}
 	m.radar.ticking = true
-	return radarTick(m.session.Generation)
+	return m.radarTick()
 }
 
 func (m Model) updateRadar(msg tea.Msg) (Model, tea.Cmd, bool) {
 	switch msg := msg.(type) {
 	case radarTickMsg:
-		if msg.session != m.session.Generation {
+		if msg.session != m.session.Generation || m.life.Err() != nil {
 			return m, nil, true
 		}
 		m.radar.ticking = false
 		return m, m.radarCmd(), true
 	case radarMsg:
-		if msg.session != m.session.Generation {
+		if msg.session != m.session.Generation || m.life.Err() != nil {
 			return m, nil, true
 		}
 		m.applyRadar(msg.snap)
@@ -129,8 +140,48 @@ func (m *Model) syncRadar() {
 
 func (m *Model) applyRadar(snap insight.SignalSnapshot) {
 	m.radar.snap, m.radar.have = snap, true
-	m.radar.rows = radarRows(snap.Signals)
+	m.radar.listed = radarRows(snap.Signals)
+	m.scopeRadar()
 	m.syncRadarSelection()
+}
+
+func (m *Model) scopeRadar() {
+	m.radar.scope = m.nsFilter
+	m.radar.rows = inScope(m.radar.listed, m.nsFilter)
+	m.radar.counts = ui.CountSignals(inScope(m.radar.snap.Signals, m.nsFilter))
+}
+
+func inScope(signals []insight.Signal, scope nsSet) []insight.Signal {
+	if scope == "" {
+		return signals
+	}
+	allowed := scope.matcher()
+	out := make([]insight.Signal, 0, len(signals))
+	for _, s := range signals {
+		if allowed(s.Entity.Namespace) {
+			out = append(out, s)
+		}
+	}
+	return out
+}
+
+func (m *Model) followRadarScope() {
+	if !m.radar.have || m.radar.scope == m.nsFilter {
+		return
+	}
+	m.scopeRadar()
+	if !m.nsFilter.matcher()(m.radar.held.Entity.Namespace) {
+		m.radar.id, m.radar.cursor, m.radar.scroll = "", 0, 0
+	}
+	m.syncRadarSelection()
+}
+
+func (m Model) yankSignal() (yank, bool) {
+	s := m.selectedSignal()
+	if s == nil {
+		return yank{}, false
+	}
+	return exact(s.Entity.Namespace + "/" + s.Entity.Name)
 }
 
 func radarGroup(s insight.Signal) int {
@@ -240,6 +291,10 @@ func (m Model) radarViewState() ui.RadarState {
 		Have:      m.radar.have,
 		Snapshot:  m.radar.snap,
 		Rows:      m.radar.rows,
+		Counts:    m.radar.counts,
+		Scope:     m.nsFilter.names(),
+		Compact:   m.layout.Compact,
+		Hidden:    len(m.radar.listed) - len(m.radar.rows),
 		Cursor:    m.radar.cursor,
 		Scroll:    m.radar.scroll,
 		Gone:      m.radar.gone,

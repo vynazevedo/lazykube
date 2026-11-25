@@ -58,7 +58,7 @@ func (radarScreen) Keys(m Model) []key.Binding {
 		k.Up, k.Down, k.PageUp, k.PageDown, k.Home, k.End, k.Enter, k.Esc,
 		k.SecurityAck, k.Palette, k.Pause, k.Help, k.Quit,
 		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads, k.Nodes, k.Security, k.Events, k.Radar,
-		k.Context, k.Namespace, k.Tree,
+		k.Context, k.Namespace, k.Tree, k.Yank,
 	}
 	if m.layout.Compact {
 		keys = append(keys, k.NextPanel, k.PrevPanel)
@@ -98,13 +98,21 @@ func (m *Model) scrollRadar(delta int) {
 	m.radar.scroll = max(0, min(m.radar.scroll+delta, m.maxRadarScroll()))
 }
 
+func (m *Model) stepRadar(delta int) {
+	if m.layout.Compact && m.focus == FocusDetails {
+		m.scrollRadar(delta)
+		return
+	}
+	m.moveRadar(delta)
+}
+
 func (m Model) handleRadarKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 	k := m.keys
 	switch {
 	case key.Matches(msg, k.Up):
-		m.moveRadar(-1)
+		m.stepRadar(-1)
 	case key.Matches(msg, k.Down):
-		m.moveRadar(1)
+		m.stepRadar(1)
 	case key.Matches(msg, k.PageUp):
 		m.scrollRadar(-ui.RadarDetailRows(m.layout.Message.H))
 	case key.Matches(msg, k.PageDown):

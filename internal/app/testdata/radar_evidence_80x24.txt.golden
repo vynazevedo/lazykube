@@ -1,0 +1,24 @@
+ lazykube [DEMO] [RO]  ◎ context demo namespace Todos   k8s demo      ⠙ ● live  
+  2 Dashboard | 3 Workloads | 4 Nodes | 5 Security | 6 Events |[7 Radar]        
+ Radar                                                                          
+ ╭─ Radar ────────────────────────────────────────────────────────────────────╮ 
+ │ Ativos 4 (High 1 Warn 3) | rec 0 | obs 0 | susp 0 | res 1 | normais 81     │ 
+ │ Saúde: indisponível; sinais não são incidentes correlacionados.            │ 
+ ╰────────────────────────────────────────────────────────────────────────────╯ 
+ ╭─ Evidências do sinal ──────────────────────────────────────────────────────╮ 
+ │ Sinal: CrashLoop | regra v1                                                │ 
+ │ Alvo: Pod kube-system/svclb-traefik-8c2f1-6n2vb                            │ 
+ │ Container: lb-tcp-80 (regular)                                             │ 
+ │ Estado: ativo | severidade High | pico High                                │ 
+ │ Preexistente: sim (já presente na primeira observação desta sessão)        │ 
+ │ Primeira observação: 20:15:00 | última: 20:21:40                           │ 
+ │                                                                            │ 
+ │ EVIDÊNCIAS                                                                 │ 
+ │ Motivo de espera: CrashLoopBackOff                                         │ 
+ ╰────────────────────────────────────────────────────────────────────────────╯ 
+ ╭─ Cobertura ────────────────────────────────────────────────────────────────╮ 
+ │ Cobertura: inventário de pods completa 13/13                               │ 
+ │ Eventos, owners, nodes e métricas ainda não consumidos. Sem nodes/proxy.   │ 
+ ╰────────────────────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────
+  tab  signals / evidence   ↑↓  move   enter  open pod        bubbletea · 0 fps 

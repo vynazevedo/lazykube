@@ -18,6 +18,10 @@ type RadarState struct {
 	Have      bool
 	Snapshot  insight.SignalSnapshot
 	Rows      []insight.Signal
+	Counts    RadarCounts
+	Scope     []string
+	Hidden    int
+	Compact   bool
 	Cursor    int
 	Scroll    int
 	Gone      bool
@@ -200,7 +204,10 @@ func RadarSummaryLines(st RadarState) []draw.Line {
 	case !st.Have:
 		return []draw.Line{{muted("Coletando baseline; ainda sem conclusão.")}}
 	}
-	c := CountSignals(st.Snapshot.Signals)
+	c := st.Counts
+	if st.Compact {
+		return radarCompactSummary(st)
+	}
 	counts := draw.Line{
 		muted("Sinais ativos: "), bold(fmt.Sprint(c.High+c.Warning), theme.Text),
 		muted(" (High "), colored(fmt.Sprint(c.High), theme.Err), muted(", Warning "), colored(fmt.Sprint(c.Warning), theme.Warn), muted(")"),
@@ -220,8 +227,26 @@ func RadarSummaryLines(st RadarState) []draw.Line {
 	}
 }
 
+func radarCompactSummary(st RadarState) []draw.Line {
+	c := st.Counts
+	counts := draw.Line{
+		muted("Ativos "), bold(fmt.Sprint(c.High+c.Warning), theme.Text),
+		muted(" (High "), colored(fmt.Sprint(c.High), theme.Err), muted(" Warn "), colored(fmt.Sprint(c.Warning), theme.Warn),
+		muted(fmt.Sprintf(") | rec %d | obs %d | susp %d | res %d | normais %d", c.Recovering, c.Candidates, c.Suspended, c.Resolved, c.Normal)),
+	}
+	health := draw.Line{muted("Saúde: "), text("indisponível"), faint("; sinais não são incidentes correlacionados.")}
+	if st.Snapshot.OmittedSignals > 0 {
+		health = draw.Line{colored(fmt.Sprintf("omitidos %d de %d", st.Snapshot.OmittedSignals, st.Snapshot.TotalSignals), theme.Warn), faint(" | Saúde: indisponível")}
+	}
+	return []draw.Line{counts, health}
+}
+
 func RadarSummary(r draw.Region, st RadarState, ctx Ctx) {
-	inner := Panel(r, "Radar", false, ctx).Inset(1, 0, 1, 0)
+	title := "Radar"
+	if len(st.Scope) > 0 {
+		title += " | " + draw.Truncate(securityScopeLabel(st.Scope), scopeLabelWidth)
+	}
+	inner := Panel(r, title, false, ctx).Inset(1, 0, 1, 0)
 	for y, l := range RadarSummaryLines(st) {
 		if y >= inner.H {
 			break
@@ -314,6 +339,8 @@ func RadarList(r draw.Region, st RadarState, ctx Ctx) {
 		centeredColor(body, "sem observações tipadas nesta fonte", theme.Warn)
 	case !st.Have:
 		centered(body, "Coletando baseline; ainda sem conclusão.")
+	case len(st.Rows) == 0 && len(st.Scope) > 0 && st.Snapshot.Coverage.State == insight.CoverageComplete:
+		centered(body, fmt.Sprintf("Nenhum sinal no escopo; %d fora dele.", st.Hidden))
 	case len(st.Rows) == 0 && st.Snapshot.Coverage.State == insight.CoverageComplete:
 		centered(body, "Nenhum sinal ativo nos dados observados.")
 	case len(st.Rows) == 0:
@@ -335,6 +362,9 @@ func RadarList(r draw.Region, st RadarState, ctx Ctx) {
 	}
 	if inner.H > rows+RadarListTop {
 		hint := fmt.Sprintf("%d sinais · High/Warn ativos, rec. obs. susp res.", len(st.Rows))
+		if st.Hidden > 0 {
+			hint = fmt.Sprintf("%d sinais no escopo, %d fora dele", len(st.Rows), st.Hidden)
+		}
 		inner.Line(0, inner.H-1, draw.Line{faint(hint)}.Truncate(inner.W))
 	}
 }
@@ -513,6 +543,9 @@ func RadarCoverageLines(st RadarState) []draw.Line {
 	if c.Reason != "" {
 		line = append(line, faint("; "+draw.Sanitize(c.Reason)))
 	}
+	if st.Compact {
+		return []draw.Line{line, {faint("Eventos, owners, nodes e métricas ainda não consumidos. Sem nodes/proxy.")}}
+	}
 	line = append(line, faint(" | eventos, owners, nodes e métricas: ainda não consumidos pelo Radar"))
 	return []draw.Line{line, {faint("Rede indisponível; nodes/proxy não é utilizado. Histórico limitado a esta sessão.")}}
 }
@@ -535,6 +568,7 @@ func RadarHelp() []KeyHelp {
 		{"m", "menu"},
 		{"?", "help"},
 		{"q", "quit"},
+		{"y", "copy"},
 	}
 }
 
@@ -553,6 +587,8 @@ func FullHelpRadar() []KeyHelp {
 		{"6", "Events screen"},
 		{"7", "Radar screen"},
 		{"c n", "switch context / namespace"},
+		{"b", "navigation tree"},
+		{"y", "copy namespace/pod"},
 		{"A", "ack all Security alerts"},
 		{"p", "cycle palette"},
 		{"ctrl+p", "pause animations"},

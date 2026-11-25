@@ -1,0 +1,48 @@
+ lazykube [DEMO] [RO]  v2.0   ◎ context demo namespace Todos   k8s demo  nodes 1  ns 8  pods 13  uptime 119d                         ⠙ metrics every 5s ● live  
+  2 Dashboard  |  3 Workloads  |  4 Nodes  | [5 Security] |  6 Events  |  7 Radar                                                                       m menu  
+ Security                                                                                                                                                       
+  [+] Cluster             │ ╭─ Postura de segurança ──────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+  [+] Workloads (3)       │ │ Cluster | Todos: Segurança 55 E | Higiene 97 A | Sem sistema: Segurança 54 E | Higiene 97 A                                     │ 
+  [+] Configuration       │ │ Segurança: mediana 75 | pior decil 20 | A..F A3 B0 C4 D0 E0 F6                                                                  │ 
+  [+] Network             │ │ High novos 0 | Cobertura 13/13 pods (complete in scope) | Nota não garante segurança                                            │ 
+  [+] Storage             │ │ Score v2 | regras v5 | tendência ▅ (revisões da sessão)                                                                         │ 
+  [+] Access Control      │ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+  [+] Custom Resources    │  [Workloads] [RBAC] [Rede e exposição] [Conformidade PSS]                                                                           
+  [+] Helm                │  [Achados aceitos] [Audit]                                                                                                          
+ ›Security (5)            │ ╭─ Workloads (13) | Todos ───────────────╮ ╭─ Evidência e remediação ─────────────────────────────────────────────────────────────╮ 
+  Radar (7)               │ │ WORKLOAD        PODS  SEG  HIG   H     │ │ bilibili-raffle/ReplicaSet/bilibili-live-7f6b8d9c5                                   │ 
+                          │ │ rs bilibili-live-7…    1   20   88   2 │ │ Owner: ReplicaSet por UID (ownerReference controller)                                │ 
+                          │ │ rs metrics-server-…    1   20   88   2 │ │ Pods observados: 1 | Segurança 20 F | Higiene 88 B                                   │ 
+                          │ │ rs traefik-f4564c4…    1   20  100   2 │ │ Cobertura 1/1 pods (complete in scope)                                               │ 
+                          │ │ rs lgo-7c5d97584 l…    1   20  100   2 │ │                                                                                      │ 
+                          │ │ rs lingqu-16054860…    1   20  100   2 │ │ [high] allowPrivilegeEscalation: Unsafe, container init-permissions                  │ 
+                          │ │ rs qiandao-1605400…    1   20   88   2 │ │ spec.initContainers[0].securityContext.allowPrivilegeEscalation                      │ 
+                          │ │ rs bilibili-raffle…    1   75  100   0 │ │ Valor observado: forced by privileged | regra versão 5                               │ 
+                          │ │ rs coredns-6799fbc…    1   75  100   0 │ │ Origem: demo fixture; spec observado, não runtime | 1/1 pods                         │ 
+                          │ │ rs svclb-traefik-8…    1   75  100   0 │ │ Additional privileges possible. Disable privileged mode                              │ 
+                          │ │ rs odoo-7575bf6d8 …    1   75  100   0 │ │ Alvo: template de quem gerencia ReplicaSet/bilibili-live-7f6b8d9c5; controlador      │ 
+                          │ │ rs local-path-prov…    1  100  100   0 │ │ acima não observado nesta versão.                                                    │ 
+                          │ │ rs lingqu-16054896…    1  100  100   0 │ │ Sugestão YAML; revise compatibilidade antes de aplicar.                              │ 
+                          │ │ rs psql-6bc7744f9 …    1  100  100   0 │ │   initContainers:                                                                    │ 
+                          │ │                                        │ │   - name: init-permissions                                                           │ 
+                          │ │                                        │ │     securityContext:                                                                 │ 
+                          │ │                                        │ │       allowPrivilegeEscalation: false                                                │ 
+                          │ │                                        │ │ Valide se algum processo depende de setuid ou de ganho de privilégio.                │ 
+                          │ │                                        │ │                                                                                      │ 
+                          │ │                                        │ │ [high] privileged: Unsafe, container init-permissions                                │ 
+                          │ │                                        │ │ spec.initContainers[0].securityContext.privileged                                    │ 
+                          │ │                                        │ │ Valor observado: true | regra versão 5                                               │ 
+                          │ │                                        │ │ Origem: demo fixture; spec observado, não runtime | 1/1 pods                         │ 
+                          │ │                                        │ │ Privileged init container configured. Disable privileged mode                        │ 
+                          │ │                                        │ │ Alvo: template de quem gerencia ReplicaSet/bilibili-live-7f6b8d9c5; controlador      │ 
+                          │ │                                        │ │ acima não observado nesta versão.                                                    │ 
+                          │ │                                        │ │ Sugestão YAML; revise compatibilidade antes de aplicar.                              │ 
+                          │ │ Owner: ReplicaSet por UID (ownerRefer… │ │   initContainers:                                                                    │ 
+                          │ │ Réplicas observadas, não desejadas     │ │   - name: init-permissions                                                           │ 
+                          │ │ Deployment acima do ReplicaSet ainda … │ │     securityContext:                                                                 │ 
+                          │ ╰────────────────────────────────────────╯ ╰──────────────────────────────────────────────────────────────────────────────────────╯ 
+                          │  PSS v1.34: verificação local do spec; não é admissão                                                                               
+                          │  RBAC: concessões observadas, não permissão efetiva. Rede: alcance público desconhecido.                                            
+  enter abre · b fecha    │  [DEMO] dados sintéticos                                                                                                            
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   ←→  collapse / expand   enter  open   b  close tree   esc  body   ?  help   q  quit                                              bubbletea · 0 fps 

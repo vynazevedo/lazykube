@@ -40,6 +40,7 @@ func markNamespaces(t *testing.T, m Model, names ...string) Model {
 		marks = marks.toggle(n)
 	}
 	m.setMarks(marks)
+	m.syncSelection()
 	return deliver(t, m, tea.FocusMsg{})
 }
 

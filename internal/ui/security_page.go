@@ -107,6 +107,8 @@ func pageCoverageText(c data.Coverage) string {
 const (
 	scopeLabelWidth   = 48
 	scopeLabelCompact = 28
+
+	scoreCaveat = "Nota não garante segurança"
 )
 
 func securityScopeLabel(names []string) string {
@@ -141,8 +143,9 @@ func SecuritySummaryLines(st SecurityPageState) []draw.Line {
 			second = append(second, text(fmt.Sprintf("%c%d ", g, d.Grades[i])))
 		}
 	}
-	third := draw.Line{muted("High novos "), text(fmt.Sprint(st.Alerts)), faint(" | "), muted(pageCoverageText(st.All.Score.Coverage)), faint(" | "), colored("Nota não garante segurança", theme.Warn)}
+	third := draw.Line{muted("High novos "), text(fmt.Sprint(st.Alerts)), faint(" | "), muted(pageCoverageText(st.All.Score.Coverage)), faint(" | "), colored(scoreCaveat, theme.Warn)}
 	if st.Compact {
+		third = draw.Line{muted("High novos "), text(fmt.Sprint(st.Alerts)), faint(" | "), muted(pageCoverageText(st.All.Score.Coverage))}
 		if st.NoSystemCut {
 			return []draw.Line{first, second, third}
 		}
@@ -435,6 +438,10 @@ func SecurityPendingPanel(r draw.Region, t SecurityPageTab, ctx Ctx) {
 
 func SecurityNotes(r draw.Region, st SecurityPageState) {
 	r.Fill(theme.BgApp)
+	if st.Compact {
+		r.Line(1, 0, draw.Line{colored(scoreCaveat, theme.Warn), faint(". PSS v1.34: verificação local; não é admissão")}.Truncate(max(0, r.W-2)))
+		return
+	}
 	lines := []draw.Line{
 		{faint("PSS v1.34: verificação local do spec; não é admissão")},
 		{faint("RBAC: concessões observadas, não permissão efetiva. Rede: alcance público desconhecido.")},
@@ -460,6 +467,7 @@ func SecurityHelp() []KeyHelp {
 		{"m", "menu"},
 		{"?", "help"},
 		{"q", "quit"},
+		{"y", "copy"},
 	}
 }
 
@@ -481,6 +489,8 @@ func FullHelpSecurity() []KeyHelp {
 		{"6", "Events screen"},
 		{"7", "Radar screen"},
 		{"c n", "switch context / namespace"},
+		{"b", "navigation tree"},
+		{"y", "copy namespace/workload"},
 		{"A", "ack all Security alerts"},
 		{"p", "cycle palette"},
 		{"ctrl+p", "pause animations"},
