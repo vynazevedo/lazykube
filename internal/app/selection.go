@@ -127,7 +127,7 @@ func (m *Model) focusOrder() []Focus {
 	if (m.onScreen(ScreenNodes) || m.onScreen(ScreenRadar)) && m.layout.Compact {
 		return []Focus{FocusPods, FocusDetails}
 	}
-	if m.onScreen(ScreenNodes) || m.onScreen(ScreenEvents) || m.onScreen(ScreenResources) || m.onScreen(ScreenOverview) || m.onScreen(ScreenRadar) {
+	if m.onScreen(ScreenNodes) || m.onScreen(ScreenEvents) || m.onScreen(ScreenResources) || m.onScreen(ScreenOverview) || m.onScreen(ScreenRadar) || m.onScreen(ScreenSecurity) {
 		return []Focus{FocusPods}
 	}
 	order := []Focus{FocusPods, FocusDetails}

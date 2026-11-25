@@ -1,0 +1,40 @@
+ lazykube [RO]  v2.0   ◎ context dev namespace Todos   k8s demo  nodes 1  ns 8  pods 13  uptime 119d   ⠙ metrics every 5s ● live  
+  2 Dashboard  |  3 Workloads  |  4 Nodes  | [5 Security] |  6 Events  |  7 Radar                                         m menu  
+ Security                                                                                                                         
+ ╭─ Postura de segurança ───────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ │ Cluster | Todos: Segurança 55 E | Higiene 97 A | Sem sistema: Segurança 54 E | Higiene 97 A                                  │ 
+ │ Segurança: mediana 75 | pior decil 20 | A..F A3 B0 C4 D0 E0 F6                                                               │ 
+ │ High novos 0 | Cobertura 13/13 pods (complete in scope) | Nota não garante segurança                                         │ 
+ ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+  [Workloads] [RBAC] [Rede e exposição] [Conformidade PSS]                                                                        
+  [Achados aceitos] [Audit]                                                                                                       
+ ╭─ Audit local (6) ──────────────────────╮ ╭─ Registro ────────────────────────────────────────────────────────────────────────╮ 
+ │ HORA      AÇÃO        RESULTADO        │ │ Horário       2026-10-22 12:07:00Z                                                │ 
+ │ 12:07:00Z scale       read_only        │ │ Contexto      dev                                                                 │ 
+ │ 12:06:00Z scale       read_only        │ │ Sessão        session-1                                                           │ 
+ │ 12:04:00Z scale       read_only        │ │ Ação          scale                                                               │ 
+ │ 12:03:00Z scale       read_only        │ │ Alvo          apps/deployments.apps/api uid u-1                                   │ 
+ │ 12:01:00Z scale       read_only        │ │ Fase          result                                                              │ 
+ │ 12:00:00Z scale       read_only        │ │ Resultado     read_only                                                           │ 
+ │                                        │ │ Operação      op-007                                                              │ 
+ │                                        │ │ Modo          read-only true | protegido false                                    │ 
+ │                                        │ │                                                                                   │ 
+ │                                        │ │ Identidade registrada pela sessão do lazykube; não é a identidade autenticada no  │ 
+ │                                        │ │ Kubernetes.                                                                       │ 
+ │                                        │ │ outcome_unknown preserva resultado sem confirmação do servidor.                   │ 
+ │                                        │ │                                                                                   │ 
+ │                                        │ │                                                                                   │ 
+ │                                        │ │                                                                                   │ 
+ │                                        │ │                                                                                   │ 
+ │                                        │ │                                                                                   │ 
+ │                                        │ │                                                                                   │ 
+ │ 3 de outros contextos ocultos          │ │                                                                                   │ 
+ │                                        │ │                                                                                   │ 
+ │ [Mostrar outros contextos]             │ │                                                                                   │ 
+ │ Sem payload, comando ou credenciais.   │ │                                                                                   │ 
+ ╰────────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────────────────────────╯ 
+  PSS v1.34: verificação local do spec; não é admissão                                                                            
+  RBAC: concessões observadas, não permissão efetiva. Rede: alcance público desconhecido.                                         
+                                                                                                                                  
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   [ ]  tab   tab  panel   H  cohort   esc  back   m  menu   ?  help   q  quit                        bubbletea · 0 fps 

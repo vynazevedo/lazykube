@@ -136,7 +136,7 @@ func MenuHelp() []KeyHelp {
 		{"←→", "move"},
 		{"home end", "first / last"},
 		{"enter", "open"},
-		{"2 3 4 6 7", "Dashboard / Workloads / Nodes / Events / Radar"},
+		{"2 3 4 5 6 7", "open screen"},
 		{"esc m", "cancel"},
 	}
 }

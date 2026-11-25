@@ -53,6 +53,7 @@ type Model struct {
 	securityKey       string
 	securityNamespace bool
 	securityView      ui.SecurityView
+	sec               securityPage
 
 	w, h     int
 	layout   Layout
@@ -69,6 +70,7 @@ type Model struct {
 	blurred  bool
 	fps      int
 	gen      int
+	auditSeq *uint64
 	now      func() time.Time
 
 	keys      KeyMap
@@ -145,6 +147,7 @@ func New(opts Options) Model {
 		nav:      newRouter(),
 		after:    tea.Tick,
 		life:     opts.Context,
+		auditSeq: new(uint64),
 	}
 	if m.life == nil {
 		m.life = context.Background()
@@ -225,6 +228,8 @@ func (m *Model) screenLayout() func(w, h int) Layout {
 		return ComputeNodes
 	case m.onScreen(ScreenEvents):
 		return ComputeEvents
+	case m.onScreen(ScreenSecurity):
+		return ComputeSecurity
 	case m.onScreen(ScreenRadar):
 		return ComputeRadar
 	case m.onScreen(ScreenResources), m.onScreen(ScreenOverview):
@@ -274,6 +279,12 @@ func (m *Model) applyCompact() {
 		} else {
 			l.Message = Rect{}
 		}
+	case m.onScreen(ScreenSecurity):
+		if m.sec.Focus == ui.SecurityFocusEvidence {
+			l.SecList = Rect{}
+		} else {
+			l.SecEvidence = Rect{}
+		}
 	case m.onScreen(ScreenRadar):
 		if m.focus == FocusDetails {
 			l.Events = Rect{}
@@ -318,6 +329,7 @@ func (m *Model) refresh() {
 		m.dg.containers = m.dg.diag.Containers(name)
 	}
 	m.refreshEventsScreen()
+	m.refreshSecurityPage()
 	m.trackClusterFeed()
 	m.updateMatches()
 	m.clampScroll()
@@ -326,20 +338,29 @@ func (m *Model) refresh() {
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if next, cmd, ok := m.handleResourceMsg(msg); ok {
-		return next.withResources(cmd)
+		return next.settled(cmd)
+	}
+	if next, cmd, ok := m.updateAudit(msg); ok {
+		return next.settled(cmd)
 	}
 	next, cmd := m.update(msg)
 	if nm, ok := next.(Model); ok {
-		return nm.withResources(cmd)
+		return nm.settled(cmd)
 	}
 	return next, cmd
 }
 
-func (m Model) withResources(cmd tea.Cmd) (tea.Model, tea.Cmd) {
-	if sync := m.syncResources(); sync != nil {
-		return m, tea.Batch(cmd, sync)
+func (m Model) settled(cmd tea.Cmd) (tea.Model, tea.Cmd) {
+	cmds := []tea.Cmd{cmd}
+	for _, sync := range []func() tea.Cmd{m.syncResources, m.followAudit} {
+		if c := sync(); c != nil {
+			cmds = append(cmds, c)
+		}
 	}
-	return m, cmd
+	if len(cmds) == 1 {
+		return m, cmd
+	}
+	return m, tea.Batch(cmds...)
 }
 
 func (m Model) update(msg tea.Msg) (tea.Model, tea.Cmd) {

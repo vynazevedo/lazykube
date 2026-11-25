@@ -1,5 +1,5 @@
  lazykube [DEMO] [RO]  v2.0   ◎ context demo namespace Todos   k8s demo  nodes 1  ns 8  pods 13        ⠙ metrics every 5s ● live  
-  2 Dashboard  |  3 Workloads  |  4 Nodes  |  6 Events  | [7 Radar]                                                       m menu  
+  2 Dashboard  |  3 Workloads  |  4 Nodes  |  5 Security  |  6 Events  | [7 Radar]                                        m menu  
  Radar                                                                                                                            
  ╭─ Radar ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
  │ Sinais ativos: 4 (High 1, Warning 3) | recuperando 0 | observando 0 | suspensos 0 | resolvidos 1 | normais 81                │ 

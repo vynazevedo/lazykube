@@ -42,8 +42,10 @@ type KeyMap struct {
 	Dashboard   key.Binding
 	Workloads   key.Binding
 	Nodes       key.Binding
+	Security    key.Binding
 	Events      key.Binding
 	Radar       key.Binding
+	Cohort      key.Binding
 	Context     key.Binding
 	Namespace   key.Binding
 	Tree        key.Binding
@@ -96,8 +98,10 @@ func DefaultKeyMap() KeyMap {
 		Dashboard:   b("2", "Dashboard screen", "2"),
 		Workloads:   b("3", "Workloads screen", "3"),
 		Nodes:       b("4", "Nodes screen", "4"),
+		Security:    b("5", "Security screen", "5"),
 		Events:      b("6", "Events screen", "6"),
 		Radar:       b("7", "Radar screen", "7"),
+		Cohort:      b("H", "Security list cohort", "H"),
 		Context:     b("c", "switch context", "c"),
 		Namespace:   b("n", "switch namespace", "n"),
 		Tree:        b("b", "navigation tree", "b"),
@@ -114,7 +118,7 @@ func (k KeyMap) Bindings() []key.Binding {
 		k.TabPrev, k.TabNext, k.Container, k.Previous, k.SearchNext, k.SearchPrev, k.EventScope,
 		k.Palette, k.ToggleLeft, k.Pause, k.Help, k.Quit,
 		k.PageUp, k.PageDown, k.Home, k.End, k.Follow, k.Wrap, k.Top, k.Bottom,
-		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads, k.Nodes, k.Events, k.Radar,
-		k.Context, k.Namespace, k.Tree, k.Refresh, k.MarkNS, k.Yank,
+		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads, k.Nodes, k.Security, k.Events, k.Radar,
+		k.Context, k.Namespace, k.Tree, k.Refresh, k.MarkNS, k.Yank, k.Cohort,
 	}
 }

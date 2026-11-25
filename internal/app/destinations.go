@@ -101,8 +101,8 @@ func buildDestinations() []Destination {
 	events.Shortcut = "6"
 	workloads := category(DestWorkloads, "Workloads", 1)
 	workloads.Shortcut, workloads.Default = "3", DestPods
-	security := planned(DestSecurity, "", "Security", 8)
-	security.Reserved = "5"
+	security := leaf(DestSecurity, "", "Security", 8, ScreenSecurity, FocusPods)
+	security.Shortcut = "5"
 	radar := leaf(DestRadar, "", "Radar", 9, ScreenRadar, FocusPods)
 	radar.Shortcut = "7"
 	out := []Destination{

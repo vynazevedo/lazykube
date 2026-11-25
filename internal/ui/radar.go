@@ -549,6 +549,7 @@ func FullHelpRadar() []KeyHelp {
 		{"2", "Dashboard screen"},
 		{"3", "Workloads screen"},
 		{"4", "Nodes screen"},
+		{"5", "Security screen"},
 		{"6", "Events screen"},
 		{"7", "Radar screen"},
 		{"c n", "switch context / namespace"},

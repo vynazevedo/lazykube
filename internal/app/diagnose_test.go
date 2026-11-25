@@ -43,15 +43,15 @@ func TestHelpIsHonest(t *testing.T) {
 			keys[k] = true
 		}
 	}
-	for _, k := range []string{"b", "c", "n", "C", "P", "alt+n", "N", "E", "S", "w", "g", "G", "m", "2", "3", "4", "6", "7", "enter", "esc"} {
+	for _, k := range []string{"b", "c", "n", "C", "P", "alt+n", "N", "E", "S", "w", "g", "G", "m", "2", "3", "4", "5", "6", "7", "enter", "esc"} {
 		if !keys[k] {
 			t.Fatalf("implemented key %q missing from help", k)
 		}
 	}
-	for _, list := range [][]ui.KeyHelp{ui.FullHelp(), ui.ShortHelp(), ui.PodDetailHelp(), ui.MenuHelp(), ui.NodesHelp(), ui.FullHelpNodes(), ui.EventsHelp(true), ui.FullHelpEvents(true), ui.EventsHelp(false), ui.FullHelpEvents(false), ui.TreeHelp(), ui.FullHelpTree(), ui.RadarHelp(), ui.FullHelpRadar()} {
+	for _, list := range [][]ui.KeyHelp{ui.FullHelp(), ui.ShortHelp(), ui.PodDetailHelp(), ui.MenuHelp(), ui.NodesHelp(), ui.FullHelpNodes(), ui.EventsHelp(true), ui.FullHelpEvents(true), ui.EventsHelp(false), ui.FullHelpEvents(false), ui.TreeHelp(), ui.FullHelpTree(), ui.RadarHelp(), ui.FullHelpRadar(), ui.SecurityHelp(), ui.FullHelpSecurity()} {
 		for _, h := range list {
 			for _, k := range strings.Fields(h.Key) {
-				if k == "5" {
+				if _, ok := registry.shortcut(k); !ok && k != "1" && len(k) == 1 && k >= "0" && k <= "9" {
 					t.Fatalf("screen key %q is announced before its screen exists", k)
 				}
 			}
@@ -90,9 +90,15 @@ func TestHelpIsHonest(t *testing.T) {
 	if e := press(t, m, "6"); !e.onScreen(ScreenEvents) || e.nav.Depth() != 1 {
 		t.Fatal("6 activates Events")
 	}
-	for _, k := range []string{"5"} {
+	if s := press(t, m, "5"); !s.onScreen(ScreenSecurity) || s.nav.Depth() != 1 {
+		t.Fatal("5 activates Security")
+	}
+	if r := press(t, m, "7"); !r.onScreen(ScreenRadar) || r.nav.Depth() != 1 {
+		t.Fatal("7 activates Radar")
+	}
+	for _, k := range []string{"0", "8", "9"} {
 		if got := press(t, m, k); got.nav != m.nav || got.menu.open {
-			t.Fatalf("%s must stay unbound until its screen exists", k)
+			t.Fatalf("%s has no screen and stays unbound", k)
 		}
 	}
 }

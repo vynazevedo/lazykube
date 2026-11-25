@@ -377,6 +377,7 @@ func FullHelpEvents(full bool) []KeyHelp {
 		KeyHelp{"2", "Dashboard screen"},
 		KeyHelp{"3", "Workloads screen"},
 		KeyHelp{"4", "Nodes screen"},
+		KeyHelp{"5", "Security screen"},
 		KeyHelp{"6", "Events screen"},
 		KeyHelp{"7", "Radar screen"},
 		KeyHelp{"c n", "switch context / namespace"},

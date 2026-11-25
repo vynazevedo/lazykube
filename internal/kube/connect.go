@@ -115,6 +115,7 @@ func Connect(ctx context.Context, opts ConnectOptions) (*Source, error) {
 	if auditPath == "" {
 		auditPath, _ = guard.DefaultAuditPath()
 	}
+	s.auditPath = auditPath
 	actionClient, clientErr := dynamic.NewForConfig(cfg)
 	if clientErr != nil {
 		s.Close()

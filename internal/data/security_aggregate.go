@@ -151,6 +151,58 @@ func (d SecurityDashboard) MergeNamespaces(names []string) SecurityAggregate {
 	return merged
 }
 
+func finishAggregate(a SecurityAggregate, c Coverage, rules map[string]int) SecurityAggregate {
+	a.Distribution.finish()
+	a.HygieneDistribution.finish()
+	a.Score = distributionScore(c, a.Distribution)
+	a.Hygiene = distributionScore(c, a.HygieneDistribution)
+	a.Rules = rankRules(rules)
+	return a
+}
+
+func aggregateGroup(s SecuritySnapshot, keys []string) SecurityAggregate {
+	list := s.ListCoverage
+	if list.State == "" {
+		list = s.Coverage
+	}
+	c := Coverage{State: list.State, Reason: list.Reason, ObservedAt: list.ObservedAt, Total: len(keys)}
+	for _, key := range keys {
+		p := s.Pods[key]
+		c.Evaluated += p.Coverage.Evaluated
+		if p.Coverage.State == CoveragePartial && list.State == CoverageComplete {
+			c.State = CoveragePartial
+		}
+	}
+	override := c.State != CoverageComplete && c.State != CoveragePartial
+	var a SecurityAggregate
+	rules := make(map[string]int)
+	for _, key := range keys {
+		p := s.Pods[key]
+		if override {
+			p.Coverage.State, p.Coverage.Reason = c.State, c.Reason
+		}
+		scores := scorePod(p, func(rule string, severity Severity) {
+			switch severity {
+			case SeverityHigh:
+				a.High++
+			case SeverityMedium:
+				a.Medium++
+			case SeverityInfo:
+				a.Info++
+			}
+			rules[rule]++
+		})
+		for _, f := range p.Findings {
+			if f.Result == ResultUnknown {
+				a.Unknown++
+			}
+		}
+		a.Distribution.add(scores.Security)
+		a.HygieneDistribution.add(scores.Hygiene)
+	}
+	return finishAggregate(a, c, rules)
+}
+
 func AggregateSecurity(s SecuritySnapshot) SecurityDashboard {
 	d := SecurityDashboard{Namespaces: make(map[string]SecurityAggregate), Pods: make(map[string]PostureScore, len(s.Pods)), PodHygiene: make(map[string]PostureScore, len(s.Pods))}
 	counts := make(map[string]map[string]int)
@@ -195,14 +247,7 @@ func AggregateSecurity(s SecuritySnapshot) SecurityDashboard {
 		d.Cluster.HygieneDistribution.add(scores.Hygiene)
 		d.Namespaces[a.Name] = a
 	}
-	finish := func(a SecurityAggregate, c Coverage, rules map[string]int) SecurityAggregate {
-		a.Distribution.finish()
-		a.HygieneDistribution.finish()
-		a.Score = distributionScore(c, a.Distribution)
-		a.Hygiene = distributionScore(c, a.HygieneDistribution)
-		a.Rules = rankRules(rules)
-		return a
-	}
+	finish := finishAggregate
 	d.Cluster.Name = "Cluster"
 	d.Cluster = finish(d.Cluster, s.Coverage, counts[""])
 	for name, a := range d.Namespaces {

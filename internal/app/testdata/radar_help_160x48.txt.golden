@@ -1,5 +1,5 @@
  lazykube [DEMO] [RO]  v2.0   ◎ context demo namespace Todos   k8s demo  nodes 1  ns 8  pods 13  uptime 119d                         ⠙ metrics every 5s ● live  
-  2 Dashboard  |  3 Workloads  |  4 Nodes  |  6 Events  | [7 Radar]                                                                                     m menu  
+  2 Dashboard  |  3 Workloads  |  4 Nodes  |  5 Security  |  6 Events  | [7 Radar]                                                                      m menu  
  Radar                                                                                                                                                          
  ╭─ Radar ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
  │ Sinais ativos: 4 (High 1, Warning 3) | recuperando 0 | observando 0 | suspensos 0 | resolvidos 1 | normais 81                                              │ 
@@ -17,15 +17,15 @@
  │                                            │ │ EVIDÊNCIAS                                                                                                  │ 
  │                                 ╭─ Help ────────────────────────────────────────────────────────────────────────────────╮                                  │ 
  │                                 │                                                                                       │                                  │ 
- │                                 │  ↑/↓ k/j    move selection                 6          Events screen                   │                                  │ 
- │                                 │  pgup/pgdn  scroll evidence                7          Radar screen                    │                                  │ 
- │                                 │  home/end   first / last signal            c n        switch context / namespace      │                                  │ 
- │                                 │  enter      open pod of the signal         A          ack all Security alerts         │                                  │ 
- │                                 │  esc        back                           p          cycle palette                   │                                  │ 
- │                                 │  m          screens menu ← → enter         ctrl+p     pause animations                │                                  │ 
- │                                 │  2          Dashboard screen               ?          toggle help                     │                                  │ 
- │                                 │  3          Workloads screen               q ctrl+c   quit                            │                                  │ 
- │                                 │  4          Nodes screen                                                              │                                  │ 
+ │                                 │  ↑/↓ k/j    move selection                 5          Security screen                 │                                  │ 
+ │                                 │  pgup/pgdn  scroll evidence                6          Events screen                   │                                  │ 
+ │                                 │  home/end   first / last signal            7          Radar screen                    │                                  │ 
+ │                                 │  enter      open pod of the signal         c n        switch context / namespace      │                                  │ 
+ │                                 │  esc        back                           A          ack all Security alerts         │                                  │ 
+ │                                 │  m          screens menu ← → enter         p          cycle palette                   │                                  │ 
+ │                                 │  2          Dashboard screen               ctrl+p     pause animations                │                                  │ 
+ │                                 │  3          Workloads screen               ?          toggle help                     │                                  │ 
+ │                                 │  4          Nodes screen                   q ctrl+c   quit                            │                                  │ 
  │                                 │                                                                                       │                                  │ 
  │                                 ╰───────────────────────────────────────────────────────────────────────────────────────╯                                  │ 
  │                                            │ │                                                                                                             │ 
