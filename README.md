@@ -354,7 +354,8 @@ Dentro da TUI, `c` abre o seletor de contextos do kubeconfig (com filtro `/`)
 e `n` o seletor de namespace; clicar no contexto ou no namespace do cabeçalho
 faz o mesmo. A troca fecha a sessão anterior e reconecta pela tela de loading,
 sem reiniciar o binário. As escolhas valem só para a execução atual: o
-lazykube nunca escreve no kubeconfig nem altera o `current-context`.
+lazykube não grava no kubeconfig nem altera o `current-context` (um plugin de
+credenciais executado pelo client-go pode manter cache próprio).
 `--kubeconfig` seleciona um arquivo; sem ele, `KUBECONFIG` com vários
 arquivos segue a precedência nativa do client-go. Cada contexto lembra o
 último namespace usado nesta execução, e `Todos` só vale quando escolhido.
@@ -399,11 +400,19 @@ ação ainda não enviada é cancelada.
 
 `u` abre o seletor de URLs: mostra a URL escolhida inteira, quebrada em linhas e
 com o host em destaque, e `enter` copia exatamente esse texto; se ela não couber
-no terminal, a cópia é recusada. A URL só é copiada por esse seletor; `y` nunca
-copia URL (veja [Atalhos](#0x04-atalhos)). Só vira link clicável (OSC8) a
+no terminal, a cópia é recusada. `y` não seleciona as URLs da seção Acesso: a URL
+de Acesso só sai pelo seletor `u`, e `y` continua copiando o conteúdo indicado em
+[Atalhos](#0x04-atalhos), que pode conter uma URL, como uma linha do Log. Só vira
+link clicável (OSC8) a
 URL http ou https com host ASCII validado, sem credencial, controle ou bidi, e
 visível por inteiro na linha; endereços internos do cluster podem ser copiados,
-mas não são links. O lazykube nunca abre navegador nem executa comando externo.
+mas não são links. As URLs da seção Acesso nunca abrem navegador nem executam
+comando, e o lazykube não faz requisição HTTP a elas.
+
+A autenticação segue o kubeconfig: plugins de credenciais configurados em
+`users[].user.exec` (como `aws`, `gcloud` ou `kubelogin`) são executados pelo
+client-go, como no kubectl, inclusive só para ler o cluster. O lazykube não filtra
+nem bloqueia esses plugins; confie no kubeconfig que você usa.
 
 Por padrão o lazykube só lê o cluster: lista e observa recursos, segue logs e
 consulta métricas. Escrever exige `--read-write` e a confirmação descrita em
@@ -493,7 +502,8 @@ sistema. O que vai depende da tela:
 | Security, aba Workloads | `namespace/nome` do workload; nas demais abas, inclusive Audit, nada |
 
 Nome com caractere de controle não é copiado no Radar nem na Security. A URL da
-seção Acesso só sai pelo seletor de `u`. Sem item, o rodapé diz `nada para copiar`.
+seção Acesso só é selecionada pelo seletor de `u`; o texto copiado por `y`, como
+uma linha de log ou um YAML, pode conter URLs. Sem item, o rodapé diz `nada para copiar`.
 O rodapé mostra
 `enviado ao clipboard: ...`, já que o OSC52 não confirma a cópia. Conteúdo cujo
 payload em base64 passe de 100000 bytes (cerca de 73 KiB de texto) é recusado
@@ -512,7 +522,9 @@ e, enquanto a janela enche, o painel mostra `coletando 12/60`.
 ```
  RECURSO                         USO                        SEM PERMISSÃO
  ───────                         ───                        ─────────────
- pods, deployments (list/watch)  base da interface          não inicia
+ pods (list/watch)               base da interface          não inicia
+ deployments (list/watch)        painel Deployments         cobertura degradada,
+                                                            motivo na tela
  pods/log (get)                  aba Log                    erro do servidor na aba
  events (list/watch)             aba Events                 aviso na aba
  statefulsets, daemonsets, jobs, Workloads                  motivo na tela
