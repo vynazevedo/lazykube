@@ -38,6 +38,7 @@ func TestObserveReadsOnlyTheRequestedObject(t *testing.T) {
 		{"pod", guard.Delete, guard.Target{Version: "v1", Resource: "pods", Namespace: "apps", Name: "api-1"}, "/api/v1/namespaces/apps/pods/api-1", `{"apiVersion":"v1","kind":"Pod","metadata":{"name":"api-1","uid":"u","resourceVersion":"8","finalizers":["a/b"],"deletionTimestamp":"2026-01-01T00:00:00Z","ownerReferences":[{"apiVersion":"apps/v1","kind":"ReplicaSet","name":"api","uid":"o","controller":true}]},"spec":{"terminationGracePeriodSeconds":45}}`, func(o guard.Observation) bool {
 			return o.GraceKnown && o.GraceSeconds == 45 && o.Owner == "ReplicaSet/api" && o.Terminating && o.Finalizers == 1
 		}},
+		{"node", guard.Cordon, guard.Target{Version: "v1", Resource: "nodes", Name: "node-a"}, "/api/v1/nodes/node-a", `{"apiVersion":"v1","kind":"Node","metadata":{"name":"node-a","uid":"u","resourceVersion":"8"},"spec":{"unschedulable":true}}`, func(o guard.Observation) bool { return o.Unschedulable }},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			var seen []string

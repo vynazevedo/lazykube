@@ -37,7 +37,7 @@ type actionBackend struct {
 }
 
 func (b actionBackend) Supported(a guard.Action) bool {
-	return a >= guard.Delete && a <= guard.Edit || (a == guard.Exec || a == guard.PortForward) && b.active != nil
+	return a >= guard.Delete && a <= guard.Edit || a == guard.Cordon || a == guard.Uncordon || (a == guard.Exec || a == guard.PortForward) && b.active != nil
 }
 func (b actionBackend) resource(t guard.Target) dynamic.ResourceInterface {
 	r := b.client.Resource(schema.GroupVersionResource{Group: t.Group, Version: t.Version, Resource: t.Resource})
@@ -63,13 +63,15 @@ func readReason(err error) guard.Reason {
 }
 
 func patches(a guard.Action) bool {
-	return a == guard.Restart
+	return a == guard.Restart || a == guard.Cordon || a == guard.Uncordon
 }
 
 func unchanged(r guard.Request, obj *unstructured.Unstructured) bool {
 	switch r.Action {
 	case guard.Scale:
 		return scaleReplicas(obj) == int64(r.Parameters.Replicas)
+	case guard.Cordon, guard.Uncordon:
+		return nodeUnschedulable(obj) == (r.Action == guard.Cordon)
 	}
 	return false
 }
@@ -77,6 +79,19 @@ func unchanged(r guard.Request, obj *unstructured.Unstructured) bool {
 func scaleReplicas(obj *unstructured.Unstructured) int64 {
 	n, _, _ := unstructured.NestedInt64(obj.Object, "spec", "replicas")
 	return n
+}
+
+func nodeUnschedulable(obj *unstructured.Unstructured) bool {
+	v, _, _ := unstructured.NestedBool(obj.Object, "spec", "unschedulable")
+	return v
+}
+
+func nodePatch(r guard.Request) ([]byte, error) {
+	return json.Marshal([]map[string]any{
+		{"op": "test", "path": "/metadata/uid", "value": r.Target.UID},
+		{"op": "test", "path": "/metadata/resourceVersion", "value": r.Target.ResourceVersion},
+		{"op": "add", "path": "/spec/unschedulable", "value": r.Action == guard.Cordon},
+	})
 }
 
 func (b actionBackend) Observe(ctx context.Context, action guard.Action, t guard.Target) (guard.Observation, error) {
@@ -103,6 +118,8 @@ func (b actionBackend) Observe(ctx context.Context, action guard.Action, t guard
 		if t.Group == "" && t.Resource == "pods" {
 			out.GraceSeconds, out.GraceKnown, _ = unstructured.NestedInt64(obj.Object, "spec", "terminationGracePeriodSeconds")
 		}
+	case guard.Cordon, guard.Uncordon:
+		out.Unschedulable = nodeUnschedulable(obj)
 	}
 	return out, nil
 }
@@ -162,6 +179,12 @@ func (b actionBackend) Send(ctx context.Context, r guard.Request, dry bool) erro
 		annotations["kubectl.kubernetes.io/restartedAt"] = string(r.Parameters.Document)
 		patch := []map[string]any{{"op": "test", "path": "/metadata/uid", "value": r.Target.UID}, {"op": "test", "path": "/metadata/resourceVersion", "value": r.Target.ResourceVersion}, {"op": "add", "path": "/spec/template/metadata/annotations", "value": annotations}}
 		body, marshalErr := json.Marshal(patch)
+		if marshalErr != nil {
+			return guard.Invalid
+		}
+		_, err = client.Patch(ctx, r.Target.Name, types.JSONPatchType, body, metav1.PatchOptions{DryRun: dryRun})
+	case guard.Cordon, guard.Uncordon:
+		body, marshalErr := nodePatch(r)
 		if marshalErr != nil {
 			return guard.Invalid
 		}

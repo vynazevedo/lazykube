@@ -16,6 +16,8 @@ const (
 	Edit
 	Exec
 	PortForward
+	Cordon
+	Uncordon
 )
 
 type Reason string
@@ -72,6 +74,7 @@ type Observation struct {
 	Strategy         string
 	Finalizers       int
 	Terminating      bool
+	Unschedulable    bool
 }
 type Parameters struct {
 	Replicas              int32
@@ -140,6 +143,8 @@ func (p Policy) Evaluate(s Session, r Request) (Decision, error) {
 		if t.Group != "" || t.Resource != "pods" || r.Parameters.LocalPort == 0 || r.Parameters.RemotePort == 0 || r.Parameters.Address != "127.0.0.1" && r.Parameters.Address != "::1" {
 			return d, Invalid
 		}
+	case Cordon, Uncordon:
+		d.HighRisk, d.DryRun = true, true
 	default:
 		return d, Unsupported
 	}
@@ -174,7 +179,7 @@ func Requirements(r Request) []Access {
 		a.Subresource = "scale"
 		write.Subresource = "scale"
 		write.Verb = "update"
-	case Restart:
+	case Restart, Cordon, Uncordon:
 		write.Verb = "patch"
 	case Edit:
 		write.Verb = "update"
