@@ -382,7 +382,8 @@ func (m Model) update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 		m.reload()
-		return m, tea.Batch(m.waitData(), m.radarCmd())
+		cmd := m.requestRadar()
+		return m, tea.Batch(m.waitData(), cmd)
 	case frameMsg:
 		if msg.session != m.session.Generation || msg.gen != m.gen || !m.running() {
 			return m, nil

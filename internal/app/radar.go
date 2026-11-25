@@ -20,6 +20,15 @@ type radarFeed struct {
 	engine *insight.Engine
 	cursor insight.Cursor
 	busy   atomic.Bool
+	seq    uint64
+}
+
+func (f *radarFeed) begin() (uint64, bool) {
+	if !f.busy.CompareAndSwap(false, true) {
+		return 0, false
+	}
+	f.seq++
+	return f.seq, true
 }
 
 func (f *radarFeed) run() insight.SignalSnapshot {
@@ -34,6 +43,8 @@ type radarState struct {
 	feed    *radarFeed
 	live    bool
 	ticking bool
+	pending bool
+	applied uint64
 	err     string
 	have    bool
 	snap    insight.SignalSnapshot
@@ -50,6 +61,7 @@ type radarState struct {
 
 type radarMsg struct {
 	session uint64
+	seq     uint64
 	snap    insight.SignalSnapshot
 }
 
@@ -77,8 +89,18 @@ func (m Model) radarTick() tea.Cmd {
 	return m.after(radarInterval, func(time.Time) tea.Msg { return radarTickMsg{session: session} })
 }
 
+func (m *Model) requestRadar() tea.Cmd {
+	cmd := m.radarCmd()
+	m.radar.pending = cmd == nil && m.radar.feed != nil
+	return cmd
+}
+
 func (m Model) radarCmd() tea.Cmd {
-	if m.radar.feed == nil || !m.radar.feed.busy.CompareAndSwap(false, true) {
+	if m.radar.feed == nil {
+		return nil
+	}
+	seq, free := m.radar.feed.begin()
+	if !free {
 		return nil
 	}
 	feed, session := m.radar.feed, m.session.Generation
@@ -88,7 +110,7 @@ func (m Model) radarCmd() tea.Cmd {
 			feed.busy.Store(false)
 			return nil
 		}
-		return radarMsg{session: session, snap: feed.run()}
+		return radarMsg{session: session, seq: seq, snap: feed.run()}
 	}
 }
 
@@ -120,21 +142,35 @@ func (m Model) updateRadar(msg tea.Msg) (Model, tea.Cmd, bool) {
 			return m, nil, true
 		}
 		m.radar.ticking = false
-		return m, m.radarCmd(), true
+		cmd := m.requestRadar()
+		return m, cmd, true
 	case radarMsg:
 		if msg.session != m.session.Generation || m.life.Err() != nil {
 			return m, nil, true
 		}
-		m.applyRadar(msg.snap)
-		return m, m.armRadarTick(), true
+		if msg.seq > m.radar.applied {
+			m.radar.applied = msg.seq
+			m.applyRadar(msg.snap)
+		}
+		next := m.armRadarTick
+		if m.radar.pending {
+			next = m.requestRadar
+		}
+		cmd := next()
+		return m, cmd, true
 	}
 	return m, nil, false
 }
 
 func (m *Model) syncRadar() {
-	if m.radar.feed == nil || !m.radar.feed.busy.CompareAndSwap(false, true) {
+	if m.radar.feed == nil {
 		return
 	}
+	seq, free := m.radar.feed.begin()
+	if !free {
+		return
+	}
+	m.radar.applied = seq
 	m.applyRadar(m.radar.feed.run())
 }
 
