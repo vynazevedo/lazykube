@@ -88,6 +88,7 @@ type Model struct {
 	workloadsLeaf DestinationID
 	tree          treeState
 	res           resourceState
+	acc           accessState
 	manifest      []string
 	describe      []data.Field
 
@@ -220,7 +221,7 @@ func (m *Model) screenLayout() func(w, h int) Layout {
 		return ComputeNodes
 	case m.onScreen(ScreenEvents):
 		return ComputeEvents
-	case m.onScreen(ScreenResources), m.onScreen(ScreenOverview):
+	case m.onTables():
 		return ComputeTable
 	}
 	mode := m.leftMode
@@ -260,7 +261,7 @@ func (m *Model) applyCompact() {
 		return
 	}
 	switch {
-	case m.inDetail(), m.onScreen(ScreenResources), m.onScreen(ScreenOverview):
+	case m.inDetail(), m.onTables():
 	case m.onScreen(ScreenEvents):
 		if m.ev.reading {
 			l.Events = Rect{}

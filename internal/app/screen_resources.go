@@ -34,7 +34,7 @@ func (resourcesScreen) Title() string      { return "Workloads" }
 func (resourcesScreen) ShowsDetails() bool { return false }
 func (resourcesScreen) Init(Model) tea.Cmd { return nil }
 
-func (s resourcesScreen) Keys(m Model) []key.Binding { return tableKeys(m) }
+func (s resourcesScreen) Keys(m Model) []key.Binding { return append(tableKeys(m), m.keys.Filter) }
 
 func (resourcesScreen) Help(Model) []ui.KeyHelp { return ui.ResourceHelp() }
 
@@ -45,6 +45,9 @@ func (s resourcesScreen) Update(m Model, msg tea.Msg) (Model, tea.Cmd) {
 	case tea.KeyPressMsg:
 		if m.helpOpen {
 			return updateBody(m, msg)
+		}
+		if m.filtering {
+			return m.handleTableFilter(msg)
 		}
 		if !screenKey(s, m, msg) {
 			return m, nil
@@ -87,7 +90,10 @@ func (m Model) scopeLabel() string {
 
 func (m Model) leafTable(w workloadLeaf) ui.ResourceTableState {
 	_, supported := m.browser()
-	st := ui.ResourceTableState{Label: w.label, Kind: w.kind, Supported: supported, Scope: m.scopeLabel(), Cursor: m.res.cursor, AllNamespaces: m.resourceNamespace() == ""}
+	st := ui.ResourceTableState{Label: w.label, Kind: w.kind, Net: w.net, ClusterScoped: w.scope.cluster, Filter: m.filter.Value(), Filtering: m.filtering, Supported: supported, Scope: m.scopeLabel(), Cursor: m.res.cursor, AllNamespaces: m.resourceNamespace() == ""}
+	if w.scope.cluster {
+		st.Scope, st.AllNamespaces = "cluster", false
+	}
 	if !supported {
 		return st
 	}
@@ -133,11 +139,41 @@ func (m Model) handleTableKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 	case key.Matches(msg, k.Refresh):
 		cmd := m.refreshResources()
 		return m, cmd
+	case key.Matches(msg, k.Filter):
+		m.filtering = true
+		return m, m.filter.Focus()
 	case key.Matches(msg, k.Enter):
+		m.openResource()
 	default:
 		return updateBody(m, msg)
 	}
 	return m, nil
+}
+
+func (m Model) handleTableFilter(msg tea.KeyPressMsg) (Model, tea.Cmd) {
+	switch msg.String() {
+	case "esc":
+		m.endEditing()
+		m.filter.SetValue("")
+		m.reloadTable()
+		return m, nil
+	case "enter":
+		m.endEditing()
+		return m, nil
+	case "up":
+		m.moveTable(-1)
+		return m, nil
+	case "down":
+		m.moveTable(1)
+		return m, nil
+	}
+	var cmd tea.Cmd
+	before := m.filter.Value()
+	m.filter, cmd = m.filter.Update(msg)
+	if m.filter.Value() != before {
+		m.reloadTable()
+	}
+	return m, cmd
 }
 
 func (overviewScreen) ID() ScreenID       { return ScreenOverview }

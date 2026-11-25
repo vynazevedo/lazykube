@@ -20,12 +20,13 @@ configuration | Configuration | categoria
   configuration.hpa | HPA | futuro
   configuration.poddisruptionbudgets | PodDisruptionBudgets | futuro
 network | Network | categoria
-  network.services | Services | futuro
+  network.services | Services | pronto
   network.endpoints | Endpoints | futuro
-  network.endpointslices | EndpointSlices | futuro
-  network.ingresses | Ingresses | futuro
-  network.ingressclasses | IngressClasses | futuro
-  network.networkpolicies | NetworkPolicies | futuro
+  network.endpointslices | EndpointSlices | pronto
+  network.ingresses | Ingresses | pronto
+  network.ingressclasses | IngressClasses | pronto
+  network.networkpolicies | NetworkPolicies | pronto
+  network.httproutes | HTTPRoutes | pronto
 storage | Storage | categoria
   storage.persistentvolumeclaims | PersistentVolumeClaims | futuro
   storage.persistentvolumes | PersistentVolumes | futuro

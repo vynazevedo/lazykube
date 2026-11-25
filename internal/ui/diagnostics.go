@@ -7,11 +7,13 @@ import (
 	"github.com/vynazevedo/lazykube/internal/data"
 	"github.com/vynazevedo/lazykube/internal/draw"
 	"github.com/vynazevedo/lazykube/internal/theme"
+	"github.com/vynazevedo/lazykube/internal/weburl"
 )
 
 type Diagnosis struct {
 	Containers   []data.Container
 	LogContainer string
+	Access       *AccessView
 }
 
 type RowKind int
@@ -23,6 +25,8 @@ const (
 	RowHint
 	RowField
 	RowBlank
+	RowAddress
+	RowNote
 )
 
 type Health int
@@ -40,6 +44,7 @@ type DescribeRow struct {
 	Label    string
 	Value    string
 	Selected bool
+	Link     weburl.URL
 }
 
 const (
@@ -145,6 +150,9 @@ func DescribeRows(d Diagnosis, fields []data.Field) []DescribeRow {
 		}
 		rows = append(rows, DescribeRow{Kind: RowBlank})
 	}
+	if d.Access != nil {
+		rows = append(append(rows, AccessRows(*d.Access)...), DescribeRow{Kind: RowBlank})
+	}
 	for _, f := range fields {
 		rows = append(rows, DescribeRow{Kind: RowField, Label: f.Key, Value: f.Value})
 	}
@@ -209,6 +217,17 @@ func describeRow(r draw.Region, y int, row DescribeRow, ctx Ctx) {
 		r.Text(diagKindW, y, draw.PadRight(row.Label, diagLabelW), draw.Fg(theme.Muted))
 		x := diagKindW + diagLabelW
 		r.Text(x, y, draw.Truncate(row.Value, max(0, r.W-x)), draw.Fg(theme.TextSoft))
+	case RowAddress:
+		addressRow(r, y, row, ctx)
+	case RowNote:
+		glyph, gc := healthGlyph(row.Health, ctx)
+		r.Text(0, y, glyph, draw.Fg(gc))
+		x := 2
+		if row.Label != "" {
+			r.Text(x, y, draw.PadRight(row.Label, originW-2), draw.Fg(theme.Muted))
+			x = originW
+		}
+		r.Text(x, y, draw.Truncate(row.Value, max(0, r.W-x)), draw.Fg(healthColor(row.Health)))
 	case RowHint:
 		r.Text(diagKindW, y, draw.Truncate("↳ "+row.Value, max(0, r.W-diagKindW)), draw.Fg(theme.Faint))
 	case RowField:

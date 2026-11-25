@@ -131,7 +131,7 @@ func (m Model) detailsState(pod *data.Pod) ui.DetailsState {
 		Events:         m.events,
 		Manifest:       m.manifest,
 		Describe:       m.describe,
-		Diag:           ui.Diagnosis{Containers: m.dg.containers, LogContainer: m.dg.logView.Container},
+		Diag:           m.diagnosis(),
 		LogInfo:        m.logInfo(),
 		Focused:        m.focus == FocusDetails,
 		Scroll:         m.scroll,

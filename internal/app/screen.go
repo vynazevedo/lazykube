@@ -18,6 +18,7 @@ const (
 	ScreenEvents
 	ScreenResources
 	ScreenOverview
+	ScreenResourceDetail
 )
 
 type Screen interface {
@@ -48,6 +49,8 @@ func screenFor(id ScreenID) (Screen, bool) {
 		return resourcesScreen{}, true
 	case ScreenOverview:
 		return overviewScreen{}, true
+	case ScreenResourceDetail:
+		return resourceDetailScreen{}, true
 	}
 	return nil, false
 }

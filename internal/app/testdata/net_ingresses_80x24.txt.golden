@@ -1,0 +1,24 @@
+ lazykube [DEMO] [RO]  ◎ context demo namespace Todos   k8s demo      ⠙ ● live  
+  2 Dashboard  |  3 Workloads  |  4 Nodes  |  6 Events                  m menu  
+ Network · Ingresses                                                            
+ ╭─ Ingresses · focus ────────────────────────────────────────────────────────╮ 
+ │ escopo todos os namespaces  ·  cobertura completa no escopo  ·  5 itens  … │ 
+ │   NAMESPACE/NAME                      HOSTS                          TLS   │ 
+ │ › bilibili-raffle/live                live.example.com               sim   │ 
+ │   lgo/lgo                             lgo.example.com                -     │ 
+ │   xcx/qiandao                         qd.example.com                 -     │ 
+ │   ys-odoo/odoo                        *.odoo.example.com             sim   │ 
+ │   ys-odoo/erp                         erp.example.com                -     │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │ selecionado bilibili-raffle/live · r recarrega                             │ 
+ ╰────────────────────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   enter  detail   /  filter   r  reload            bubbletea · 0 fps 

@@ -278,6 +278,9 @@ func (m *Model) openTarget(t Destination) {
 	if id == ScreenResources || id == ScreenOverview {
 		m.res.cursor, m.res.card = 0, 0
 	}
+	if id == ScreenResources || id == ScreenOverview || m.onTables() {
+		setup = append(setup, func(m *Model) { m.filter.SetValue("") })
+	}
 	if id == ScreenWorkloads {
 		focus := t.Focus
 		m.workloadsLeaf = t.ID
@@ -316,6 +319,9 @@ func (m *Model) handleEsc() {
 	switch {
 	case m.onScreen(ScreenEvents) && m.ev.reading:
 		m.stopReadingEvent()
+	case m.onScreen(ScreenResources) && m.filter.Value() != m.nav.entryFilter:
+		m.filter.SetValue(m.nav.entryFilter)
+		m.reloadTable()
 	case m.screen().ShowsDetails() && m.tab == ui.TabLog && m.dg.search.Value() != "":
 		m.dg.search.SetValue("")
 		m.updateMatches()
@@ -445,6 +451,8 @@ func routeLabel(r Route) string {
 	switch r.Kind {
 	case RouteNamespace:
 		return r.Namespace
+	case RouteResource:
+		return r.Ref.Name
 	case RoutePod:
 		if _, name, ok := strings.Cut(r.Pod, "/"); ok {
 			return name
@@ -453,7 +461,11 @@ func routeLabel(r Route) string {
 	}
 	if r.Screen == ScreenResources || r.Screen == ScreenOverview {
 		if d, ok := registry.get(r.Dest); ok {
-			return r.screen().Title() + " · " + d.Label
+			title := r.screen().Title()
+			if parent, ok := registry.get(d.Parent); ok {
+				title = parent.Label
+			}
+			return title + " · " + d.Label
 		}
 	}
 	return r.screen().Title()

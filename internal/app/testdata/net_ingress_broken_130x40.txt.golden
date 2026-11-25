@@ -1,0 +1,40 @@
+ lazykube [DEMO] [RO]  v2.0   ◎ context demo namespace Todos   k8s demo  nodes 1  ns 8  pods 13        ⠙ metrics every 5s ● live  
+  2 Dashboard  |  3 Workloads  |  4 Nodes  |  6 Events                                                                    m menu  
+ Network · Ingresses > erp                                                                                                        
+ ╭─ Ingresses · ys-odoo/erp · [DEMO] ───────────────────────────────────────────────────────────────────────────────────────────╮ 
+ │ Nome              erp                                                                                                        │ 
+ │ Namespace         ys-odoo                                                                                                    │ 
+ │ Idade             3d                                                                                                         │ 
+ │ Cobertura         cobertura completa no escopo                                                                               │ 
+ │ Classe            traefik                                                                                                    │ 
+ │ Endereço          192.168.0.12                                                                                               │ 
+ │ Regra             erp.example.com/erp Prefix para erp:http                                                                   │ 
+ │                                                                                                                              │ 
+ │ Acesso  1 endereço · estado pelos endpoints lidos; nenhuma requisição foi feita                                              │ 
+ │ ✗ Ingress      http://erp.example.com/erp                                                                                ◂ y │ 
+ │           estado    sem backend · rede privada · Ingress ys-odoo/erp · sem TLS declarado                                     │ 
+ │           motivo    o Service ys-odoo/erp não existe                                                                         │ 
+ │           ↳ u próxima URL · y copia a selecionada                                                                            │ 
+ │                                                                                                                              │ 
+ │ Rota  primeiro elo quebrado pelos objetos lidos                                                                              │ 
+ │ ✗ Ingress ys-odoo/erp erp.example.com/erp para erp:http                                                                      │ 
+ │           ↳ primeiro elo quebrado: Service, o Service ys-odoo/erp não existe                                                 │ 
+ │ ● IngressClass traefik                                                                                                       │ 
+ │ ● TLS          sem TLS declarado para este host                                                                              │ 
+ │ ✗ Service      o Service ys-odoo/erp não existe                                                                              │ 
+ │ ● Endereço     endereço publicado no Ingress                                                                                 │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  scroll   u  next URL   y  copy   r  reload   esc  back   b  tree   m  menu   ?  help   q  quit            bubbletea · 0 fps 

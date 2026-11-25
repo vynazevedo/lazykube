@@ -1,0 +1,24 @@
+ lazykube [DEMO] [RO]  ◎ context demo namespace Todos   k8s demo      ⠙ ● live  
+  2 Dashboard  |  3 Workloads  |  4 Nodes  |  6 Events                  m menu  
+ Network · EndpointSlices                                                       
+ ╭─ EndpointSlices · focus ───────────────────────────────────────────────────╮ 
+ │ escopo todos os namespaces  ·  cobertura completa no escopo  ·  8 itens  … │ 
+ │   NAMESPACE/NAME                       SERVICE                  READY      │ 
+ │ › bilibili-raffle/bilibili-live-7xk2p  bilibili-live            1/1        │ 
+ │   bilibili-raffle/bilibili-raffle-7xk… bilibili-raffle          1/1        │ 
+ │   lgo/lgo-7xk2p                        lgo                      1/1        │ 
+ │   ys-odoo/odoo-7xk2p                   odoo                     1/1        │ 
+ │   ys-odoo/psql-7xk2p                   psql                     1/1        │ 
+ │   xcx/qiandao-7xk2p                    qiandao                  0/0        │ 
+ │   kube-system/kube-dns-7xk2p           kube-dns                 1/1        │ 
+ │   kube-system/traefik-7xk2p            traefik                  1/1        │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │ selecionado bilibili-raffle/bilibili-live-7xk2p · r recarrega              │ 
+ ╰────────────────────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   enter  detail   /  filter   r  reload            bubbletea · 0 fps 

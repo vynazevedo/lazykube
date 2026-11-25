@@ -16,6 +16,7 @@ type treeState struct {
 	cursor   DestinationID
 	offset   int
 	note     string
+	gateway  bool
 }
 
 type treeRow struct {
@@ -41,6 +42,9 @@ func (t treeState) rows() []treeRow {
 	var walk func(parent DestinationID, depth int)
 	walk = func(parent DestinationID, depth int) {
 		for _, d := range registry.Children(parent) {
+			if d.ID == DestHTTPRoutes && !t.gateway {
+				continue
+			}
 			out = append(out, treeRow{dest: d, depth: depth})
 			if d.Kind == DestCategory && t.isExpanded(d.ID) {
 				walk(d.ID, depth+1)

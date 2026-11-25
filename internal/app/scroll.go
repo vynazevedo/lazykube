@@ -58,7 +58,7 @@ func (m Model) scrollTotal() int {
 	case ui.TabConfig:
 		return len(m.manifest)
 	case ui.TabDescribe:
-		return len(ui.DescribeRows(ui.Diagnosis{Containers: m.dg.containers}, m.describe))
+		return len(ui.DescribeRows(m.diagnosis(), m.describe))
 	case ui.TabEvents:
 		return len(m.events.Items)
 	default:

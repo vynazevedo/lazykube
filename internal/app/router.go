@@ -10,6 +10,7 @@ const (
 	RouteScreen RouteKind = iota
 	RouteNamespace
 	RoutePod
+	RouteResource
 )
 
 type ResourceRef struct {

@@ -35,6 +35,12 @@ func (m Model) yankTarget() (yank, bool) {
 	switch {
 	case m.inDetail():
 		return m.yankDetails()
+	case m.onScreen(ScreenResourceDetail):
+		_, ref, ok := m.activeResource()
+		if !ok {
+			return yank{}, false
+		}
+		return yankRef(ref.Namespace, ref.Name)
 	case m.onScreen(ScreenEvents):
 		return m.yankEvent()
 	case m.onScreen(ScreenResources):
@@ -125,14 +131,24 @@ func (m Model) yankTableRow() (yank, bool) {
 		return yank{}, false
 	}
 	ref := st.Page.Items[st.Cursor].Ref
-	if ref.Namespace == "" {
-		return named(ref.Name)
+	return yankRef(ref.Namespace, ref.Name)
+}
+
+func yankRef(namespace, name string) (yank, bool) {
+	if namespace == "" {
+		return named(name)
 	}
-	return named(ref.Namespace + "/" + ref.Name)
+	return named(namespace + "/" + name)
 }
 
 func (m Model) yank() (Model, tea.Cmd) {
-	y, ok := m.yankTarget()
+	y, refused, ok := m.yankAddress()
+	if refused != "" {
+		return m, m.showNotice(refused)
+	}
+	if !ok {
+		y, ok = m.yankTarget()
+	}
 	if !ok {
 		return m, m.showNotice("nada para copiar")
 	}

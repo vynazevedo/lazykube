@@ -77,6 +77,8 @@ func (m Model) handleKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 		m.setTab(m.tab.Next(-1))
 	case key.Matches(msg, k.TabNext):
 		m.setTab(m.tab.Next(1))
+	case key.Matches(msg, k.NextURL) && m.inDetail() && m.tab == ui.TabDescribe:
+		m.nextURL()
 	case key.Matches(msg, k.Container):
 		m.cycleContainer()
 	case key.Matches(msg, k.Previous):
