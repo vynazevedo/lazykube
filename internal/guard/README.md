@@ -84,6 +84,11 @@ JSON testa UID e resourceVersion e altera somente `spec.unschedulable`, com os
 mesmos bytes no dry-run e no envio. Estado ja igual, em scale ou node, e recusado
 com `no_change` antes do dry-run. Conflito dos testes do PATCH e alvo obsoleto.
 
+Todo plano valido consumido deixa um unico desfecho no audit: recusa de politica ou
+de confirmacao, cancelamento, expiracao, remocao de plano vencido ou resultado. Um
+ID inexistente nao gera evento, porque nao ha alvo conhecido. Se o registro da
+recusa falhar, o plano continua consumido e novas acoes ficam bloqueadas.
+
 `Observe` faz uma leitura pontual do alvo, sem mutex, e so depois da politica e da
 allowlist: em somente leitura nenhuma requisicao sai. `Discard` consome um preview
 sem enviar nada e registra o cancelamento. `AuditBlocked` informa a falha de audit

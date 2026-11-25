@@ -207,9 +207,10 @@ func (e *Executor) Prepare(parent context.Context, r Request) (Preview, error) {
 		return reject(Canceled)
 	}
 	now := e.clock.Now()
-	for id, p := range e.plans {
-		if !now.Before(p.preview.ExpiresAt) {
-			delete(e.plans, id)
+	for _, old := range e.expiredPlans(now) {
+		delete(e.plans, old.preview.ID)
+		if err = e.event(old.preview.ID, old.request, old.preview.Decision, "canceled", Canceled); err != nil {
+			return Preview{}, err
 		}
 	}
 	if len(e.plans) >= 16 {
@@ -232,48 +233,36 @@ func (e *Executor) Execute(parent context.Context, id string, c Confirmation) (R
 	defer cancel()
 	ctx, deadlineCancel := context.WithTimeout(ctx, max(0, p.preview.ExpiresAt.Sub(e.clock.Now())))
 	defer deadlineCancel()
-	d, err := e.policy.Evaluate(e.session, p.request)
-	if err != nil {
-		return result, err
-	}
-	if !c.Approved || d.HighRisk && c.Resource != p.request.Target.Name || d.Mode.Protected && c.Context != e.session.Context {
-		return result, ConfirmationRequired
-	}
-	if e.planExpired(ctx, p) {
-		result.Outcome = Canceled
-		if err = e.event(id, p.request, d, "canceled", Canceled); err != nil {
-			return result, err
-		}
-		return result, Canceled
-	}
-	cancelBeforeSend := func() (Result, error) {
-		result.Outcome = Canceled
-		if auditErr := e.rejection(id, p.request, d, Canceled); auditErr != nil {
+	refuse := func(d Decision, reason Reason) (Result, error) {
+		result.Outcome = reason
+		if auditErr := e.rejection(id, p.request, d, reason); auditErr != nil {
 			return result, auditErr
 		}
-		return result, Canceled
+		return result, reason
+	}
+	d, err := e.policy.Evaluate(e.session, p.request)
+	if err != nil {
+		return refuse(d, safeReason(err, Invalid))
+	}
+	if !c.Approved || d.HighRisk && c.Resource != p.request.Target.Name || d.Mode.Protected && c.Context != e.session.Context {
+		return refuse(d, ConfirmationRequired)
+	}
+	if e.planExpired(ctx, p) {
+		return refuse(d, Canceled)
 	}
 	err = e.access(ctx, p.request)
 	if e.planExpired(ctx, p) {
-		return cancelBeforeSend()
+		return refuse(d, Canceled)
 	}
 	if err != nil {
-		result.Outcome = safeReason(err, Unavailable)
-		if auditErr := e.rejection(id, p.request, d, result.Outcome); auditErr != nil {
-			return result, auditErr
-		}
-		return result, err
+		return refuse(d, safeReason(err, Unavailable))
 	}
 	err = e.backend.Validate(ctx, p.request)
 	if e.planExpired(ctx, p) {
-		return cancelBeforeSend()
+		return refuse(d, Canceled)
 	}
 	if err != nil {
-		result.Outcome = safeReason(err, Stale)
-		if auditErr := e.rejection(id, p.request, d, result.Outcome); auditErr != nil {
-			return result, auditErr
-		}
-		return result, result.Outcome
+		return refuse(d, safeReason(err, Stale))
 	}
 	if err = e.event(id, p.request, d, "intent", ""); err != nil {
 		return result, err
@@ -300,6 +289,16 @@ func (e *Executor) Execute(parent context.Context, id string, c Confirmation) (R
 		return result, result.Outcome
 	}
 	return result, nil
+}
+
+func (e *Executor) expiredPlans(now time.Time) []plan {
+	var out []plan
+	for _, p := range e.plans {
+		if !now.Before(p.preview.ExpiresAt) {
+			out = append(out, p)
+		}
+	}
+	return out
 }
 
 func (e *Executor) planExpired(ctx context.Context, p plan) bool {

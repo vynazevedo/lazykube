@@ -205,3 +205,131 @@ func TestNamespacedTargetsRequireNamespace(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestEveryConsumedPlanLeavesOneOutcome(t *testing.T) {
+	approved := Confirmation{Approved: true, Resource: "pod"}
+	for _, tc := range []struct {
+		name    string
+		change  func(*Executor, *guardFake, *time.Time)
+		confirm Confirmation
+		want    Reason
+		phase   string
+		sends   int
+	}{
+		{"not approved", nil, Confirmation{Resource: "pod"}, ConfirmationRequired, "denied", 1},
+		{"empty", nil, Confirmation{}, ConfirmationRequired, "denied", 1},
+		{"wrong name", nil, Confirmation{Approved: true, Resource: "other"}, ConfirmationRequired, "denied", 1},
+		{"read only", func(e *Executor, _ *guardFake, _ *time.Time) { e.policy = NewPolicy(false) }, approved, ReadOnly, "denied", 1},
+		{"protected", func(e *Executor, _ *guardFake, _ *time.Time) { e.session.Environment.Protected = true }, approved, ReadOnly, "denied", 1},
+		{"config", func(e *Executor, _ *guardFake, _ *time.Time) { e.session.Environment.Valid = false }, approved, InvalidConfig, "denied", 1},
+		{"session identity", func(e *Executor, _ *guardFake, _ *time.Time) { e.session.Identity = "" }, approved, Invalid, "denied", 1},
+		{"revoked", func(_ *Executor, f *guardFake, _ *time.Time) { f.allowed = false }, approved, Denied, "denied", 1},
+		{"stale", func(_ *Executor, f *guardFake, _ *time.Time) { f.invalid = true }, approved, Stale, "denied", 1},
+		{"expired", func(_ *Executor, _ *guardFake, n *time.Time) { *n = n.Add(time.Hour) }, approved, Canceled, "canceled", 1},
+		{"closed", func(e *Executor, _ *guardFake, _ *time.Time) { e.Close() }, approved, Canceled, "canceled", 1},
+		{"unknown", func(_ *Executor, f *guardFake, _ *time.Time) { f.sendErr = errors.New("private") }, approved, Unknown, "result", 2},
+		{"succeeded", nil, approved, Succeeded, "result", 2},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			e, f, now := guardExecutor(t)
+			p, err := e.Prepare(context.Background(), guardRequest())
+			if err != nil {
+				t.Fatal(err)
+			}
+			if tc.change != nil {
+				tc.change(e, f, now)
+			}
+			before := len(f.events)
+			r, err := e.Execute(context.Background(), p.ID, tc.confirm)
+			if r.Outcome != tc.want || tc.want != Succeeded && !errors.Is(err, tc.want) || len(f.sends) != tc.sends {
+				t.Fatal(r, err, f.sends)
+			}
+			outcomes := 0
+			for _, ev := range f.events[before:] {
+				if ev.Outcome != "" {
+					outcomes++
+				}
+				if ev.OperationID != p.ID || ev.Name != "pod" || ev.UID != "uid" {
+					t.Fatalf("%+v", ev)
+				}
+			}
+			if last := f.events[len(f.events)-1]; outcomes != 1 || last.Phase != tc.phase || last.Outcome != tc.want {
+				t.Fatalf("%d outcomes, last %+v", outcomes, last)
+			}
+			after := len(f.events)
+			if _, err = e.Execute(context.Background(), p.ID, tc.confirm); !errors.Is(err, Invalid) || len(f.events) != after {
+				t.Fatal("a consumed id has no second outcome", err)
+			}
+		})
+	}
+}
+
+func TestUnknownPlanIDInventsNoAuditTarget(t *testing.T) {
+	e, f, _ := guardExecutor(t)
+	for _, id := range []string{"", "missing"} {
+		if r, err := e.Execute(context.Background(), id, Confirmation{Approved: true}); !errors.Is(err, Invalid) || r.Outcome != "" {
+			t.Fatal(r, err)
+		}
+		if err := e.Discard(id); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if len(f.events) != 0 {
+		t.Fatal(f.events)
+	}
+}
+
+func TestEarlyRefusalWithBrokenAuditStaysClosed(t *testing.T) {
+	e, f, _ := guardExecutor(t)
+	p, err := e.Prepare(context.Background(), guardRequest())
+	if err != nil {
+		t.Fatal(err)
+	}
+	f.failPhase = "denied"
+	r, err := e.Execute(context.Background(), p.ID, Confirmation{})
+	if r.Outcome != ConfirmationRequired || !errors.Is(err, AuditFailed) || !e.AuditBlocked() || len(f.sends) != 1 {
+		t.Fatal(r, err, f.sends)
+	}
+	f.failPhase = ""
+	recorded := len(f.events)
+	if _, err = e.Execute(context.Background(), p.ID, Confirmation{Approved: true, Resource: "pod"}); !errors.Is(err, Invalid) {
+		t.Fatal("the plan stays consumed", err)
+	}
+	if _, err = e.Prepare(context.Background(), guardRequest()); !errors.Is(err, AuditFailed) || len(f.events) != recorded || len(f.sends) != 1 {
+		t.Fatal(err, f.events)
+	}
+}
+
+func TestPrunedPlansAreAudited(t *testing.T) {
+	e, f, now := guardExecutor(t)
+	first, err := e.Prepare(context.Background(), guardRequest())
+	if err != nil {
+		t.Fatal(err)
+	}
+	*now = first.ExpiresAt
+	if _, err = e.Prepare(context.Background(), guardRequest()); err != nil {
+		t.Fatal(err)
+	}
+	found := 0
+	for _, ev := range f.events {
+		if ev.OperationID == first.ID && ev.Phase == "canceled" && ev.Outcome == Canceled {
+			found++
+		}
+	}
+	if found != 1 {
+		t.Fatal(f.events)
+	}
+}
+
+func TestPrunedPlanAuditFailureReleasesNoPreview(t *testing.T) {
+	e, f, now := guardExecutor(t)
+	first, err := e.Prepare(context.Background(), guardRequest())
+	if err != nil {
+		t.Fatal(err)
+	}
+	*now = first.ExpiresAt
+	f.failPhase = "canceled"
+	if p, err := e.Prepare(context.Background(), guardRequest()); !errors.Is(err, AuditFailed) || p.ID != "" || len(e.plans) != 0 {
+		t.Fatal(p, err, len(e.plans))
+	}
+}
