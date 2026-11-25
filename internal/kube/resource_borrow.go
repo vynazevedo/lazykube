@@ -112,7 +112,7 @@ func (e *resourceEntry) projectBorrowed(inf cache.SharedIndexInformer) {
 	labelSelector, _ := labels.Parse(e.key.LabelSelector)
 	fieldSelector, _ := fields.ParseSelector(e.key.FieldSelector)
 	next := make(map[string]data.ResourceRow)
-	truncated := false
+	truncated, bytes := false, 0
 	for _, obj := range inf.GetStore().List() {
 		m, err := meta.Accessor(obj)
 		if err != nil {
@@ -131,11 +131,13 @@ func (e *resourceEntry) projectBorrowed(inf cache.SharedIndexInformer) {
 		}
 		row, ok := projectResource(m)
 		row.Workload = resourceWorkload(obj, e.key.GVR)
+		row.Network = e.facts(obj)
 		ok = ok && resourceRowFits(row)
 		if !ok {
 			truncated = true
 			continue
 		}
+		bytes += factBytes(row)
 		next[row.Ref.Namespace+"/"+row.Ref.Name] = row
 	}
 	cov := e.borrowedCoverage(inf)
@@ -145,7 +147,7 @@ func (e *resourceEntry) projectBorrowed(inf cache.SharedIndexInformer) {
 	if e.ctx.Err() != nil {
 		return
 	}
-	if p.rows-len(e.rows)+len(next) > p.poolLimit {
+	if p.rows-len(e.rows)+len(next) > p.poolLimit || p.factBytes-e.factBytes+bytes > p.factLimit {
 		e.coverage = data.Coverage{State: data.CoveragePartial, Reason: "resource pool budget exhausted"}
 		e.truncated = true
 		e.changedLocked()
@@ -154,10 +156,11 @@ func (e *resourceEntry) projectBorrowed(inf cache.SharedIndexInformer) {
 	if truncated {
 		cov = data.Coverage{State: data.CoveragePartial, Reason: "existing cache projection limited"}
 	}
-	if maps.Equal(e.rows, next) && e.coverage == cov && e.truncated == truncated {
+	if maps.EqualFunc(e.rows, next, data.SameResourceRow) && e.coverage == cov && e.truncated == truncated {
 		return
 	}
 	p.rows += len(next) - len(e.rows)
+	e.addFacts(bytes - e.factBytes)
 	e.rows = next
 	e.workloads = data.WorkloadDistribution{}
 	for _, row := range next {
