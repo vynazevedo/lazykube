@@ -1012,20 +1012,21 @@ func TestPinnedPodAccessIsDroppedWhenTheGraphSeesTheReplacementFirst(t *testing.
 }
 
 func TestPodOpenedByNameDropsAccessWhenItsUIDChanges(t *testing.T) {
-	b := newNetBrowser(nil, hostPages("web.example.com"))
-	m := nodeModel(t, b, 160, 48)
-	m = openPodAccess(t, m)
+	m, _ := accessHarness(t)
+	key, uid := shownPod(m)
+	m = pressDrive(t, m, "esc")
+	m.selName = key
+	m.openPod()
+	m = pressDrive(t, m, "d", "u")
 	before := m.acc.target
-	if before.uid == "" {
-		t.Fatal("the observed UID pins the access section")
+	if _, pinned := shownPod(m); pinned != "" || before.uid != uid || !m.urls.open {
+		t.Fatalf("the route carries no UID and the observed one pins access: %+v picker %v", before, m.urls.open)
 	}
-	m = pressDrive(t, m, "u")
-	key, _ := shownPod(m)
 	m = replacePod(m, key, "replacement-uid")
 	m.refresh()
 	next, _ := m.Update(tea.FocusMsg{})
 	m = next.(Model)
 	if m.acc.target == before || m.acc.view != nil || m.urls.open {
-		t.Fatal("another UID starts another report from nothing")
+		t.Fatal("another UID starts another report from nothing and closes the picker")
 	}
 }
