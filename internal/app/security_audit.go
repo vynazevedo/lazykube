@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"errors"
 	"strings"
 
 	tea "charm.land/bubbletea/v2"
@@ -128,6 +129,10 @@ func (m *Model) applyAudit(msg auditPageMsg) {
 	switch {
 	case msg.err != nil:
 		*a = auditView{all: a.all, state: ui.AuditUnavailable}
+		var refusal guard.AuditRefusal
+		if errors.As(msg.err, &refusal) {
+			a.reason = refusal.Error() + "; ações bloqueadas"
+		}
 		return
 	case msg.page.Rotated:
 		*a = auditView{all: a.all, state: ui.AuditRotated}
