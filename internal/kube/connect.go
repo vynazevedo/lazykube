@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/vynazevedo/lazykube/internal/guard"
 	"io"
-	"k8s.io/client-go/dynamic"
 	"time"
 
 	"github.com/go-logr/logr"
@@ -115,7 +114,7 @@ func Connect(ctx context.Context, opts ConnectOptions) (*Source, error) {
 	if auditPath == "" {
 		auditPath, _ = guard.DefaultAuditPath()
 	}
-	actionClient, clientErr := dynamic.NewForConfig(cfg)
+	actionClient, clientErr := newActionClient(cfg)
 	if clientErr != nil {
 		s.Close()
 		return nil, connectError(ErrorGuard, name, clientErr)
