@@ -103,7 +103,7 @@ func step(t *testing.T, m Model, keys ...string) Model {
 	t.Helper()
 	for _, k := range keys {
 		next, cmd := m.Update(keyPress(k))
-		m = settle(t, next.(Model), cmd)
+		m = settleSecurity(settle(t, next.(Model), cmd))
 	}
 	return m
 }

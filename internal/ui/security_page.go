@@ -48,6 +48,9 @@ type SecurityPageState struct {
 	Alerts      int
 	History     []float64
 	RuleVersion string
+	Loading     bool
+	Stale       bool
+	RulesReady  bool
 	Tab         SecurityPageTab
 	Focus       int
 	Cohort      string
@@ -122,6 +125,9 @@ func SecuritySummaryLines(st SecurityPageState) []draw.Line {
 		width = scopeLabelCompact
 	}
 	scope := draw.Truncate(securityScopeLabel(st.Namespaces), width)
+	if st.Loading {
+		return []draw.Line{{text(scope + " | "), muted("Calculando a postura; ainda sem conclusão.")}}
+	}
 	first := append(draw.Line{text(scope + " | ")}, cohortLine("Todos", st.All)...)
 	noSystem := cohortLine("Sem sistema", st.NoSystem)
 	if !st.NoSystemCut && !st.Compact {
@@ -262,13 +268,20 @@ func resolutionText(w data.WorkloadPosture) string {
 }
 
 func SecurityWorkloadsPanel(r draw.Region, st SecurityPageState, ctx Ctx) {
-	inner := Panel(r, fmt.Sprintf("Workloads (%d) | %s", len(st.Workloads), st.Cohort), st.Focus == SecurityFocusList, ctx).Inset(1, 0, 1, 0)
+	title := fmt.Sprintf("Workloads (%d) | %s", len(st.Workloads), st.Cohort)
+	if st.Stale {
+		title += " | recalculando"
+	}
+	inner := Panel(r, title, st.Focus == SecurityFocusList, ctx).Inset(1, 0, 1, 0)
 	if inner.Empty() {
 		return
 	}
 	inner.Line(0, 0, draw.Line{muted(draw.PadRight("WORKLOAD", max(1, inner.W-22))), muted("PODS  SEG  HIG   H")}.Truncate(inner.W))
 	rows := SecurityListRows(r.H)
-	if len(st.Workloads) == 0 {
+	switch {
+	case st.Loading:
+		inner.Line(0, 1, draw.Line{muted("Calculando a postura dos workloads.")})
+	case len(st.Workloads) == 0:
 		inner.Line(0, 1, draw.Line{muted("Sem amostra avaliável.")})
 	}
 	offset := ScrollOffset(st.Cursor, len(st.Workloads), rows)
@@ -315,6 +328,9 @@ func severityColor(s data.Severity) theme.RGB {
 
 func SecurityEvidenceLines(st SecurityPageState, width int) []draw.Line {
 	w := st.Selected()
+	if st.Loading {
+		return []draw.Line{{muted("Calculando a postura; ainda sem conclusão.")}}
+	}
 	if w == nil {
 		return []draw.Line{{muted("Selecione um workload para ver evidências.")}}
 	}
@@ -330,6 +346,10 @@ func SecurityEvidenceLines(st SecurityPageState, width int) []draw.Line {
 	wrap(resolutionText(*w), muted)
 	out = append(out, draw.Line{muted(fmt.Sprintf("Pods observados: %d | Segurança ", len(w.Pods))), pageScore(a.Score), muted(" | Higiene "), pageScore(a.Hygiene)})
 	wrap(pageCoverageText(a.Score.Coverage), muted)
+	if !st.RulesReady {
+		wrap("Calculando evidências deste workload.", muted)
+		return out
+	}
 	if len(st.Rules) == 0 {
 		wrap("Nenhum achado nas regras locais avaliadas; ausência de achados não prova segurança.", muted)
 		return out

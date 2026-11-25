@@ -53,6 +53,7 @@ type Model struct {
 	securityKey       string
 	securityNamespace bool
 	securityView      ui.SecurityView
+	secCalc           securityCalc
 	sec               securityPage
 
 	w, h     int
@@ -329,7 +330,6 @@ func (m *Model) refresh() {
 		m.dg.containers = m.dg.diag.Containers(name)
 	}
 	m.refreshEventsScreen()
-	m.refreshSecurityPage()
 	m.trackClusterFeed()
 	m.updateMatches()
 	m.clampScroll()
@@ -339,6 +339,9 @@ func (m *Model) refresh() {
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if next, cmd, ok := m.handleResourceMsg(msg); ok {
 		return next.settled(cmd)
+	}
+	if next, ok := m.updateSecurityCalc(msg); ok {
+		return next.settled(nil)
 	}
 	if next, cmd, ok := m.updateAudit(msg); ok {
 		return next.settled(cmd)
@@ -352,7 +355,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 func (m Model) settled(cmd tea.Cmd) (tea.Model, tea.Cmd) {
 	cmds := []tea.Cmd{cmd}
-	for _, sync := range []func() tea.Cmd{m.syncResources, m.followAudit} {
+	for _, sync := range []func() tea.Cmd{m.syncResources, m.followAudit, m.followSecurity} {
 		if c := sync(); c != nil {
 			cmds = append(cmds, c)
 		}

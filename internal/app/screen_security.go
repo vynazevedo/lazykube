@@ -1,7 +1,6 @@
 package app
 
 import (
-	"fmt"
 	"slices"
 
 	"charm.land/bubbles/v2/key"
@@ -25,13 +24,12 @@ type securityFrame struct {
 
 type securityPage struct {
 	securityFrame
-	key       string
-	all       data.SecurityAggregate
-	noSystem  data.SecurityAggregate
-	workloads []data.WorkloadPosture
-	rules     []data.WorkloadRule
-	rulesFor  data.WorkloadKey
-	audit     auditView
+	have     bool
+	result   securityResult
+	rules    []data.WorkloadRule
+	rulesFor data.WorkloadKey
+	rulesKey securityKey
+	audit    auditView
 }
 
 func (securityScreen) ID() ScreenID {
@@ -149,16 +147,19 @@ func (m Model) securityPageState() ui.SecurityPageState {
 		Synthetic:   m.snap.Synthetic,
 		Namespaces:  scope.names(),
 		Compact:     m.layout.Compact,
-		All:         m.sec.all,
-		NoSystem:    m.sec.noSystem,
+		All:         m.sec.result.all,
+		NoSystem:    m.sec.result.noSystem,
 		NoSystemCut: scope != "",
 		Alerts:      m.securityAlerts(scope),
 		History:     m.securityHistory(scope),
 		RuleVersion: m.security.RuleVersion,
+		Loading:     !m.sec.have,
+		Stale:       m.sec.have && m.sec.result.key != m.wantedSecurityKey(),
+		RulesReady:  m.sec.have && len(m.sec.result.workloads) > 0 && m.sec.rulesFor == m.sec.Selected,
 		Tab:         m.sec.Tab,
 		Focus:       m.sec.Focus,
 		Cohort:      cohort,
-		Workloads:   m.sec.workloads,
+		Workloads:   m.sec.result.workloads,
 		Cursor:      m.sec.Cursor,
 		Rules:       m.sec.rules,
 		Scroll:      m.sec.Scroll,
@@ -179,67 +180,12 @@ func (m Model) securityAlerts(scope nsSet) int {
 	return n
 }
 
-func (m *Model) refreshSecurityPage() {
-	if !m.onScreen(ScreenSecurity) {
-		return
-	}
-	scope := m.securityScope()
-	key := fmt.Sprintf("%d|%s|%s|%t|%d", m.security.Revision, m.security.RuleVersion, scope, m.sec.NoSystem, len(m.security.Pods))
-	if key != m.sec.key {
-		m.sec.key = key
-		m.rebuildSecurityPage(scope)
-	}
-	m.syncSecurityRules()
-}
-
-func (m Model) securityAggregate(scope nsSet) data.SecurityAggregate {
-	d := m.securitySession.Dashboard
-	names := scope.names()
-	switch len(names) {
-	case 0:
-		return d.Cluster
-	case 1:
-		if a, ok := d.Namespaces[names[0]]; ok {
-			return a
-		}
-		return data.SecurityAggregate{Name: names[0], Score: data.PostureScore{Coverage: data.Coverage{State: data.CoverageUnavailable, Reason: "namespace não observado"}}}
-	}
-	return d.MergeNamespaces(names)
-}
-
-func (m *Model) rebuildSecurityPage(scope nsSet) {
-	m.sec.all = m.securityAggregate(scope)
-	m.sec.noSystem = data.AggregateSecurity(data.SubsetSecurity(m.security, func(p data.PodPosture) bool {
-		return !data.IsSystemNamespace(p.Target.Namespace)
-	})).Cluster
-	noSystem, allowed := m.sec.NoSystem && scope == "", scope.matcher()
-	m.sec.workloads = data.AggregateWorkloads(m.security, func(p data.PodPosture) bool {
-		return allowed(p.Target.Namespace) && (!noSystem || !data.IsSystemNamespace(p.Target.Namespace))
-	})
-	m.sec.rules = nil
-	if i := slices.IndexFunc(m.sec.workloads, func(w data.WorkloadPosture) bool { return w.Key == m.sec.Selected }); i >= 0 {
-		m.sec.Cursor = i
-	}
-	m.adoptSecurityWorkload(m.sec.Cursor)
-}
-
 func (m *Model) adoptSecurityWorkload(i int) {
-	m.sec.Cursor = max(0, min(i, len(m.sec.workloads)-1))
+	m.sec.Cursor = max(0, min(i, len(m.sec.result.workloads)-1))
 	m.sec.Selected = data.WorkloadKey{}
-	if m.sec.Cursor < len(m.sec.workloads) {
-		m.sec.Selected = m.sec.workloads[m.sec.Cursor].Key
+	if m.sec.Cursor < len(m.sec.result.workloads) {
+		m.sec.Selected = m.sec.result.workloads[m.sec.Cursor].Key
 	}
-}
-
-func (m *Model) syncSecurityRules() {
-	if m.sec.rules != nil && m.sec.rulesFor == m.sec.Selected {
-		return
-	}
-	m.sec.rules, m.sec.rulesFor = []data.WorkloadRule{}, m.sec.Selected
-	if m.sec.Cursor < len(m.sec.workloads) {
-		m.sec.rules = data.WorkloadRules(m.security, m.sec.workloads[m.sec.Cursor])
-	}
-	m.clampSecurityScroll()
 }
 
 func (m Model) securityEvidenceMax() int {
@@ -265,7 +211,7 @@ func (m *Model) moveSecurity(delta int) {
 		}
 		return
 	}
-	if m.sec.Tab != ui.SecTabWorkloads {
+	if m.sec.Tab != ui.SecTabWorkloads || !m.sec.have {
 		return
 	}
 	if m.sec.Focus == ui.SecurityFocusEvidence {
@@ -277,7 +223,6 @@ func (m *Model) moveSecurity(delta int) {
 	m.adoptSecurityWorkload(m.sec.Cursor + delta)
 	if m.sec.Selected != before {
 		m.sec.Scroll = 0
-		m.syncSecurityRules()
 	}
 }
 
@@ -303,9 +248,9 @@ func (m Model) handleSecurityKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 	case key.Matches(msg, k.PageDown):
 		m.moveSecurity(m.securityPageSize())
 	case key.Matches(msg, k.Home):
-		m.moveSecurity(-len(m.sec.workloads) - len(m.sec.audit.events) - m.securityEvidenceMax())
+		m.moveSecurity(-len(m.sec.result.workloads) - len(m.sec.audit.events) - m.securityEvidenceMax())
 	case key.Matches(msg, k.End):
-		m.moveSecurity(len(m.sec.workloads) + len(m.sec.audit.events) + m.securityEvidenceMax())
+		m.moveSecurity(len(m.sec.result.workloads) + len(m.sec.audit.events) + m.securityEvidenceMax())
 	case key.Matches(msg, k.NextPanel), key.Matches(msg, k.PrevPanel):
 		if m.sec.Tab == ui.SecTabWorkloads || m.sec.Tab == ui.SecTabAudit {
 			m.sec.Focus = 1 - m.sec.Focus
@@ -314,7 +259,7 @@ func (m Model) handleSecurityKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 		switch {
 		case m.sec.Tab == ui.SecTabAudit && m.sec.Focus == ui.SecurityFocusEvidence:
 			m.toggleAuditContexts()
-		case m.sec.Tab == ui.SecTabWorkloads && len(m.sec.workloads) > 0:
+		case m.sec.Tab == ui.SecTabWorkloads && len(m.sec.result.workloads) > 0:
 			m.sec.Focus = ui.SecurityFocusEvidence
 		}
 	case key.Matches(msg, k.TabPrev):
@@ -325,7 +270,6 @@ func (m Model) handleSecurityKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 		if m.securityScope() == "" {
 			m.sec.NoSystem = !m.sec.NoSystem
 			m.sec.Scroll = 0
-			m.refreshSecurityPage()
 		}
 	case key.Matches(msg, k.SecurityAck):
 		m.acknowledgeSecurity()
@@ -359,8 +303,8 @@ func (m *Model) handleSecurityClick(ms tea.Mouse) {
 		if row < 0 || row >= rows {
 			return
 		}
-		idx := ui.ScrollOffset(m.sec.Cursor, len(m.sec.workloads), rows) + row
-		if idx < len(m.sec.workloads) && idx != m.sec.Cursor {
+		idx := ui.ScrollOffset(m.sec.Cursor, len(m.sec.result.workloads), rows) + row
+		if idx < len(m.sec.result.workloads) && idx != m.sec.Cursor {
 			m.moveSecurity(idx - m.sec.Cursor)
 		}
 	case l.SecEvidence.Contains(ms.X, ms.Y):

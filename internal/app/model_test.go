@@ -54,6 +54,16 @@ func press(t *testing.T, m Model, keys ...string) Model {
 	t.Helper()
 	for _, k := range keys {
 		next, _ := m.Update(keyPress(k))
+		m = settleSecurity(next.(Model))
+	}
+	return m
+}
+
+func settleSecurity(m Model) Model {
+	for m.secCalc.running {
+		msg := m.secCalc.job.run()
+		msg.session, msg.seq = m.session.Generation, m.secCalc.seq
+		next, _ := m.Update(msg)
 		m = next.(Model)
 	}
 	return m

@@ -58,8 +58,8 @@ func TestSecurityPageActivation(t *testing.T) {
 func TestSecurityPageSharesDashboardScore(t *testing.T) {
 	m := onSecurity(t, demoModel(t, 160, 48))
 	cluster := m.securitySession.Dashboard.Cluster
-	if m.sec.all.Score != cluster.Score || m.sec.all.Hygiene != cluster.Hygiene {
-		t.Fatalf("page score %+v differs from dashboard %+v", m.sec.all.Score, cluster.Score)
+	if m.sec.result.all.Score != cluster.Score || m.sec.result.all.Hygiene != cluster.Hygiene {
+		t.Fatalf("page score %+v differs from dashboard %+v", m.sec.result.all.Score, cluster.Score)
 	}
 	want := fmt.Sprintf("Todos: Segurança %d %s | Higiene %d %s", cluster.Score.Value, cluster.Score.Grade, cluster.Hygiene.Value, cluster.Hygiene.Grade)
 	if !strings.Contains(m.Render().Plain(), want) {
@@ -68,10 +68,10 @@ func TestSecurityPageSharesDashboardScore(t *testing.T) {
 	ns := navNamespace(t, demoModel(t, 160, 48))
 	ns = onSecurity(t, ns)
 	scope := ns.securityScope()
-	if scope == "" || ns.sec.all.Score != ns.securitySession.Dashboard.Namespaces[string(scope)].Score {
+	if scope == "" || ns.sec.result.all.Score != ns.securitySession.Dashboard.Namespaces[string(scope)].Score {
 		t.Fatalf("namespace scope %q uses the dashboard namespace aggregate", scope)
 	}
-	for _, w := range ns.sec.workloads {
+	for _, w := range ns.sec.result.workloads {
 		if nsSet(w.Key.Namespace) != scope {
 			t.Fatalf("namespace scope lists only its workloads: %+v", w.Key)
 		}
@@ -83,17 +83,17 @@ func TestSecurityPageSharesDashboardScore(t *testing.T) {
 
 func TestSecurityPageCohortAndSelection(t *testing.T) {
 	m := onSecurity(t, demoModel(t, 160, 48))
-	all := len(m.sec.workloads)
+	all := len(m.sec.result.workloads)
 	h := press(t, m, "H")
-	if !h.sec.NoSystem || len(h.sec.workloads) >= all {
-		t.Fatalf("H hides system namespaces from the list: %d -> %d", all, len(h.sec.workloads))
+	if !h.sec.NoSystem || len(h.sec.result.workloads) >= all {
+		t.Fatalf("H hides system namespaces from the list: %d -> %d", all, len(h.sec.result.workloads))
 	}
-	for _, w := range h.sec.workloads {
+	for _, w := range h.sec.result.workloads {
 		if data.IsSystemNamespace(w.Key.Namespace) {
 			t.Fatalf("system workload listed in the cohort: %+v", w.Key)
 		}
 	}
-	if h.sec.all.Score != m.sec.all.Score || h.sec.noSystem.Score != m.sec.noSystem.Score {
+	if h.sec.result.all.Score != m.sec.result.all.Score || h.sec.result.noSystem.Score != m.sec.result.noSystem.Score {
 		t.Fatal("cohort does not change the summary denominators")
 	}
 	if !strings.Contains(h.Render().Plain(), "| Sem sistema ") {
@@ -111,17 +111,17 @@ func TestSecurityPageCohortAndSelection(t *testing.T) {
 		t.Fatal("enter focuses evidence and arrows scroll it")
 	}
 	moved := press(t, d, "end")
-	if moved.sec.Cursor != len(m.sec.workloads)-1 {
+	if moved.sec.Cursor != len(m.sec.result.workloads)-1 {
 		t.Fatal("end selects the last workload")
 	}
 	key := moved.sec.Selected
 	moved.clock = anim.Fixed(240, goldenPhase, 30)
 	next, _ := moved.Update(tea.WindowSizeMsg{Width: 160, Height: 48})
-	adv := next.(Model)
+	adv := settleSecurity(next.(Model))
 	if adv.security.Revision == moved.security.Revision {
 		t.Fatal("demo advances the security revision")
 	}
-	if adv.sec.Selected != key || adv.sec.workloads[adv.sec.Cursor].Key != key {
+	if adv.sec.Selected != key || adv.sec.result.workloads[adv.sec.Cursor].Key != key {
 		t.Fatal("selection follows the workload identity across revisions")
 	}
 }
@@ -129,7 +129,7 @@ func TestSecurityPageCohortAndSelection(t *testing.T) {
 func TestSecurityPageRulesFollowRevision(t *testing.T) {
 	m := onSecurity(t, demoModel(t, 160, 48))
 	target := data.PodKey("bilibili-raffle", "bilibili-raffle-5d8f9c7b4-x2kqp")
-	i := slices.IndexFunc(m.sec.workloads, func(w data.WorkloadPosture) bool { return slices.Contains(w.Pods, target) })
+	i := slices.IndexFunc(m.sec.result.workloads, func(w data.WorkloadPosture) bool { return slices.Contains(w.Pods, target) })
 	if i < 0 {
 		t.Fatal("demo workload missing")
 	}
@@ -146,7 +146,7 @@ func TestSecurityPageRulesFollowRevision(t *testing.T) {
 	}
 	m.clock = anim.Fixed(240, goldenPhase, 30)
 	next, _ := m.Update(tea.WindowSizeMsg{Width: 160, Height: 48})
-	adv := next.(Model)
+	adv := settleSecurity(next.(Model))
 	if adv.sec.Selected != key || !hasRule(adv, "hostPID") || !strings.Contains(adv.Render().Plain(), "hostPID") {
 		t.Fatal("a new revision with the same selection refreshes rules and evidence")
 	}
@@ -158,8 +158,9 @@ func TestSecurityPageRulesFollowRevision(t *testing.T) {
 	renewed.security.Pods[data.PodKey(p.Target.Namespace, p.Target.Name)] = p
 	renewed.security.Revision++
 	renewed.securitySession.Update(renewed.security)
-	renewed.refreshSecurityPage()
-	if renewed.sec.Selected != key || hasRule(renewed, "hostPID") || slices.Contains(renewed.sec.workloads[renewed.sec.Cursor].Pods, target) {
+	settled, _ := renewed.Update(tea.FocusMsg{})
+	renewed = settleSecurity(settled.(Model))
+	if renewed.sec.Selected != key || hasRule(renewed, "hostPID") || slices.Contains(renewed.sec.result.workloads[renewed.sec.Cursor].Pods, target) {
 		t.Fatal("a renewed pod under the same owner UID drops the removed finding")
 	}
 }
