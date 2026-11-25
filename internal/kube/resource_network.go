@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	factRowLimit       = 32 << 10
+	factRowLimit       = 48 << 10
 	factTextLimit      = 253
 	factWordLimit      = 64
 	factPathLimit      = 1024

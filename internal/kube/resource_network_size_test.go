@@ -203,3 +203,20 @@ func TestFactBudgetIsReturnedRowByRowAndOnClear(t *testing.T) {
 		}
 	}
 }
+
+func TestHostilePolicyStaysReadableAndInsideTheBudget(t *testing.T) {
+	tc := hostileObjects()[0]
+	f := networkFacts(tc.object, tc.gvr)
+	if f.Truncated || f.Policy == nil || len(f.Policy.Expressions) != 30 {
+		t.Fatal("the fixture must be projected whole to exercise the pool budget")
+	}
+	s, e := hostileEntry(t, tc.gvr)
+	accepted := 0
+	for e.put(hostileRow(accepted, networkFacts(tc.object, tc.gvr)), false) {
+		accepted++
+	}
+	retained := accepted * independentSize(reflect.ValueOf(f))
+	if accepted == 0 || retained > resourceFactBytes || s.resources.factBytes < retained {
+		t.Fatalf("accepted=%d retained=%d charged=%d", accepted, retained, s.resources.factBytes)
+	}
+}
