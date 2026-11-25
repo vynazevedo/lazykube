@@ -65,8 +65,19 @@ func (a accessState) closed() accessState {
 
 func (m Model) accessTarget() accessTarget {
 	r := m.nav.Active()
-	if r.Kind == RoutePod && m.tab == ui.TabDescribe && r.Ref.Name != "" {
-		return accessTarget{active: true, kind: netpath.TargetPod, gvr: podGVR, namespace: r.Ref.Namespace, name: r.Ref.Name}
+	if r.Kind == RoutePod {
+		if m.tab != ui.TabDescribe || r.Ref.Name == "" {
+			return accessTarget{}
+		}
+		pod := m.selectedPod()
+		if pod == nil {
+			return accessTarget{}
+		}
+		uid := r.Ref.UID
+		if uid == "" {
+			uid = pod.UID
+		}
+		return accessTarget{active: true, kind: netpath.TargetPod, gvr: podGVR, namespace: r.Ref.Namespace, name: r.Ref.Name, uid: uid}
 	}
 	w, ref, ok := m.activeResource()
 	if !ok {
@@ -116,10 +127,12 @@ func (m *Model) followAccess() []workloadLeaf {
 				s.release()
 			}
 			m.acc = m.acc.closed()
+			m.urls = urlPicker{}
 		}
 		return nil
 	}
 	if t != m.acc.target {
+		m.urls = urlPicker{}
 		subs, seq := m.acc.subs, m.acc.seq+1
 		m.acc = accessState{target: t, subs: subs, seq: seq, dirty: true}
 	}
@@ -189,6 +202,9 @@ func (m *Model) storeAccess(msg accessMsg) {
 	m.acc.computing = false
 	view := msg.view
 	m.acc.view = &view
+	if view.gone {
+		m.urls = urlPicker{}
+	}
 	m.clampAccess()
 }
 
@@ -242,7 +258,7 @@ func (r accessRequest) run() accessView {
 		return out
 	}
 	t := r.target
-	target := netpath.Target{Kind: t.kind, Namespace: t.namespace, Name: t.name}
+	target := netpath.Target{Kind: t.kind, Namespace: t.namespace, Name: t.name, UID: t.uid}
 	g := netpath.Graph{Services: set(serviceGVR), Slices: set(endpointSliceGVR), Ingresses: set(ingressGVR), Classes: set(ingressClassGVR), Policies: set(netPolicyGVR), Pods: set(podGVR), Nodes: set(nodeGVR)}
 	var own netpath.Set
 	switch t.kind {
@@ -255,12 +271,18 @@ func (r accessRequest) run() accessView {
 	default:
 		own = g.Pods
 	}
+	replaced := false
 	for _, row := range own.Rows {
-		if row.Ref.Namespace == t.namespace && row.Ref.Name == t.name && (t.uid == "" || row.Ref.UID == t.uid) {
+		if row.Ref.Namespace != t.namespace || row.Ref.Name != t.name {
+			continue
+		}
+		if t.uid == "" || row.Ref.UID == t.uid {
 			view.row = &row
+		} else {
+			replaced = true
 		}
 	}
-	view.gone = view.row == nil && own.State == netpath.SetKnown
+	view.gone = view.row == nil && (replaced || own.State == netpath.SetKnown)
 	if t.kind == netpath.TargetWorkload && view.row != nil && view.row.Network != nil && view.row.Network.Template != nil && !view.row.Network.Truncated {
 		target.Labels, target.LabelsKnown = view.row.Network.Template.Labels, true
 	}

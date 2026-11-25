@@ -493,7 +493,7 @@ func TestAccessKeepsDeniedUnknownAbsentAndEmptyApart(t *testing.T) {
 		m := nodeModel(t, newNetBrowser(tc.avail, pages), 160, 48)
 		pod := m.selectedPod()
 		pods := pages[podGVR]
-		pods.Items[0].Ref.Namespace, pods.Items[0].Ref.Name = pod.Namespace, pod.Name
+		pods.Items[0].Ref.Namespace, pods.Items[0].Ref.Name, pods.Items[0].Ref.UID = pod.Namespace, pod.Name, pod.UID
 		m = openPodAccess(t, m)
 		plain := m.Render().Plain()
 		if !strings.Contains(plain, tc.want) || strings.Contains(plain, tc.never) {
@@ -861,5 +861,171 @@ func TestRootPickersNeverLeaveAPartialLink(t *testing.T) {
 	}
 	if occluded == 0 {
 		t.Fatal("no size puts a picker over the link")
+	}
+}
+
+func radarPodAccess(t *testing.T, host string, w, h int) (Model, fakeBrowser) {
+	t.Helper()
+	harness := newRadarHarness(t)
+	m := harness.active(w, h)
+	sig := m.selectedSignal()
+	if sig == nil || sig.Entity.UID == "" {
+		t.Fatal("the fixture needs a Radar signal with UID")
+	}
+	b := newNetBrowser(nil, hostPages(host))
+	b.Demo = harness.demo
+	pod := &b.pages[podGVR].Items[0]
+	pod.Ref.Namespace, pod.Ref.Name, pod.Ref.UID = sig.Entity.Namespace, sig.Entity.Name, sig.Entity.UID
+	for _, gvr := range []schema.GroupVersionResource{serviceGVR, endpointSliceGVR, ingressGVR} {
+		b.pages[gvr].Items[0].Ref.Namespace = sig.Entity.Namespace
+	}
+	m.src = b
+	m = pressDrive(t, m, "enter", "d")
+	r := m.nav.Active()
+	if r.Kind != RoutePod || r.Ref.UID != sig.Entity.UID || m.acc.target.uid != sig.Entity.UID || len(m.accessAddresses()) == 0 {
+		t.Fatalf("the Radar pod is pinned by UID and has addresses: %+v %+v", r, m.acc.target)
+	}
+	if !strings.Contains(m.Render().Plain(), host) && h >= 40 {
+		t.Fatal("the section shows the URL")
+	}
+	return m, b
+}
+
+func shownPod(m Model) (string, string) {
+	r := m.nav.Active()
+	return r.Pod, r.Ref.UID
+}
+
+func requireNoAccess(t *testing.T, m Model, when string) {
+	t.Helper()
+	if m.acc.target.active || m.acc.view != nil || len(m.acc.subs) != 0 || m.urls.open || len(m.accessAddresses()) != 0 {
+		t.Fatalf("%s keeps access: target %+v subs %d picker %v", when, m.acc.target, len(m.acc.subs), m.urls.open)
+	}
+	if m.manifest != nil || len(m.logs) != 0 {
+		t.Fatalf("%s keeps the manifest or logs", when)
+	}
+	plain, out := m.Render().Plain(), m.Render().String()
+	if strings.Contains(plain, "http://") || strings.Contains(plain, "https://") || strings.Contains(out, "\x1b]8") || strings.Contains(plain, "Copiar URL") {
+		t.Fatalf("%s still shows a URL", when)
+	}
+	opened := pressDrive(t, m, "u")
+	if opened.urls.open {
+		t.Fatalf("%s opens the picker", when)
+	}
+	_, msgs := pressYank(t, m)
+	if text, ok := clipboardOf(msgs); ok && strings.HasPrefix(text, "http") {
+		t.Fatalf("%s copied %q", when, text)
+	}
+}
+
+func TestRadarPodAccessIsDroppedWithTheReplacedPod(t *testing.T) {
+	for _, picker := range []bool{false, true} {
+		for _, size := range [][2]int{{80, 24}, {130, 40}, {160, 48}} {
+			m, b := radarPodAccess(t, "web.example.com", size[0], size[1])
+			if picker {
+				m = pressDrive(t, m, "u")
+				if !m.urls.open {
+					t.Fatal("picker closed")
+				}
+			}
+			late := accessMsg{session: m.session.Generation, seq: m.acc.seq, view: *m.acc.view}
+			key, _ := shownPod(m)
+			m = replacePod(m, key, "replacement-uid")
+			m.refresh()
+			next, cmd := m.Update(tea.FocusMsg{})
+			m = drive(t, next.(Model), cmd)
+			requireNoAccess(t, m, "the replacement")
+			if plain := m.Render().Plain(); !strings.Contains(plain, "pod original não existe mais") || strings.Contains(plain, "replacement-image") || strings.Contains(plain, "web.example.com") {
+				t.Fatal("only the missing original is shown")
+			}
+			if b.cancels.Load() != b.subs.Load() {
+				t.Fatalf("subscriptions %d cancels %d", b.subs.Load(), b.cancels.Load())
+			}
+			next, cmd = m.Update(late)
+			requireNoAccess(t, drive(t, next.(Model), cmd), "a late report of the original")
+		}
+	}
+}
+
+func accessHarness(t *testing.T) (Model, fakeBrowser) {
+	t.Helper()
+	b := newNetBrowser(nil, hostPages("web.example.com"))
+	m := nodeModel(t, b, 160, 48)
+	pod := *m.selectedPod()
+	row := &b.pages[podGVR].Items[0]
+	row.Ref.Namespace, row.Ref.Name, row.Ref.UID = pod.Namespace, pod.Name, pod.UID
+	for _, gvr := range []schema.GroupVersionResource{serviceGVR, endpointSliceGVR, ingressGVR} {
+		b.pages[gvr].Items[0].Ref.Namespace = pod.Namespace
+	}
+	m.navigate(Route{Kind: RoutePod, Screen: ScreenPodDetail, Pod: pod.Key(), Ref: ResourceRef{Version: "v1", Resource: "pods", Namespace: pod.Namespace, Name: pod.Name, UID: pod.UID}})
+	m = pressDrive(t, m, "d")
+	if len(m.accessAddresses()) == 0 || pod.UID == "" {
+		t.Fatalf("fixture needs addresses and UID %q", pod.UID)
+	}
+	return m, b
+}
+
+func TestPinnedPodAccessIsDroppedByTheSnapshot(t *testing.T) {
+	for _, picker := range []bool{false, true} {
+		m, b := accessHarness(t)
+		if picker {
+			m = pressDrive(t, m, "u")
+		}
+		key, _ := shownPod(m)
+		late := accessMsg{session: m.session.Generation, seq: m.acc.seq, view: *m.acc.view}
+		m = replacePod(m, key, "replacement-uid")
+		m.refresh()
+		next, cmd := m.Update(tea.FocusMsg{})
+		m = drive(t, next.(Model), cmd)
+		requireNoAccess(t, m, "the snapshot replacement")
+		if b.cancels.Load() != b.subs.Load() {
+			t.Fatalf("subscriptions %d cancels %d", b.subs.Load(), b.cancels.Load())
+		}
+		next, cmd = m.Update(late)
+		requireNoAccess(t, drive(t, next.(Model), cmd), "a late report of the original")
+	}
+}
+
+func TestPinnedPodAccessIsDroppedWhenTheGraphSeesTheReplacementFirst(t *testing.T) {
+	for _, state := range []data.CoverageState{data.CoverageComplete, data.CoveragePartial, data.CoverageListOnly} {
+		m, b := accessHarness(t)
+		m = pressDrive(t, m, "u")
+		row := b.pages[podGVR].Items[0]
+		row.Ref.UID = "replacement-uid"
+		page := netPage(row)
+		page.Coverage.State = state
+		for gvr, s := range m.acc.subs {
+			if gvr == podGVR {
+				s.handle.(*fakeHandle).page = page
+			}
+		}
+		m.acc.dirty = true
+		next, cmd := m.Update(tea.FocusMsg{})
+		m = drive(t, next.(Model), cmd)
+		if len(m.accessAddresses()) != 0 || m.urls.open || !m.acc.view.gone {
+			t.Fatalf("%s: the replacement's addresses were adopted", state)
+		}
+		if plain := m.Render().Plain(); strings.Contains(plain, "web.example.com") || !strings.Contains(plain, "o objeto não está mais na lista lida") {
+			t.Fatalf("%s: the section must say the object is gone", state)
+		}
+	}
+}
+
+func TestPodOpenedByNameDropsAccessWhenItsUIDChanges(t *testing.T) {
+	b := newNetBrowser(nil, hostPages("web.example.com"))
+	m := nodeModel(t, b, 160, 48)
+	m = openPodAccess(t, m)
+	before := m.acc.target
+	if before.uid == "" {
+		t.Fatal("the observed UID pins the access section")
+	}
+	m = pressDrive(t, m, "u")
+	key, _ := shownPod(m)
+	m = replacePod(m, key, "replacement-uid")
+	m.refresh()
+	next, _ := m.Update(tea.FocusMsg{})
+	m = next.(Model)
+	if m.acc.target == before || m.acc.view != nil || m.urls.open {
+		t.Fatal("another UID starts another report from nothing")
 	}
 }

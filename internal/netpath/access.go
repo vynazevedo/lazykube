@@ -98,8 +98,13 @@ type Target struct {
 	Kind        TargetKind
 	Namespace   string
 	Name        string
+	UID         string
 	Labels      data.Labels
 	LabelsKnown bool
+}
+
+func (t Target) is(row *data.ResourceRow) bool {
+	return row != nil && (t.UID == "" || row.Ref.UID == t.UID)
 }
 
 func Access(g Graph, t Target) Report {
@@ -147,7 +152,7 @@ func (b *builder) route(r Route) {
 
 func (b *builder) ingressTarget(t Target) {
 	row := b.g.Ingresses.find(t.Namespace, t.Name)
-	if row == nil || row.Network == nil || row.Network.Ingress == nil {
+	if !t.is(row) || row.Network == nil || row.Network.Ingress == nil {
 		b.note(cmp.Or(b.g.Ingresses.gap("Ingresses"), "o Ingress não está mais na lista"))
 		return
 	}
@@ -162,7 +167,7 @@ func (b *builder) gaps() {
 
 func (b *builder) serviceTarget(t Target) {
 	svc, found := b.g.service(t.Namespace, t.Name)
-	if found != data.TriTrue {
+	if found != data.TriTrue || !t.is(b.g.Services.find(t.Namespace, t.Name)) {
 		b.note(cmp.Or(b.g.Services.gap("Services"), "o Service não está mais na lista"))
 		return
 	}
@@ -174,7 +179,7 @@ func (b *builder) serviceTarget(t Target) {
 
 func (b *builder) workloadTarget(t Target) {
 	if t.Kind == TargetPod && !t.LabelsKnown {
-		if row := b.g.Pods.find(t.Namespace, t.Name); row != nil && row.Network != nil && row.Network.Pod != nil && !row.Network.Truncated {
+		if row := b.g.Pods.find(t.Namespace, t.Name); t.is(row) && row.Network != nil && row.Network.Pod != nil && !row.Network.Truncated {
 			t.Labels, t.LabelsKnown = row.Network.Pod.Labels, true
 		}
 	}

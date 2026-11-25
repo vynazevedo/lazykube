@@ -541,3 +541,17 @@ func TestReportsNeverClaimWhatWasNotRead(t *testing.T) {
 		}
 	}
 }
+
+func TestReportsNeverAdoptAnObjectWithAnotherUID(t *testing.T) {
+	for _, target := range []Target{podTarget, serviceTarget, ingressTarget} {
+		target.UID = "apps" + target.Name
+		if r := Access(healthy(), target); len(r.Addresses) == 0 {
+			t.Fatalf("the original is reported: %+v", target)
+		}
+		target.UID = "another"
+		r := Access(healthy(), target)
+		if len(r.Addresses) != 0 || len(r.Routes) != 0 || len(r.Policies.Selecting) != 0 || len(r.Notes) == 0 {
+			t.Fatalf("a replacement is never reported as the original: %+v", r)
+		}
+	}
+}
