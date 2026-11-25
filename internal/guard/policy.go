@@ -215,3 +215,4 @@ type Backend interface {
 	Send(context.Context, Request, bool) error
 }
 type Auditor interface{ Record(AuditEvent) error }
+type AuditChecker interface{ Check(create bool) error }

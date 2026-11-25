@@ -96,6 +96,8 @@ type actionLateMsg struct{ done actionDone }
 
 type actionTickMsg struct{ tag actionTag }
 
+type actionAuditMsg struct{ tag actionTag }
+
 type actionState struct {
 	stage   actionStage
 	tag     actionTag
@@ -162,7 +164,7 @@ func (m Model) actionBlock() string {
 	case mode.ReadOnly:
 		return textReadOnly
 	case exec.AuditBlocked():
-		return textAuditBlocked
+		return auditBlockText(exec.AuditRefusal())
 	}
 	return ""
 }
@@ -278,7 +280,13 @@ func (m Model) openActions() (Model, tea.Cmd) {
 	}
 	m.endEditing()
 	m.act = actionState{stage: actionChoosing, target: t, context: m.session.Context, items: items, late: m.act.late}
-	m.nextActionTag()
+	tag := m.nextActionTag()
+	if exec := m.executor(); m.actionBlock() == "" {
+		return m, func() tea.Msg {
+			_ = exec.CheckAudit(false)
+			return actionAuditMsg{tag: tag}
+		}
+	}
 	return m, nil
 }
 
@@ -324,7 +332,7 @@ func (m *Model) showLate(d actionDone) {
 	spec, _ := specFor(d.action)
 	m.act = actionState{spec: spec, target: d.target, plan: d.target, context: d.context, opID: d.result.OperationID, late: m.act.late, tag: actionTag{session: d.session}}
 	lines := []ui.ActionLine{{Text: "Operacao da sessao anterior, encerrada por troca de sessao.", Tone: ui.ActionWarn}}
-	m.finishAction(append(lines, resultLines(d.result, d.err, spec.success)...), d.result.Outcome)
+	m.finishAction(append(lines, doneLines(d, spec)...), d.result.Outcome)
 }
 
 func specFor(a guard.Action) (actionSpec, bool) {
@@ -365,6 +373,8 @@ func (m Model) handleActionMsg(msg tea.Msg) (Model, tea.Cmd, bool) {
 		m.stopActionWork()
 		cmd := m.prepared(msg)
 		return m, cmd, true
+	case actionAuditMsg:
+		return m, nil, true
 	case actionTickMsg:
 		if msg.tag != m.act.tag || m.act.stage != actionPreview || m.act.expired {
 			return m, nil, true
@@ -380,7 +390,7 @@ func (m Model) handleActionMsg(msg tea.Msg) (Model, tea.Cmd, bool) {
 		}
 		m.stopActionWork()
 		m.act.opID, m.act.verify = msg.done.result.OperationID, true
-		m.finishAction(resultLines(msg.done.result, msg.done.err, m.act.spec.success), doneCode(msg.done))
+		m.finishAction(doneLines(msg.done, m.act.spec), doneCode(msg.done))
 		return m, nil, true
 	}
 	return m, nil, false
@@ -434,14 +444,18 @@ func (m *Model) observeAction(t guard.Target, verify bool) tea.Cmd {
 	m.act.cancel = cancel
 	tag, action := m.nextActionTag(), m.act.spec.action
 	return func() tea.Msg {
-		obs, err := exec.Observe(ctx, action, t)
+		read := exec.Observe
+		if verify {
+			read = exec.Verify
+		}
+		obs, err := read(ctx, action, t)
 		return actionObservedMsg{tag: tag, obs: obs, err: err, verify: verify}
 	}
 }
 
 func (m *Model) observed(msg actionObservedMsg) tea.Cmd {
 	if msg.err != nil {
-		m.finishAction([]ui.ActionLine{{Text: prepareText(msg.err, false), Tone: ui.ActionErr}}, reasonOf(msg.err))
+		m.finishAction([]ui.ActionLine{{Text: m.refusalText(prepareText(msg.err, false), msg.err), Tone: ui.ActionErr}}, reasonOf(msg.err))
 		return nil
 	}
 	if m.act.spec.action != guard.Scale && msg.obs.Target.ResourceVersion != m.act.target.ResourceVersion {
@@ -494,7 +508,7 @@ func (m Model) actionRequest() guard.Request {
 
 func (m *Model) prepared(msg actionPreparedMsg) tea.Cmd {
 	if msg.err != nil {
-		m.finishAction([]ui.ActionLine{{Text: prepareText(msg.err, msg.timedOut), Tone: ui.ActionErr}}, reasonOf(msg.err))
+		m.finishAction([]ui.ActionLine{{Text: m.refusalText(prepareText(msg.err, msg.timedOut), msg.err), Tone: ui.ActionErr}}, reasonOf(msg.err))
 		return nil
 	}
 	m.act.preview, m.act.stage, m.act.focus = msg.preview, actionPreview, 0
@@ -553,6 +567,24 @@ func (m *Model) confirmAction() tea.Cmd {
 		done.result, done.err = exec.Execute(ctx, id, confirmation)
 		return actionDoneMsg{done: done}
 	}
+}
+
+func (m Model) refusalText(text string, err error) string {
+	if exec := m.executor(); exec != nil && reasonOf(err) == guard.AuditFailed {
+		return auditBlockText(exec.AuditRefusal())
+	}
+	return text
+}
+
+func doneLines(d actionDone, spec actionSpec) []ui.ActionLine {
+	lines := resultLines(d.result, d.err, spec.success)
+	if d.err == nil || d.exec == nil || reasonOf(d.err) != guard.AuditFailed {
+		return lines
+	}
+	if refusal := d.exec.AuditRefusal(); refusal != "" {
+		lines = append(lines, ui.ActionLine{Text: auditBlockText(refusal), Tone: ui.ActionErr})
+	}
+	return lines
 }
 
 func (m *Model) verifyAction() tea.Cmd {

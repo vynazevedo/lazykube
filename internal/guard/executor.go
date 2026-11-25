@@ -47,6 +47,7 @@ type Executor struct {
 	clock   Clock
 	plans   map[string]plan
 	failed  atomic.Bool
+	refusal atomic.Pointer[AuditRefusal]
 
 	sendMu sync.Mutex
 	sends  map[string]Dispatch
@@ -99,6 +100,14 @@ func (e *Executor) Mode() Mode         { return e.policy.Mode(e.session) }
 func (e *Executor) AuditBlocked() bool { return e.failed.Load() }
 
 func (e *Executor) Observe(parent context.Context, action Action, t Target) (Observation, error) {
+	return e.observe(parent, action, t, func() error { return e.CheckAudit(true) })
+}
+
+func (e *Executor) Verify(parent context.Context, action Action, t Target) (Observation, error) {
+	return e.observe(parent, action, t, func() error { return nil })
+}
+
+func (e *Executor) observe(parent context.Context, action Action, t Target, ready func() error) (Observation, error) {
 	mode := e.Mode()
 	switch {
 	case !mode.ConfigValid:
@@ -109,6 +118,9 @@ func (e *Executor) Observe(parent context.Context, action Action, t Target) (Obs
 		return Observation{}, Unsupported
 	case t.Name == "" || t.UID == "" || t.ResourceVersion == "" || !inScope(e.session, t):
 		return Observation{}, Invalid
+	}
+	if err := ready(); err != nil {
+		return Observation{}, err
 	}
 	ctx, cancel := e.operationContext(parent)
 	defer cancel()
@@ -155,11 +167,41 @@ func (e *Executor) event(id string, r Request, d Decision, phase string, outcome
 	}
 	err := e.audit.Record(AuditEvent{SchemaVersion: 1, Timestamp: e.clock.Now().UTC(), OperationID: id, Phase: phase, Action: r.Action, Context: e.session.Context, Identity: e.session.Identity, Namespace: r.Target.Namespace, Group: r.Target.Group, Resource: r.Target.Resource, Name: r.Target.Name, UID: r.Target.UID, ReadOnly: d.Mode.ReadOnly, Protected: d.Mode.Protected, Outcome: outcome})
 	if err != nil {
-		e.failed.Store(true)
-		return AuditFailed
+		return e.failAudit(err)
 	}
 	return nil
 }
+
+func (e *Executor) failAudit(err error) error {
+	var refusal AuditRefusal
+	if errors.As(err, &refusal) {
+		e.refusal.Store(&refusal)
+	}
+	e.failed.Store(true)
+	return AuditFailed
+}
+
+func (e *Executor) CheckAudit(create bool) error {
+	if e.failed.Load() {
+		return AuditFailed
+	}
+	checker, ok := e.audit.(AuditChecker)
+	if !ok {
+		return nil
+	}
+	if err := checker.Check(create); err != nil {
+		return e.failAudit(err)
+	}
+	return nil
+}
+
+func (e *Executor) AuditRefusal() AuditRefusal {
+	if r := e.refusal.Load(); r != nil {
+		return *r
+	}
+	return ""
+}
+
 func (e *Executor) Prepare(parent context.Context, r Request) (Preview, error) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
@@ -183,8 +225,8 @@ func (e *Executor) Prepare(parent context.Context, r Request) (Preview, error) {
 	if err != nil {
 		return reject(safeReason(err, Invalid))
 	}
-	if e.failed.Load() {
-		return Preview{}, AuditFailed
+	if err = e.CheckAudit(true); err != nil {
+		return Preview{}, err
 	}
 	if !e.backend.Supported(r.Action) {
 		return reject(Unsupported)
@@ -271,6 +313,9 @@ func (e *Executor) Execute(parent context.Context, id string, c Confirmation) (R
 	}
 	if e.planExpired(ctx, p) {
 		return refuse(d, Canceled)
+	}
+	if err = e.CheckAudit(true); err != nil {
+		return result, err
 	}
 	err = e.access(ctx, p.request)
 	if e.planExpired(ctx, p) {

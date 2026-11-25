@@ -32,6 +32,16 @@ const (
 	textWaitCanceled     = "Cancelamento da espera solicitado. Cancelar nao desfaz uma requisicao ja enviada."
 )
 
+func auditBlockText(r guard.AuditRefusal) string {
+	switch r {
+	case "":
+		return textAuditBlocked
+	case guard.RefusedPlatform:
+		return "Acoes bloqueadas: " + string(r) + ". --audit-file nao muda esta recusa; a leitura do cluster continua."
+	}
+	return "Acoes bloqueadas: " + string(r) + ". Corrija o caminho ou use --audit-file com um caminho absoluto em disco local, sem links do usuario, e reconecte."
+}
+
 func reasonOf(err error) guard.Reason {
 	var r guard.Reason
 	if errors.As(err, &r) {
