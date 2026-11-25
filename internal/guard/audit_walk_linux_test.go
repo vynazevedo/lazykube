@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"strings"
 	"testing"
 	"time"
@@ -31,11 +32,36 @@ func must(t *testing.T, err error) {
 	}
 }
 
-func openFDs(t *testing.T) int {
+func openDescriptors(t *testing.T) map[string]string {
 	t.Helper()
-	entries, err := os.ReadDir("/proc/self/fd")
+	const table = "/proc/self/fd"
+	entries, err := os.ReadDir(table)
 	must(t, err)
-	return len(entries)
+	out := make(map[string]string, len(entries))
+	for _, e := range entries {
+		target, err := os.Readlink(filepath.Join(table, e.Name()))
+		if errors.Is(err, os.ErrNotExist) {
+			continue
+		}
+		must(t, err)
+		out[e.Name()] = target
+	}
+	return out
+}
+
+func trackDescriptors(t *testing.T) func(what string) {
+	t.Helper()
+	percent := debug.SetGCPercent(-1)
+	t.Cleanup(func() { debug.SetGCPercent(percent) })
+	before := openDescriptors(t)
+	return func(what string) {
+		t.Helper()
+		for fd, target := range openDescriptors(t) {
+			if before[fd] != target {
+				t.Fatalf("%s leaks descriptor %s: %s", what, fd, target)
+			}
+		}
+	}
 }
 
 func TestAuditReaderAndWriterShareOneDecision(t *testing.T) {
@@ -93,7 +119,7 @@ func TestAuditReaderAndWriterShareOneDecision(t *testing.T) {
 			base := privateBase(t)
 			dir := tc.prepare(t, base)
 			path := dir + "/audit.jsonl"
-			before := openFDs(t)
+			leaks := trackDescriptors(t)
 			tree := snapshotTree(t, base)
 			_, readErr := ReadAudit(t.Context(), path, AuditCursor{}, 0)
 			var refusal AuditRefusal
@@ -103,27 +129,30 @@ func TestAuditReaderAndWriterShareOneDecision(t *testing.T) {
 			}
 			a := NewFileAudit(path)
 			writeErr := a.Record(AuditEvent{SchemaVersion: 1, Timestamp: time.Now().UTC(), OperationID: "op"})
-			_, direct := openAudit(path, true)
+			checkErr := NewFileAudit(path).check(false)
+			opened, direct := openAudit(path, true)
+			if direct == nil {
+				must(t, opened.close())
+			}
 			refusal = ""
 			if tc.want != "" {
 				errors.As(direct, &refusal)
 			}
-			if refusal != tc.want || (tc.want == "") != (writeErr == nil) || (tc.want != "" && !errors.Is(writeErr, AuditFailed)) {
-				t.Fatalf("writer: %v / %v, want %q", writeErr, direct, tc.want)
+			if refusal != tc.want || (tc.want == "") != (writeErr == nil) || (tc.want != "" && !errors.Is(writeErr, AuditFailed)) || (tc.want == "") != (checkErr == nil) {
+				t.Fatalf("writer: %v / %v / %v, want %q", writeErr, checkErr, direct, tc.want)
 			}
 			if tc.want != "" {
 				if got := snapshotTree(t, base); got != tree {
 					t.Fatalf("a refused path is left untouched:\n%s\n%s", tree, got)
 				}
-				if after := openFDs(t); after != before {
-					t.Fatalf("descriptors leak: %d -> %d", before, after)
-				}
+				leaks("a refused path")
 				return
 			}
 			page, err := ReadAudit(t.Context(), path, AuditCursor{}, 0)
 			if err != nil || len(page.Events) != 1 {
 				t.Fatalf("what the writer records the reader shows: %+v %v", page, err)
 			}
+			leaks("an accepted path")
 		})
 	}
 }
@@ -232,7 +261,7 @@ func TestAuditWalkFollowsOnlyTrustedLinks(t *testing.T) {
 	want := inode(t, filepath.Join(real, "audit"))
 
 	walk := func(path string) (uint64, error) {
-		before := openFDs(t)
+		leaks := trackDescriptors(t)
 		f, err := injected(owners).open(path)
 		var ino uint64
 		if err == nil {
@@ -241,9 +270,7 @@ func TestAuditWalkFollowsOnlyTrustedLinks(t *testing.T) {
 			ino = st.Ino
 			must(t, f.Close())
 		}
-		if after := openFDs(t); after != before {
-			t.Fatalf("%s leaks descriptors: %d -> %d", path, before, after)
-		}
+		leaks(path)
 		return ino, err
 	}
 	for _, name := range []string{"relative", "absolute", "parent", "chain"} {
