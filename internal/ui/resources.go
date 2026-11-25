@@ -465,7 +465,6 @@ func FullHelpResources() []KeyHelp {
 		{"/", "filter by name or columns"},
 		{"r", "reload list (retry denied or list-only)"},
 		{"y", "copy namespace/name"},
-		{"o", "actions on the row"},
 		{"esc", "back"},
 		{"b", "navigation tree"},
 		{"m", "screens menu ← → enter"},

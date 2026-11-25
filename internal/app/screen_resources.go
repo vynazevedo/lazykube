@@ -38,7 +38,9 @@ func (s resourcesScreen) Keys(m Model) []key.Binding { return append(tableKeys(m
 
 func (resourcesScreen) Help(Model) []ui.KeyHelp { return ui.ResourceHelp() }
 
-func (resourcesScreen) FullHelp(Model) []ui.KeyHelp { return ui.FullHelpResources() }
+func (resourcesScreen) FullHelp(m Model) []ui.KeyHelp {
+	return m.actionHelp(ui.FullHelpResources(), "actions on the row")
+}
 
 func (s resourcesScreen) Update(m Model, msg tea.Msg) (Model, tea.Cmd) {
 	switch msg := msg.(type) {

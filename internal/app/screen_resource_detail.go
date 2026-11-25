@@ -19,15 +19,20 @@ func (resourceDetailScreen) Init(Model) tea.Cmd { return nil }
 func (resourceDetailScreen) Keys(m Model) []key.Binding {
 	k := m.keys
 	return []key.Binding{
-		k.Up, k.Down, k.PageUp, k.PageDown, k.Home, k.End, k.Esc, k.Refresh, k.NextURL, k.Yank,
+		k.Up, k.Down, k.PageUp, k.PageDown, k.Home, k.End, k.Esc, k.Refresh, k.NextURL, k.Yank, k.Actions,
 		k.SecurityAck, k.Palette, k.Pause, k.Help, k.Quit,
 		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads, k.Nodes, k.Security, k.Events, k.Radar,
 		k.Context, k.Namespace, k.Tree,
 	}
 }
 
-func (resourceDetailScreen) Help(Model) []ui.KeyHelp     { return ui.ResourceDetailHelp() }
-func (resourceDetailScreen) FullHelp(Model) []ui.KeyHelp { return ui.FullHelpResourceDetail() }
+func (resourceDetailScreen) Help(m Model) []ui.KeyHelp {
+	return m.actionHelp(ui.ResourceDetailHelp(), "actions")
+}
+
+func (resourceDetailScreen) FullHelp(m Model) []ui.KeyHelp {
+	return m.actionHelp(ui.FullHelpResourceDetail(), "actions on the object")
+}
 
 func (m Model) resourceDetailState() ui.ResourceDetailState {
 	w, ref, ok := m.activeResource()

@@ -11,6 +11,7 @@ import (
 
 const (
 	textNoAction         = "Nenhuma acao disponivel para este alvo."
+	textSearchPending    = "A lista ainda esta sendo filtrada. Aguarde o resultado para escolher o alvo."
 	textNoSource         = "Acoes indisponiveis nesta fonte."
 	textInvalidConfig    = "Configuracao de politica invalida. Acoes bloqueadas; leitura preservada."
 	textProtected        = "Contexto protegido. Acoes bloqueadas mesmo com --read-write."
