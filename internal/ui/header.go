@@ -15,6 +15,8 @@ type HeaderState struct {
 	ReadOnly       bool
 	Writable       bool
 	Protected      bool
+	ConfigInvalid  bool
+	AuditBlocked   bool
 	Synthetic      bool
 	Cluster        data.Cluster
 	MetricsOK      bool
@@ -30,7 +32,7 @@ func Header(r draw.Region, st HeaderState, ctx Ctx) {
 		r.Put(x+i, 0, ch, draw.Fg(colors[i]).WithBold())
 	}
 	x += len(logo)
-	x += r.Line(x, 0, headerBadges(st))
+	x += r.Line(x, 0, headerBadges(st, r.W))
 	x += r.Line(x, 0, draw.Line{muted(headerVersion(r.W))})
 
 	pill := headerPill(st, ctx, r.W)
@@ -98,7 +100,7 @@ func headerPill(st HeaderState, ctx Ctx, w int) draw.Line {
 	return pill
 }
 
-func headerBadges(st HeaderState) draw.Line {
+func headerBadges(st HeaderState, w int) draw.Line {
 	var l draw.Line
 	if st.Synthetic {
 		l = append(l, draw.S(" [DEMO]", draw.Fg(theme.Warn).WithBold()))
@@ -107,15 +109,28 @@ func headerBadges(st HeaderState) draw.Line {
 	case st.ReadOnly:
 		l = append(l, draw.S(" [RO]", draw.Fg(theme.Warn).WithBold()))
 	case st.Writable:
-		l = append(l, draw.S(" [RW]", draw.Fg(theme.Err).WithBold()))
+		l = append(l, draw.S(headerLabel(w, " [RW: --read-write]", " [RW]"), draw.Fg(theme.Err).WithBold()))
 	}
-	if st.Protected {
+	switch {
+	case st.ConfigInvalid:
+		l = append(l, draw.S(headerLabel(w, " [CONFIG INVALIDA]", " [CONFIG]"), draw.Fg(theme.Err).WithBold()))
+	case st.Protected:
 		l = append(l, draw.S(" [PROTECTED]", draw.Fg(theme.Err).WithBold()))
+	}
+	if st.AuditBlocked {
+		l = append(l, draw.S(headerLabel(w, " [ACOES BLOQUEADAS: AUDIT]", " [AUDIT]"), draw.Fg(theme.Err).WithBold()))
 	}
 	return l
 }
 
 const headerVersionFrom = 100
+
+func headerLabel(w int, full, short string) string {
+	if w < headerVersionFrom {
+		return short
+	}
+	return full
+}
 
 func headerVersion(w int) string {
 	if w < headerVersionFrom {
@@ -125,7 +140,7 @@ func headerVersion(w int) string {
 }
 
 func HeaderLayout(st HeaderState, w int) HeaderGeometry {
-	start := len("lazykube") + headerBadges(st).Width() + draw.Width(headerVersion(w))
+	start := len("lazykube") + headerBadges(st, w).Width() + draw.Width(headerVersion(w))
 	g := HeaderGeometry{CtxStart: start, NsStart: start, End: start}
 	g.Right = w - headerPill(st, Ctx{Pal: theme.DefaultPalette(), Clock: anim.Fixed(0, 0, 0)}, w).Width()
 	room := g.Right - start - 2 - draw.Width(headerCtxLabel) - draw.Width(headerNsLabel) - 2
