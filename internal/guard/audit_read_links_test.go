@@ -1,4 +1,4 @@
-//go:build linux || darwin
+//go:build linux
 
 package guard
 
@@ -165,7 +165,7 @@ func TestReadAuditOpenNeverFollowsOrBlocks(t *testing.T) {
 	if err := os.Symlink("target", filepath.Join(dir, "swapped")); err != nil {
 		t.Fatal(err)
 	}
-	if f, err := root.OpenFile("swapped", os.O_RDONLY|auditReadFlags, 0); err == nil {
+	if f, err := root.OpenFile("swapped", os.O_RDONLY|auditFileFlags, 0); err == nil {
 		info, statErr := f.Stat()
 		_ = f.Close()
 		linked, lerr := root.Lstat("swapped")
@@ -179,7 +179,7 @@ func TestReadAuditOpenNeverFollowsOrBlocks(t *testing.T) {
 	opened := make(chan struct{})
 	go func() {
 		defer close(opened)
-		if f, err := root.OpenFile("fifo", os.O_RDONLY|auditReadFlags, 0); err == nil {
+		if f, err := root.OpenFile("fifo", os.O_RDONLY|auditFileFlags, 0); err == nil {
 			_ = f.Close()
 		}
 	}()

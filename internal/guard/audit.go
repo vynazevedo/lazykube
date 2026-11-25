@@ -80,9 +80,6 @@ func (a *FileAudit) Record(event AuditEvent) error {
 	return nil
 }
 func (a *FileAudit) record(event AuditEvent) (recordErr error) {
-	if !filepath.IsAbs(a.path) {
-		return AuditFailed
-	}
 	event.OperationID = auditText(event.OperationID)
 	event.Phase = auditText(event.Phase)
 	event.Outcome = Reason(auditText(string(event.Outcome)))
@@ -98,23 +95,12 @@ func (a *FileAudit) record(event AuditEvent) (recordErr error) {
 		return err
 	}
 	raw = append(raw, '\n')
-	dir, name := filepath.Dir(a.path), filepath.Base(a.path)
-	if err := os.MkdirAll(dir, 0700); err != nil {
-		return err
-	}
-	info, err := os.Lstat(dir)
-	if err != nil || !private(info, true) {
-		return AuditFailed
-	}
-	root, err := os.OpenRoot(dir)
+	dir, err := openAudit(a.path, true)
 	if err != nil {
 		return err
 	}
-	defer func() { recordErr = errors.Join(recordErr, root.Close()) }()
-	current, err := root.Stat(".")
-	if err != nil || !os.SameFile(info, current) {
-		return AuditFailed
-	}
+	defer func() { recordErr = errors.Join(recordErr, dir.close()) }()
+	root, name := dir.root, filepath.Base(a.path)
 	directory, err := root.Open(".")
 	if err != nil {
 		return err
@@ -126,27 +112,11 @@ func (a *FileAudit) record(event AuditEvent) (recordErr error) {
 	if err = a.expire(root, name); err != nil {
 		return err
 	}
-	if info, err = root.Lstat(name); err == nil {
-		if !private(info, false) {
-			return AuditFailed
-		}
-		if info.Size()+int64(len(raw)) > a.limit {
-			if err = a.rotate(root, name); err != nil {
-				return err
-			}
-		}
-	} else if !os.IsNotExist(err) {
-		return err
-	}
-	file, err := root.OpenFile(name, os.O_CREATE|os.O_APPEND|os.O_WRONLY|auditNoFollow, 0600)
+	file, err := a.appendTo(root, name, int64(len(raw)))
 	if err != nil {
 		return err
 	}
 	defer func() { recordErr = errors.Join(recordErr, file.Close()) }()
-	info, err = file.Stat()
-	if err != nil || !private(info, false) {
-		return AuditFailed
-	}
 	if n, writeErr := file.Write(raw); writeErr != nil || n != len(raw) {
 		return AuditFailed
 	}
@@ -155,6 +125,23 @@ func (a *FileAudit) record(event AuditEvent) (recordErr error) {
 	}
 	return directory.Sync()
 }
+func (a *FileAudit) appendTo(root *os.Root, name string, size int64) (*os.File, error) {
+	file, info, err := openAuditFile(root, name, os.O_APPEND|os.O_WRONLY)
+	if os.IsNotExist(err) {
+		return createAuditFile(root, name)
+	}
+	if err != nil {
+		return nil, err
+	}
+	if info.Size()+size <= a.limit {
+		return file, nil
+	}
+	if err = errors.Join(a.rotate(root, name), file.Close()); err != nil {
+		return nil, err
+	}
+	return createAuditFile(root, name)
+}
+
 func (a *FileAudit) rotate(root *os.Root, name string) error {
 	slot := 0
 	for i := 1; i < 10; i++ {
@@ -226,7 +213,7 @@ func (a *FileAudit) expire(root *os.Root, name string) error {
 }
 
 func auditSegmentExpired(root *os.Root, entry string, cutoff time.Time) (expired bool, scanErr error) {
-	file, err := root.OpenFile(entry, os.O_RDONLY|auditNoFollow, 0)
+	file, _, err := openAuditFile(root, entry, os.O_RDONLY)
 	if err != nil {
 		return false, err
 	}

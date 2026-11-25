@@ -212,6 +212,12 @@ para futuros handlers de acoes estao descritos em
 por virgula. `--audit-file` permite escolher um caminho absoluto para o audit
 privado. Nenhuma tecla desativa a politica.
 
+Sem audit confiavel nao ha acao. No macOS e no Windows as acoes ficam bloqueadas
+nesta versao, porque a privacidade do audit ainda nao e verificada. Em Linux tambem
+ficam quando o caminho passa por link do usuario, por diretorio com escrita de grupo
+ou outros sem sticky, ou por filesystem de rede ou FUSE. A aba Audit da tela Security
+mostra o motivo.
+
 ---
 
 ## Comparação de escopo

@@ -607,7 +607,11 @@ func SecurityAuditList(r draw.Region, st SecurityPageState, ctx Ctx) {
 	inner.Line(0, 0, draw.Line{muted(header)}.Truncate(inner.W))
 	rows := SecurityAuditRows(r.H)
 	if msg, color := auditStateText(a); msg != "" {
-		for i, l := range draw.Wrap(msg, max(1, inner.W)) {
+		wrapped := draw.Wrap(msg, max(1, inner.W))
+		if a.Reason != "" {
+			wrapped = append(wrapped, draw.Wrap("Motivo: "+draw.Sanitize(a.Reason), max(1, inner.W))...)
+		}
+		for i, l := range wrapped {
 			if i < rows {
 				inner.Line(0, 1+i, draw.Line{colored(l, color)})
 			}
