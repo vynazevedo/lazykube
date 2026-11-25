@@ -170,7 +170,7 @@ func (b actionBackend) Send(ctx context.Context, r guard.Request, dry bool) erro
 	case guard.Restart:
 		obj, getErr := client.Get(ctx, r.Target.Name, metav1.GetOptions{})
 		if getErr != nil {
-			return guard.Unavailable
+			return guard.NotSent{Reason: readReason(getErr)}
 		}
 		annotations, _, _ := unstructured.NestedStringMap(obj.Object, "spec", "template", "metadata", "annotations")
 		if annotations == nil {
@@ -180,13 +180,13 @@ func (b actionBackend) Send(ctx context.Context, r guard.Request, dry bool) erro
 		patch := []map[string]any{{"op": "test", "path": "/metadata/uid", "value": r.Target.UID}, {"op": "test", "path": "/metadata/resourceVersion", "value": r.Target.ResourceVersion}, {"op": "add", "path": "/spec/template/metadata/annotations", "value": annotations}}
 		body, marshalErr := json.Marshal(patch)
 		if marshalErr != nil {
-			return guard.Invalid
+			return guard.NotSent{Reason: guard.Invalid}
 		}
 		_, err = client.Patch(ctx, r.Target.Name, types.JSONPatchType, body, metav1.PatchOptions{DryRun: dryRun})
 	case guard.Cordon, guard.Uncordon:
 		body, marshalErr := nodePatch(r)
 		if marshalErr != nil {
-			return guard.Invalid
+			return guard.NotSent{Reason: guard.Invalid}
 		}
 		_, err = client.Patch(ctx, r.Target.Name, types.JSONPatchType, body, metav1.PatchOptions{DryRun: dryRun})
 	case guard.Edit:

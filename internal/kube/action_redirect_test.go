@@ -136,10 +136,16 @@ func wireExecutor(t *testing.T, w *wire) (*guard.Executor, *wireAudit) {
 	return exec, audit
 }
 
-type wireAudit struct{ events []guard.AuditEvent }
+type wireAudit struct {
+	events   []guard.AuditEvent
+	onRecord func(guard.AuditEvent)
+}
 
 func (a *wireAudit) Record(e guard.AuditEvent) error {
 	a.events = append(a.events, e)
+	if a.onRecord != nil {
+		a.onRecord(e)
+	}
 	return nil
 }
 

@@ -333,3 +333,28 @@ func TestPrunedPlanAuditFailureReleasesNoPreview(t *testing.T) {
 		t.Fatal(p, err, len(e.plans))
 	}
 }
+
+func TestOnlyProvenUnsentFailuresLeaveUnknown(t *testing.T) {
+	for _, tc := range []struct {
+		err  error
+		want Reason
+	}{
+		{NotSent{Unavailable}, Unavailable}, {NotSent{Denied}, Denied}, {NotSent{Stale}, Stale}, {NotSent{Invalid}, Invalid},
+		{NotSent{Succeeded}, Unavailable}, {NotSent{"private server response"}, Unavailable}, {NotSent{Unknown}, Unknown},
+		{Unavailable, Unknown}, {Invalid, Unknown}, {Canceled, Unknown}, {errors.New("reset"), Unknown}, {context.Canceled, Unknown},
+	} {
+		e, f, _ := guardExecutor(t)
+		p, err := e.Prepare(context.Background(), guardRequest())
+		if err != nil {
+			t.Fatal(err)
+		}
+		f.sendErr = tc.err
+		r, err := e.Execute(context.Background(), p.ID, Confirmation{Approved: true, Resource: "pod"})
+		if r.Outcome != tc.want || !errors.Is(err, tc.want) {
+			t.Fatal(tc.err, r, err)
+		}
+		if last := f.events[len(f.events)-1]; last.Phase != "result" || last.Outcome != tc.want {
+			t.Fatal(last)
+		}
+	}
+}

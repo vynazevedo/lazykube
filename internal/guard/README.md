@@ -89,6 +89,10 @@ de confirmacao, cancelamento, expiracao, remocao de plano vencido ou resultado. 
 ID inexistente nao gera evento, porque nao ha alvo conhecido. Se o registro da
 recusa falhar, o plano continua consumido e novas acoes ficam bloqueadas.
 
+`NotSent` e a unica forma de um backend afirmar que falhou antes da requisicao
+mutante, como a leitura interna do restart. Qualquer outro erro de envio continua
+`outcome_unknown`, inclusive cancelamento e timeout.
+
 `Observe` faz uma leitura pontual do alvo, sem mutex, e so depois da politica e da
 allowlist: em somente leitura nenhuma requisicao sai. `Discard` consome um preview
 sem enviar nada e registra o cancelamento. `AuditBlocked` informa a falha de audit

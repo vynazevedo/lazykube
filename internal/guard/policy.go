@@ -41,6 +41,11 @@ const (
 
 func (r Reason) Error() string { return string(r) }
 
+type NotSent struct{ Reason Reason }
+
+func (n NotSent) Error() string { return string(n.Reason) }
+func (n NotSent) Unwrap() error { return n.Reason }
+
 type Environment struct{ ReadOnly, Protected, Valid bool }
 type Session struct {
 	Context     string

@@ -271,9 +271,12 @@ func (e *Executor) Execute(parent context.Context, id string, c Confirmation) (R
 		result.Outcome = Canceled
 	} else {
 		err = e.backend.Send(ctx, p.request, false)
+		var unsent NotSent
 		switch {
 		case err == nil:
 			result.Outcome = Succeeded
+		case errors.As(err, &unsent):
+			result.Outcome = safeReason(unsent.Reason, Unavailable)
 		case errors.Is(err, Denied):
 			result.Outcome = Denied
 		case errors.Is(err, Stale):
