@@ -108,12 +108,18 @@ func Connect(ctx context.Context, opts ConnectOptions) (*Source, error) {
 			environment.Valid = false
 		}
 	}
-	s.guardSession = guard.Session{Context: name, Namespace: opts.Namespace, Identity: fmt.Sprintf("session-%d", s.generation), Generation: s.generation, Environment: environment}
+	identity, err := guard.NewSessionIdentity(s.generation)
+	if err != nil {
+		s.Close()
+		return nil, connectError(ErrorGuard, name, err)
+	}
+	s.guardSession = guard.Session{Context: name, Namespace: opts.Namespace, Identity: identity, Generation: s.generation, Environment: environment}
 	s.guardPolicy = guard.NewPolicy(opts.AllowWrites)
 	auditPath := opts.AuditPath
 	if auditPath == "" {
 		auditPath, _ = guard.DefaultAuditPath()
 	}
+	s.auditPath = auditPath
 	authClient, actionClient, clientErr := newActionClients(cfg)
 	if clientErr != nil {
 		s.Close()

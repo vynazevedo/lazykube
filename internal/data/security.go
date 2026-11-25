@@ -76,7 +76,15 @@ type Coverage struct {
 	ObservedAt time.Time
 }
 
+type OwnerRef struct {
+	APIVersion string
+	Kind       string
+	Name       string
+	UID        string
+}
+
 type PodPosture struct {
+	Owner         *OwnerRef
 	RuleVersion   string
 	Assessments   []RuleAssessment
 	LocalCoverage Coverage

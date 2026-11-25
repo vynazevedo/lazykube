@@ -1,0 +1,24 @@
+ lazykube [DEMO] [RO]  ◎ context demo namespace Todos   k8s demo      ⠙ ● live  
+  2 Dashboard | 3 Workloads | 4 Nodes | 5 Security | 6 Events |[7 Radar]        
+ Radar                                                                          
+ ╭─ Radar ────────────────────────────────────────────────────────────────────╮ 
+ │ Ativos 4 (High 1 Warn 3) | rec 0 | obs 0 | susp 0 | res 1 | normais 81     │ 
+ │ Saúde: indisponível; sinais não são incidentes correlacionados.            │ 
+ ╰────────────────────────────────────────────────────────────────────────────╯ 
+ ╭─ Sinais · focus ───────────────────────────────────────────────────────────╮ 
+ │   EST  SINAL     POD/CONTAINER                                       DESDE │ 
+ │ > High CrashLoop svclb-traefik-8c2f1-6n2vb/lb-tcp-80                 20:15 │ 
+ │   Warn Pending   local-path-provisioner-84db5d-h4                    20:15 │ 
+ │   Warn ImagePull local-path-provisioner-84db5d-h4/app                20:15 │ 
+ │   Warn Pending   lingqu-1605489600-b7xsd                             20:15 │ 
+ │   res. OOMKilled odoo-7575bf6d8-9wjvk/app                            20:15 │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │ 5 sinais · High/Warn ativos, rec. obs. susp res.                           │ 
+ ╰────────────────────────────────────────────────────────────────────────────╯ 
+ ╭─ Cobertura ────────────────────────────────────────────────────────────────╮ 
+ │ Cobertura: inventário de pods completa 13/13                               │ 
+ │ Eventos, owners, nodes e métricas ainda não consumidos. Sem nodes/proxy.   │ 
+ ╰────────────────────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────
+  tab  signals / evidence   ↑↓  move   enter  open pod        bubbletea · 0 fps 

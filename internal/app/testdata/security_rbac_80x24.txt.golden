@@ -1,0 +1,24 @@
+ lazykube [DEMO] [RO]  ◎ context demo namespace Todos   k8s demo      ⠙ ● live  
+  2 Dashboard | 3 Workloads | 4 Nodes |[5 Security]| 6 Events | 7 Radar         
+ Security                                                                       
+ ╭─ Postura de segurança ─────────────────────────────────────────────────────╮ 
+ │ Cluster | Todos: Segurança 55 E | Higiene 97 A                             │ 
+ │ Sem sistema: Segurança 54 E | Higiene 97 A                                 │ 
+ │ High novos 0 | Cobertura 13/13 pods (complete in scope)                    │ 
+ ╰────────────────────────────────────────────────────────────────────────────╯ 
+  [Workloads] [RBAC] [Rede e exposição] [Conformidade PSS]                      
+  [Achados aceitos] [Audit]                                                     
+ ╭─ RBAC ─────────────────────────────────────────────────────────────────────╮ 
+ │ Concessões RBAC observadas; não são permissões efetivas.                   │ 
+ │ Aguardando projetor do catálogo de recursos; nenhuma leitura foi feita     │ 
+ │ para esta aba.                                                             │ 
+ │ Nenhum Role, RoleBinding, ClusterRole ou ClusterRoleBinding foi lido.      │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ ╰────────────────────────────────────────────────────────────────────────────╯ 
+  Nota não garante segurança. PSS v1.34: verificação local; não é admissão      
+────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   [ ]  tab   tab  panel   H  cohort   esc  back    bubbletea · 0 fps 

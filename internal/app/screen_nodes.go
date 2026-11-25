@@ -47,7 +47,7 @@ func (nodesScreen) Keys(m Model) []key.Binding {
 	keys := []key.Binding{
 		k.Up, k.Down, k.Filter, k.Enter, k.Esc, k.SecurityAck,
 		k.Palette, k.Pause, k.Help, k.Quit,
-		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads, k.Nodes, k.Events,
+		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads, k.Nodes, k.Security, k.Events, k.Radar,
 		k.Context, k.Namespace, k.Tree, k.Yank, k.Actions,
 	}
 	if m.layout.Compact {

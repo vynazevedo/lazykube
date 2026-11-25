@@ -43,6 +43,7 @@ func (m Model) frame() Frame {
 		Follow:      m.follow,
 		Tab:         m.tab,
 		Events:      m.ev.eventsFrame,
+		Security:    m.sec.securityFrame,
 	}
 }
 
@@ -120,6 +121,8 @@ func (m *Model) restore(f Frame) {
 	m.podOffset, m.nsCursor, m.depCursor = f.PodOffset, f.NSCursor, f.DepCursor
 	m.tab, m.scroll, m.follow = f.Tab, f.Scroll, f.Follow
 	m.restoreEvents(f.Events)
+	m.sec.audit.stop()
+	m.sec = securityPage{securityFrame: f.Security}
 	m.relayout()
 	m.fixSelection()
 	m.refresh()
@@ -168,7 +171,7 @@ func (m Model) hasMarks() bool {
 	if m.nsFilter == "" || m.nav.Active().Kind != RouteScreen {
 		return false
 	}
-	return m.onScreen(ScreenDashboard) || m.onScreen(ScreenWorkloads) || m.onScreen(ScreenNodes)
+	return m.onScreen(ScreenDashboard) || m.onScreen(ScreenWorkloads) || m.onScreen(ScreenNodes) || m.onScreen(ScreenSecurity) || m.onScreen(ScreenRadar)
 }
 
 func (m *Model) setMarks(marks nsSet) {
@@ -300,7 +303,7 @@ func (m *Model) openTarget(t Destination) {
 }
 
 func (m Model) shortcutDestination(msg tea.KeyPressMsg) DestinationID {
-	for _, b := range []key.Binding{m.keys.Dashboard, m.keys.Workloads, m.keys.Nodes, m.keys.Events} {
+	for _, b := range []key.Binding{m.keys.Dashboard, m.keys.Workloads, m.keys.Nodes, m.keys.Security, m.keys.Events, m.keys.Radar} {
 		if !key.Matches(msg, b) {
 			continue
 		}
@@ -499,7 +502,7 @@ func (m Model) handleShellClick(ms tea.Mouse) (Model, bool) {
 	case AreaMenu:
 		m.endEditing()
 		m.menu.open = false
-		if i, ok := ui.MenuItemAt(m.menuItems(), ms.X-m.layout.Menu.X); ok {
+		if i, ok := ui.MenuItemAt(m.menuItems(), ms.X-m.layout.Menu.X, m.layout.Menu.W); ok {
 			m.activateScreen(registeredScreens()[i])
 		}
 		return m, true

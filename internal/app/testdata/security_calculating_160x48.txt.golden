@@ -1,0 +1,48 @@
+ lazykube [DEMO] [RO]  v2.0   ◎ context demo namespace Todos   k8s demo  nodes 1  ns 8  pods 13  uptime 119d                         ⠙ metrics every 5s ● live  
+  2 Dashboard  |  3 Workloads  |  4 Nodes  | [5 Security] |  6 Events  |  7 Radar                                                                       m menu  
+ Security                                                                                                                                                       
+ ╭─ Postura de segurança ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ │ Cluster | Calculando a postura; ainda sem conclusão.                                                                                                       │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ │                                                                                                                                                            │ 
+ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+  [Workloads] [RBAC] [Rede e exposição] [Conformidade PSS]                                                                                                      
+  [Achados aceitos] [Audit]                                                                                                                                     
+ ╭─ Workloads (0) | Todos ──────────────────────────╮ ╭─ Evidência e remediação ──────────────────────────────────────────────────────────────────────────────╮ 
+ │ WORKLOAD                  PODS  SEG  HIG   H     │ │ Calculando a postura; ainda sem conclusão.                                                            │ 
+ │ Calculando a postura dos workloads.              │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │ Réplicas observadas, não desejadas               │ │                                                                                                       │ 
+ │ Deployment acima do ReplicaSet ainda não resolv… │ │                                                                                                       │ 
+ ╰──────────────────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+  PSS v1.34: verificação local do spec; não é admissão                                                                                                          
+  RBAC: concessões observadas, não permissão efetiva. Rede: alcance público desconhecido.                                                                       
+  [DEMO] dados sintéticos                                                                                                                                       
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   [ ]  tab   tab  panel   H  cohort   esc  back   m  menu   ?  help   q  quit   y  copy                                            bubbletea · 0 fps 

@@ -1,9 +1,12 @@
 package app
 
 import (
+	"slices"
+
 	"charm.land/bubbles/v2/key"
 	tea "charm.land/bubbletea/v2"
 
+	"github.com/vynazevedo/lazykube/internal/data"
 	"github.com/vynazevedo/lazykube/internal/draw"
 	"github.com/vynazevedo/lazykube/internal/ui"
 )
@@ -46,7 +49,7 @@ func (podScreen) Keys(m Model) []key.Binding {
 		k.TabPrev, k.TabNext, k.Container, k.Previous, k.SearchNext, k.SearchPrev, k.EventScope,
 		k.Palette, k.Pause, k.Help, k.Quit,
 		k.PageUp, k.PageDown, k.Home, k.End, k.Follow, k.Wrap, k.Top, k.Bottom,
-		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads, k.Nodes, k.Events,
+		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads, k.Nodes, k.Security, k.Events, k.Radar,
 		k.Context, k.Namespace, k.Tree, k.Yank, k.Actions,
 	}
 }
@@ -54,7 +57,9 @@ func (podScreen) Keys(m Model) []key.Binding {
 func (podScreen) View(m Model, body draw.Region, ctx ui.Ctx) {
 	pod := m.selectedPod()
 	if pod == nil {
-		ui.PodMissing(region(body, m.layout.Details), m.nav.Active().Pod, ctx)
+		r := m.nav.Active()
+		recreated := slices.ContainsFunc(m.snap.Pods, func(p data.Pod) bool { return p.Key() == r.Pod })
+		ui.PodMissing(region(body, m.layout.Details), r.Pod, recreated, ctx)
 		return
 	}
 	st := m.detailsState(pod)

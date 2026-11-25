@@ -5,7 +5,7 @@ import (
 	"syscall"
 )
 
-const auditNoFollow = syscall.O_NOFOLLOW
+const auditFileFlags = syscall.O_NOFOLLOW | syscall.O_NONBLOCK
 
 func private(info os.FileInfo, dir bool) bool {
 	stat, ok := info.Sys().(*syscall.Stat_t)

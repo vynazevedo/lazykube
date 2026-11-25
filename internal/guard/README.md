@@ -77,10 +77,32 @@ novas acoes neste executor. Falha apos
 o envio preserva resultado desconhecido quando nao ha confirmacao do servidor;
 nao ha repeticao automatica.
 
-Linux foi exercitado com fakes e servidor HTTP local. Darwin e Windows permanecem
-preview ate validacao nativa. No Windows, verificacao de ACL privada ainda nao foi
-validada: o audit falha fechado e bloqueia acoes. Nao ha afirmacao de suporte de
-mutacoes nessa plataforma. A matriz alvo Kubernetes e 1.34, 1.35 e 1.36; fakes e
+Escritor e leitor do audit usam a mesma abertura. Em Linux o caminho e percorrido
+por descritores desde a raiz, um componente por vez, sem deixar o kernel seguir links:
+
+- cada diretorio precisa ser de root ou do proprio usuario, sem escrita de grupo ou
+  outros. Escrita so e tolerada com sticky, como em `/tmp`;
+- um link so e seguido quando ele e o diretorio que o contem sao de root e esse
+  diretorio nao permite escrita de grupo ou outros, com ou sem sticky. Cada componente
+  do destino passa pelas mesmas regras;
+- links do proprio usuario sao recusados, inclusive os criados por gerenciadores de
+  dotfiles, e tambem link de root dentro de diretorio do usuario;
+- o filesystem precisa manter dono e modo: ext2/3/4, xfs, btrfs, f2fs, zfs, bcachefs,
+  tmpfs, ramfs, overlay, squashfs ou erofs. NFS, CIFS, 9p e FUSE sao recusados;
+- diretorios ausentes sao criados com 0700 a partir do descritor ja verificado.
+
+Nao existe excecao para grupo privado: com umask 002, um `~/.local` em 0775 e recusado.
+Nenhuma permissao ou link e reparado automaticamente. Quando o caminho e recusado, a
+aba Audit mostra o motivo e as acoes ficam bloqueadas. Para resolver, retire a escrita
+de grupo do ancestral ou use `--audit-file` com um caminho absoluto em disco local,
+sem links do usuario. A regra protege contra outro usuario sem privilegios; nao protege
+contra root nem contra processos do proprio usuario. Dono nao reconhecido, como em
+user namespace, falha fechado.
+
+Linux foi exercitado com fakes e servidor HTTP local. Em Darwin a ausencia de ACL
+estendida ainda nao e verificada e, no Windows, a ACL privada tambem nao: nas duas
+plataformas o audit falha fechado e bloqueia acoes. Nao ha afirmacao de suporte de
+mutacoes nelas. A matriz alvo Kubernetes e 1.34, 1.35 e 1.36; fakes e
 HTTP sintetico validam contratos, nao substituem evidencia por versao de servidor.
 
 Nodes sao o unico alvo de escopo cluster: o namespace do alvo e vazio. O PATCH

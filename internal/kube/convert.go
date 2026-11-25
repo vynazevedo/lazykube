@@ -100,6 +100,7 @@ func toPod(p *corev1.Pod, now time.Time) data.Pod {
 	}
 	sum := summarize(p)
 	return data.Pod{
+		UID:        string(p.UID),
 		Name:       p.Name,
 		Namespace:  p.Namespace,
 		Status:     sum.status,
@@ -118,7 +119,6 @@ func toPod(p *corev1.Pod, now time.Time) data.Pod {
 		Controller: controller(p),
 		QoS:        string(p.Status.QOSClass),
 
-		UID:             string(p.UID),
 		ResourceVersion: p.ResourceVersion,
 	}
 }

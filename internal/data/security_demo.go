@@ -7,8 +7,9 @@ func (d *Demo) buildSecurity() SecuritySnapshot {
 	pods := make(map[string]PodPosture, len(d.pods))
 	for i, row := range d.pods {
 		p := row.pod
-		ref := ResourceRef{Context: "demo", Generation: 1, Version: "v1", Resource: "pods", Namespace: p.Namespace, Name: p.Name, UID: "demo-" + p.Key(), ResourceVersion: "1"}
-		posture := PodPosture{RuleVersion: SecurityRuleVersion, Target: ref, Coverage: Coverage{State: CoverageComplete, Evaluated: 1, Total: 1, ObservedAt: at}}
+		ref := ResourceRef{Context: "demo", Generation: 1, Version: "v1", Resource: "pods", Namespace: p.Namespace, Name: p.Name, UID: p.UID, ResourceVersion: "1"}
+		owner := withoutLastSegment(p.Name)
+		posture := PodPosture{Owner: &OwnerRef{APIVersion: "apps/v1", Kind: "ReplicaSet", Name: owner, UID: "demo-rs-" + p.Namespace + "/" + owner}, RuleVersion: SecurityRuleVersion, Target: ref, Coverage: Coverage{State: CoverageComplete, Evaluated: 1, Total: 1, ObservedAt: at}}
 		add := func(rule, container, field, evidence, why, recommendation string, severity Severity, result RuleResult) {
 			confidence := ConfidenceObserved
 			if result == ResultUnknown {
