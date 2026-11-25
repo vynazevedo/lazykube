@@ -152,7 +152,7 @@ func staleSecurity(t *testing.T, w, h int, keys ...string) Model {
 func TestSecurityStaleDataIsLabelledInEveryVisiblePanel(t *testing.T) {
 	const label = "recalculando"
 	for _, size := range [][2]int{{160, 48}, {130, 40}, {100, 30}, {80, 24}} {
-		for _, keys := range [][]string{nil, {"tab"}, {"]"}, {"]", "]"}, {"]", "]", "]"}, {"[", "["}, {"["}, {"[", "tab"}, {"b"}} {
+		for _, keys := range [][]string{nil, {"tab"}, {"]"}, {"]", "]"}, {"]", "]", "]"}, {"[", "["}, {"["}, {"[", "tab"}, {"b"}, {"tab", "b"}, {"]", "b"}, {"[", "b"}} {
 			m := staleSecurity(t, size[0], size[1], keys...)
 			l, lines := m.layout, strings.Split(m.Render().Plain(), "\n")
 			panels := []Rect{l.SecSummary}
@@ -160,7 +160,7 @@ func TestSecurityStaleDataIsLabelledInEveryVisiblePanel(t *testing.T) {
 				panels = append(panels, l.SecList, l.SecEvidence)
 			}
 			for _, r := range panels {
-				if l.TreeOverlay || r.Empty() {
+				if r.Empty() {
 					continue
 				}
 				row := []rune(lines[r.Y])
@@ -168,13 +168,20 @@ func TestSecurityStaleDataIsLabelledInEveryVisiblePanel(t *testing.T) {
 					t.Fatalf("%v %v panel without the label: %q", size, keys, title)
 				}
 			}
-			if !l.TreeOverlay && strings.Count(lines[l.SecSummary.Y], label) != 1 {
+			if strings.Count(lines[l.SecSummary.Y], label) != 1 {
 				t.Fatalf("%v %v the summary is labelled in every tab", size, keys)
 			}
 			if fresh := settleSecurity(m); strings.Contains(fresh.Render().Plain(), label) {
 				t.Fatalf("%v %v the label leaves with the new result", size, keys)
 			}
 		}
+	}
+	for name, keys := range map[string][]string{"security_stale_tree": {"b"}, "security_stale_tree_evidence": {"tab", "b"}} {
+		m := staleSecurity(t, 80, 24, keys...)
+		if !m.layout.TreeOverlay {
+			t.Fatal("at 80x24 the tree covers the panels")
+		}
+		golden(t, name+"_80x24.txt", m.Render().Plain())
 	}
 	for _, size := range [][2]int{{80, 24}, {130, 40}} {
 		suffix := fmt.Sprintf("_%dx%d.txt", size[0], size[1])

@@ -155,6 +155,7 @@ func (m Model) securityPageState() ui.SecurityPageState {
 		RuleVersion: m.security.RuleVersion,
 		Loading:     !m.sec.have,
 		Stale:       m.sec.have && m.sec.result.key != m.wantedSecurityKey(),
+		LeftCovered: m.tree.visible && m.layout.TreeOverlay,
 		RulesReady:  m.sec.have && len(m.sec.result.workloads) > 0 && m.sec.rulesFor == m.sec.Selected,
 		Tab:         m.sec.Tab,
 		Focus:       m.sec.Focus,

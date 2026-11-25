@@ -81,11 +81,22 @@ type keyFeeder struct {
 }
 
 func feedKeys(key string) *keyFeeder {
+	now := make(chan struct{})
+	close(now)
+	return feedKeysAfter(now, key)
+}
+
+func feedKeysAfter(ready <-chan struct{}, key string) *keyFeeder {
 	r, w := io.Pipe()
 	k := &keyFeeder{r: r, w: w, stop: make(chan struct{})}
 	k.wg.Add(1)
 	go func() {
 		defer k.wg.Done()
+		select {
+		case <-k.stop:
+			return
+		case <-ready:
+		}
 		t := time.NewTicker(20 * time.Millisecond)
 		defer t.Stop()
 		for {
@@ -111,12 +122,16 @@ func (k *keyFeeder) close() {
 
 func runWith(t *testing.T, connect connector, key string) (int, string) {
 	t.Helper()
-	keys := feedKeys(key)
+	return runFed(t, connect, feedKeys(key))
+}
+
+func runFed(t *testing.T, connect connector, keys *keyFeeder, opts ...tea.ProgramOption) (int, string) {
+	t.Helper()
 	defer keys.close()
 	var stderr bytes.Buffer
 	done := make(chan int, 1)
 	go func() {
-		done <- run(nil, &stderr, connect, tea.WithInput(keys.r), tea.WithOutput(io.Discard), tea.WithWindowSize(100, 30))
+		done <- run(nil, &stderr, connect, append([]tea.ProgramOption{tea.WithInput(keys.r), tea.WithOutput(io.Discard), tea.WithWindowSize(100, 30)}, opts...)...)
 	}()
 	select {
 	case code := <-done:
@@ -142,56 +157,81 @@ func TestRunReportsConnectError(t *testing.T) {
 	}
 }
 
-func TestRunCtrlCCancelsConnection(t *testing.T) {
-	cancelled := make(chan struct{})
-	connect := func(ctx context.Context, _ kube.ConnectOptions) (data.Source, func(), error) {
-		<-ctx.Done()
-		close(cancelled)
-		return nil, nil, ctx.Err()
-	}
-	code, _ := runWith(t, connect, "\x03")
-	if code != app.ExitCancelled {
-		t.Fatalf("exit code = %d", code)
-	}
+type blockedConnection struct {
+	started, cancelled chan struct{}
+}
+
+func newBlockedConnection() blockedConnection {
+	return blockedConnection{started: make(chan struct{}), cancelled: make(chan struct{})}
+}
+
+func (c blockedConnection) connect(ctx context.Context, _ kube.ConnectOptions) (data.Source, func(), error) {
+	close(c.started)
+	<-ctx.Done()
+	close(c.cancelled)
+	return nil, nil, ctx.Err()
+}
+
+func (c blockedConnection) requireCancelled(t *testing.T) {
+	t.Helper()
 	select {
-	case <-cancelled:
+	case <-c.cancelled:
 	case <-time.After(5 * time.Second):
 		t.Fatal("connection context was not cancelled")
 	}
 }
 
+func interruptOnKey(_ tea.Model, msg tea.Msg) tea.Msg {
+	if _, ok := msg.(tea.KeyPressMsg); ok {
+		return tea.InterruptMsg{}
+	}
+	return msg
+}
+
+func TestRunCtrlCCancelsConnection(t *testing.T) {
+	c := newBlockedConnection()
+	code, _ := runFed(t, c.connect, feedKeysAfter(c.started, "\x03"))
+	if code != app.ExitCancelled {
+		t.Fatalf("exit code = %d", code)
+	}
+	c.requireCancelled(t)
+}
+
 func TestRunSigintDuringLoadingExitsCancelled(t *testing.T) {
-	cancelled := make(chan struct{})
-	connect := func(ctx context.Context, _ kube.ConnectOptions) (data.Source, func(), error) {
-		<-ctx.Done()
-		close(cancelled)
-		return nil, nil, ctx.Err()
+	c := newBlockedConnection()
+	code, stderr := runFed(t, c.connect, feedKeysAfter(c.started, "x"), tea.WithFilter(interruptOnKey))
+	if code != app.ExitCancelled {
+		t.Fatalf("exit code = %d, stderr = %q", code, stderr)
 	}
-	interrupt := tea.WithFilter(func(_ tea.Model, msg tea.Msg) tea.Msg {
-		if _, ok := msg.(tea.KeyPressMsg); ok {
-			return tea.InterruptMsg{}
-		}
-		return msg
-	})
-	keys := feedKeys("x")
-	defer keys.close()
-	var stderr bytes.Buffer
-	done := make(chan int, 1)
-	go func() {
-		done <- run(nil, &stderr, connect, tea.WithInput(keys.r), tea.WithOutput(io.Discard), tea.WithWindowSize(100, 30), interrupt)
-	}()
-	select {
-	case code := <-done:
-		if code != app.ExitCancelled {
-			t.Fatalf("exit code = %d, stderr = %q", code, stderr.String())
-		}
-	case <-time.After(10 * time.Second):
-		t.Fatal("program did not exit on SIGINT")
-	}
-	select {
-	case <-cancelled:
-	case <-time.After(5 * time.Second):
-		t.Fatal("deferred shutdown must cancel the connection")
+	c.requireCancelled(t)
+}
+
+func TestRunCancelBeforeConnectionStarts(t *testing.T) {
+	for name, tc := range map[string]struct {
+		key    string
+		filter func(tea.Model, tea.Msg) tea.Msg
+	}{
+		"ctrl+c": {"\x03", func(_ tea.Model, msg tea.Msg) tea.Msg { return msg }},
+		"sigint": {"x", interruptOnKey},
+	} {
+		t.Run(name, func(t *testing.T) {
+			c := newBlockedConnection()
+			withoutStart := func(m tea.Model, msg tea.Msg) tea.Msg {
+				if _, ok := msg.(tea.BatchMsg); ok {
+					return nil
+				}
+				return tc.filter(m, msg)
+			}
+			code, stderr := runFed(t, c.connect, feedKeys(tc.key), tea.WithFilter(withoutStart))
+			if code != app.ExitCancelled {
+				t.Fatalf("exit code = %d, stderr = %q", code, stderr)
+			}
+			select {
+			case <-c.started:
+				t.Fatal("the connection must not start")
+			default:
+			}
+		})
 	}
 }
 

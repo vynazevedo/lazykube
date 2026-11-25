@@ -1,0 +1,24 @@
+ lazykube [DEMO] [RO]  ◎ context demo namespace Todos   k8s demo      ⠙ ● live  
+  2 Dashboard | 3 Workloads | 4 Nodes |[5 Security]| 6 Events | 7 Radar         
+ Security                                                                       
+  [+] Cluster           │────────────────────────────────────── recalculando ─╮ 
+  [+] Workloads (3)     │ança 55 E | Higiene 97 A                             │ 
+  [+] Configuration     │ 54 E | Higiene 97 A                                 │ 
+  [+] Network           │ra 13/13 pods (complete in scope)                    │ 
+  [+] Storage           │─────────────────────────────────────────────────────╯ 
+  [+] Access Control    │e e exposição] [Conformidade PSS]                      
+  [+] Custom Resources  │t]                                                     
+  [+] Helm              │o ──────────────────────────────────── recalculando ─╮ 
+ ›Security (5)          │aSet/bilibili-live-7f6b8d9c5                         │ 
+  Radar (7)             │UID (ownerReference controller)                      │ 
+                        │egurança 20 F | Higiene 88 B                         │ 
+                        │mplete in scope)                                     │ 
+                        │                                                     │ 
+                        │scalation: Unsafe, container init-permissions        │ 
+                        │.securityContext.allowPrivilegeEscalation            │ 
+                        │d by privileged | regra versão 5                     │ 
+                        │spec observado, não runtime | 1/1 pods               │ 
+                        │─────────────────────────────────────────────────────╯ 
+  enter abre · b fecha  │nça. PSS v1.34: verificação local; não é admissão      
+────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   ←→  collapse / expand   enter  open              bubbletea · 0 fps 
