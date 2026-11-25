@@ -33,6 +33,7 @@ const (
 	DryRunFailed         Reason = "dry_run_failed"
 	ConfirmationRequired Reason = "confirmation_required"
 	Unknown              Reason = "outcome_unknown"
+	Unchanged            Reason = "no_change"
 	Succeeded            Reason = "succeeded"
 )
 
@@ -61,6 +62,17 @@ func DefaultEnvironment(name string) Environment {
 }
 
 type Target struct{ Group, Version, Resource, Namespace, Name, UID, ResourceVersion string }
+type Observation struct {
+	Target           Target
+	Replicas         int32
+	ObservedReplicas int32
+	GraceSeconds     int64
+	GraceKnown       bool
+	Owner            string
+	Strategy         string
+	Finalizers       int
+	Terminating      bool
+}
 type Parameters struct {
 	Replicas              int32
 	Container             string
@@ -91,7 +103,7 @@ func (p Policy) Evaluate(s Session, r Request) (Decision, error) {
 		return d, ReadOnly
 	}
 	t := r.Target
-	if s.Context == "" || s.Identity == "" || s.Generation == 0 || t.Version == "" || t.Resource == "" || t.Name == "" || t.UID == "" || t.ResourceVersion == "" || strings.Contains(t.Resource, "/") || strings.ContainsAny(t.Name, "/\\") || s.Namespace != "" && t.Namespace != s.Namespace {
+	if s.Context == "" || s.Identity == "" || s.Generation == 0 || t.Version == "" || t.Resource == "" || t.Name == "" || t.UID == "" || t.ResourceVersion == "" || strings.Contains(t.Resource, "/") || strings.ContainsAny(t.Name, "/\\") || !inScope(s, t) {
 		return d, Invalid
 	}
 	if !SupportsAction(r.Action, t) {
@@ -137,6 +149,17 @@ func (p Policy) Evaluate(s Session, r Request) (Decision, error) {
 	return d, nil
 }
 
+func ClusterScoped(t Target) bool {
+	return t.Group == "" && t.Resource == "nodes"
+}
+
+func inScope(s Session, t Target) bool {
+	if ClusterScoped(t) {
+		return t.Namespace == ""
+	}
+	return t.Namespace != "" && (s.Namespace == "" || t.Namespace == s.Namespace)
+}
+
 func Requirements(r Request) []Access {
 	if !SupportsAction(r.Action, r.Target) {
 		return nil
@@ -177,6 +200,7 @@ type Authorizer interface {
 }
 type Backend interface {
 	Supported(Action) bool
+	Observe(context.Context, Action, Target) (Observation, error)
 	Validate(context.Context, Request) error
 	Send(context.Context, Request, bool) error
 }

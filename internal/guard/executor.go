@@ -7,6 +7,7 @@ import (
 	"errors"
 	"slices"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -40,7 +41,7 @@ type Executor struct {
 	audit   Auditor
 	clock   Clock
 	plans   map[string]plan
-	failed  bool
+	failed  atomic.Bool
 }
 
 func NewExecutor(ctx context.Context, s Session, p Policy, a Authorizer, b Backend, audit Auditor, clock Clock) (*Executor, error) {
@@ -50,8 +51,64 @@ func NewExecutor(ctx context.Context, s Session, p Policy, a Authorizer, b Backe
 	sessionCtx, cancel := context.WithCancel(ctx)
 	return &Executor{ctx: sessionCtx, cancel: cancel, session: s, policy: p, auth: a, backend: b, audit: audit, clock: clock, plans: make(map[string]plan)}, nil
 }
-func (e *Executor) Close()     { e.cancel() }
-func (e *Executor) Mode() Mode { return e.policy.Mode(e.session) }
+
+const closeWait = 2 * time.Second
+
+func (e *Executor) Close() {
+	e.cancel()
+	idle := make(chan struct{})
+	go func() {
+		e.mu.Lock()
+		defer e.mu.Unlock()
+		close(idle)
+	}()
+	timer := time.NewTimer(closeWait)
+	defer timer.Stop()
+	select {
+	case <-idle:
+	case <-timer.C:
+	}
+}
+
+func (e *Executor) Mode() Mode         { return e.policy.Mode(e.session) }
+func (e *Executor) AuditBlocked() bool { return e.failed.Load() }
+
+func (e *Executor) Observe(parent context.Context, action Action, t Target) (Observation, error) {
+	mode := e.Mode()
+	switch {
+	case !mode.ConfigValid:
+		return Observation{}, InvalidConfig
+	case mode.ReadOnly:
+		return Observation{}, ReadOnly
+	case !SupportsAction(action, t) || !e.backend.Supported(action):
+		return Observation{}, Unsupported
+	case t.Name == "" || t.UID == "" || t.ResourceVersion == "" || !inScope(e.session, t):
+		return Observation{}, Invalid
+	}
+	ctx, cancel := e.operationContext(parent)
+	defer cancel()
+	out, err := e.backend.Observe(ctx, action, t)
+	switch {
+	case ctx.Err() != nil:
+		return Observation{}, Canceled
+	case err != nil:
+		return Observation{}, safeReason(err, Unavailable)
+	case out.Target.UID != t.UID:
+		return Observation{}, Stale
+	}
+	return out, nil
+}
+
+func (e *Executor) Discard(id string) error {
+	e.mu.Lock()
+	defer e.mu.Unlock()
+	p, ok := e.plans[id]
+	if !ok {
+		return nil
+	}
+	delete(e.plans, id)
+	return e.event(id, p.request, p.preview.Decision, "canceled", Canceled)
+}
 func (e *Executor) operationContext(parent context.Context) (context.Context, func()) {
 	ctx, cancel := context.WithCancel(parent)
 	stop := context.AfterFunc(e.ctx, cancel)
@@ -73,12 +130,12 @@ func (e *Executor) access(ctx context.Context, r Request) error {
 	return nil
 }
 func (e *Executor) event(id string, r Request, d Decision, phase string, outcome Reason) error {
-	if e.failed {
+	if e.failed.Load() {
 		return AuditFailed
 	}
 	err := e.audit.Record(AuditEvent{SchemaVersion: 1, Timestamp: e.clock.Now().UTC(), OperationID: id, Phase: phase, Action: r.Action, Context: e.session.Context, Identity: e.session.Identity, Namespace: r.Target.Namespace, Group: r.Target.Group, Resource: r.Target.Resource, Name: r.Target.Name, UID: r.Target.UID, ReadOnly: d.Mode.ReadOnly, Protected: d.Mode.Protected, Outcome: outcome})
 	if err != nil {
-		e.failed = true
+		e.failed.Store(true)
 		return AuditFailed
 	}
 	return nil
@@ -106,7 +163,7 @@ func (e *Executor) Prepare(parent context.Context, r Request) (Preview, error) {
 	if err != nil {
 		return reject(safeReason(err, Invalid))
 	}
-	if e.failed {
+	if e.failed.Load() {
 		return Preview{}, AuditFailed
 	}
 	if !e.backend.Supported(r.Action) {
@@ -252,7 +309,7 @@ func safeReason(err error, fallback Reason) Reason {
 	var reason Reason
 	if errors.As(err, &reason) {
 		switch reason {
-		case Invalid, ReadOnly, InvalidConfig, Denied, Unavailable, Unsupported, Stale, Canceled, AuditFailed, DryRunFailed, ConfirmationRequired, Unknown:
+		case Invalid, ReadOnly, InvalidConfig, Denied, Unavailable, Unsupported, Stale, Canceled, AuditFailed, DryRunFailed, ConfirmationRequired, Unknown, Unchanged:
 			return reason
 		}
 	}

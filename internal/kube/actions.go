@@ -52,13 +52,71 @@ func actionSubresource(r guard.Request) []string {
 	}
 	return nil
 }
+func readReason(err error) guard.Reason {
+	switch {
+	case apierrors.IsForbidden(err), apierrors.IsUnauthorized(err):
+		return guard.Denied
+	case apierrors.IsNotFound(err):
+		return guard.Stale
+	}
+	return guard.Unavailable
+}
+
+func patches(a guard.Action) bool {
+	return a == guard.Restart
+}
+
+func unchanged(r guard.Request, obj *unstructured.Unstructured) bool {
+	switch r.Action {
+	case guard.Scale:
+		return scaleReplicas(obj) == int64(r.Parameters.Replicas)
+	}
+	return false
+}
+
+func scaleReplicas(obj *unstructured.Unstructured) int64 {
+	n, _, _ := unstructured.NestedInt64(obj.Object, "spec", "replicas")
+	return n
+}
+
+func (b actionBackend) Observe(ctx context.Context, action guard.Action, t guard.Target) (guard.Observation, error) {
+	obj, err := b.resource(t).Get(ctx, t.Name, metav1.GetOptions{}, actionSubresource(guard.Request{Action: action})...)
+	if err != nil {
+		return guard.Observation{}, readReason(err)
+	}
+	out := guard.Observation{Target: t, Finalizers: len(obj.GetFinalizers()), Terminating: obj.GetDeletionTimestamp() != nil}
+	out.Target.UID, out.Target.ResourceVersion = string(obj.GetUID()), obj.GetResourceVersion()
+	if owner := metav1.GetControllerOf(obj); owner != nil {
+		out.Owner = owner.Kind + "/" + owner.Name
+	}
+	switch action {
+	case guard.Scale:
+		observed, _, _ := unstructured.NestedInt64(obj.Object, "status", "replicas")
+		out.Replicas, out.ObservedReplicas = int32(scaleReplicas(obj)), int32(observed)
+	case guard.Restart:
+		path := []string{"spec", "updateStrategy", "type"}
+		if t.Resource == "deployments" {
+			path = []string{"spec", "strategy", "type"}
+		}
+		out.Strategy, _, _ = unstructured.NestedString(obj.Object, path...)
+	case guard.Delete:
+		if t.Group == "" && t.Resource == "pods" {
+			out.GraceSeconds, out.GraceKnown, _ = unstructured.NestedInt64(obj.Object, "spec", "terminationGracePeriodSeconds")
+		}
+	}
+	return out, nil
+}
+
 func (b actionBackend) Validate(ctx context.Context, r guard.Request) error {
 	obj, err := b.resource(r.Target).Get(ctx, r.Target.Name, metav1.GetOptions{}, actionSubresource(r)...)
 	if err != nil {
-		return guard.Unavailable
+		return readReason(err)
 	}
 	if string(obj.GetUID()) != r.Target.UID || obj.GetResourceVersion() != r.Target.ResourceVersion {
 		return guard.Stale
+	}
+	if unchanged(r, obj) {
+		return guard.Unchanged
 	}
 	if r.Action == guard.Exec {
 		containers, _, _ := unstructured.NestedSlice(obj.Object, "spec", "containers")
@@ -128,7 +186,7 @@ func (b actionBackend) Send(ctx context.Context, r guard.Request, dry bool) erro
 	if apierrors.IsForbidden(err) || apierrors.IsUnauthorized(err) {
 		return guard.Denied
 	}
-	if apierrors.IsConflict(err) || apierrors.IsNotFound(err) {
+	if apierrors.IsConflict(err) || apierrors.IsNotFound(err) || patches(r.Action) && apierrors.IsInvalid(err) {
 		return guard.Stale
 	}
 	if err != nil {
