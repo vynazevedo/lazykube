@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"slices"
 	"strings"
 	"sync/atomic"
@@ -13,6 +14,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
 	"github.com/vynazevedo/lazykube/internal/data"
+	"github.com/vynazevedo/lazykube/internal/draw"
 	"github.com/vynazevedo/lazykube/internal/ui"
 )
 
@@ -769,5 +771,95 @@ func TestURLPickerNeedsAddresses(t *testing.T) {
 	m = pressDrive(t, openLeaf(t, demoModel(t, 160, 48), DestServices), "u")
 	if m.urls.open {
 		t.Fatal("u does nothing in a list")
+	}
+}
+
+func partialLinks(c *draw.Canvas) (int, []string) {
+	whole := 0
+	var broken []string
+	for y := range c.Height() {
+		for x := 0; x < c.Width(); {
+			u := c.At(x, y).Link
+			if u.IsZero() {
+				x++
+				continue
+			}
+			var label strings.Builder
+			for ; x < c.Width() && c.At(x, y).Link == u; x++ {
+				label.WriteRune(c.At(x, y).Rune)
+			}
+			if label.String() == u.String() {
+				whole++
+			} else {
+				broken = append(broken, label.String())
+			}
+		}
+	}
+	if opened := strings.Count(c.String(), "\x1b]8;;http"); opened != whole {
+		broken = append(broken, fmt.Sprintf("%d links emitted for %d intact labels", opened, whole))
+	}
+	return whole, broken
+}
+
+func TestOverlaysAndResizeNeverLeaveAPartialLink(t *testing.T) {
+	long, _ := longURL()
+	seen := 0
+	for _, host := range []string{"web.example.com", long} {
+		base := openIngress(t, host, 160, 48)
+		for _, keys := range [][]string{nil, {"u"}, {"?"}, {"m"}, {"b"}, {"b", "b"}} {
+			for _, size := range [][2]int{{80, 24}, {100, 30}, {120, 36}, {130, 40}, {160, 48}, {200, 48}, {240, 48}, {300, 48}} {
+				next, _ := base.Update(tea.WindowSizeMsg{Width: size[0], Height: size[1]})
+				m := pressDrive(t, next.(Model), keys...)
+				whole, broken := partialLinks(m.Render())
+				if len(broken) > 0 {
+					t.Fatalf("%s %v %v: %q", host, keys, size, broken)
+				}
+				seen += whole
+				for w := size[0]; w >= 80; w -= 7 {
+					next, _ := m.Update(tea.WindowSizeMsg{Width: w, Height: size[1]})
+					m = next.(Model)
+					if _, broken := partialLinks(m.Render()); len(broken) > 0 {
+						t.Fatalf("%s %v resized to %d: %q", host, keys, w, broken)
+					}
+				}
+			}
+		}
+	}
+	if seen == 0 {
+		t.Fatal("the fixture must also show intact links")
+	}
+}
+
+func TestRootPickersNeverLeaveAPartialLink(t *testing.T) {
+	long, _ := longURL()
+	occluded := 0
+	for _, kind := range []pickKind{pickContext, pickNamespace} {
+		for _, w := range []int{100, 160, 200, 240, 300} {
+			r := NewRoot(RootOptions{Options: Options{Source: newNetBrowser(nil, hostPages(long)), NoAnim: true}})
+			t.Cleanup(r.Shutdown)
+			base := openIngress(t, long, w, 48)
+			for h := 24; h <= 48; h++ {
+				next, _ := base.Update(tea.WindowSizeMsg{Width: w, Height: h})
+				r.cur, r.w, r.h, r.pick = next, w, h, nil
+				before, broken := partialLinks(r.Render())
+				if len(broken) > 0 {
+					t.Fatalf("%dx%d: %q", w, h, broken)
+				}
+				r, _ = r.openPicker(kind)
+				if r.pick == nil {
+					t.Fatal("picker closed")
+				}
+				after, broken := partialLinks(r.Render())
+				if len(broken) > 0 {
+					t.Fatalf("picker %v at %dx%d: %q", kind, w, h, broken)
+				}
+				if after < before {
+					occluded++
+				}
+			}
+		}
+	}
+	if occluded == 0 {
+		t.Fatal("no size puts a picker over the link")
 	}
 }

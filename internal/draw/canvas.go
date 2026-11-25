@@ -92,9 +92,17 @@ func (c *Canvas) String() string {
 				writeSGR(&b, cl)
 				prev = cl
 			}
-			if cl.Link != link {
-				writeLink(&b, cl.Link)
-				link = cl.Link
+			if x == 0 || cl.Link != row[x-1].Link {
+				next := cl.Link
+				if !next.IsZero() {
+					if _, whole := linkRun(row, x); !whole {
+						next = weburl.URL{}
+					}
+				}
+				if next != link {
+					writeLink(&b, next)
+					link = next
+				}
 			}
 			cl.write(&b)
 		}

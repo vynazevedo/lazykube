@@ -59,6 +59,7 @@ func (m Model) Render() *draw.Canvas {
 		}
 		ui.HelpOverlay(screen, full, ctx)
 	}
+	c.SealLinks()
 	return c
 }
 

@@ -357,6 +357,7 @@ func (r Root) Render() *draw.Canvas {
 	if r.pick != nil {
 		ui.Picker(c.Region(), r.pick.state(), r.uiCtx())
 	}
+	c.SealLinks()
 	return c
 }
 
