@@ -101,11 +101,11 @@ func plural(n int, one, many string) string {
 
 func addressRows(a netpath.Address, selected bool) []DescribeRow {
 	rows := []DescribeRow{{Kind: RowAddress, Health: stateHealth(a.State), Label: a.Origin.String(), Value: a.Display, Selected: selected, Link: a.URL}}
-	parts := []string{a.State.String(), a.Reach.String(), a.Source}
+	parts := []string{a.State.String(), a.Source}
 	if a.Scheme != "" {
 		parts = append(parts, a.Scheme)
 	}
-	rows = append(rows, detailRow("estado", strings.Join(parts, " · ")))
+	rows = append(rows, detailRow("estado", strings.Join(parts, " · ")), detailRow("alcance", a.Reach.String()))
 	if a.Reason != "" {
 		rows = append(rows, detailRow("motivo", a.Reason))
 	}
@@ -282,7 +282,7 @@ func serviceFields(add func(string, string), s data.ServiceFacts) {
 	add("Externo", serviceExternal(s))
 	selector := s.Selector.String()
 	if selector == "" {
-		selector = "sem selector; endpoints geridos à parte"
+		selector = "sem selector"
 	}
 	add("Selector", selector)
 	for _, p := range s.Ports {

@@ -332,7 +332,7 @@ func (m Model) yankAddress() (yank, string, bool) {
 	}
 	label := a.URL.String()
 	if !a.URL.Linkable() {
-		label += " (só dentro do cluster)"
+		label += " (endereço interno do cluster)"
 	}
 	return yank{label: label, text: a.URL.String()}, "", true
 }

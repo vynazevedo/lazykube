@@ -70,7 +70,7 @@ func classStep(g Graph, ing *data.IngressFacts) Step {
 			return step(StatusOK, ing.Class)
 		}
 		if g.Classes.State == SetKnown {
-			return step(StatusBroken, "a IngressClass "+ing.Class+" não existe")
+			return step(StatusBroken, "a IngressClass "+ing.Class+" não existe na lista lida")
 		}
 		return step(StatusUnknown, g.Classes.gap("IngressClasses"))
 	}
@@ -124,7 +124,7 @@ func tlsStep(ing *data.IngressFacts, host string) Step {
 	case !ok:
 		return Step{StepTLS, StatusOK, "sem TLS declarado para este host"}
 	case t.Secret == "":
-		return Step{StepTLS, StatusAttention, "TLS sem secretName; o certificado depende do controlador"}
+		return Step{StepTLS, StatusAttention, "TLS sem secretName; certificado não identificado"}
 	}
 	return Step{StepTLS, StatusOK, "secretName " + t.Secret + " (conteúdo não lido)"}
 }
@@ -165,7 +165,7 @@ func checkIngressBackend(g Graph, namespace string, backend data.IngressBackend)
 		return out
 	}
 	if svc.Type == "ExternalName" {
-		text := "Service ExternalName aponta para fora do cluster"
+		text := "Service ExternalName: alias DNS, destino não verificado"
 		out.add(StepPort, StatusUnknown, text)
 		out.settle(StateUnknown, text)
 		return out
@@ -191,7 +191,7 @@ func (b *backendResult) service(g Graph, namespace, name string, found data.Tri)
 		b.add(StepService, StatusOK, namespace+"/"+name)
 		return true
 	case data.TriFalse:
-		text := "o Service " + namespace + "/" + name + " não existe"
+		text := "o Service " + namespace + "/" + name + " não existe na lista lida"
 		b.add(StepService, StatusBroken, text)
 		b.settle(StateNoBackend, text)
 	default:
@@ -206,7 +206,7 @@ func (b *backendResult) serve(g Graph, namespace, name string, svc *data.Service
 	eps := g.endpoints(namespace, name, port)
 	pods := podCount{}
 	if len(svc.Selector) == 0 {
-		b.add(StepPods, StatusOK, "Service sem selector; endpoints geridos à parte")
+		b.add(StepPods, StatusOK, "Service sem selector; nenhum pod a conferir")
 	} else {
 		pods = g.pods(namespace, svc.Selector)
 		b.podStep(pods, svc, g, eps.ready > 0)
@@ -220,11 +220,11 @@ func (b *backendResult) serve(g Graph, namespace, name string, svc *data.Service
 		b.add(StepEndpoints, StatusUnknown, text)
 		b.settle(StateUnknown, text)
 	case eps.slices > 0 && !eps.withPort:
-		text := "nenhum endpoint expõe a porta " + portText(*port)
+		text := "nenhum EndpointSlice lido declara a porta " + portText(*port)
 		b.add(StepEndpoints, StatusBroken, text)
 		b.settle(StateNoBackend, text)
 	case eps.total == 0:
-		text := "o Service não tem endpoints"
+		text := "nenhum endpoint do Service na lista lida"
 		b.add(StepEndpoints, StatusBroken, text)
 		if pods.matched > 0 {
 			b.settle(StatePending, text)
@@ -244,13 +244,13 @@ func (b *backendResult) podStep(pods podCount, svc *data.ServiceFacts, g Graph, 
 	case pods.matched == 0 && !pods.known:
 		b.add(StepPods, StatusUnknown, g.Pods.gap("Pods"))
 	case pods.matched == 0:
-		text := "o selector " + svc.Selector.String() + " não encontra pods"
+		text := "o selector " + svc.Selector.String() + " não encontra pods na lista lida"
 		b.add(StepPods, StatusBroken, text)
 		b.settle(StateNoBackend, text)
 	case pods.ready == 0 && !pods.known:
 		b.add(StepPods, StatusUnknown, g.Pods.gap("Pods"))
 	case pods.ready == 0 && svc.PublishNotReady:
-		b.add(StepPods, StatusAttention, fmt.Sprintf("%d pods, nenhum pronto; o Service publica mesmo assim", pods.matched))
+		b.add(StepPods, StatusAttention, fmt.Sprintf("%d pods, nenhum pronto; o Service declara publishNotReadyAddresses", pods.matched))
 	case pods.ready == 0:
 		text := fmt.Sprintf("%d pods selecionados, nenhum pronto", pods.matched)
 		b.add(StepPods, StatusBroken, text)
@@ -278,7 +278,7 @@ func serviceRoute(g Graph, namespace, name string) (Route, backendResult) {
 	svc, found := g.service(namespace, name)
 	if b.service(g, namespace, name, found) {
 		if svc.Type == "ExternalName" {
-			text := "ExternalName aponta para fora do cluster; não há endpoints a conferir"
+			text := "ExternalName sem endpoints a conferir: alias DNS, destino não verificado"
 			b.add(StepEndpoints, StatusUnknown, text)
 			b.settle(StateUnknown, text)
 		} else {
@@ -302,7 +302,7 @@ func ingressRoute(g Graph, namespace, name string, ing *data.IngressFacts, host,
 	b := checkIngressBackend(g, namespace, backend)
 	route.Steps = append(route.Steps, b.steps...)
 	if len(ing.Addresses) == 0 {
-		route.Steps = append(route.Steps, Step{StepAddress, StatusAttention, "o controlador não publicou endereço no Ingress"})
+		route.Steps = append(route.Steps, Step{StepAddress, StatusAttention, "nenhum endereço publicado em status do Ingress"})
 	} else {
 		route.Steps = append(route.Steps, Step{StepAddress, StatusOK, "endereço publicado no Ingress"})
 	}

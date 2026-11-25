@@ -329,9 +329,11 @@ NetworkPolicies (e HTTPRoutes, só quando o cluster serve a Gateway API) têm
 colunas próprias, filtro com `/` e detalhe com `enter`. O detalhe de Service,
 Ingress, workload (`u` no overlay de Deployments) e a aba Describe do pod trazem
 a seção Acesso: cada endereço diz de onde veio (Ingress, LoadBalancer,
-ExternalIP, NodePort ou ClusterIP), o alcance (externa declarada, rede privada
-ou só dentro do cluster) e se está pronta, pendente, sem backend ou
-desconhecida. A seção Rota percorre Ingress, Service, EndpointSlice e Pod e
+ExternalIP, NodePort ou ClusterIP), o alcance pelo que foi declarado, nunca
+verificado (declarada, provável rede privada, porta alocada no node ou endereço
+interno do cluster) e se os endpoints lidos a deixam pronta, pendente, sem
+backend ou desconhecida. ExternalName aparece como alias DNS, com destino não
+verificado. A seção Rota percorre Ingress, Service, EndpointSlice e Pod e
 aponta o primeiro elo quebrado com a evidência. Tudo vem só de objetos da API do
 Kubernetes: o lazykube não faz requisição HTTP, DNS ou TLS ao endereço, não lê
 Secrets e não afirma que a aplicação responde. Host vazio ou curinga não vira

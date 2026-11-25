@@ -17,9 +17,11 @@
  │ │                                                                                                                                                        │ │ 
  │ │ Acesso  2 endereços · estado pelos endpoints lidos; nenhuma requisição foi feita                                                                       │ │ 
  │ │ ● Ingress      https://live.example.com                                                                                                            ◂ y │ │ 
- │ │           estado    pronta · rede privada · Ingress bilibili-raffle/live · TLS declarado                                                               │ │ 
+ │ │           estado    pronta · Ingress bilibili-raffle/live · TLS declarado                                                                              │ │ 
+ │ │           alcance   provável rede privada, alcance não verificado                                                                                      │ │ 
  │ │ ● ClusterIP    http://10.43.10.11                                                                                                                      │ │ 
- │ │           estado    pronta · só dentro do cluster · Service bilibili-raffle/bilibili-live · nome da porta                                              │ │ 
+ │ │           estado    pronta · Service bilibili-raffle/bilibili-live · nome da porta                                                                     │ │ 
+ │ │           alcance   endereço interno do cluster                                                                                                        │ │ 
  │ │           ↳ u próxima URL · y copia a selecionada                                                                                                      │ │ 
  │ │                                                                                                                                                        │ │ 
  │ │ Rota  primeiro elo quebrado pelos objetos lidos                                                                                                        │ │ 
@@ -40,8 +42,6 @@
  │ │                                                                                                                                                        │ │ 
  │ │ NetworkPolicies  o efeito real depende do CNI e não foi avaliado                                                                                       │ │ 
  │ │           selecionamdefault-deny                                                                                                                       │ │ 
- │ │                                                                                                                                                        │ │ 
- │ │ Name              bilibili-live-7f6b8d9c5-mn4tz                                                                                                        │ │ 
  │ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │ 
  ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────

@@ -12,18 +12,18 @@
  │                                                                                                                                                            │ 
  │ Acesso  1 endereço · estado pelos endpoints lidos; nenhuma requisição foi feita                                                                            │ 
  │ ✗ Ingress      http://erp.example.com/erp                                                                                                              ◂ y │ 
- │           estado    sem backend · rede privada · Ingress ys-odoo/erp · sem TLS declarado                                                                   │ 
- │           motivo    o Service ys-odoo/erp não existe                                                                                                       │ 
+ │           estado    sem backend · Ingress ys-odoo/erp · sem TLS declarado                                                                                  │ 
+ │           alcance   provável rede privada, alcance não verificado                                                                                          │ 
+ │           motivo    o Service ys-odoo/erp não existe na lista lida                                                                                         │ 
  │           ↳ u próxima URL · y copia a selecionada                                                                                                          │ 
  │                                                                                                                                                            │ 
  │ Rota  primeiro elo quebrado pelos objetos lidos                                                                                                            │ 
  │ ✗ Ingress ys-odoo/erp erp.example.com/erp para erp:http                                                                                                    │ 
- │           ↳ primeiro elo quebrado: Service, o Service ys-odoo/erp não existe                                                                               │ 
+ │           ↳ primeiro elo quebrado: Service, o Service ys-odoo/erp não existe na lista lida                                                                 │ 
  │ ● IngressClass traefik                                                                                                                                     │ 
  │ ● TLS          sem TLS declarado para este host                                                                                                            │ 
- │ ✗ Service      o Service ys-odoo/erp não existe                                                                                                            │ 
+ │ ✗ Service      o Service ys-odoo/erp não existe na lista lida                                                                                              │ 
  │ ● Endereço     endereço publicado no Ingress                                                                                                               │ 
- │                                                                                                                                                            │ 
  │                                                                                                                                                            │ 
  │                                                                                                                                                            │ 
  │                                                                                                                                                            │ 

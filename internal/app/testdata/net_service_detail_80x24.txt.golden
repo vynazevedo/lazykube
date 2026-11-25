@@ -14,11 +14,11 @@
  │                                                                            │ 
  │ Acesso  3 endereços · estado pelos endpoints lidos; nenhuma requisição fo… │ 
  │ ● Ingress      http://lgo.example.com                                  ◂ y │ 
- │           estado    pronta · rede privada · Ingress lgo/lgo · sem TLS dec… │ 
+ │           estado    pronta · Ingress lgo/lgo · sem TLS declarado           │ 
+ │           alcance   provável rede privada, alcance não verificado          │ 
  │ ● NodePort     http://192.168.0.12:30080                                   │ 
- │           estado    pronta · rede privada · Service lgo/lgo, node demo-no… │ 
- │ ● ClusterIP    http://10.43.20.5                                           │ 
- │           estado    pronta · só dentro do cluster · Service lgo/lgo · nom… │ 
+ │           estado    pronta · Service lgo/lgo, node demo-node-01 · nome da… │ 
+ │           alcance   porta alocada no node, alcance não verificado          │ 
  ╰────────────────────────────────────────────────────────────────────────────╯ 
 ────────────────────────────────────────────────────────────────────────────────
   ↑↓  scroll   u  next URL   y  copy   r  reload   esc  back  bubbletea · 0 fps 

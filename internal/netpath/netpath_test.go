@@ -108,15 +108,15 @@ func TestRouteFindsTheFirstBrokenLink(t *testing.T) {
 			p.Network.Pod.Terminating = true
 			g.Pods, g.Slices = known(p), known(webSlice(1, 0))
 		}, StepPods, StatusBroken, "nenhum pronto", StatePending},
-		{"pods denied and no endpoints", func(g *Graph) { g.Pods, g.Slices = Set{State: SetDenied}, known() }, StepEndpoints, StatusBroken, "o Service não tem endpoints", StateNoBackend},
+		{"pods denied and no endpoints", func(g *Graph) { g.Pods, g.Slices = Set{State: SetDenied}, known() }, StepEndpoints, StatusBroken, "nenhum endpoint do Service na lista lida", StateNoBackend},
 		{"pods denied and healthy endpoints", func(g *Graph) { g.Pods = Set{State: SetDenied} }, StepPods, StatusUnknown, "sem permissão para ler Pods", StateReady},
-		{"no endpoints", func(g *Graph) { g.Slices = known() }, StepEndpoints, StatusBroken, "o Service não tem endpoints", StatePending},
+		{"no endpoints", func(g *Graph) { g.Slices = known() }, StepEndpoints, StatusBroken, "nenhum endpoint do Service na lista lida", StatePending},
 		{"endpoints not ready", func(g *Graph) { g.Slices = known(webSlice(2, 0)) }, StepEndpoints, StatusBroken, "2 endpoints, nenhum pronto", StatePending},
 		{"port without endpoints", func(g *Graph) {
 			s := webSlice(2, 2)
 			s.Network.Slice.Ports[0].Name = "grpc"
 			g.Slices = known(s)
-		}, StepEndpoints, StatusBroken, "nenhum endpoint expõe a porta http 80/TCP", StateNoBackend},
+		}, StepEndpoints, StatusBroken, "nenhum EndpointSlice lido declara a porta http 80/TCP", StateNoBackend},
 		{"slices denied", func(g *Graph) { g.Slices = Set{State: SetDenied} }, StepEndpoints, StatusUnknown, "sem permissão para ler EndpointSlices", StateUnknown},
 		{"unreadable slice blocks negative claims", func(g *Graph) {
 			g.Slices = known(data.ResourceRow{Ref: data.ResourceMetadataRef{Namespace: "apps", Name: "x"}, Network: &data.NetworkFacts{Truncated: true}})
@@ -125,9 +125,9 @@ func TestRouteFindsTheFirstBrokenLink(t *testing.T) {
 			s := webSlice(2, 2)
 			s.Network.Slice.Service = "other"
 			g.Slices = known(s)
-		}, StepEndpoints, StatusBroken, "o Service não tem endpoints", StatePending},
+		}, StepEndpoints, StatusBroken, "nenhum endpoint do Service na lista lida", StatePending},
 		{"stale pods with ready endpoints", func(g *Graph) { g.Pods = known() }, StepPods, StatusAttention, "mas há endpoints prontos", StateReady},
-		{"address not published", func(g *Graph) { g.Ingresses = known(webIngress(func(i *data.IngressFacts) { i.Addresses = nil })) }, StepAddress, StatusAttention, "não publicou endereço", StatePending},
+		{"address not published", func(g *Graph) { g.Ingresses = known(webIngress(func(i *data.IngressFacts) { i.Addresses = nil })) }, StepAddress, StatusAttention, "nenhum endereço publicado em status do Ingress", StatePending},
 		{"resource backend", func(g *Graph) {
 			g.Ingresses = known(webIngress(func(i *data.IngressFacts) {
 				i.Rules[0].Paths[0].Backend = data.IngressBackend{Resource: "Bucket/static"}
@@ -265,31 +265,31 @@ func TestServiceAddresses(t *testing.T) {
 		nodes  Set
 		want   []string
 	}{
-		{"cluster ip", nil, known(), []string{"ClusterIP|http://10.1.0.1|só dentro do cluster|pronta"}},
-		{"headless", func(s *data.ServiceFacts) { s.ClusterIPs = []string{"None"} }, known(), []string{"ClusterIP|web.apps.svc headless http 80/TCP|só dentro do cluster|pronta"}},
+		{"cluster ip", nil, known(), []string{"ClusterIP|http://10.1.0.1|endereço interno do cluster|pronta"}},
+		{"headless", func(s *data.ServiceFacts) { s.ClusterIPs = []string{"None"} }, known(), []string{"ClusterIP|web.apps.svc headless http 80/TCP|endereço interno do cluster|pronta"}},
 		{"load balancer hostname", func(s *data.ServiceFacts) {
 			s.Type = "LoadBalancer"
 			s.LoadBalancer = []data.LoadBalancerAddress{{Hostname: "lb.example.com"}}
-		}, known(), []string{"LoadBalancer|http://lb.example.com|externa declarada|pronta", "ClusterIP|http://10.1.0.1|só dentro do cluster|pronta"}},
+		}, known(), []string{"LoadBalancer|http://lb.example.com|declarada, alcance não verificado|pronta", "ClusterIP|http://10.1.0.1|endereço interno do cluster|pronta"}},
 		{"load balancer private ip", func(s *data.ServiceFacts) {
 			s.Type = "LoadBalancer"
 			s.LoadBalancer = []data.LoadBalancerAddress{{IP: "192.168.1.5"}}
-		}, known(), []string{"LoadBalancer|http://192.168.1.5|rede privada|pronta", "ClusterIP|http://10.1.0.1|só dentro do cluster|pronta"}},
+		}, known(), []string{"LoadBalancer|http://192.168.1.5|provável rede privada, alcance não verificado|pronta", "ClusterIP|http://10.1.0.1|endereço interno do cluster|pronta"}},
 		{"load balancer localhost", func(s *data.ServiceFacts) {
 			s.Type = "LoadBalancer"
 			s.LoadBalancer = []data.LoadBalancerAddress{{Hostname: "localhost"}}
-		}, known(), []string{"LoadBalancer|localhost 80/TCP|alcance desconhecido|pronta", "ClusterIP|http://10.1.0.1|só dentro do cluster|pronta"}},
-		{"load balancer pending", func(s *data.ServiceFacts) { s.Type = "LoadBalancer" }, known(), []string{"LoadBalancer|(sem endereço) http 80/TCP|alcance desconhecido|pendente", "ClusterIP|http://10.1.0.1|só dentro do cluster|pronta"}},
+		}, known(), []string{"LoadBalancer|localhost 80/TCP|alcance desconhecido|pronta", "ClusterIP|http://10.1.0.1|endereço interno do cluster|pronta"}},
+		{"load balancer pending", func(s *data.ServiceFacts) { s.Type = "LoadBalancer" }, known(), []string{"LoadBalancer|(sem endereço) http 80/TCP|alcance desconhecido|pendente", "ClusterIP|http://10.1.0.1|endereço interno do cluster|pronta"}},
 		{"node port", func(s *data.ServiceFacts) { s.Type = "NodePort"; s.Ports[0].NodePort = 30080 },
 			known(node("n1", data.TriTrue, "10.0.0.1", "203.0.113.1"), node("n2", data.TriTrue, "10.0.0.2", ""), node("n3", data.TriFalse, "10.0.0.3", ""), node("n4", data.TriTrue, "10.0.0.4", "")),
-			[]string{"NodePort|http://203.0.113.1:30080|externa declarada|pronta", "NodePort|http://10.0.0.2:30080|rede privada|pronta", "ClusterIP|http://10.1.0.1|só dentro do cluster|pronta"}},
+			[]string{"NodePort|http://203.0.113.1:30080|porta alocada no node, alcance não verificado|pronta", "NodePort|http://10.0.0.2:30080|porta alocada no node, alcance não verificado|pronta", "ClusterIP|http://10.1.0.1|endereço interno do cluster|pronta"}},
 		{"node port without nodes", func(s *data.ServiceFacts) { s.Type = "NodePort"; s.Ports[0].NodePort = 30080 }, Set{State: SetDenied},
-			[]string{"NodePort|(qualquer node):30080|alcance desconhecido|pronta", "ClusterIP|http://10.1.0.1|só dentro do cluster|pronta"}},
-		{"external ip", func(s *data.ServiceFacts) { s.ExternalIPs = []string{"203.0.113.4"} }, known(), []string{"ExternalIP|http://203.0.113.4|externa declarada|pronta", "ClusterIP|http://10.1.0.1|só dentro do cluster|pronta"}},
+			[]string{"NodePort|(node não identificado):30080|porta alocada no node, alcance não verificado|pronta", "ClusterIP|http://10.1.0.1|endereço interno do cluster|pronta"}},
+		{"external ip", func(s *data.ServiceFacts) { s.ExternalIPs = []string{"203.0.113.4"} }, known(), []string{"ExternalIP|http://203.0.113.4|declarada, alcance não verificado|pronta", "ClusterIP|http://10.1.0.1|endereço interno do cluster|pronta"}},
 		{"unknown scheme", func(s *data.ServiceFacts) {
 			s.Ports[0] = data.ServicePort{Name: "http", Port: 5432, Protocol: "TCP", AppProtocol: "postgresql"}
-		}, known(), []string{"ClusterIP|10.1.0.1 5432/TCP|só dentro do cluster|pronta"}},
-		{"udp", func(s *data.ServiceFacts) { s.Ports[0].Protocol = "UDP" }, known(), []string{"ClusterIP|10.1.0.1 80/UDP|só dentro do cluster|pronta"}},
+		}, known(), []string{"ClusterIP|10.1.0.1 5432/TCP|endereço interno do cluster|pronta"}},
+		{"udp", func(s *data.ServiceFacts) { s.Ports[0].Protocol = "UDP" }, known(), []string{"ClusterIP|10.1.0.1 80/UDP|endereço interno do cluster|pronta"}},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			g := healthy()
@@ -344,12 +344,12 @@ func TestPodAndWorkloadAccess(t *testing.T) {
 		t.Fatalf("%+v", w)
 	}
 	other := Access(g, Target{Kind: TargetWorkload, Namespace: "apps", Name: "x", Labels: data.Labels{{Key: "app", Value: "x"}}, LabelsKnown: true})
-	if len(other.Addresses) != 0 || !slices.Contains(other.Notes, "nenhum Service seleciona este alvo") {
+	if len(other.Addresses) != 0 || !slices.Contains(other.Notes, "nenhum Service da lista lida seleciona este alvo") {
 		t.Fatalf("%+v", other)
 	}
 	g.Services = Set{State: SetDenied}
 	denied := Access(g, podTarget)
-	if slices.Contains(denied.Notes, "nenhum Service seleciona este alvo") || !slices.Contains(denied.Notes, "sem permissão para ler Services") {
+	if slices.Contains(denied.Notes, "nenhum Service da lista lida seleciona este alvo") || !slices.Contains(denied.Notes, "sem permissão para ler Services") {
 		t.Fatalf("denied is not empty: %v", denied.Notes)
 	}
 	g = healthy()
@@ -381,7 +381,7 @@ func TestServiceRouteReportsPendingLoadBalancer(t *testing.T) {
 	}
 	g.Services = known(webService(func(s *data.ServiceFacts) { s.Type, s.ExternalName = "ExternalName", "db.example.com" }))
 	r = Access(g, serviceTarget)
-	if len(r.Addresses) != 0 || !strings.Contains(strings.Join(r.Notes, " "), "ExternalName para db.example.com") {
+	if len(r.Addresses) != 0 || !strings.Contains(strings.Join(r.Notes, " "), "declara ExternalName db.example.com: alias DNS, destino não verificado") {
 		t.Fatalf("%+v", r)
 	}
 	g.Services = known()
@@ -462,5 +462,82 @@ func TestReportsAreBounded(t *testing.T) {
 	r := Access(g, ingressTarget)
 	if len(r.Addresses) != maxAddresses || len(r.Routes) != maxRoutes || !r.Truncated {
 		t.Fatalf("%d %d %v", len(r.Addresses), len(r.Routes), r.Truncated)
+	}
+}
+
+func TestNodePortNeverClaimsAnOpenPort(t *testing.T) {
+	g := healthy()
+	g.Ingresses = known()
+	g.Services = known(webService(func(s *data.ServiceFacts) { s.Type = "NodePort"; s.Ports[0].NodePort = 30080 }))
+	for _, name := range []string{"a", "b", "c"} {
+		g.Nodes.Rows = append(g.Nodes.Rows, row("", name, data.NetworkFacts{Node: &data.NodeFacts{Ready: data.TriTrue, External: []string{"203.0.113.10"}}}))
+	}
+	r := Access(g, serviceTarget)
+	if !slices.Contains(r.Notes, "NodePort 30080, outros nodes não listados: 1; porta alocada no node, alcance não verificado") {
+		t.Fatalf("%q", r.Notes)
+	}
+	for _, a := range r.Addresses {
+		if a.Origin == OriginNodePort && a.Reach != ReachNodePort {
+			t.Fatalf("%+v", a)
+		}
+	}
+}
+
+func TestInternalExternalNameIsOnlyAnAlias(t *testing.T) {
+	for _, name := range []string{"db.apps.svc.cluster.local", "db.example.com"} {
+		g := healthy()
+		g.Services = known(webService(func(s *data.ServiceFacts) { s.Type, s.ExternalName = "ExternalName", name }))
+		for _, target := range []Target{serviceTarget, ingressTarget} {
+			r := Access(g, target)
+			text := fmt.Sprintf("%+v", r)
+			if !strings.Contains(text, "alias DNS, destino não verificado") {
+				t.Fatalf("%s: %s", name, text)
+			}
+		}
+	}
+}
+
+func TestReportsNeverClaimWhatWasNotRead(t *testing.T) {
+	banned := []string{"abert", "acessível", "alcançável", "responde", "fora do cluster", "só dentro do cluster", "expost", "expõe", "funciona", "bloquei", "libera", "permitid", "externa declarada"}
+	services := []func(*data.ServiceFacts){
+		nil,
+		func(s *data.ServiceFacts) { s.Type = "NodePort"; s.Ports[0].NodePort = 30080 },
+		func(s *data.ServiceFacts) { s.Type = "LoadBalancer" },
+		func(s *data.ServiceFacts) {
+			s.Type = "LoadBalancer"
+			s.LoadBalancer = []data.LoadBalancerAddress{{IP: "203.0.113.4"}, {IP: "10.0.0.4"}, {Hostname: "lb.example.com"}}
+		},
+		func(s *data.ServiceFacts) { s.Type, s.ExternalName = "ExternalName", "db.apps.svc.cluster.local" },
+		func(s *data.ServiceFacts) { s.ExternalIPs = []string{"203.0.113.9"} },
+		func(s *data.ServiceFacts) { s.ClusterIPs = []string{"None"} },
+		func(s *data.ServiceFacts) { s.Selector = nil },
+		func(s *data.ServiceFacts) { s.PublishNotReady = true },
+	}
+	slicesSets := []Set{known(webSlice(2, 2)), known(webSlice(2, 0)), known(), {State: SetDenied}, {State: SetAbsent}, {}}
+	podSets := []Set{known(webPod("web-1", data.TriTrue)), known(webPod("web-1", data.TriFalse)), known(), {State: SetDenied}}
+	nodes := known()
+	for _, name := range []string{"a", "b", "c"} {
+		nodes.Rows = append(nodes.Rows, row("", name, data.NetworkFacts{Node: &data.NodeFacts{Ready: data.TriTrue, Internal: []string{"10.0.0.1"}}}))
+	}
+	for _, service := range services {
+		for _, eps := range slicesSets {
+			for _, pods := range podSets {
+				g := healthy()
+				g.Services, g.Slices, g.Pods, g.Nodes = known(webService(service)), eps, pods, nodes
+				g.Policies = known(row("apps", "deny", data.NetworkFacts{Policy: &data.NetworkPolicyFacts{}}))
+				for _, target := range []Target{serviceTarget, ingressTarget, podTarget} {
+					r := Access(g, target)
+					text := strings.ToLower(fmt.Sprintf("%+v", r))
+					for _, route := range r.Routes {
+						text += strings.ToLower(route.Verdict())
+					}
+					for _, word := range banned {
+						if strings.Contains(text, word) {
+							t.Fatalf("report claims %q: %s", word, text)
+						}
+					}
+				}
+			}
+		}
 	}
 }

@@ -391,11 +391,11 @@ func TestClusterAddressesCopyButNeverLink(t *testing.T) {
 	b := newNetBrowser(nil, hostPages("web.example.com"))
 	b.pages[ingressGVR] = netPage()
 	m := pressDrive(t, openLeaf(t, nodeModel(t, b, 160, 48), DestServices), "enter")
-	if strings.Contains(m.Render().String(), "\x1b]8") || !strings.Contains(m.Render().Plain(), "só dentro do cluster") {
+	if strings.Contains(m.Render().String(), "\x1b]8") || !strings.Contains(m.Render().Plain(), "endereço interno do cluster") {
 		t.Fatal("a ClusterIP is labeled and never clickable")
 	}
 	got, msgs := pressYank(t, m)
-	if text, _ := clipboardOf(msgs); text != "http://10.1.0.1" || !strings.Contains(got.notice.text, "só dentro do cluster") {
+	if text, _ := clipboardOf(msgs); text != "http://10.1.0.1" || !strings.Contains(got.notice.text, "endereço interno do cluster") {
 		t.Fatalf("%q %q", text, got.notice.text)
 	}
 }
@@ -490,7 +490,7 @@ func TestAccessKeepsDeniedUnknownAbsentAndEmptyApart(t *testing.T) {
 		{"denied list", nil, &data.ResourcePage{Coverage: data.Coverage{State: data.CoverageDenied}}, "sem permissão para ler Services", "nenhum Service"},
 		{"partial", nil, &data.ResourcePage{Coverage: data.Coverage{State: data.CoveragePartial}}, "leitura incompleta", "nenhum Service"},
 		{"truncated", nil, &data.ResourcePage{Coverage: data.Coverage{State: data.CoverageComplete}, Truncated: true}, "leitura incompleta", "nenhum Service"},
-		{"empty", nil, &data.ResourcePage{Coverage: data.Coverage{State: data.CoverageComplete}}, "nenhum Service seleciona este alvo", "sem permissão"},
+		{"empty", nil, &data.ResourcePage{Coverage: data.Coverage{State: data.CoverageComplete}}, "nenhum Service da lista lida seleciona este alvo", "sem permissão"},
 		{"list only", nil, &data.ResourcePage{Coverage: data.Coverage{State: data.CoverageListOnly}}, "leitura pontual", "sem permissão"},
 	} {
 		pages := hostPages("web.example.com")

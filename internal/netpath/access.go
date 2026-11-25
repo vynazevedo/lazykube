@@ -51,10 +51,11 @@ const (
 	ReachPrivate
 	ReachCluster
 	ReachUnknown
+	ReachNodePort
 )
 
 func (r Reach) String() string {
-	return [...]string{"externa declarada", "rede privada", "só dentro do cluster", "alcance desconhecido"}[r]
+	return [...]string{"declarada, alcance não verificado", "provável rede privada, alcance não verificado", "endereço interno do cluster", "alcance desconhecido", "porta alocada no node, alcance não verificado"}[r]
 }
 
 type Address struct {
@@ -193,7 +194,7 @@ func (b *builder) workloadTarget(t Target) {
 		}
 	}
 	if len(names) == 0 && b.g.Services.authoritative() {
-		b.note("nenhum Service seleciona este alvo")
+		b.note("nenhum Service da lista lida seleciona este alvo")
 	}
 	b.ingressesFor(t.Namespace, names)
 	b.gaps()
@@ -262,7 +263,7 @@ func ingressAddress(row data.ResourceRow, ing *data.IngressFacts, host, path str
 		a.Reach = ReachPrivate
 	}
 	if a.State == StateReady && len(ing.Addresses) == 0 {
-		a.State, a.Reason = StatePending, "o controlador não publicou endereço no Ingress"
+		a.State, a.Reason = StatePending, "nenhum endereço publicado em status do Ingress"
 	}
 	return a
 }
@@ -331,7 +332,7 @@ func (b *builder) service(namespace, name string, svc *data.ServiceFacts) {
 	b.route(route)
 	src := "Service " + namespace + "/" + name
 	if svc.Type == "ExternalName" {
-		b.note(src + " é ExternalName para " + svc.ExternalName + ", fora do cluster e não verificado")
+		b.note(src + " declara ExternalName " + svc.ExternalName + ": alias DNS, destino não verificado")
 		return
 	}
 	for i, p := range svc.Ports {
@@ -382,6 +383,9 @@ func (b *builder) port(a Address, host string, port int, p data.ServicePort) {
 			a.Display = fmt.Sprintf("%s %d/TCP", host, port)
 		}
 	}
+	if a.Origin == OriginNodePort {
+		a.Reach = ReachNodePort
+	}
 	if cluster {
 		a.Reach, a.URL = ReachCluster, a.URL.WithinCluster()
 	}
@@ -421,12 +425,12 @@ func (b *builder) nodePort(base Address, p data.ServicePort) {
 		b.port(a, ips[0], p.NodePort, p)
 	}
 	if total > shown {
-		b.note(fmt.Sprintf("NodePort %d também aberto em mais %d nodes", p.NodePort, total-shown))
+		b.note(fmt.Sprintf("NodePort %d, outros nodes não listados: %d; porta alocada no node, alcance não verificado", p.NodePort, total-shown))
 	}
 	if total == 0 {
 		a := base
-		a.Display, a.Reach = fmt.Sprintf("(qualquer node):%d", p.NodePort), ReachUnknown
-		a.Refused = cmp.Or(b.g.Nodes.gap("Nodes"), "nenhum node pronto com IP conhecido")
+		a.Display, a.Reach = fmt.Sprintf("(node não identificado):%d", p.NodePort), ReachNodePort
+		a.Refused = cmp.Or(b.g.Nodes.gap("Nodes"), "nenhum node pronto com IP na lista lida")
 		b.address(a)
 	}
 }

@@ -14,11 +14,14 @@
  │                                                                                                                                                            │ 
  │ Acesso  3 endereços · estado pelos endpoints lidos; nenhuma requisição foi feita                                                                           │ 
  │ ● Ingress      http://lgo.example.com                                                                                                                  ◂ y │ 
- │           estado    pronta · rede privada · Ingress lgo/lgo · sem TLS declarado                                                                            │ 
+ │           estado    pronta · Ingress lgo/lgo · sem TLS declarado                                                                                           │ 
+ │           alcance   provável rede privada, alcance não verificado                                                                                          │ 
  │ ● NodePort     http://192.168.0.12:30080                                                                                                                   │ 
- │           estado    pronta · rede privada · Service lgo/lgo, node demo-node-01 · nome da porta                                                             │ 
+ │           estado    pronta · Service lgo/lgo, node demo-node-01 · nome da porta                                                                            │ 
+ │           alcance   porta alocada no node, alcance não verificado                                                                                          │ 
  │ ● ClusterIP    http://10.43.20.5                                                                                                                           │ 
- │           estado    pronta · só dentro do cluster · Service lgo/lgo · nome da porta                                                                        │ 
+ │           estado    pronta · Service lgo/lgo · nome da porta                                                                                               │ 
+ │           alcance   endereço interno do cluster                                                                                                            │ 
  │           ↳ u próxima URL · y copia a selecionada                                                                                                          │ 
  │                                                                                                                                                            │ 
  │ Rota  primeiro elo quebrado pelos objetos lidos                                                                                                            │ 
@@ -36,9 +39,6 @@
  │ ● Pods         1 de 1 prontos                                                                                                                              │ 
  │ ● Endpoints    1 de 1 prontos                                                                                                                              │ 
  │ ● Endereço     endereço publicado no Ingress                                                                                                               │ 
- │                                                                                                                                                            │ 
- │                                                                                                                                                            │ 
- │                                                                                                                                                            │ 
  │                                                                                                                                                            │ 
  │                                                                                                                                                            │ 
  │                                                                                                                                                            │ 

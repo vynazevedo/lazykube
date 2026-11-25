@@ -17,7 +17,7 @@
  │ │                                                                        │ │ 
  │ │ Acesso  2 endereços · estado pelos endpoints lidos; nenhuma requisiçã… │ │ 
  │ │ ● Ingress      https://live.example.com                            ◂ y │ │ 
- │ │           estado    pronta · rede privada · Ingress bilibili-raffle/l… │ │ 
+ │ │           estado    pronta · Ingress bilibili-raffle/live · TLS decla… │ │ 
  │ ╰────────────────────────────────────────────────────────────────────────╯ │ 
  ╰────────────────────────────────────────────────────────────────────────────╯ 
 ────────────────────────────────────────────────────────────────────────────────
