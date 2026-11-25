@@ -324,6 +324,25 @@ fica ao lado do conteúdo; em terminais estreitos ela abre por cima e fecha ao
 escolher um destino. O shell funciona a partir de 80x24: abaixo de 120x36 as
 telas mostram um painel por vez, e `tab` alterna entre eles.
 
+Em Network, as listas de Services, EndpointSlices, Ingresses, IngressClasses e
+NetworkPolicies (e HTTPRoutes, só quando o cluster serve a Gateway API) têm
+colunas próprias, filtro com `/` e detalhe com `enter`. O detalhe de Service,
+Ingress, workload (`u` no overlay de Deployments) e a aba Describe do pod trazem
+a seção Acesso: cada endereço diz de onde veio (Ingress, LoadBalancer,
+ExternalIP, NodePort ou ClusterIP), o alcance (externa declarada, rede privada
+ou só dentro do cluster) e se está pronta, pendente, sem backend ou
+desconhecida. A seção Rota percorre Ingress, Service, EndpointSlice e Pod e
+aponta o primeiro elo quebrado com a evidência. Tudo vem só de objetos da API do
+Kubernetes: o lazykube não faz requisição HTTP, DNS ou TLS ao endereço, não lê
+Secrets e não afirma que a aplicação responde. Host vazio ou curinga não vira
+URL. Para NetworkPolicy, só diz quais políticas selecionam o pod, porque o
+efeito depende do CNI.
+
+`u` escolhe a próxima URL e `y` copia a escolhida. Só vira link clicável (OSC8) a
+URL http ou https com host ASCII validado, sem credencial, controle ou bidi, e
+visível por inteiro na linha; endereços internos do cluster podem ser copiados,
+mas não são links. O lazykube nunca abre navegador nem executa comando externo.
+
 O lazykube só lê o cluster: lista e observa recursos, segue logs e consulta
 métricas. Nenhuma ação de escrita é executada.
 
@@ -379,7 +398,8 @@ os painéis: clique seleciona, a roda rola e o clique na aba troca de aba.
  │                                                       │
  ├─ GERAL ───────────────────────────────────────────────┤
  │                                                       │
- │  y                 copia nome, YAML ou linha do log   │
+ │  y                 copia nome, URL, YAML ou linha log │
+ │  u                 próxima URL na seção Acesso        │
  │  p                 troca a paleta de cores            │
  │  ctrl+p            pausa / retoma animações           │
  │  ?                 ajuda                              │
@@ -413,6 +433,10 @@ e, enquanto a janela enche, o painel mostra `coletando 12/60`.
  events (list/watch)             aba Events                 aviso na aba
  namespaces (list/watch)         painel Namespaces          deriva dos pods
  nodes (list/watch)              painel Node                contagem pelos pods
+ services, ingresses,            Network e Acesso, só       motivo na tela, sem
+ ingressclasses, networkpolicies com a tela aberta          concluir que está vazio
+ endpointslices, httproutes
+ (list/watch)
  metrics.k8s.io pods, nodes      CPU, memória, heatmap      motivo no painel
  nodes/proxy (get)               rede RX/TX                 motivo no card
 ```
