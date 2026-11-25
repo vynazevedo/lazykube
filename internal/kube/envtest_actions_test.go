@@ -13,7 +13,6 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 
@@ -71,7 +70,7 @@ func newActionEnv(t *testing.T) actionEnv {
 	if err != nil {
 		t.Fatal(err)
 	}
-	dc, err := dynamic.NewForConfig(cfg)
+	auth, dc, err := kube.NewActionClients(cfg)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -82,7 +81,7 @@ func newActionEnv(t *testing.T) actionEnv {
 	}
 	audit := &memoryAudit{}
 	session := guard.Session{Context: "envtest", Identity: "session-1", Generation: 1, Environment: guard.Environment{Valid: true}}
-	exec, err := kube.NewActionExecutor(ctx, session, true, client, dc, audit, guard.ClockFunc(time.Now), nil)
+	exec, err := kube.NewActionExecutor(ctx, session, true, auth, dc, audit, guard.ClockFunc(time.Now), nil)
 	if err != nil {
 		t.Fatal(err)
 	}
