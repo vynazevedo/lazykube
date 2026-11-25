@@ -197,6 +197,13 @@ func TestFactBudgetIsReturnedRowByRowAndOnClear(t *testing.T) {
 		for i := range 10 {
 			e.put(hostileRow(i, nil), true)
 		}
+		left := 0
+		for _, row := range e.rows {
+			left += factBytes(row)
+		}
+		if len(e.rows) != 10 || s.resources.factBytes != left || e.factBytes != left {
+			t.Fatalf("%s: rows=%d charged=%d expected=%d", tc.name, len(e.rows), s.resources.factBytes, left)
+		}
 		e.clear(data.CoverageCollecting, "")
 		if s.resources.factBytes != 0 || e.factBytes != 0 || s.resources.rows != 0 {
 			t.Fatalf("%s: leftovers bytes=%d rows=%d", tc.name, s.resources.factBytes, s.resources.rows)
@@ -218,5 +225,14 @@ func TestHostilePolicyStaysReadableAndInsideTheBudget(t *testing.T) {
 	retained := accepted * independentSize(reflect.ValueOf(f))
 	if accepted == 0 || retained > resourceFactBytes || s.resources.factBytes < retained {
 		t.Fatalf("accepted=%d retained=%d charged=%d", accepted, retained, s.resources.factBytes)
+	}
+}
+
+func TestUnusedCapacityIsCharged(t *testing.T) {
+	loose := &data.NetworkFacts{Policy: &data.NetworkPolicyFacts{Types: make([]string, 1, 500)}}
+	tight := &data.NetworkFacts{Policy: &data.NetworkPolicyFacts{Types: make([]string, 1)}}
+	extra := 499 * 16
+	if got := retainedBytes(reflect.ValueOf(loose)) - retainedBytes(reflect.ValueOf(tight)); got < extra {
+		t.Fatalf("capacity of %d bytes charged as %d", extra, got)
 	}
 }
