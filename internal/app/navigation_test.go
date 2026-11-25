@@ -212,7 +212,7 @@ func TestMenuByKeyboard(t *testing.T) {
 	for _, step := range []struct {
 		key    string
 		cursor int
-	}{{"right", 1}, {"right", 2}, {"right", 3}, {"right", 3}, {"left", 2}, {"left", 1}, {"left", 0}, {"left", 0}, {"end", 3}, {"home", 0}, {"j", 0}, {"q", 0}, {"l", 0}, {"/", 0}} {
+	}{{"right", 1}, {"right", 2}, {"right", 3}, {"right", 4}, {"right", 5}, {"right", 5}, {"left", 4}, {"left", 3}, {"left", 2}, {"left", 1}, {"left", 0}, {"left", 0}, {"end", 5}, {"home", 0}, {"j", 0}, {"q", 0}, {"l", 0}, {"/", 0}} {
 		m = press(t, m, step.key)
 		if !m.menu.open || m.menu.cursor != step.cursor || m.selName != sel || m.tab != ui.TabTop || m.filtering {
 			t.Fatalf("menu consumes %q without touching the content, cursor %d", step.key, m.menu.cursor)
@@ -266,7 +266,7 @@ func TestMenuAndCrumbsByMouse(t *testing.T) {
 	m := navNamespace(t, demoModel(t, 160, 48))
 	m = press(t, m, "tab", "tab", "enter")
 	root := m.nav.Frames(0)
-	span := ui.MenuSpans(m.menuItems())[0]
+	span := ui.MenuSpans(m.menuItems(), m.layout.Menu.W)[0]
 	click := func(m Model, x, y int) Model {
 		next, _ := m.Update(tea.MouseClickMsg{X: x, Y: y, Button: tea.MouseLeft})
 		return next.(Model)
@@ -526,7 +526,7 @@ func navCrumbX(m Model, i int) int {
 }
 
 func navMenuX(m Model) int {
-	return m.layout.Menu.X + ui.MenuSpans(m.menuItems())[0].X + 1
+	return m.layout.Menu.X + ui.MenuSpans(m.menuItems(), m.layout.Menu.W)[0].X + 1
 }
 
 func navAssertKeysWork(t *testing.T, m Model) {

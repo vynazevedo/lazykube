@@ -62,6 +62,7 @@ type Source struct {
 	guardSession       guard.Session
 	guardPolicy        guard.Policy
 	actions            *guard.Executor
+	auditPath          string
 	rebuildMu          sync.Mutex
 	observations       *insight.Inventory
 	observationPods    map[string]insight.PodObservation
@@ -691,4 +692,8 @@ func (s *Source) Describe(key string) []data.Field {
 		return nil
 	}
 	return describePod(p, addr)
+}
+
+func (s *Source) AuditPath() string {
+	return s.auditPath
 }

@@ -1,0 +1,40 @@
+ lazykube [DEMO] [RO]  v2.0   ◎ context demo namespace Todos   k8s demo  nodes 1  ns 8  pods 13        ⠙ metrics every 5s ● live  
+  2 Dashboard  |  3 Workloads  |  4 Nodes  | [5 Security] |  6 Events  |  7 Radar                                         m menu  
+ Security                                                                                                                         
+  [+] Cluster           │ ╭─ Postura de segurança ──────────────────────────────────────────────────────────────────────────────╮ 
+  [+] Workloads (3)     │ │ Cluster | Todos: Segurança 55 E | Higiene 97 A                                                      │ 
+  [+] Configuration     │ │ Sem sistema: Segurança 54 E | Higiene 97 A                                                          │ 
+  [+] Network           │ │ High novos 0 | Cobertura 13/13 pods (complete in scope)                                             │ 
+  [+] Storage           │ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+  [+] Access Control    │  [Workloads] [RBAC] [Rede e exposição] [Conformidade PSS]                                               
+  [+] Custom Resources  │  [Achados aceitos] [Audit]                                                                              
+  [+] Helm              │ ╭─ Workloads (13) | Todos ────────────────────────────────────────────────────────────────────────────╮ 
+ ›Security (5)          │ │ WORKLOAD                                                                     PODS  SEG  HIG   H     │ 
+  Radar (7)             │ │ rs bilibili-live-7f6b8d9c5 bilibili-raffle                                          1   20   88   2 │ 
+                        │ │ rs metrics-server-67c658944b kube-system                                            1   20   88   2 │ 
+                        │ │ rs traefik-f4564c4f4 kube-system                                                    1   20  100   2 │ 
+                        │ │ rs lgo-7c5d97584 lgo                                                                1   20  100   2 │ 
+                        │ │ rs lingqu-1605486000 xcx                                                            1   20  100   2 │ 
+                        │ │ rs qiandao-1605400800 xcx                                                           1   20   88   2 │ 
+                        │ │ rs bilibili-raffle-5d8f9c7b4 bilibili-raffle                                        1   75  100   0 │ 
+                        │ │ rs coredns-6799fbcd5 kube-system                                                    1   75  100   0 │ 
+                        │ │ rs svclb-traefik-8c2f1 kube-system                                                  1   75  100   0 │ 
+                        │ │ rs odoo-7575bf6d8 ys-odoo                                                           1   75  100   0 │ 
+                        │ │ rs local-path-provisioner-84db5d kube-system                                        1  100  100   0 │ 
+                        │ │ rs lingqu-1605489600 xcx                                                            1  100  100   0 │ 
+                        │ │ rs psql-6bc7744f9 ys-odoo                                                           1  100  100   0 │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │ Owner: ReplicaSet por UID (ownerReference controller)                                               │ 
+                        │ │ Réplicas observadas, não desejadas                                                                  │ 
+                        │ │ Deployment acima do ReplicaSet ainda não resolvido                                                  │ 
+                        │ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+  enter abre · b fecha  │  Nota não garante segurança. PSS v1.34: verificação local; não é admissão                               
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   ←→  collapse / expand   enter  open   b  close tree   esc  body   ?  help   q  quit                bubbletea · 0 fps 

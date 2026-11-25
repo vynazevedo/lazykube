@@ -1,0 +1,40 @@
+ lazykube [DEMO] [RO]  v2.0   ◎ context demo namespace Todos   k8s demo  nodes 1  ns 8  pods 13        ⠙ metrics every 5s ● live  
+  2 Dashboard  |  3 Workloads  |  4 Nodes  |  5 Security  |  6 Events  | [7 Radar]                                        m menu  
+ Radar                                                                                                                            
+  [+] Cluster           │ ╭─ Radar ─────────────────────────────────────────────────────────────────────────────────────────────╮ 
+  [+] Workloads (3)     │ │ Ativos 4 (High 1 Warn 3) | rec 0 | obs 0 | susp 0 | res 1 | normais 81                              │ 
+  [+] Configuration     │ │ Saúde: indisponível; sinais não são incidentes correlacionados.                                     │ 
+  [+] Network           │ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+  [+] Storage           │ ╭─ Sinais · focus ────────────────────────────────────────────────────────────────────────────────────╮ 
+  [+] Access Control    │ │   EST  SINAL     POD/CONTAINER                                                                DESDE │ 
+  [+] Custom Resources  │ │ > High CrashLoop svclb-traefik-8c2f1-6n2vb/lb-tcp-80                                          20:15 │ 
+  [+] Helm              │ │   Warn Pending   local-path-provisioner-84db5d-h4                                             20:15 │ 
+  Security (5)          │ │   Warn ImagePull local-path-provisioner-84db5d-h4/app                                         20:15 │ 
+ ›Radar (7)             │ │   Warn Pending   lingqu-1605489600-b7xsd                                                      20:15 │ 
+                        │ │   res. OOMKilled odoo-7575bf6d8-9wjvk/app                                                     20:15 │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │                                                                                                     │ 
+                        │ │ 5 sinais · High/Warn ativos, rec. obs. susp res.                                                    │ 
+                        │ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+                        │ ╭─ Cobertura ─────────────────────────────────────────────────────────────────────────────────────────╮ 
+                        │ │ Cobertura: inventário de pods completa 13/13                                                        │ 
+                        │ │ Eventos, owners, nodes e métricas ainda não consumidos. Sem nodes/proxy.                            │ 
+  enter abre · b fecha  │ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   ←→  collapse / expand   enter  open   b  close tree   esc  body   ?  help   q  quit                bubbletea · 0 fps 

@@ -1,0 +1,40 @@
+ lazykube [DEMO] [RO]  v2.0   ◎ context demo namespace Todos   k8s demo  nodes 1  ns 8  pods 13        ⠙ metrics every 5s ● live  
+  2 Dashboard  |  3 Workloads  |  4 Nodes  | [5 Security] |  6 Events  |  7 Radar                                         m menu  
+ Security                                                                                                                         
+ ╭─ Postura de segurança ───────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ │ Cluster | Todos: Segurança 55 E | Higiene 97 A | Sem sistema: Segurança 54 E | Higiene 97 A                                  │ 
+ │ Segurança: mediana 75 | pior decil 20 | A..F A3 B0 C4 D0 E0 F6                                                               │ 
+ │ High novos 0 | Cobertura 13/13 pods (complete in scope) | Nota não garante segurança                                         │ 
+ ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+  [Workloads] [RBAC] [Rede e exposição] [Conformidade PSS]                                                                        
+  [Achados aceitos] [Audit]                                                                                                       
+ ╭─ RBAC ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ │ Concessões RBAC observadas; não são permissões efetivas.                                                                     │ 
+ │ Aguardando projetor do catálogo de recursos; nenhuma leitura foi feita para esta aba.                                        │ 
+ │ Nenhum Role, RoleBinding, ClusterRole ou ClusterRoleBinding foi lido.                                                        │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+  PSS v1.34: verificação local do spec; não é admissão                                                                            
+  RBAC: concessões observadas, não permissão efetiva. Rede: alcance público desconhecido.                                         
+  [DEMO] dados sintéticos                                                                                                         
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   [ ]  tab   tab  panel   H  cohort   esc  back   m  menu   ?  help   q  quit   y  copy              bubbletea · 0 fps 

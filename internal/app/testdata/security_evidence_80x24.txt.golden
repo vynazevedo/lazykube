@@ -1,0 +1,24 @@
+ lazykube [DEMO] [RO]  ◎ context demo namespace Todos   k8s demo      ⠙ ● live  
+  2 Dashboard | 3 Workloads | 4 Nodes |[5 Security]| 6 Events | 7 Radar         
+ Security                                                                       
+ ╭─ Postura de segurança ─────────────────────────────────────────────────────╮ 
+ │ Cluster | Todos: Segurança 55 E | Higiene 97 A                             │ 
+ │ Sem sistema: Segurança 54 E | Higiene 97 A                                 │ 
+ │ High novos 0 | Cobertura 13/13 pods (complete in scope)                    │ 
+ ╰────────────────────────────────────────────────────────────────────────────╯ 
+  [Workloads] [RBAC] [Rede e exposição] [Conformidade PSS]                      
+  [Achados aceitos] [Audit]                                                     
+ ╭─ Evidência e remediação ───────────────────────────────────────────────────╮ 
+ │ bilibili-raffle/ReplicaSet/bilibili-live-7f6b8d9c5                         │ 
+ │ Owner: ReplicaSet por UID (ownerReference controller)                      │ 
+ │ Pods observados: 1 | Segurança 20 F | Higiene 88 B                         │ 
+ │ Cobertura 1/1 pods (complete in scope)                                     │ 
+ │                                                                            │ 
+ │ [high] allowPrivilegeEscalation: Unsafe, container init-permissions        │ 
+ │ spec.initContainers[0].securityContext.allowPrivilegeEscalation            │ 
+ │ Valor observado: forced by privileged | regra versão 5                     │ 
+ │ Origem: demo fixture; spec observado, não runtime | 1/1 pods               │ 
+ ╰────────────────────────────────────────────────────────────────────────────╯ 
+  Nota não garante segurança. PSS v1.34: verificação local; não é admissão      
+────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   [ ]  tab   tab  panel   H  cohort   esc  back    bubbletea · 0 fps 

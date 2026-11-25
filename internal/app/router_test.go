@@ -16,7 +16,7 @@ func TestRouterRegistersOnlyFunctionalDestinations(t *testing.T) {
 	if r.Active() != (Route{Kind: RouteScreen, Screen: ScreenDashboard, Dest: DestDashboard}) || r.Depth() != 0 {
 		t.Fatalf("initial route = %+v", r.Active())
 	}
-	if got := registeredScreens(); !reflect.DeepEqual(got, []ScreenID{ScreenDashboard, ScreenWorkloads, ScreenNodes, ScreenEvents}) {
+	if got := registeredScreens(); !reflect.DeepEqual(got, []ScreenID{ScreenDashboard, ScreenWorkloads, ScreenNodes, ScreenSecurity, ScreenEvents, ScreenRadar}) {
 		t.Fatalf("registered screens = %v", got)
 	}
 	s, ok := screenFor(ScreenDashboard)
@@ -35,19 +35,19 @@ func TestRouterRegistersOnlyFunctionalDestinations(t *testing.T) {
 	if s, ok := screenFor(ScreenEvents); !ok || s.ID() != ScreenEvents {
 		t.Fatal("events is a functional destination")
 	}
-	for _, id := range []ScreenID{ScreenResources, ScreenOverview} {
+	for _, id := range []ScreenID{ScreenResources, ScreenOverview, ScreenRadar, ScreenSecurity} {
 		if s, ok := screenFor(id); !ok || s.ID() != id {
 			t.Fatalf("screen %d is a functional destination", id)
 		}
 	}
-	if _, ok := screenFor(ScreenOverview + 1); ok {
+	if _, ok := screenFor(ScreenSecurity + 1); ok {
 		t.Fatal("no other screen may be registered before it works")
 	}
 	m := demoModel(t, 160, 48)
 	if m.nav.Active().Screen != ScreenDashboard || m.screen().ID() != ScreenDashboard {
 		t.Fatalf("model route = %+v", m.nav.Active())
 	}
-	if got := m.menuItems(); !reflect.DeepEqual(got, []ui.MenuItem{{Key: "2", Title: "Dashboard"}, {Key: "3", Title: "Workloads"}, {Key: "4", Title: "Nodes"}, {Key: "6", Title: "Events"}}) {
+	if got := m.menuItems(); !reflect.DeepEqual(got, []ui.MenuItem{{Key: "2", Title: "Dashboard"}, {Key: "3", Title: "Workloads"}, {Key: "4", Title: "Nodes"}, {Key: "5", Title: "Security"}, {Key: "6", Title: "Events"}, {Key: "7", Title: "Radar"}}) {
 		t.Fatalf("menu lists only functional destinations: %+v", got)
 	}
 }
@@ -251,14 +251,14 @@ func TestDashboardKeysMatchKeyMap(t *testing.T) {
 			seen[k] = true
 		}
 	}
-	for _, k := range []string{"m", "2", "3", "4", "6", "left", "right"} {
+	for _, k := range []string{"m", "2", "3", "4", "5", "6", "7", "left", "right"} {
 		if !seen[k] {
 			t.Fatalf("navigation key %q must be bound", k)
 		}
 	}
-	for _, k := range []string{"5"} {
+	for _, k := range []string{"0", "8", "9"} {
 		if seen[k] {
-			t.Fatalf("screen key %q belongs to a later PR", k)
+			t.Fatalf("key %q has no screen", k)
 		}
 	}
 }

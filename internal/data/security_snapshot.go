@@ -57,6 +57,10 @@ func SummarizeSecurity(pods map[string]PodPosture, namespaces []string, coverage
 func (s SecuritySnapshot) Clone() SecuritySnapshot {
 	out := SecuritySnapshot{RuleVersion: s.RuleVersion, ListCoverage: s.ListCoverage, Revision: s.Revision, Coverage: s.Coverage, Pods: make(map[string]PodPosture, len(s.Pods)), Namespaces: make(map[string]NamespacePosture, len(s.Namespaces))}
 	for k, p := range s.Pods {
+		if p.Owner != nil {
+			owner := *p.Owner
+			p.Owner = &owner
+		}
 		p.Findings = slices.Clone(p.Findings)
 		p.Assessments = slices.Clone(p.Assessments)
 		for i := range p.Assessments {

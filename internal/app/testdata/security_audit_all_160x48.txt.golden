@@ -1,0 +1,48 @@
+ lazykube [RO]  v2.0   ◎ context dev namespace Todos   k8s demo  nodes 1  ns 8  pods 13  uptime 119d                                 ⠙ metrics every 5s ● live  
+  2 Dashboard  |  3 Workloads  |  4 Nodes  | [5 Security] |  6 Events  |  7 Radar                                                                       m menu  
+ Security                                                                                                                                                       
+ ╭─ Postura de segurança ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ │ Cluster | Todos: Segurança 55 E | Higiene 97 A | Sem sistema: Segurança 54 E | Higiene 97 A                                                                │ 
+ │ Segurança: mediana 75 | pior decil 20 | A..F A3 B0 C4 D0 E0 F6                                                                                             │ 
+ │ High novos 0 | Cobertura 13/13 pods (complete in scope) | Nota não garante segurança                                                                       │ 
+ │ Score v2 | regras v5 | tendência ▅ (revisões da sessão)                                                                                                    │ 
+ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+  [Workloads] [RBAC] [Rede e exposição] [Conformidade PSS]                                                                                                      
+  [Achados aceitos] [Audit]                                                                                                                                     
+ ╭─ Audit local (9) ────────────────────────────────╮ ╭─ Registro ────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ │ CONTEXTO    HORA      RESULTADO                  │ │ Horário       2026-10-22 12:08:00Z                                                                    │ 
+ │ prod        12:08:00Z outcome_unknown scale      │ │ Contexto      prod                                                                                    │ 
+ │ dev         12:07:00Z read_only scale            │ │ Sessão        session-1-0123456789abcdef0123456789abcdef                                              │ 
+ │ dev         12:06:00Z read_only scale            │ │ Ação          scale                                                                                   │ 
+ │ prod        12:05:00Z read_only scale            │ │ Alvo          apps/deployments.apps/api uid u-1                                                       │ 
+ │ dev         12:04:00Z read_only scale            │ │ Fase          result                                                                                  │ 
+ │ dev         12:03:00Z read_only scale            │ │ Resultado     outcome_unknown                                                                         │ 
+ │ prod        12:02:00Z read_only scale            │ │ Operação      op-008                                                                                  │ 
+ │ dev         12:01:00Z read_only scale            │ │ Modo          read-only true | protegido false                                                        │ 
+ │ dev         12:00:00Z read_only scale            │ │                                                                                                       │ 
+ │                                                  │ │ Identidade registrada pela sessão do lazykube; não é a identidade autenticada no Kubernetes.          │ 
+ │                                                  │ │ outcome_unknown preserva resultado sem confirmação do servidor.                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │ Todas as sessões; sem reuso para ação            │ │                                                                                                       │ 
+ │                                                  │ │                                                                                                       │ 
+ │ [Somente esta sessão]                            │ │                                                                                                       │ 
+ │ Sem payload, comando ou credenciais.             │ │                                                                                                       │ 
+ ╰──────────────────────────────────────────────────╯ ╰───────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+  PSS v1.34: verificação local do spec; não é admissão                                                                                                          
+  RBAC: concessões observadas, não permissão efetiva. Rede: alcance público desconhecido.                                                                       
+                                                                                                                                                                
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   [ ]  tab   tab  panel   H  cohort   esc  back   m  menu   ?  help   q  quit   y  copy                                            bubbletea · 0 fps 
