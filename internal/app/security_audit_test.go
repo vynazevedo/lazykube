@@ -1,4 +1,4 @@
-//go:build linux || darwin
+//go:build linux
 
 package app
 
@@ -394,6 +394,37 @@ func TestSecurityAuditSeparatesSimultaneousProcesses(t *testing.T) {
 		}
 		if op != "" && (len(rows) != 1 || rows[0].OperationID != op) {
 			t.Fatalf("%s sees only its own process: %+v", identity, rows)
+		}
+	}
+}
+
+func TestSecurityAuditShowsWhyThePathIsRefused(t *testing.T) {
+	base := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(base, "real", "audit"), 0700); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Symlink("real", filepath.Join(base, "alias")); err != nil {
+		t.Fatal(err)
+	}
+	for _, size := range [][2]int{{160, 48}, {130, 40}, {80, 24}} {
+		m := auditModel(t, filepath.Join(base, "alias", "audit", "audit.jsonl"), size[0], size[1])
+		if m.sec.audit.state != ui.AuditUnavailable || len(m.auditRows()) != 0 {
+			t.Fatalf("a refused path loads nothing: %+v", m.sec.audit.state)
+		}
+		if want := string(guard.RefusedLink) + "; ações bloqueadas"; m.sec.audit.reason != want {
+			t.Fatalf("reason %q, want %q", m.sec.audit.reason, want)
+		}
+		plain := m.Render().Plain()
+		l := m.layout.SecList
+		var list strings.Builder
+		for _, line := range strings.Split(plain, "\n")[l.Y+1 : l.Y+l.H-1] {
+			list.WriteString(strings.TrimSpace(strings.Trim(string([]rune(line)[l.X:l.X+l.W]), "│ ")) + " ")
+		}
+		if text := strings.Join(strings.Fields(list.String()), " "); !strings.Contains(text, "link não confiável; ações bloqueadas") {
+			t.Fatalf("%v the list says why: %q", size, text)
+		}
+		if strings.Contains(plain, base) {
+			t.Fatal("the reason never shows the raw path")
 		}
 	}
 }

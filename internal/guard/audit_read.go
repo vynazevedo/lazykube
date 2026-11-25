@@ -52,32 +52,16 @@ func ReadAudit(ctx context.Context, path string, cursor AuditCursor, limit int) 
 	if limit <= 0 || limit > AuditPageSize {
 		limit = AuditPageSize
 	}
-	if !filepath.IsAbs(path) || filepath.Clean(path) != path {
-		return page, ErrAuditUnreadable
-	}
-	dir, name := filepath.Dir(path), filepath.Base(path)
-	walked, err := openAuditDir(dir)
+	dir, err := openAudit(path, false)
 	if errors.Is(err, os.ErrNotExist) {
 		page.Missing = true
 		return page, nil
 	}
 	if err != nil {
-		return page, ErrAuditUnreadable
+		return page, unreadable(err)
 	}
-	defer func() { readErr = errors.Join(readErr, walked.Close()) }()
-	info, err := walked.Stat()
-	if err != nil || !private(info, true) {
-		return page, ErrAuditUnreadable
-	}
-	root, err := os.OpenRoot(dir)
-	if err != nil {
-		return page, ErrAuditUnreadable
-	}
-	defer func() { readErr = errors.Join(readErr, root.Close()) }()
-	if current, statErr := root.Stat("."); statErr != nil || !os.SameFile(info, current) {
-		return page, ErrAuditUnreadable
-	}
-	r := auditReader{ctx: ctx, root: root, name: name, limit: limit, budget: auditReadBudget, page: &page}
+	defer func() { readErr = errors.Join(readErr, dir.close()) }()
+	r := auditReader{ctx: ctx, root: dir.root, name: filepath.Base(path), limit: limit, budget: auditReadBudget, page: &page}
 	start := 0
 	if cursor.started {
 		start = cursor.segment
@@ -103,6 +87,14 @@ func ReadAudit(ctx context.Context, path string, cursor AuditCursor, limit int) 
 	return page, nil
 }
 
+func unreadable(err error) error {
+	var refusal AuditRefusal
+	if errors.As(err, &refusal) {
+		return refusal
+	}
+	return ErrAuditUnreadable
+}
+
 type auditReader struct {
 	ctx    context.Context
 	root   *os.Root
@@ -114,23 +106,18 @@ type auditReader struct {
 
 func (r *auditReader) segment(seg int, resume bool, cursor AuditCursor) (done bool, segErr error) {
 	entry := auditSegmentName(r.name, seg)
-	linfo, err := r.root.Lstat(entry)
+	file, info, err := openAuditFile(r.root, entry, os.O_RDONLY)
 	if os.IsNotExist(err) {
 		if resume {
 			r.page.Rotated = true
 		}
 		return false, nil
 	}
-	if err != nil || !private(linfo, false) || linfo.Size() > auditSegmentMax {
-		return false, ErrAuditUnreadable
-	}
-	file, err := r.root.OpenFile(entry, os.O_RDONLY|auditReadFlags, 0)
 	if err != nil {
-		return false, ErrAuditUnreadable
+		return false, unreadable(err)
 	}
 	defer func() { segErr = errors.Join(segErr, file.Close()) }()
-	info, err := file.Stat()
-	if err != nil || !private(info, false) || !os.SameFile(linfo, info) {
+	if info.Size() > auditSegmentMax {
 		return false, ErrAuditUnreadable
 	}
 	end := info.Size()
