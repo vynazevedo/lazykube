@@ -306,9 +306,9 @@ func (c endpointCount) partial() bool {
 	})
 }
 
-func (c endpointCount) family(name string) data.EndpointTally {
+func (c endpointCount) servedFamily(name string) data.EndpointTally {
 	for _, f := range c.families {
-		if f.name == name {
+		if f.served && f.name == name {
 			return f.EndpointTally
 		}
 	}

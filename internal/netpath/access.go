@@ -532,7 +532,7 @@ func (a *Address) narrow(host string, eps endpointCount) {
 	if _, err := netip.ParseAddr(host); err != nil {
 		return
 	}
-	own := eps.family(familyOf(host))
+	own := eps.servedFamily(familyOf(host))
 	if a.State == StateReady && own.Ready == 0 || a.State == StateDraining && own.Draining == 0 {
 		a.State, a.Reason = StateUnknown, "endpoints de outra família de IP: "+strings.TrimPrefix(eps.outside(), "; ")
 	}

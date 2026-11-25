@@ -158,3 +158,62 @@ func TestNamesAreNotAnIPFamily(t *testing.T) {
 		}
 	}
 }
+
+func TestLiteralAddressesOnlyInheritAServedFamily(t *testing.T) {
+	ready, drain, down := endpoint(yes, yes, no), endpoint(no, yes, yes), endpoint(no, no, no)
+	for _, tc := range []struct {
+		name       string
+		clusterIPs []string
+		four, six  data.SliceEndpoint
+		want       map[string]State
+	}{
+		{"IPv4 service, both ready", []string{"10.1.0.1"}, ready, ready, map[string]State{"4": StateReady, "6": StateUnknown, "name": StateReady}},
+		{"IPv6 service, both ready", []string{"fd00::1"}, ready, ready, map[string]State{"4": StateUnknown, "6": StateReady, "name": StateReady}},
+		{"IPv4 service, both draining", []string{"10.1.0.1"}, drain, drain, map[string]State{"4": StateDraining, "6": StateUnknown, "name": StateDraining}},
+		{"IPv4 service, IPv6 ready only", []string{"10.1.0.1"}, down, ready, map[string]State{"4": StateUnknown, "6": StateUnknown, "name": StateUnknown}},
+		{"dual, both ready", []string{"10.1.0.1", "fd00::1"}, ready, ready, map[string]State{"4": StateReady, "6": StateReady, "name": StateReady}},
+		{"dual, IPv6 down", []string{"10.1.0.1", "fd00::1"}, ready, down, map[string]State{"4": StateReady, "6": StateUnknown, "name": StateReady}},
+		{"dual, IPv6 draining", []string{"10.1.0.1", "fd00::1"}, ready, drain, map[string]State{"4": StateReady, "6": StateUnknown, "name": StateReady}},
+	} {
+		g := healthy()
+		g.Ingresses = known()
+		svc := g.Services.Rows[0].Network.Service
+		svc.Type, svc.Selector, svc.ClusterIPs = "LoadBalancer", nil, tc.clusterIPs
+		svc.ExternalIPs = []string{"203.0.113.20", "2001:db8::20"}
+		svc.LoadBalancer = []data.LoadBalancerAddress{{IP: "203.0.113.30"}, {IP: "2001:db8::30"}, {Hostname: "lb.example.com"}}
+		g.Slices = known(familySlice("four", "IPv4", tc.four), familySlice("six", "IPv6", tc.six))
+		for _, a := range Access(g, serviceTarget).Addresses {
+			kind := "name"
+			switch {
+			case strings.Contains(a.Display, "["):
+				kind = "6"
+			case !strings.Contains(a.Display, "lb.example.com"):
+				kind = "4"
+			}
+			if a.State != tc.want[kind] {
+				t.Errorf("%s: %s %s is %s, want %s (%s)", tc.name, a.Origin, a.Display, a.State, tc.want[kind], a.Reason)
+			}
+		}
+	}
+}
+
+func TestNodePortLiteralsOnlyInheritAServedFamily(t *testing.T) {
+	g := healthy()
+	g.Ingresses = known()
+	svc := g.Services.Rows[0].Network.Service
+	svc.Type, svc.Selector, svc.Ports[0].NodePort = "NodePort", nil, 30080
+	g.Slices = known(familySlice("four", "IPv4", endpoint(yes, yes, no)), familySlice("six", "IPv6", endpoint(yes, yes, no)))
+	g.Nodes = known(
+		row("", "a", data.NetworkFacts{Node: &data.NodeFacts{Ready: yes, Internal: []string{"10.2.0.1"}}}),
+		row("", "b", data.NetworkFacts{Node: &data.NodeFacts{Ready: yes, Internal: []string{"fd00::b"}}}),
+	)
+	for _, a := range Access(g, serviceTarget).Addresses {
+		want := StateReady
+		if strings.Contains(a.Display, "[") {
+			want = StateUnknown
+		}
+		if a.State != want {
+			t.Errorf("%s %s is %s, want %s", a.Origin, a.Display, a.State, want)
+		}
+	}
+}
