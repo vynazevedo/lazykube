@@ -332,15 +332,20 @@ telas mostram um painel por vez, e `tab` alterna entre eles.
 
 Em Network, as listas de Services, EndpointSlices, Ingresses, IngressClasses e
 NetworkPolicies (e HTTPRoutes, só quando o cluster serve a Gateway API) têm
-colunas próprias, filtro com `/` e detalhe com `enter`. O detalhe de Service,
+colunas próprias, filtro com `/` e detalhe com `enter`. O filtro percorre todos
+os itens lidos da lista (até 10 mil) em segundo plano e mostra até 500; a linha
+de estado diz quantos corresponderam. O detalhe de Service,
 Ingress, workload (`u` no overlay de Deployments) e a aba Describe do pod trazem
 a seção Acesso: cada endereço diz de onde veio (Ingress, LoadBalancer,
 ExternalIP, NodePort ou ClusterIP), o alcance pelo que foi declarado, nunca
 verificado (declarada, provável rede privada, porta alocada no node ou endereço
-interno do cluster) e se os endpoints lidos a deixam pronta, pendente, sem
-backend ou desconhecida. ExternalName aparece como alias DNS, com destino não
+interno do cluster) e se os endpoints lidos a deixam pronta, em drenagem,
+pendente, sem backend ou desconhecida. ExternalName aparece como alias DNS, com destino não
 verificado. A seção Rota percorre Ingress, Service, EndpointSlice e Pod e
-aponta o primeiro elo quebrado com a evidência. Tudo vem só de objetos da API do
+aponta o primeiro elo quebrado com a evidência; endpoints que encerram mas ainda
+atendem aparecem como drenagem, com a contagem, e condições que não permitem
+concluir ficam indeterminadas. A porta do EndpointSlice é conferida por nome e
+protocolo. A seção calcula até 64 endereços e 32 rotas e avisa quando limita. Tudo vem só de objetos da API do
 Kubernetes: o lazykube não faz requisição HTTP, DNS ou TLS ao endereço, não lê
 Secrets e não afirma que a aplicação responde. Host vazio ou curinga não vira
 URL. Para NetworkPolicy, só diz quais políticas selecionam o pod, porque o
