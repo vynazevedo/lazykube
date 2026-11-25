@@ -106,6 +106,10 @@ type Model struct {
 	notice   notice
 	after    func(time.Duration, func(time.Time) tea.Msg) tea.Cmd
 	life     context.Context
+
+	act     actionState
+	actSeq  uint64
+	actTick func(context.Context, time.Duration, tea.Msg) tea.Cmd
 }
 
 func New(opts Options) Model {
@@ -144,6 +148,7 @@ func New(opts Options) Model {
 		nav:      newRouter(),
 		after:    tea.Tick,
 		life:     opts.Context,
+		actTick:  tickWithin,
 	}
 	if m.life == nil {
 		m.life = context.Background()
@@ -309,14 +314,30 @@ func (m *Model) refresh() {
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if next, cmd, ok := m.handleActionMsg(msg); ok {
+		return next.settle(cmd)
+	}
 	if next, cmd, ok := m.handleResourceMsg(msg); ok {
-		return next.withResources(cmd)
+		return next.settle(cmd)
 	}
 	next, cmd := m.update(msg)
 	if nm, ok := next.(Model); ok {
-		return nm.withResources(cmd)
+		return nm.settle(cmd)
 	}
 	return next, cmd
+}
+
+func (m Model) settle(cmd tea.Cmd) (tea.Model, tea.Cmd) {
+	next, cmd := m.withResources(cmd)
+	nm, ok := next.(Model)
+	if !ok || !nm.act.stage.beforeSend() {
+		return next, cmd
+	}
+	nm.anchorAction()
+	if stop := nm.checkAction(); stop != nil {
+		cmd = tea.Batch(cmd, stop)
+	}
+	return nm, cmd
 }
 
 func (m Model) withResources(cmd tea.Cmd) (tea.Model, tea.Cmd) {
@@ -384,9 +405,16 @@ func (m Model) update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		idle := !m.busy()
 		next, cmd := m.routeKey(msg)
 		return wake(idle, next, cmd)
+	case tea.PasteMsg:
+		if m.act.stage != actionClosed {
+			return m, nil
+		}
 	case tea.MouseClickMsg, tea.MouseWheelMsg, tea.MouseMotionMsg:
 		if m.layout.TooSmall {
 			return m, nil
+		}
+		if m.act.stage != actionClosed {
+			return m.actionMouse(msg)
 		}
 		if _, motion := msg.(tea.MouseMotionMsg); motion && m.tree.visible && m.layout.TreeOverlay {
 			return m, nil

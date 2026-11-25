@@ -6,7 +6,6 @@ import (
 	"charm.land/bubbles/v2/key"
 	tea "charm.land/bubbletea/v2"
 
-	"github.com/vynazevedo/lazykube/internal/data"
 	"github.com/vynazevedo/lazykube/internal/ui"
 )
 
@@ -392,6 +391,9 @@ func (m Model) handleMenuKey(msg tea.KeyPressMsg) Model {
 }
 
 func (m Model) routeKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
+	if m.act.stage != actionClosed {
+		return m.handleActionKey(msg)
+	}
 	if m.menu.open {
 		return m.handleMenuKey(msg), nil
 	}
@@ -426,6 +428,8 @@ func (m Model) routeKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 			return m, nil
 		case key.Matches(msg, k.Yank):
 			return m.yank()
+		case key.Matches(msg, k.Actions):
+			return m.openActions()
 		}
 	}
 	return m.screen().Update(m, msg)
@@ -468,12 +472,10 @@ func crumbLabels(cs []crumb) []string {
 }
 
 func (m Model) headerState() ui.HeaderState {
-	mode := m.session.Mode
-	if mode == (data.EffectiveMode{}) {
-		mode = data.ReadOnlyMode
-	}
+	mode := m.accessMode()
 	readOnly := mode.ReadOnly || !mode.Valid
-	return ui.HeaderState{ReadOnly: readOnly, Writable: !readOnly, Protected: mode.Protected, Synthetic: m.snap.Synthetic, Cluster: m.snap.Cluster, MetricsOK: m.metrics.Available, SecurityAlerts: len(m.securitySession.Alerts)}
+	exec := m.executor()
+	return ui.HeaderState{ReadOnly: readOnly, Writable: !readOnly, Protected: mode.Protected && mode.Valid, ConfigInvalid: !mode.Valid, AuditBlocked: exec != nil && exec.AuditBlocked(), Synthetic: m.snap.Synthetic, Cluster: m.snap.Cluster, MetricsOK: m.metrics.Available, SecurityAlerts: len(m.securitySession.Alerts)}
 }
 
 func (m Model) headerClick(ms tea.Mouse) tea.Cmd {

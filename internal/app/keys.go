@@ -49,6 +49,7 @@ type KeyMap struct {
 	Refresh     key.Binding
 	MarkNS      key.Binding
 	Yank        key.Binding
+	Actions     key.Binding
 }
 
 func DefaultKeyMap() KeyMap {
@@ -102,6 +103,7 @@ func DefaultKeyMap() KeyMap {
 		Refresh:     b("r", "reload list", "r"),
 		MarkNS:      b("space", "mark namespace", "space"),
 		Yank:        b("y", "copy", "y"),
+		Actions:     b("o", "actions", "o"),
 	}
 }
 
@@ -113,6 +115,6 @@ func (k KeyMap) Bindings() []key.Binding {
 		k.Palette, k.ToggleLeft, k.Pause, k.Help, k.Quit,
 		k.PageUp, k.PageDown, k.Home, k.End, k.Follow, k.Wrap, k.Top, k.Bottom,
 		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads, k.Nodes, k.Events,
-		k.Context, k.Namespace, k.Tree, k.Refresh, k.MarkNS, k.Yank,
+		k.Context, k.Namespace, k.Tree, k.Refresh, k.MarkNS, k.Yank, k.Actions,
 	}
 }

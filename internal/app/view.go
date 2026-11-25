@@ -41,6 +41,8 @@ func (m Model) Render() *draw.Canvas {
 		keys = ui.TreeHelp()
 	case m.menu.open:
 		keys = ui.MenuHelp()
+	case m.act.stage != actionClosed:
+		keys = ui.ActionHelp()
 	case m.dep.open:
 		keys = ui.OverlayHelp()
 	}
@@ -52,6 +54,9 @@ func (m Model) Render() *draw.Canvas {
 			full = ui.FullHelpTree()
 		}
 		ui.HelpOverlay(screen, full, ctx)
+	}
+	if m.act.stage != actionClosed {
+		ui.ActionDialog(screen, m.actionDialog(), ctx)
 	}
 	return c
 }

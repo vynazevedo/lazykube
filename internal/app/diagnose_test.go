@@ -43,7 +43,7 @@ func TestHelpIsHonest(t *testing.T) {
 			keys[k] = true
 		}
 	}
-	for _, k := range []string{"b", "c", "n", "C", "P", "alt+n", "N", "E", "S", "w", "g", "G", "m", "2", "3", "4", "6", "enter", "esc"} {
+	for _, k := range []string{"b", "c", "n", "C", "P", "alt+n", "N", "E", "S", "w", "g", "G", "m", "2", "3", "4", "6", "o", "enter", "esc"} {
 		if !keys[k] {
 			t.Fatalf("implemented key %q missing from help", k)
 		}
