@@ -59,6 +59,7 @@ func TestCredentialWait(t *testing.T) {
 		"certificate from the future keeps waiting": {clock(-time.Second, 3*time.Second), []error{nil}, 1, ""},
 		"rejection is retried":                      {clock(5 * time.Second), []error{denied, denied, nil}, 3, ""},
 		"rejection until the deadline":              {clock(5 * time.Second), []error{denied}, -1, "Unauthorized"},
+		"accepted but still inside the margin":      {clock(time.Second), []error{nil}, 0, "1s apos o NotBefore"},
 		"clock stuck before the margin":             {clock(-700 * time.Millisecond), nil, 0, "-700ms apos o NotBefore"},
 	} {
 		t.Run(name, func(t *testing.T) {
