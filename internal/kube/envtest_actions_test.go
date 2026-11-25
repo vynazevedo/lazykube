@@ -14,6 +14,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 
 	"github.com/vynazevedo/lazykube/internal/guard"
@@ -66,6 +67,7 @@ func newActionEnv(t *testing.T) actionEnv {
 			t.Error(err)
 		}
 	})
+	awaitCredentials(t, map[string]*rest.Config{"admin": cfg})
 	client, err := kubernetes.NewForConfig(cfg)
 	if err != nil {
 		t.Fatal(err)
