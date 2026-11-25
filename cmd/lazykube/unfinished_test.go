@@ -39,7 +39,7 @@ func TestLeavingWhileSendingPrintsAfterShutdown(t *testing.T) {
 		t.Fatal(code, restored)
 	}
 	line := stderr.String()
-	if strings.Count(line, "\n") != 1 || strings.Contains(line, "\x1b") || !strings.Contains(line, "operacao 0123abcd.") || strings.Contains(screen.String(), "0123abcd") {
+	if strings.Count(line, "\n") != 1 || strings.Contains(line, "\x1b") || !strings.Contains(line, "operacao 0123abcd, resultado") || strings.Contains(screen.String(), "0123abcd") {
 		t.Fatalf("%q", line)
 	}
 }
@@ -50,13 +50,13 @@ func TestUnfinishedOperationsPrintOneSafeLineEach(t *testing.T) {
 	if out.Len() != 0 {
 		t.Fatalf("%q", out.String())
 	}
-	writeUnfinished(&out, []app.PendingOperation{{Context: "alpha", OperationID: "0123abcd"}, {Context: "beta", OperationID: "4567ef"}})
+	writeUnfinished(&out, []app.PendingOperation{{Context: "alpha", OperationID: "0123abcd", Outcome: "outcome_unknown"}, {Context: "beta", OperationID: "4567ef"}})
 	lines := strings.Split(strings.TrimSuffix(out.String(), "\n"), "\n")
 	if len(lines) != 2 {
 		t.Fatalf("%q", lines)
 	}
-	for i, want := range []string{"contexto alpha, operacao 0123abcd.", "contexto beta, operacao 4567ef."} {
-		if !strings.HasPrefix(lines[i], "lazykube: ") || !strings.Contains(lines[i], want) || !strings.Contains(lines[i], "Sair nao desfaz a operacao; confira o alvo e o audit antes de repetir.") {
+	for i, want := range []string{"contexto alpha, operacao 0123abcd, resultado no audit: outcome_unknown.", "contexto beta, operacao 4567ef, resultado nao registrado no audit."} {
+		if !strings.HasPrefix(lines[i], "lazykube: ") || !strings.Contains(lines[i], want) || !strings.Contains(lines[i], "Sair nao desfaz a operacao; confira o alvo antes de repetir.") {
 			t.Fatalf("%q", lines[i])
 		}
 	}

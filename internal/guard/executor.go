@@ -26,6 +26,11 @@ type Result struct {
 	OperationID string
 	Outcome     Reason
 }
+type Dispatch struct {
+	Sent     bool
+	Outcome  Reason
+	Recorded bool
+}
 type plan struct {
 	preview Preview
 	request Request
@@ -42,6 +47,9 @@ type Executor struct {
 	clock   Clock
 	plans   map[string]plan
 	failed  atomic.Bool
+
+	sendMu sync.Mutex
+	sends  map[string]Dispatch
 }
 
 func NewExecutor(ctx context.Context, s Session, p Policy, a Authorizer, b Backend, audit Auditor, clock Clock) (*Executor, error) {
@@ -49,7 +57,7 @@ func NewExecutor(ctx context.Context, s Session, p Policy, a Authorizer, b Backe
 		return nil, Invalid
 	}
 	sessionCtx, cancel := context.WithCancel(ctx)
-	return &Executor{ctx: sessionCtx, cancel: cancel, session: s, policy: p, auth: a, backend: b, audit: audit, clock: clock, plans: make(map[string]plan)}, nil
+	return &Executor{ctx: sessionCtx, cancel: cancel, session: s, policy: p, auth: a, backend: b, audit: audit, clock: clock, plans: make(map[string]plan), sends: make(map[string]Dispatch)}, nil
 }
 
 const closeWait = 2 * time.Second
@@ -69,6 +77,22 @@ func (e *Executor) Close() {
 	case <-idle:
 	case <-timer.C:
 	}
+}
+
+func (e *Executor) Dispatch(id string) Dispatch {
+	e.sendMu.Lock()
+	defer e.sendMu.Unlock()
+	return e.sends[id]
+}
+
+func (e *Executor) dispatched(id string, d Dispatch) {
+	e.sendMu.Lock()
+	defer e.sendMu.Unlock()
+	if !d.Sent {
+		delete(e.sends, id)
+		return
+	}
+	e.sends[id] = d
 }
 
 func (e *Executor) Mode() Mode         { return e.policy.Mode(e.session) }
@@ -265,16 +289,19 @@ func (e *Executor) Execute(parent context.Context, id string, c Confirmation) (R
 	if err = e.event(id, p.request, d, "intent", ""); err != nil {
 		return result, err
 	}
+	var state Dispatch
 	if e.planExpired(ctx, p) {
 		result.Outcome = Canceled
 	} else {
+		state.Sent = true
+		e.dispatched(id, state)
 		err = e.backend.Send(ctx, p.request, false)
 		var unsent NotSent
 		switch {
 		case err == nil:
 			result.Outcome = Succeeded
 		case errors.As(err, &unsent):
-			result.Outcome = safeReason(unsent.Reason, Unavailable)
+			result.Outcome, state.Sent = safeReason(unsent.Reason, Unavailable), false
 		case errors.Is(err, Denied):
 			result.Outcome = Denied
 		case errors.Is(err, Stale):
@@ -283,7 +310,10 @@ func (e *Executor) Execute(parent context.Context, id string, c Confirmation) (R
 			result.Outcome = Unknown
 		}
 	}
-	if auditErr := e.event(id, p.request, d, "result", result.Outcome); auditErr != nil {
+	auditErr := e.event(id, p.request, d, "result", result.Outcome)
+	state.Outcome, state.Recorded = result.Outcome, auditErr == nil
+	e.dispatched(id, state)
+	if auditErr != nil {
 		return result, auditErr
 	}
 	if result.Outcome != Succeeded {

@@ -109,7 +109,7 @@ type Model struct {
 
 	act     actionState
 	actSeq  uint64
-	left    []PendingOperation
+	left    []operation
 	actTick func(context.Context, time.Duration, tea.Msg) tea.Cmd
 }
 

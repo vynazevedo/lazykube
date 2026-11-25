@@ -67,6 +67,7 @@ type actionDone struct {
 	target  guard.Target
 	result  guard.Result
 	err     error
+	exec    *guard.Executor
 }
 
 type actionTag struct {
@@ -547,7 +548,7 @@ func (m *Model) confirmAction() tea.Cmd {
 	tag := m.nextActionTag()
 	m.act.stage, m.act.focus, m.act.err, m.act.scroll = actionExecuting, -1, "", 0
 	m.act.preview.ID, m.act.opID = "", id
-	done := actionDone{session: tag.session, attempt: tag.attempt, context: m.act.context, action: m.act.spec.action, target: m.act.plan}
+	done := actionDone{session: tag.session, attempt: tag.attempt, context: m.act.context, action: m.act.spec.action, target: m.act.plan, exec: exec}
 	return func() tea.Msg {
 		done.result, done.err = exec.Execute(ctx, id, confirmation)
 		return actionDoneMsg{done: done}

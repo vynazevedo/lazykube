@@ -211,7 +211,8 @@ permitir agendamentos em nodes. Toda acao congela UID e resourceVersion, roda
 dry-run no servidor, mostra um preview de dois minutos e exige confirmacao
 explicita, com o nome digitado quando o risco e alto. Em somente leitura o menu
 explica o bloqueio e nao chama a API; a demo nunca executa acoes. Sair durante um
-envio nao desfaz a operacao: o terminal mostra o contexto e o ID para conferencia.
+envio nao desfaz a operacao: se a requisicao pode ter saido, o terminal mostra o
+contexto, o ID e o resultado que o audit registrou.
 Edit, exec, port-forward, drain, rollback e CronJob nao fazem parte desta versao. O executor
 esta descrito em [Guardrails](internal/guard/README.md).
 `--protected-contexts` e `--read-only-contexts` recebem nomes exatos separados

@@ -536,3 +536,75 @@ func TestConcurrentLifecycleLeavesOneOutcomePerPlan(t *testing.T) {
 		}
 	}
 }
+
+func TestDispatchTellsTheSameStoryAsTheAudit(t *testing.T) {
+	approved := Confirmation{Approved: true, Resource: "pod"}
+	for _, tc := range []struct {
+		name   string
+		change func(*Executor, *guardFake, *time.Time)
+		c      Confirmation
+		want   Dispatch
+	}{
+		{"refused", nil, Confirmation{}, Dispatch{}},
+		{"revoked", func(_ *Executor, f *guardFake, _ *time.Time) { f.allowed = false }, approved, Dispatch{}},
+		{"stale before", func(_ *Executor, f *guardFake, _ *time.Time) { f.invalid = true }, approved, Dispatch{}},
+		{"expired", func(_ *Executor, _ *guardFake, n *time.Time) { *n = n.Add(time.Hour) }, approved, Dispatch{}},
+		{"closed", func(e *Executor, _ *guardFake, _ *time.Time) { e.Close() }, approved, Dispatch{}},
+		{"intent failed", func(_ *Executor, f *guardFake, _ *time.Time) { f.failPhase = "intent" }, approved, Dispatch{}},
+		{"not sent", func(_ *Executor, f *guardFake, _ *time.Time) { f.sendErr = NotSent{Unavailable} }, approved, Dispatch{}},
+		{"succeeded", nil, approved, Dispatch{Sent: true, Outcome: Succeeded, Recorded: true}},
+		{"denied", func(_ *Executor, f *guardFake, _ *time.Time) { f.sendErr = Denied }, approved, Dispatch{Sent: true, Outcome: Denied, Recorded: true}},
+		{"stale", func(_ *Executor, f *guardFake, _ *time.Time) { f.sendErr = Stale }, approved, Dispatch{Sent: true, Outcome: Stale, Recorded: true}},
+		{"unknown", func(_ *Executor, f *guardFake, _ *time.Time) { f.sendErr = errors.New("x") }, approved, Dispatch{Sent: true, Outcome: Unknown, Recorded: true}},
+		{"result failed", func(_ *Executor, f *guardFake, _ *time.Time) { f.failPhase = "result" }, approved, Dispatch{Sent: true, Outcome: Succeeded}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			e, f, now := guardExecutor(t)
+			p, err := e.Prepare(context.Background(), guardRequest())
+			if err != nil {
+				t.Fatal(err)
+			}
+			if e.Dispatch(p.ID) != (Dispatch{}) {
+				t.Fatal("a preview sends nothing")
+			}
+			if tc.change != nil {
+				tc.change(e, f, now)
+			}
+			_, _ = e.Execute(context.Background(), p.ID, tc.c)
+			got := e.Dispatch(p.ID)
+			if got != tc.want {
+				t.Fatalf("%+v", got)
+			}
+			if got.Sent != (len(f.sends) == 2 && tc.name != "not sent") {
+				t.Fatal(f.sends)
+			}
+			if outcomes := outcomesFor(f, p.ID); got.Recorded && (len(outcomes) != 1 || outcomes[0] != got.Outcome) {
+				t.Fatal(outcomes)
+			}
+		})
+	}
+}
+
+func TestDispatchIsVisibleWhileSending(t *testing.T) {
+	e, h, _ := reviewExecutor(t)
+	p, err := e.Prepare(context.Background(), guardRequest())
+	if err != nil {
+		t.Fatal(err)
+	}
+	b := stuckBackend{Backend: h, started: make(chan struct{}), release: make(chan struct{})}
+	e.backend = b
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		_, _ = e.Execute(context.Background(), p.ID, Confirmation{Approved: true, Resource: "pod"})
+	}()
+	<-b.started
+	if got := e.Dispatch(p.ID); got != (Dispatch{Sent: true}) {
+		t.Fatalf("%+v", got)
+	}
+	close(b.release)
+	<-done
+	if got := e.Dispatch(p.ID); got != (Dispatch{Sent: true, Outcome: Unknown, Recorded: true}) {
+		t.Fatalf("%+v", got)
+	}
+}

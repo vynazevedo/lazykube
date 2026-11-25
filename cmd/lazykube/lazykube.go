@@ -128,7 +128,11 @@ func newModel(f flags, connect connector) (tea.Model, func(), error) {
 
 func writeUnfinished(stderr io.Writer, pending []app.PendingOperation) {
 	for _, p := range pending {
-		_, _ = fmt.Fprintf(stderr, "lazykube: operacao sem resultado exibido ao sair: contexto %s, operacao %s. Sair nao desfaz a operacao; confira o alvo e o audit antes de repetir.\n", p.Context, p.OperationID)
+		result := "resultado no audit: " + p.Outcome
+		if p.Outcome == "" {
+			result = "resultado nao registrado no audit"
+		}
+		_, _ = fmt.Fprintf(stderr, "lazykube: operacao enviada sem resultado exibido: contexto %s, operacao %s, %s. Sair nao desfaz a operacao; confira o alvo antes de repetir.\n", p.Context, p.OperationID, result)
 	}
 }
 

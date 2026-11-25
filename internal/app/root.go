@@ -48,7 +48,7 @@ type Root struct {
 	w, h      int
 	late      []actionDone
 
-	unresolved []PendingOperation
+	unresolved []operation
 }
 
 type catalogMsg struct {

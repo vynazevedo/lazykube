@@ -99,6 +99,9 @@ recusa falhar, o plano continua consumido e novas acoes ficam bloqueadas.
 mutante, como a leitura interna do restart. Qualquer outro erro de envio continua
 `outcome_unknown`, inclusive cancelamento e timeout.
 
+`Dispatch` informa se a requisicao mutante pode ter saido e o resultado gravado no
+audit. E a fonte da linha de saida da TUI: sem envio possivel nao ha linha.
+
 `Observe` faz uma leitura pontual do alvo, sem mutex, e so depois da politica e da
 allowlist: em somente leitura nenhuma requisicao sai. `Discard` consome um preview
 sem enviar nada e registra o cancelamento. `AuditBlocked` informa a falha de audit

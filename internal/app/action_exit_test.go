@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"strings"
 	"testing"
 
@@ -31,6 +32,28 @@ func (d *rootDriver) leaveWith(msg tea.Msg) {
 	d.t.Fatal("the key must quit at once")
 }
 
+func outcomeOf(f *actionBackendFake, id string) (string, int) {
+	last, n := "", 0
+	f.locked(func() {
+		for _, e := range f.events {
+			if e.OperationID == id && e.Outcome != "" {
+				last = string(e.Outcome)
+				n++
+			}
+		}
+	})
+	return last, n
+}
+
+func (d *rootDriver) wantLine(f *actionBackendFake, id string) {
+	d.t.Helper()
+	outcome, n := outcomeOf(f, id)
+	got := Unfinished(d.r)
+	if len(got) != 1 || got[0] != (PendingOperation{Context: "alpha", OperationID: id, Outcome: outcome}) || n > 1 {
+		d.t.Fatalf("line %+v, audit %q (%d)", got, outcome, n)
+	}
+}
+
 func TestCtrlCWhileSendingReportsTheOperation(t *testing.T) {
 	d, s := sessionDriver(t)
 	f := s.byContext["alpha"]
@@ -40,29 +63,19 @@ func TestCtrlCWhileSendingReportsTheOperation(t *testing.T) {
 		t.Fatal(text)
 	}
 	d.leaveWith(keyPress("ctrl+c"))
-	want := []PendingOperation{{Context: "alpha", OperationID: id}}
-	if got := Unfinished(d.r); len(got) != 1 || got[0] != want[0] {
-		t.Fatalf("%+v", got)
-	}
+	d.wantLine(f, id)
 	d.r.Shutdown()
 	d.drain()
-	if got := Unfinished(d.r); len(got) != 1 || got[0] != want[0] {
-		t.Fatalf("a result nobody saw keeps the line: %+v", got)
+	d.wantLine(f, id)
+	if outcome, n := outcomeOf(f, id); outcome != string(guard.Unknown) || n != 1 || len(f.real) != 1 {
+		t.Fatal(outcome, n, len(f.real))
 	}
-	f.locked(func() {
-		last := f.events[len(f.events)-1]
-		if len(f.real) != 1 || last.Phase != "result" || last.Outcome != guard.Unknown || last.OperationID != id {
-			t.Errorf("sends=%d last=%+v", len(f.real), last)
-		}
-	})
 }
 
 func TestExternalQuitWhileSendingReportsTheOperation(t *testing.T) {
 	d, s := sessionDriver(t)
 	id := d.holdSend(s.byContext["alpha"])
-	if got := Unfinished(d.r); len(got) != 1 || got[0].OperationID != id {
-		t.Fatalf("%+v", got)
-	}
+	d.wantLine(s.byContext["alpha"], id)
 }
 
 func TestSmallTerminalQuitWhileSendingReportsTheOperation(t *testing.T) {
@@ -70,9 +83,7 @@ func TestSmallTerminalQuitWhileSendingReportsTheOperation(t *testing.T) {
 	id := d.holdSend(s.byContext["alpha"])
 	d.send(tea.WindowSizeMsg{Width: 60, Height: 15})
 	d.leaveWith(keyPress("q"))
-	if got := Unfinished(d.r); len(got) != 1 || got[0].OperationID != id {
-		t.Fatalf("%+v", got)
-	}
+	d.wantLine(s.byContext["alpha"], id)
 }
 
 func TestExitAfterSessionSwitchReportsUntilResultIsSeen(t *testing.T) {
@@ -80,9 +91,7 @@ func TestExitAfterSessionSwitchReportsUntilResultIsSeen(t *testing.T) {
 	id := d.holdSend(s.byContext["alpha"])
 	next, cmd := d.r.begin(d.r.pending)
 	d.r = next.(Root)
-	if got := Unfinished(d.r); len(got) != 1 || got[0] != (PendingOperation{Context: "alpha", OperationID: id}) {
-		t.Fatalf("%+v", got)
-	}
+	d.wantLine(s.byContext["alpha"], id)
 	d.run(cmd)
 	d.until("late result", inStage(actionResult))
 	if got := Unfinished(d.r); len(got) != 0 {
@@ -91,19 +100,108 @@ func TestExitAfterSessionSwitchReportsUntilResultIsSeen(t *testing.T) {
 }
 
 func TestQueuedLateResultSurvivesAnotherSwitch(t *testing.T) {
-	d, _ := sessionDriver(t)
-	d.press("3")
+	d, s := sessionDriver(t)
+	d.restartPreview()
+	d.press("tab", "enter")
+	d.until("result", inStage(actionResult))
+	m, _ := d.r.model()
+	id, exec := m.act.opID, m.executor()
+	d.press("esc")
+	if got := Unfinished(d.r); len(got) != 0 {
+		t.Fatalf("a displayed result needs no line: %+v", got)
+	}
 	d.focusDeployment()
 	d.press("o")
-	late := actionDone{session: 99, context: "antigo", action: guard.Restart, result: guard.Result{OperationID: "op", Outcome: guard.Unknown}, err: guard.Unknown}
-	d.send(actionDoneMsg{done: late})
-	if got := Unfinished(d.r); len(got) != 1 || got[0].OperationID != "op" {
+	d.send(actionDoneMsg{done: actionDone{session: 99, context: "alpha", action: guard.Restart, result: guard.Result{OperationID: id, Outcome: guard.Succeeded}, exec: exec}})
+	d.wantLine(s.byContext["alpha"], id)
+	d.switchTo("beta")
+	if m, _ = d.r.model(); m.act.stage != actionResult || m.act.opID != id {
+		t.Fatalf("%+v", m.act)
+	}
+	if got := Unfinished(d.r); len(got) != 0 {
 		t.Fatalf("%+v", got)
 	}
-	d.switchTo("beta")
-	m, _ := d.r.model()
-	if m.act.stage != actionResult || m.act.opID != "op" {
-		t.Fatalf("%+v", m.act)
+}
+
+func TestExitBeforeExecuteStartsPrintsNothing(t *testing.T) {
+	r := writableRig(t)
+	r.scalePreview("5")
+	id := r.m.act.preview.ID
+	r.toButton(controlConfirm)
+	execute := r.send(keyPress("enter"))
+	r.stage(actionExecuting)
+	r.send(keyPress("ctrl+c"))
+	r.exec.Close()
+	if got := Unfinished(r.m); len(got) != 0 {
+		t.Fatalf("%+v", got)
+	}
+	r.run(execute)
+	if got := Unfinished(r.m); len(got) != 0 || len(r.back.real) != 0 {
+		t.Fatalf("%+v after %d sends", got, len(r.back.real))
+	}
+	if outcome, n := outcomeOf(r.back, id); outcome != string(guard.Canceled) || n != 1 {
+		t.Fatal("the audit tells the same story", outcome, n)
+	}
+}
+
+func TestExitDuringPreflightPrintsNothing(t *testing.T) {
+	r := writableRig(t)
+	r.scalePreview("5")
+	id := r.m.act.preview.ID
+	r.back.block = make(chan struct{})
+	r.toButton(controlConfirm)
+	execute := r.send(keyPress("enter"))
+	done := make(chan tea.Msg, 1)
+	go func() { done <- execute() }()
+	r.send(keyPress("ctrl+c"))
+	r.exec.Close()
+	<-done
+	if got := Unfinished(r.m); len(got) != 0 || len(r.back.real) != 0 {
+		t.Fatalf("%+v after %d sends", got, len(r.back.real))
+	}
+	if outcome, n := outcomeOf(r.back, id); outcome != string(guard.Canceled) || n != 1 {
+		t.Fatal(outcome, n)
+	}
+}
+
+func TestExitLineFollowsTheRecordedOutcome(t *testing.T) {
+	for _, tc := range []struct {
+		name  string
+		setup func(*actionBackendFake)
+		want  []PendingOperation
+	}{
+		{"succeeded", func(*actionBackendFake) {}, []PendingOperation{{Outcome: string(guard.Succeeded)}}},
+		{"denied", func(f *actionBackendFake) { f.sendErr = guard.Denied }, []PendingOperation{{Outcome: string(guard.Denied)}}},
+		{"unknown", func(f *actionBackendFake) { f.sendErr = errors.New("reset") }, []PendingOperation{{Outcome: string(guard.Unknown)}}},
+		{"audit failed", func(f *actionBackendFake) { f.failPhase = "result" }, []PendingOperation{{}}},
+		{"not sent", func(f *actionBackendFake) { f.sendErr = guard.NotSent{Reason: guard.Unavailable} }, nil},
+		{"intent failed", func(f *actionBackendFake) { f.failPhase = "intent" }, nil},
+		{"revoked", func(f *actionBackendFake) { f.denied = true }, nil},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			r := writableRig(t)
+			r.scalePreview("5")
+			id := r.m.act.preview.ID
+			tc.setup(r.back)
+			r.toButton(controlConfirm)
+			execute := r.send(keyPress("enter"))
+			r.send(keyPress("ctrl+c"))
+			execute()
+			r.exec.Close()
+			got := Unfinished(r.m)
+			if len(got) != len(tc.want) {
+				t.Fatalf("%+v", got)
+			}
+			for i, want := range tc.want {
+				want.Context, want.OperationID = "laboratorio", id
+				if got[i] != want {
+					t.Fatalf("%+v, want %+v", got[i], want)
+				}
+				if outcome, _ := outcomeOf(r.back, id); want.Outcome != "" && outcome != want.Outcome {
+					t.Fatalf("line %q, audit %q", want.Outcome, outcome)
+				}
+			}
+		})
 	}
 }
 
@@ -119,16 +217,20 @@ func TestExitWithoutOperationPrintsNothing(t *testing.T) {
 	}
 }
 
+type hostileModel struct{ tea.Model }
+
+func (hostileModel) PendingOperations() []PendingOperation {
+	return []PendingOperation{{Context: "c\x1b]52;c;eA==\x07\n\u202e" + strings.Repeat("x", 500), Outcome: "r\x1b[31m\n"}}
+}
+
 func TestUnfinishedIsSanitizedAndBounded(t *testing.T) {
-	r := writableRig(t)
-	r.m.act = actionState{stage: actionExecuting, context: "c\x1b]52;c;eA==\x07\n\u202e" + strings.Repeat("x", 500), target: guard.Target{Name: "alvo-privado", Namespace: "ns-privado"}}
-	got := Unfinished(r.m)
+	got := Unfinished(hostileModel{})
 	if len(got) != 1 || got[0].OperationID != "desconhecido" {
 		t.Fatalf("%+v", got)
 	}
-	for _, bad := range []string{"\x1b", "\x07", "\n", "\u202e", "privado"} {
-		if strings.Contains(got[0].Context, bad) {
-			t.Fatalf("%q in %q", bad, got[0].Context)
+	for _, bad := range []string{"\x1b", "\x07", "\n", "\u202e"} {
+		if strings.Contains(got[0].Context+got[0].Outcome, bad) {
+			t.Fatalf("%q in %+v", bad, got[0])
 		}
 	}
 	if n := len([]rune(got[0].Context)); n > exitTextLimit {
