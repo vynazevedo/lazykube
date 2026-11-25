@@ -13,7 +13,7 @@
  │ Porta             http 80:30080 para 8080                                  │ 
  │                                                                            │ 
  │ Acesso  3 endereços · estado pelos endpoints lidos; nenhuma requisição fo… │ 
- │ ● Ingress      http://lgo.example.com                                  ◂ y │ 
+ │ ● Ingress      http://lgo.example.com                                      │ 
  │           estado    pronta · Ingress lgo/lgo · sem TLS declarado           │ 
  │           alcance   provável rede privada, alcance não verificado          │ 
  │ ● NodePort     http://192.168.0.12:30080                                   │ 
@@ -21,4 +21,4 @@
  │           alcance   porta alocada no node, alcance não verificado          │ 
  ╰────────────────────────────────────────────────────────────────────────────╯ 
 ────────────────────────────────────────────────────────────────────────────────
-  ↑↓  scroll   u  next URL   y  copy   r  reload   esc  back  bubbletea · 0 fps 
+  ↑↓  scroll   u  URLs   y  copy name   r  reload   esc  back bubbletea · 0 fps 

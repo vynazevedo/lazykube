@@ -39,7 +39,6 @@ type accessState struct {
 	computing bool
 	dirty     bool
 	view      *accessView
-	selected  int
 	scroll    int
 }
 
@@ -190,7 +189,6 @@ func (m *Model) storeAccess(msg accessMsg) {
 	m.acc.computing = false
 	view := msg.view
 	m.acc.view = &view
-	m.acc.selected = max(0, min(m.acc.selected, len(view.report.Addresses)-1))
 	m.clampAccess()
 }
 
@@ -280,7 +278,7 @@ func (m Model) accessView() *ui.AccessView {
 	if !m.acc.target.active {
 		return nil
 	}
-	out := &ui.AccessView{Loading: true, Selected: m.acc.selected}
+	out := &ui.AccessView{Loading: true}
 	if _, ok := m.browser(); !ok {
 		out.Loading, out.Err = false, "esta fonte não oferece o catálogo de recursos"
 		return out
@@ -298,43 +296,12 @@ func (m Model) accessAddresses() []netpath.Address {
 	return m.acc.view.report.Addresses
 }
 
-func (m *Model) nextURL() {
-	list := m.accessAddresses()
-	if len(list) == 0 {
-		return
-	}
-	m.acc.selected = (m.acc.selected + 1) % len(list)
-	if m.inDetail() {
-		rows := ui.DescribeRows(m.diagnosis(), m.describe)
-		m.scrollTo(ui.ScrollToSelection(rows, m.scroll, ui.ScrollRows(ui.TabDescribe, m.layout.Details.H)))
-		return
-	}
-	m.acc.scroll = ui.ScrollToSelection(m.resourceDetailState().Rows(), m.acc.scroll, ui.ResourceDetailRows(m.layout.Table.H))
-	m.clampAccess()
-}
-
 func (m *Model) clampAccess() {
 	if m.nav.Active().Kind != RouteResource {
 		m.clampScroll()
 		return
 	}
 	m.acc.scroll = max(0, min(m.acc.scroll, len(m.resourceDetailState().Rows())-ui.ResourceDetailRows(m.layout.Table.H)))
-}
-
-func (m Model) yankAddress() (yank, string, bool) {
-	list := m.accessAddresses()
-	if len(list) == 0 || m.acc.selected >= len(list) {
-		return yank{}, "", false
-	}
-	a := list[m.acc.selected]
-	if a.URL.IsZero() {
-		return yank{}, "sem URL copiável: " + a.Refused, true
-	}
-	label := a.URL.String()
-	if !a.URL.Linkable() {
-		label += " (endereço interno do cluster)"
-	}
-	return yank{label: label, text: a.URL.String()}, "", true
 }
 
 func (m Model) diagnosis() ui.Diagnosis {

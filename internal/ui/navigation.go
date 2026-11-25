@@ -154,6 +154,6 @@ func PodDetailHelp() []KeyHelp {
 		{"?", "help"},
 		{"q", "quit"},
 		{"y", "copy"},
-		{"u", "next URL"},
+		{"u", "URLs"},
 	}
 }

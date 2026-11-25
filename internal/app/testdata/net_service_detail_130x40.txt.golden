@@ -13,7 +13,7 @@
  │ Porta             http 80:30080 para 8080                                                                                    │ 
  │                                                                                                                              │ 
  │ Acesso  3 endereços · estado pelos endpoints lidos; nenhuma requisição foi feita                                             │ 
- │ ● Ingress      http://lgo.example.com                                                                                    ◂ y │ 
+ │ ● Ingress      http://lgo.example.com                                                                                        │ 
  │           estado    pronta · Ingress lgo/lgo · sem TLS declarado                                                             │ 
  │           alcance   provável rede privada, alcance não verificado                                                            │ 
  │ ● NodePort     http://192.168.0.12:30080                                                                                     │ 
@@ -22,7 +22,7 @@
  │ ● ClusterIP    http://10.43.20.5                                                                                             │ 
  │           estado    pronta · Service lgo/lgo · nome da porta                                                                 │ 
  │           alcance   endereço interno do cluster                                                                              │ 
- │           ↳ u próxima URL · y copia a selecionada                                                                            │ 
+ │           ↳ u escolhe e copia uma URL                                                                                        │ 
  │                                                                                                                              │ 
  │ Rota  primeiro elo quebrado pelos objetos lidos                                                                              │ 
  │ ● Service lgo/lgo                                                                                                            │ 
@@ -37,4 +37,4 @@
  │ ● Service      lgo/lgo                                                                                                       │ 
  ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  ↑↓  scroll   u  next URL   y  copy   r  reload   esc  back   b  tree   m  menu   ?  help   q  quit            bubbletea · 0 fps 
+  ↑↓  scroll   u  URLs   y  copy name   r  reload   esc  back   b  tree   m  menu   ?  help   q  quit           bubbletea · 0 fps 

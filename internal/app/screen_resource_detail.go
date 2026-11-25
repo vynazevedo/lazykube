@@ -89,7 +89,7 @@ func (m Model) handleDetailKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 	case key.Matches(msg, k.End):
 		m.acc.scroll = len(m.resourceDetailState().Rows())
 	case key.Matches(msg, k.NextURL):
-		m.nextURL()
+		return m.openURLs()
 	case key.Matches(msg, k.Refresh):
 		return m, m.refreshResources()
 	default:

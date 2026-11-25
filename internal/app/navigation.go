@@ -404,6 +404,9 @@ func (m Model) routeKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 	if m.dep.open {
 		return m.handleOverlayKey(msg)
 	}
+	if m.urls.open {
+		return m.handleURLKey(msg)
+	}
 	if !m.helpOpen && !m.filtering && !m.dg.searching {
 		switch {
 		case key.Matches(msg, m.keys.Context):
@@ -489,7 +492,7 @@ func (m Model) headerState() ui.HeaderState {
 }
 
 func (m Model) headerClick(ms tea.Mouse) tea.Cmd {
-	if ms.Button != tea.MouseLeft || m.layout.TooSmall || m.helpOpen || m.menu.open || !m.layout.Header.Contains(ms.X, ms.Y) {
+	if m.urls.open || ms.Button != tea.MouseLeft || m.layout.TooSmall || m.helpOpen || m.menu.open || !m.layout.Header.Contains(ms.X, ms.Y) {
 		return nil
 	}
 	switch ui.HeaderTargetAt(m.headerState(), m.layout.Header.W, ms.X-m.layout.Header.X) {

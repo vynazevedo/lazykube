@@ -18,11 +18,10 @@ const (
 )
 
 type AccessView struct {
-	Loading  bool
-	Gone     bool
-	Err      string
-	Selected int
-	Report   *netpath.Report
+	Loading bool
+	Gone    bool
+	Err     string
+	Report  *netpath.Report
 }
 
 func stateHealth(s netpath.State) Health {
@@ -68,8 +67,8 @@ func AccessRows(v AccessView) []DescribeRow {
 		head.Value = "leitura em andamento · " + head.Value
 	}
 	rows := []DescribeRow{head}
-	for i, a := range r.Addresses {
-		rows = append(rows, addressRows(a, i == v.Selected)...)
+	for _, a := range r.Addresses {
+		rows = append(rows, addressRows(a)...)
 	}
 	if len(r.Addresses) == 0 && !v.Loading {
 		rows = append(rows, DescribeRow{Kind: RowHint, Value: "nenhum endereço derivado dos objetos lidos"})
@@ -81,7 +80,7 @@ func AccessRows(v AccessView) []DescribeRow {
 		rows = append(rows, DescribeRow{Kind: RowHint, Value: "lista limitada; há mais endereços ou rotas"})
 	}
 	if len(r.Addresses) > 0 {
-		rows = append(rows, DescribeRow{Kind: RowHint, Value: "u próxima URL · y copia a selecionada"})
+		rows = append(rows, DescribeRow{Kind: RowHint, Value: "u escolhe e copia uma URL"})
 	}
 	if len(r.Routes) > 0 {
 		rows = append(rows, DescribeRow{Kind: RowBlank}, DescribeRow{Kind: RowSection, Label: "Rota", Value: "primeiro elo quebrado pelos objetos lidos"})
@@ -99,8 +98,8 @@ func plural(n int, one, many string) string {
 	return fmt.Sprintf("%d %s", n, many)
 }
 
-func addressRows(a netpath.Address, selected bool) []DescribeRow {
-	rows := []DescribeRow{{Kind: RowAddress, Health: stateHealth(a.State), Label: a.Origin.String(), Value: a.Display, Selected: selected, Link: a.URL}}
+func addressRows(a netpath.Address) []DescribeRow {
+	rows := []DescribeRow{{Kind: RowAddress, Health: stateHealth(a.State), Label: a.Origin.String(), Value: a.Display, Link: a.URL}}
 	parts := []string{a.State.String(), a.Source}
 	if a.Scheme != "" {
 		parts = append(parts, a.Scheme)
@@ -152,35 +151,11 @@ func addressRow(r draw.Region, y int, row DescribeRow, ctx Ctx) {
 	r.Text(0, y, glyph, draw.Fg(gc))
 	r.Text(2, y, draw.PadRight(row.Label, originW-2), draw.Fg(theme.Muted))
 	style := draw.Fg(theme.Text)
-	if row.Selected {
-		style = draw.Fg(ctx.Pal.A).WithBold()
-	}
-	limit := r.W
-	if row.Selected {
-		limit = r.LineRight(y, draw.Line{colored("◂ y", ctx.Pal.A)}) - 1
-	}
-	width := max(0, limit-originW)
+	width := max(0, r.W-originW)
 	if draw.Width(row.Value) <= width && row.Value == row.Link.String() {
 		style = style.WithLink(row.Link)
 	}
 	r.Text(originW, y, draw.Truncate(row.Value, width), style)
-}
-
-func ScrollToSelection(rows []DescribeRow, scroll, visible int) int {
-	for i, row := range rows {
-		if row.Kind != RowAddress || !row.Selected {
-			continue
-		}
-		last := i + 1
-		switch {
-		case i < scroll:
-			return i
-		case visible > 0 && last >= scroll+visible:
-			return last - visible + 1
-		}
-		return scroll
-	}
-	return scroll
 }
 
 type ResourceDetailState struct {
@@ -374,7 +349,7 @@ func ResourceDetail(r draw.Region, st ResourceDetailState, ctx Ctx) {
 }
 
 func ResourceDetailHelp() []KeyHelp {
-	return []KeyHelp{{"↑↓", "scroll"}, {"u", "next URL"}, {"y", "copy"}, {"r", "reload"}, {"esc", "back"}, {"b", "tree"}, {"m", "menu"}, {"?", "help"}, {"q", "quit"}}
+	return []KeyHelp{{"↑↓", "scroll"}, {"u", "URLs"}, {"y", "copy name"}, {"r", "reload"}, {"esc", "back"}, {"b", "tree"}, {"m", "menu"}, {"?", "help"}, {"q", "quit"}}
 }
 
 func FullHelpResourceDetail() []KeyHelp {
@@ -382,8 +357,8 @@ func FullHelpResourceDetail() []KeyHelp {
 		{"↑/↓ k/j", "scroll"},
 		{"pgup/pgdn", "page"},
 		{"home/end", "top / bottom"},
-		{"u", "next URL in Access"},
-		{"y", "copy selected URL or name"},
+		{"u", "choose and copy a URL"},
+		{"y", "copy namespace/name"},
 		{"r", "reload lists"},
 		{"esc", "back"},
 		{"b", "navigation tree"},

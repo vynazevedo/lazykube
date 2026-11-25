@@ -70,6 +70,13 @@ func hostPages(host string) map[schema.GroupVersionResource]data.ResourcePage {
 	}
 }
 
+func copyURL(t *testing.T, m Model) (Model, []tea.Msg) {
+	t.Helper()
+	m = pressDrive(t, m, "u")
+	next, cmd := m.Update(keyPress("enter"))
+	return next.(Model), drain(cmd)
+}
+
 func TestNetworkGoldens(t *testing.T) {
 	for _, size := range []struct {
 		name string
@@ -93,6 +100,7 @@ func TestNetworkGoldens(t *testing.T) {
 				return pressDrive(t, openLeaf(t, m, DestServices), "down", "down", "enter")
 			}},
 			{"net_pod_access", func(m Model) Model { return openPodAccess(t, m) }},
+			{"net_url_picker", func(m Model) Model { return pressDrive(t, openPodAccess(t, m), "u") }},
 			{"net_filter", func(m Model) Model { return pressDrive(t, openLeaf(t, m, DestServices), "/", "o", "d", "o", "o") }},
 		} {
 			c := tc.open(demoModel(t, size.w, size.h)).Render()
@@ -335,7 +343,7 @@ func TestLinkAndCopyShareTheValidatedURL(t *testing.T) {
 	if strings.Count(out, "\x1b]8;;http://web.example.com\x1b\\") != 1 || strings.Count(out, "\x1b]8;;\x1b\\") != 1 {
 		t.Fatalf("one link expected, got %d", strings.Count(out, "\x1b]8;;"))
 	}
-	got, msgs := pressYank(t, m)
+	got, msgs := copyURL(t, m)
 	if text, ok := clipboardOf(msgs); !ok || text != "http://web.example.com" {
 		t.Fatalf("copied %q %v", text, ok)
 	}
@@ -357,7 +365,13 @@ func TestHostileHostsAreNeitherLinkedNorCopied(t *testing.T) {
 				t.Errorf("%q leaks %q into the terminal", host, banned)
 			}
 		}
-		got, msgs := pressYank(t, m)
+		opened := pressDrive(t, m, "u")
+		for _, banned := range []string{"\x1b]", "\x07", "\u009d", "\u009c", "\u202e", "\u2066", "\r"} {
+			if strings.Contains(opened.Render().String(), banned) {
+				t.Errorf("%q leaks %q through the picker", host, banned)
+			}
+		}
+		got, msgs := copyURL(t, m)
 		if text, ok := clipboardOf(msgs); ok {
 			t.Errorf("%q copied %q", host, text)
 		}
@@ -394,35 +408,12 @@ func TestClusterAddressesCopyButNeverLink(t *testing.T) {
 	if strings.Contains(m.Render().String(), "\x1b]8") || !strings.Contains(m.Render().Plain(), "endereço interno do cluster") {
 		t.Fatal("a ClusterIP is labeled and never clickable")
 	}
-	got, msgs := pressYank(t, m)
-	if text, _ := clipboardOf(msgs); text != "http://10.1.0.1" || !strings.Contains(got.notice.text, "endereço interno do cluster") {
-		t.Fatalf("%q %q", text, got.notice.text)
+	if !strings.Contains(pressDrive(t, m, "u").Render().Plain(), "endereço interno do cluster") {
+		t.Fatal("the picker states the reach")
 	}
-}
-
-func TestNextURLCyclesAndYankFollows(t *testing.T) {
-	m := openPodAccess(t, demoModel(t, 160, 48))
-	list := m.accessAddresses()
-	if len(list) < 2 {
-		t.Fatalf("addresses = %+v", list)
-	}
-	for i := range len(list) + 1 {
-		a := m.accessAddresses()[m.acc.selected]
-		if m.acc.selected != i%len(list) {
-			t.Fatalf("selected %d at step %d", m.acc.selected, i)
-		}
-		_, msgs := pressYank(t, m)
-		if text, _ := clipboardOf(msgs); text != a.URL.String() {
-			t.Fatalf("copied %q want %q", text, a.URL.String())
-		}
-		m = pressDrive(t, m, "u")
-	}
-	m = pressDrive(t, m, "]")
-	m.tab = ui.TabConfig
-	m = pressDrive(t, m, "down")
-	_, msgs := pressYank(t, m)
-	if text, _ := clipboardOf(msgs); !strings.HasPrefix(text, "apiVersion:") {
-		t.Fatalf("Config still copies the YAML, got %q", text)
+	_, msgs := copyURL(t, m)
+	if text, _ := clipboardOf(msgs); text != "http://10.1.0.1" {
+		t.Fatalf("%q", text)
 	}
 }
 
@@ -618,4 +609,165 @@ func TestAccessReadsPagesOutsideUpdate(t *testing.T) {
 	}
 	close(b.release)
 	m.releaseResources()
+}
+
+func longURL() (string, string) {
+	host := "trusted.example.com." + strings.Repeat("a", 60) + ".evil.com"
+	return host, "http://" + host
+}
+
+func TestTruncatedURLIsShownWholeBeforeTheCopy(t *testing.T) {
+	host, url := longURL()
+	for _, size := range [][2]int{{80, 24}, {100, 30}, {130, 40}, {160, 48}} {
+		m := openIngress(t, host, size[0], size[1])
+		if _, msgs := pressYank(t, m); len(msgs) > 0 {
+			if text, ok := clipboardOf(msgs); ok && text != "apps/web" {
+				t.Fatalf("y copies the name, got %q", text)
+			}
+		}
+		opened := pressDrive(t, m, "u")
+		lines := ui.URLPickerLines(size[0], size[1], opened.urls.items[0].URL)
+		plain := opened.Render().Plain()
+		for _, line := range lines {
+			if !strings.Contains(plain, line) {
+				t.Fatalf("%v hides %q", size, line)
+			}
+		}
+		_, msgs := copyURL(t, m)
+		text, ok := clipboardOf(msgs)
+		if !ok || text != url || strings.Join(lines, "") != text {
+			t.Fatalf("%v copied %q, shown %q", size, text, strings.Join(lines, ""))
+		}
+	}
+}
+
+func TestURLPickerHighlightsTheWholeHost(t *testing.T) {
+	host, _ := longURL()
+	m := pressDrive(t, openIngress(t, host, 80, 24), "u")
+	c := m.Render()
+	var shown strings.Builder
+	for y := range c.Height() {
+		for x := range c.Width() {
+			if cell := c.At(x, y); cell.Bold && cell.Fg == m.pal.A {
+				shown.WriteRune(cell.Rune)
+			}
+		}
+	}
+	if !strings.Contains(shown.String(), host) {
+		t.Fatalf("highlighted %q", shown.String())
+	}
+}
+
+func TestURLThatCannotBeShownWholeIsRefused(t *testing.T) {
+	b := newNetBrowser(nil, hostPages("web.example.com"))
+	b.pages[ingressGVR].Items[0].Network.Ingress.Rules[0].Paths[0].Path = "/" + strings.Repeat("p", 1000)
+	m := pressDrive(t, openLeaf(t, nodeModel(t, b, 80, 24), DestIngresses), "enter")
+	got, msgs := copyURL(t, m)
+	if text, ok := clipboardOf(msgs); ok || !got.urls.open || got.notice.text != "a URL inteira não cabe neste terminal" {
+		t.Fatalf("copied %q notice %q", text, got.notice.text)
+	}
+	if !strings.Contains(got.Render().Plain(), "a URL inteira não cabe neste terminal; aumente a janela") {
+		t.Fatal("the picker says why")
+	}
+	next, _ := got.Update(tea.WindowSizeMsg{Width: 160, Height: 48})
+	after, cmd := next.(Model).Update(keyPress("enter"))
+	if text, _ := clipboardOf(drain(cmd)); !strings.HasPrefix(text, "http://web.example.com/ppp") || after.(Model).urls.open {
+		t.Fatal("a larger window shows and copies it")
+	}
+}
+
+func TestYankInDescribeKeepsTheManifestInEveryAccessState(t *testing.T) {
+	check := func(name string, m Model) {
+		t.Helper()
+		_, msgs := pressYank(t, m)
+		if text, ok := clipboardOf(msgs); !ok || !strings.HasPrefix(text, "apiVersion:") {
+			t.Fatalf("%s: y copied %q", name, text)
+		}
+	}
+	m := demoModel(t, 80, 24)
+	m.after = instantTimer
+	for _, k := range []string{"enter", "d"} {
+		next, _ := m.Update(keyPress(k))
+		m = next.(Model)
+	}
+	check("before the report", m)
+	m = openPodAccess(t, demoModel(t, 80, 24))
+	if len(m.accessAddresses()) == 0 {
+		t.Fatal("fixture needs addresses")
+	}
+	check("after the report", m)
+	check("scrolled away", pressDrive(t, m, "end"))
+	check("after the picker", pressDrive(t, m, "u", "esc"))
+	check("without addresses", openPodAccess(t, nodeModel(t, newNetBrowser(nil, nil), 80, 24)))
+}
+
+func TestOffscreenAccessIsShownInThePickerBeforeTheCopy(t *testing.T) {
+	m := pressDrive(t, openPodAccess(t, demoModel(t, 80, 24)), "end")
+	if strings.Contains(m.Render().Plain(), "https://live.example.com") {
+		t.Fatal("fixture needs the address off screen")
+	}
+	opened := pressDrive(t, m, "u")
+	if !strings.Contains(opened.Render().Plain(), "https://live.example.com") {
+		t.Fatal("the picker shows the URL")
+	}
+	_, msgs := copyURL(t, m)
+	if text, _ := clipboardOf(msgs); text != "https://live.example.com" {
+		t.Fatalf("copied %q", text)
+	}
+}
+
+func TestURLPickerIsFrozenAndCapturesInput(t *testing.T) {
+	m := pressDrive(t, openPodAccess(t, demoModel(t, 160, 48)), "u")
+	frozen := slices.Clone(m.urls.items)
+	changed := *m.acc.view
+	changed.report.Addresses = nil
+	next, _ := m.Update(accessMsg{session: m.session.Generation, seq: m.acc.seq, view: changed})
+	m = next.(Model)
+	if !slices.Equal(m.urls.items, frozen) {
+		t.Fatal("an asynchronous report never changes the open picker")
+	}
+	for _, k := range []string{"y", "c", "n", "2", "m", "b", "?", "/", "e", "left", "tab"} {
+		next, cmd := m.Update(keyPress(k))
+		if _, ok := clipboardOf(drain(cmd)); ok {
+			t.Fatalf("%s copied something", k)
+		}
+		if got := next.(Model); !got.urls.open || got.nav != m.nav || got.tab != m.tab || got.helpOpen || got.menu.open {
+			t.Fatalf("%s leaked through the picker", k)
+		}
+	}
+	m = pressDrive(t, m, "u", "u", "u", "u", "up")
+	if m.urls.cursor != len(frozen)-2 {
+		t.Fatalf("cursor = %d", m.urls.cursor)
+	}
+	want := frozen[m.urls.cursor].URL.String()
+	if !strings.Contains(m.Render().Plain(), want) {
+		t.Fatal("the chosen URL is shown")
+	}
+	after, cmd := m.Update(keyPress("enter"))
+	if text, _ := clipboardOf(drain(cmd)); text != want || after.(Model).urls.open {
+		t.Fatalf("copied %q want %q", text, want)
+	}
+	clicked, _ := m.Update(tea.MouseClickMsg{X: 1, Y: 1, Button: tea.MouseLeft})
+	if clicked.(Model).urls.open {
+		t.Fatal("a click closes the picker")
+	}
+	small, _ := m.Update(tea.WindowSizeMsg{Width: 40, Height: 10})
+	if small.(Model).urls.open {
+		t.Fatal("a terminal that is too small closes the picker")
+	}
+}
+
+func TestURLPickerNeedsAddresses(t *testing.T) {
+	m := pressDrive(t, openPodAccess(t, nodeModel(t, newNetBrowser(nil, nil), 160, 48)), "u")
+	if m.urls.open {
+		t.Fatal("nothing to choose")
+	}
+	m = pressDrive(t, demoModel(t, 160, 48), "enter", "u")
+	if m.urls.open {
+		t.Fatal("u belongs to Describe")
+	}
+	m = pressDrive(t, openLeaf(t, demoModel(t, 160, 48), DestServices), "u")
+	if m.urls.open {
+		t.Fatal("u does nothing in a list")
+	}
 }

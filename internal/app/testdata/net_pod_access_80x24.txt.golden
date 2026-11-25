@@ -16,7 +16,7 @@
  │ │ ● app     log-shipper       running 119d · ready ✓ · started ✓ · rest… │ │ 
  │ │                                                                        │ │ 
  │ │ Acesso  2 endereços · estado pelos endpoints lidos; nenhuma requisiçã… │ │ 
- │ │ ● Ingress      https://live.example.com                            ◂ y │ │ 
+ │ │ ● Ingress      https://live.example.com                                │ │ 
  │ │           estado    pronta · Ingress bilibili-raffle/live · TLS decla… │ │ 
  │ ╰────────────────────────────────────────────────────────────────────────╯ │ 
  ╰────────────────────────────────────────────────────────────────────────────╯ 

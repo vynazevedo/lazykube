@@ -16,13 +16,13 @@
  │ │ ● app     log-shipper       running 119d · ready ✓ · started ✓ · restarts 0                                                                            │ │ 
  │ │                                                                                                                                                        │ │ 
  │ │ Acesso  2 endereços · estado pelos endpoints lidos; nenhuma requisição foi feita                                                                       │ │ 
- │ │ ● Ingress      https://live.example.com                                                                                                            ◂ y │ │ 
+ │ │ ● Ingress      https://live.example.com                                                                                                                │ │ 
  │ │           estado    pronta · Ingress bilibili-raffle/live · TLS declarado                                                                              │ │ 
  │ │           alcance   provável rede privada, alcance não verificado                                                                                      │ │ 
  │ │ ● ClusterIP    http://10.43.10.11                                                                                                                      │ │ 
  │ │           estado    pronta · Service bilibili-raffle/bilibili-live · nome da porta                                                                     │ │ 
  │ │           alcance   endereço interno do cluster                                                                                                        │ │ 
- │ │           ↳ u próxima URL · y copia a selecionada                                                                                                      │ │ 
+ │ │           ↳ u escolhe e copia uma URL                                                                                                                  │ │ 
  │ │                                                                                                                                                        │ │ 
  │ │ Rota  primeiro elo quebrado pelos objetos lidos                                                                                                        │ │ 
  │ │ ● Service bilibili-raffle/bilibili-live                                                                                                                │ │ 

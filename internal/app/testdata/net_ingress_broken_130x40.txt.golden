@@ -11,11 +11,11 @@
  │ Regra             erp.example.com/erp Prefix para erp:http                                                                   │ 
  │                                                                                                                              │ 
  │ Acesso  1 endereço · estado pelos endpoints lidos; nenhuma requisição foi feita                                              │ 
- │ ✗ Ingress      http://erp.example.com/erp                                                                                ◂ y │ 
+ │ ✗ Ingress      http://erp.example.com/erp                                                                                    │ 
  │           estado    sem backend · Ingress ys-odoo/erp · sem TLS declarado                                                    │ 
  │           alcance   provável rede privada, alcance não verificado                                                            │ 
  │           motivo    o Service ys-odoo/erp não existe na lista lida                                                           │ 
- │           ↳ u próxima URL · y copia a selecionada                                                                            │ 
+ │           ↳ u escolhe e copia uma URL                                                                                        │ 
  │                                                                                                                              │ 
  │ Rota  primeiro elo quebrado pelos objetos lidos                                                                              │ 
  │ ✗ Ingress ys-odoo/erp erp.example.com/erp para erp:http                                                                      │ 
@@ -37,4 +37,4 @@
  │                                                                                                                              │ 
  ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  ↑↓  scroll   u  next URL   y  copy   r  reload   esc  back   b  tree   m  menu   ?  help   q  quit            bubbletea · 0 fps 
+  ↑↓  scroll   u  URLs   y  copy name   r  reload   esc  back   b  tree   m  menu   ?  help   q  quit           bubbletea · 0 fps 

@@ -115,8 +115,7 @@ func FullHelpDetail() []KeyHelp {
 			h.Desc = "clear search, back"
 		}
 		if h.Key == "y" {
-			out = append(out, KeyHelp{"u", "next URL (Describe)"})
-			h.Desc = "copy URL / YAML / log line"
+			out = append(out, KeyHelp{"u", "copy a URL (Describe)"})
 		}
 		out = append(out, h)
 	}

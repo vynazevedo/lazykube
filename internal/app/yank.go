@@ -142,16 +142,14 @@ func yankRef(namespace, name string) (yank, bool) {
 }
 
 func (m Model) yank() (Model, tea.Cmd) {
-	y, refused, ok := m.yankAddress()
-	if refused != "" {
-		return m, m.showNotice(refused)
-	}
-	if !ok {
-		y, ok = m.yankTarget()
-	}
+	y, ok := m.yankTarget()
 	if !ok {
 		return m, m.showNotice("nada para copiar")
 	}
+	return m.copyText(y)
+}
+
+func (m Model) copyText(y yank) (Model, tea.Cmd) {
 	if size := base64.StdEncoding.EncodedLen(len(y.text)); size > clipboardLimit {
 		return m, m.showNotice(fmt.Sprintf("grande demais para copiar (%d KiB, limite %d KiB)", (size+1023)/1024, clipboardLimit/1024))
 	}

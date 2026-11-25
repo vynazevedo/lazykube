@@ -103,7 +103,7 @@ func DefaultKeyMap() KeyMap {
 		Refresh:     b("r", "reload list", "r"),
 		MarkNS:      b("space", "mark namespace", "space"),
 		Yank:        b("y", "copy", "y"),
-		NextURL:     b("u", "next URL", "u"),
+		NextURL:     b("u", "choose and copy a URL", "u"),
 	}
 }
 

@@ -340,7 +340,10 @@ Secrets e não afirma que a aplicação responde. Host vazio ou curinga não vir
 URL. Para NetworkPolicy, só diz quais políticas selecionam o pod, porque o
 efeito depende do CNI.
 
-`u` escolhe a próxima URL e `y` copia a escolhida. Só vira link clicável (OSC8) a
+`u` abre o seletor de URLs: mostra a URL escolhida inteira, quebrada em linhas e
+com o host em destaque, e `enter` copia exatamente esse texto; se ela não couber
+no terminal, a cópia é recusada. `y` continua copiando nome, YAML ou linha de
+log. Só vira link clicável (OSC8) a
 URL http ou https com host ASCII validado, sem credencial, controle ou bidi, e
 visível por inteiro na linha; endereços internos do cluster podem ser copiados,
 mas não são links. O lazykube nunca abre navegador nem executa comando externo.
@@ -400,8 +403,8 @@ os painéis: clique seleciona, a roda rola e o clique na aba troca de aba.
  │                                                       │
  ├─ GERAL ───────────────────────────────────────────────┤
  │                                                       │
- │  y                 copia nome, URL, YAML ou linha log │
- │  u                 próxima URL na seção Acesso        │
+ │  y                 copia nome, YAML ou linha do log   │
+ │  u                 escolhe e copia URL da seção Acesso│
  │  p                 troca a paleta de cores            │
  │  ctrl+p            pausa / retoma animações           │
  │  ?                 ajuda                              │
