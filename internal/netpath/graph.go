@@ -1,7 +1,10 @@
 package netpath
 
 import (
+	"cmp"
 	"context"
+	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -50,6 +53,11 @@ type indexedSet struct {
 	state    SetState
 	readable bool
 	rows     map[objectKey]*data.ResourceRow
+	order    []*data.ResourceRow
+}
+
+func compareRows(a, b *data.ResourceRow) int {
+	return cmp.Or(cmp.Compare(a.Ref.Namespace, b.Ref.Namespace), cmp.Compare(a.Ref.Name, b.Ref.Name))
 }
 
 func (s indexedSet) authoritative() bool {
@@ -112,11 +120,15 @@ func newIndex(ctx context.Context, g Graph) (*index, error) {
 		{&x.nodes, g.Nodes, x.addNode},
 	} {
 		*part.set = indexedSet{state: part.from.State, readable: true, rows: make(map[objectKey]*data.ResourceRow, len(part.from.Rows))}
+		part.set.order = make([]*data.ResourceRow, len(part.from.Rows))
 		for i := range part.from.Rows {
+			part.set.order[i] = &part.from.Rows[i]
+		}
+		slices.SortFunc(part.set.order, compareRows)
+		for i, row := range part.set.order {
 			if i%cancelStride == 0 && ctx.Err() != nil {
 				return nil, ctx.Err()
 			}
-			row := &part.from.Rows[i]
 			part.set.rows[keyOf(*row)] = row
 			if row.Network == nil || row.Network.Truncated {
 				part.set.readable = false
@@ -252,12 +264,95 @@ func (x *index) countPods(namespace string, selector data.Labels) podCount {
 	return out
 }
 
-type endpointCount struct {
+const (
+	familyIPv4 = "IPv4"
+	familyIPv6 = "IPv6"
+)
+
+type familyCount struct {
+	name   string
+	served bool
 	data.EndpointTally
+}
+
+type endpointCount struct {
+	families []familyCount
 	slices   int
 	withPort bool
 	diverges bool
 	known    bool
+}
+
+func (c endpointCount) any(pick func(familyCount) int) bool {
+	for _, f := range c.families {
+		if f.served && pick(f) > 0 {
+			return true
+		}
+	}
+	return false
+}
+
+func (c endpointCount) ready() bool    { return c.any(func(f familyCount) int { return f.Ready }) }
+func (c endpointCount) draining() bool { return c.any(func(f familyCount) int { return f.Draining }) }
+func (c endpointCount) unclear() bool  { return c.any(func(f familyCount) int { return f.Unclear }) }
+func (c endpointCount) total() bool    { return c.any(func(f familyCount) int { return f.Total }) }
+
+func (c endpointCount) partial() bool {
+	return c.any(func(f familyCount) int {
+		if f.Total > 0 && f.Ready == 0 {
+			return 1
+		}
+		return 0
+	})
+}
+
+func (c endpointCount) family(name string) data.EndpointTally {
+	for _, f := range c.families {
+		if f.name == name {
+			return f.EndpointTally
+		}
+	}
+	return data.EndpointTally{}
+}
+
+func (c endpointCount) outside() string {
+	if len(c.families) == 0 {
+		return ""
+	}
+	parts := make([]string, len(c.families))
+	for i, f := range c.families {
+		parts[i] = f.text()
+	}
+	return "; " + strings.Join(parts, "; ")
+}
+
+func (f familyCount) text() string {
+	parts := []string{fmt.Sprintf("%d de %d prontos", f.Ready, f.Total)}
+	if f.Draining > 0 {
+		parts = append(parts, fmt.Sprintf("%d em drenagem", f.Draining))
+	}
+	if f.Unclear > 0 {
+		parts = append(parts, fmt.Sprintf("%d indeterminados", f.Unclear))
+	}
+	if f.Unavailable > 0 {
+		parts = append(parts, fmt.Sprintf("%d indisponíveis", f.Unavailable))
+	}
+	out := f.name + ": " + strings.Join(parts, ", ")
+	if !f.served {
+		out += " (família fora do Service)"
+	}
+	return out
+}
+
+func (c endpointCount) text(single func(data.EndpointTally) string) string {
+	if len(c.families) == 1 {
+		return single(c.families[0].EndpointTally)
+	}
+	parts := make([]string, len(c.families))
+	for i, f := range c.families {
+		parts[i] = f.text()
+	}
+	return strings.Join(parts, "; ")
 }
 
 func protocolOf(p string) string {
@@ -275,20 +370,26 @@ func targetNumber(svc *data.ServiceFacts, port *data.ServicePort) (int, bool) {
 	return n, err == nil && n > 0
 }
 
-func primaryFamily(svc *data.ServiceFacts) string {
+func familyOf(ip string) string {
+	if strings.Contains(ip, ":") {
+		return familyIPv6
+	}
+	return familyIPv4
+}
+
+func serves(svc *data.ServiceFacts, family string) bool {
+	if family != familyIPv4 && family != familyIPv6 {
+		return false
+	}
 	if svc.Headless() {
-		return ""
+		return true
 	}
-	if strings.Contains(svc.ClusterIPs[0], ":") {
-		return "IPv6"
-	}
-	return "IPv4"
+	return slices.ContainsFunc(svc.ClusterIPs, func(ip string) bool { return familyOf(ip) == family })
 }
 
 func (x *index) endpoints(namespace, service string, svc *data.ServiceFacts, port *data.ServicePort) endpointCount {
 	out := endpointCount{known: x.slices.authoritative()}
 	want, numeric := targetNumber(svc, port)
-	families := map[string]data.EndpointTally{}
 	for _, s := range x.byService[objectKey{namespace, service}] {
 		out.slices++
 		if port != nil {
@@ -302,29 +403,25 @@ func (x *index) endpoints(namespace, service string, svc *data.ServiceFacts, por
 			}
 		}
 		out.withPort = true
-		t := families[s.AddressType]
-		t.Merge(s.Tally())
-		families[s.AddressType] = t
+		out.add(s, svc)
 	}
-	if family := primaryFamily(svc); family != "" {
-		out.EndpointTally = families[family]
-		for other, t := range families {
-			if other != family && out.Total == 0 && t.Total > 0 {
-				out.diverges = true
-			}
-		}
-		return out
-	}
-	for family, t := range families {
-		if family == "FQDN" {
+	slices.SortFunc(out.families, func(a, b familyCount) int { return cmp.Compare(a.name, b.name) })
+	served := out.total()
+	for _, f := range out.families {
+		if !f.served && (f.Ready+f.Draining+f.Unclear > 0 || !served && f.Total > 0) {
 			out.diverges = true
-			continue
-		}
-		if t.Ready > out.Ready || t.Ready == out.Ready && t.Total > out.Total {
-			out.EndpointTally = t
 		}
 	}
 	return out
+}
+
+func (c *endpointCount) add(s *data.SliceFacts, svc *data.ServiceFacts) {
+	at := slices.IndexFunc(c.families, func(f familyCount) bool { return f.name == s.AddressType })
+	if at < 0 {
+		at = len(c.families)
+		c.families = append(c.families, familyCount{name: s.AddressType, served: serves(svc, s.AddressType)})
+	}
+	c.families[at].Merge(s.Tally())
 }
 
 func matchPort(s *data.SliceFacts, port *data.ServicePort) *data.SlicePort {

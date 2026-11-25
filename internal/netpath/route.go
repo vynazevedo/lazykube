@@ -133,6 +133,7 @@ type backendResult struct {
 	reason string
 	steps  []Step
 	port   *data.ServicePort
+	eps    endpointCount
 }
 
 func (b *backendResult) add(kind StepKind, st Status, text string) {
@@ -213,6 +214,7 @@ func (b *backendResult) serve(x *index, namespace, name string, svc *data.Servic
 		pods = x.countPods(namespace, svc.Selector)
 	}
 	eps := x.endpoints(namespace, name, svc, port)
+	b.eps = eps
 	b.podStep(x, svc, pods, eps)
 	b.endpointStep(x, svc, pods, eps, port)
 }
@@ -222,7 +224,7 @@ func (b *backendResult) podStep(x *index, svc *data.ServiceFacts, pods podCount,
 		b.add(StepPods, StatusOK, "Service sem selector; nenhum pod a conferir")
 		return
 	}
-	elsewhere := eps.Ready > 0 || eps.Draining > 0 || eps.Unclear > 0 || eps.diverges
+	elsewhere := eps.ready() || eps.draining() || eps.unclear() || eps.diverges
 	switch {
 	case pods.ready > 0:
 		text := fmt.Sprintf("%d de %d prontos", pods.ready, pods.matched)
@@ -230,7 +232,7 @@ func (b *backendResult) podStep(x *index, svc *data.ServiceFacts, pods podCount,
 			text += fmt.Sprintf(", %d em drenagem", pods.draining)
 		}
 		b.add(StepPods, StatusOK, text)
-	case pods.draining > 0 && eps.Draining > 0 && eps.Ready == 0:
+	case pods.draining > 0 && eps.draining() && !eps.ready():
 		b.add(StepPods, StatusDraining, fmt.Sprintf("%d de %d pods encerrando e ainda Ready, nenhum outro pronto", pods.draining, pods.matched))
 	case pods.draining > 0:
 		b.add(StepPods, StatusAttention, fmt.Sprintf("%d de %d pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem", pods.draining, pods.matched))
@@ -271,20 +273,26 @@ func (b *backendResult) endpointStep(x *index, svc *data.ServiceFacts, pods podC
 		b.settle(state, reason)
 	}
 	switch {
-	case eps.Ready > 0 && svc.PublishNotReady && len(svc.Selector) > 0 && pods.ready == 0:
-		end(StatusUnknown, StateUnknown, fmt.Sprintf("%d de %d publicados, mas o Service declara publishNotReadyAddresses e nenhum pod pronto foi lido", eps.Ready, eps.Total))
-	case eps.Ready > 0:
-		text := fmt.Sprintf("%d de %d prontos", eps.Ready, eps.Total)
-		if eps.Draining > 0 {
-			text += fmt.Sprintf(", %d em drenagem", eps.Draining)
+	case eps.ready() && svc.PublishNotReady && len(svc.Selector) > 0 && pods.ready == 0:
+		end(StatusUnknown, StateUnknown, eps.text(func(c data.EndpointTally) string { return fmt.Sprintf("%d de %d publicados", c.Ready, c.Total) })+", mas o Service declara publishNotReadyAddresses e nenhum pod pronto foi lido")
+	case eps.ready():
+		status := StatusOK
+		if eps.partial() {
+			status = StatusAttention
 		}
-		end(StatusOK, StateReady, text)
-	case eps.Draining > 0:
-		end(StatusDraining, StateDraining, fmt.Sprintf("%d de %d em drenagem: encerrando e ainda atendendo, nenhum pronto", eps.Draining, eps.Total))
-	case eps.Unclear > 0:
-		end(StatusUnknown, StateUnknown, fmt.Sprintf("%d de %d com condições que não permitem concluir", eps.Unclear, eps.Total))
+		end(status, StateReady, eps.text(func(c data.EndpointTally) string {
+			text := fmt.Sprintf("%d de %d prontos", c.Ready, c.Total)
+			if c.Draining > 0 {
+				text += fmt.Sprintf(", %d em drenagem", c.Draining)
+			}
+			return text
+		}))
+	case eps.draining():
+		end(StatusDraining, StateDraining, eps.text(func(c data.EndpointTally) string { return fmt.Sprintf("%d de %d em drenagem", c.Draining, c.Total) })+": encerrando e ainda atendendo, nenhum pronto")
+	case eps.unclear():
+		end(StatusUnknown, StateUnknown, eps.text(func(c data.EndpointTally) string { return fmt.Sprintf("%d de %d", c.Unclear, c.Total) })+" com condições que não permitem concluir")
 	case eps.diverges:
-		end(StatusUnknown, StateUnknown, "há EndpointSlices com número de porta ou família de IP diferente do Service")
+		end(StatusUnknown, StateUnknown, "há EndpointSlices com número de porta ou família de IP diferente do Service"+eps.outside())
 	case !eps.known:
 		text := x.slices.gap("EndpointSlices")
 		b.add(StepEndpoints, StatusUnknown, label+text)
@@ -298,12 +306,12 @@ func (b *backendResult) endpointStep(x *index, svc *data.ServiceFacts, pods podC
 		b.settle(StateUnknown, text)
 	case eps.slices > 0 && !eps.withPort:
 		end(StatusBroken, StateNoBackend, "nenhum EndpointSlice lido declara esta porta e protocolo")
-	case eps.Total == 0 && pods.matched > 0:
+	case !eps.total() && pods.matched > 0:
 		end(StatusBroken, StatePending, "nenhum endpoint do Service na lista lida")
-	case eps.Total == 0:
+	case !eps.total():
 		end(StatusBroken, StateNoBackend, "nenhum endpoint do Service na lista lida")
 	default:
-		end(StatusBroken, StatePending, fmt.Sprintf("%d endpoints, nenhum pronto", eps.Total))
+		end(StatusBroken, StatePending, eps.text(func(c data.EndpointTally) string { return fmt.Sprintf("%d endpoints", c.Total) })+", nenhum pronto")
 	}
 }
 

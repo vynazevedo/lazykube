@@ -405,11 +405,12 @@ func TestSelectorlessServiceUsesItsEndpoints(t *testing.T) {
 
 func TestDualStackSlicesAreNotCountedTwice(t *testing.T) {
 	g := healthy()
+	g.Services.Rows[0].Network.Service.ClusterIPs = []string{"10.1.0.1", "fd00::1"}
 	v6 := webSlice(2, 2)
 	v6.Ref.Name, v6.Network.Slice.AddressType = "web-6", "IPv6"
 	g.Slices = known(webSlice(2, 2), v6)
 	for _, s := range Access(g, ingressTarget).Routes[0].Steps {
-		if s.Kind == StepEndpoints && s.Evidence != "http 80/TCP: 2 de 2 prontos" {
+		if s.Kind == StepEndpoints && s.Evidence != "http 80/TCP: IPv4: 2 de 2 prontos; IPv6: 2 de 2 prontos" {
 			t.Fatal(s.Evidence)
 		}
 	}
@@ -437,7 +438,7 @@ func TestPoliciesOnlySaySelection(t *testing.T) {
 		foreign,
 	)
 	p := Access(g, podTarget).Policies
-	if !slices.Equal(p.Selecting, []string{"all", "label", "in", "exists"}) || !slices.Equal(p.Uncertain, []string{"odd"}) || !p.Known || p.Note != policyCaveat {
+	if !slices.Equal(p.Selecting, []string{"all", "exists", "in", "label"}) || !slices.Equal(p.Uncertain, []string{"odd"}) || !p.Known || p.Note != policyCaveat {
 		t.Fatalf("%+v", p)
 	}
 	text := strings.ToLower(fmt.Sprintf("%+v", p))

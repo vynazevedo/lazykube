@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
@@ -14,11 +15,13 @@ import (
 var update = flag.Bool("update", false, "update golden files")
 
 type endpointCase struct {
-	name  string
-	facts []data.SliceEndpoint
-	set   *Set
-	port  func(*data.SliceFacts)
-	class string
+	name   string
+	facts  []data.SliceEndpoint
+	six    []data.SliceEndpoint
+	set    *Set
+	port   func(*data.SliceFacts)
+	class  string
+	class6 string
 }
 
 func endpoint(ready, serving, terminating data.Tri) data.SliceEndpoint {
@@ -48,6 +51,17 @@ var endpointCases = []endpointCase{
 	{name: "número diferente do targetPort", facts: []data.SliceEndpoint{endpoint(yes, yes, no)}, port: func(s *data.SliceFacts) { s.Ports[0].Port = 9999 }, class: "unclear"},
 	{name: "número nil", facts: []data.SliceEndpoint{endpoint(yes, yes, no)}, port: func(s *data.SliceFacts) { s.Ports[0].Port = 0 }, class: "unclear"},
 	{name: "só IPv6 para Service IPv4", facts: []data.SliceEndpoint{endpoint(yes, yes, no)}, port: func(s *data.SliceFacts) { s.AddressType = "IPv6" }, class: "unclear"},
+	{name: "IPv4 indisponível x2, IPv6 drenando", facts: []data.SliceEndpoint{endpoint(no, no, no), endpoint(no, no, no)}, six: []data.SliceEndpoint{endpoint(no, yes, yes)}, class: "down", class6: "draining"},
+	{name: "IPv4 indisponível x2, IPv6 indeterminado", facts: []data.SliceEndpoint{endpoint(no, no, no), endpoint(no, no, no)}, six: []data.SliceEndpoint{endpoint(no, none, yes)}, class: "down", class6: "unclear"},
+	{name: "IPv4 indisponível, IPv6 drenando", facts: []data.SliceEndpoint{endpoint(no, no, no)}, six: []data.SliceEndpoint{endpoint(no, yes, yes)}, class: "down", class6: "draining"},
+	{name: "IPv4 drenando, IPv6 indisponível", facts: []data.SliceEndpoint{endpoint(no, yes, yes)}, six: []data.SliceEndpoint{endpoint(no, no, no)}, class: "draining", class6: "down"},
+	{name: "IPv4 drenando, IPv6 indeterminado", facts: []data.SliceEndpoint{endpoint(no, yes, yes)}, six: []data.SliceEndpoint{endpoint(no, none, yes)}, class: "draining", class6: "unclear"},
+	{name: "IPv4 indisponível x2, IPv6 pronto", facts: []data.SliceEndpoint{endpoint(no, no, no), endpoint(no, no, no)}, six: []data.SliceEndpoint{endpoint(yes, yes, no)}, class: "down", class6: "ready"},
+	{name: "IPv4 pronto, IPv6 indisponível x2", facts: []data.SliceEndpoint{endpoint(yes, yes, no)}, six: []data.SliceEndpoint{endpoint(no, no, no), endpoint(no, no, no)}, class: "ready", class6: "down"},
+	{name: "IPv4 pronto, IPv6 drenando", facts: []data.SliceEndpoint{endpoint(yes, yes, no)}, six: []data.SliceEndpoint{endpoint(no, yes, yes)}, class: "ready", class6: "draining"},
+	{name: "IPv4 e IPv6 indisponíveis", facts: []data.SliceEndpoint{endpoint(no, no, no)}, six: []data.SliceEndpoint{endpoint(no, no, no)}, class: "down", class6: "down"},
+	{name: "IPv4 e IPv6 prontos", facts: []data.SliceEndpoint{endpoint(yes, yes, no)}, six: []data.SliceEndpoint{endpoint(yes, yes, no)}, class: "ready", class6: "ready"},
+	{name: "IPv4 vazio, IPv6 drenando", facts: []data.SliceEndpoint{}, six: []data.SliceEndpoint{endpoint(no, yes, yes)}, class: "none", class6: "draining"},
 	{name: "sem EndpointSlice", set: &Set{State: SetKnown}, class: "none"},
 	{name: "EndpointSlice vazio", facts: []data.SliceEndpoint{}, class: "none"},
 	{name: "leitura negada", set: &Set{State: SetDenied}, class: "unknown"},
@@ -90,12 +104,14 @@ var serviceCases = []serviceCase{
 	{"sem selector", func(s *data.ServiceFacts) { s.Selector = nil }},
 	{"publishNotReadyAddresses", func(s *data.ServiceFacts) { s.PublishNotReady = true }},
 	{"headless", func(s *data.ServiceFacts) { s.ClusterIPs = []string{"None"} }},
+	{"dual-stack", func(s *data.ServiceFacts) { s.ClusterIPs = []string{"10.1.0.1", "fd00::1"} }},
+	{"headless publishNotReady", func(s *data.ServiceFacts) { s.ClusterIPs, s.PublishNotReady = []string{"None"}, true }},
+	{"dual-stack publishNotReady", func(s *data.ServiceFacts) { s.ClusterIPs, s.PublishNotReady = []string{"10.1.0.1", "fd00::1"}, true }},
 	{"targetPort nomeada", func(s *data.ServiceFacts) { s.Ports[0].Target = "web" }},
 }
 
 func stateGraph(s serviceCase, e endpointCase, p podCase) Graph {
 	g := healthy()
-	g.Ingresses = known()
 	g.Services = known(webService(func(f *data.ServiceFacts) {
 		f.Ports[0].Target = "8080"
 		if s.change != nil {
@@ -113,7 +129,32 @@ func stateGraph(s serviceCase, e endpointCase, p podCase) Graph {
 		e.port(row.Network.Slice)
 	}
 	g.Slices = known(row)
+	if e.six != nil {
+		six := webSlice(0, 0)
+		six.Ref.Name = "web-six"
+		six.Network.Slice.AddressType = "IPv6"
+		six.Network.Slice.Endpoints, six.Network.Slice.Total = e.six, len(e.six)
+		g.Slices.Rows = append(g.Slices.Rows, six)
+	}
 	return g
+}
+
+func originAddress(r Report, o Origin) Address {
+	for _, a := range r.Addresses {
+		if a.Origin == o {
+			return a
+		}
+	}
+	return Address{State: StateUnknown}
+}
+
+func serviceRouteOf(r Report) Route {
+	for _, route := range r.Routes {
+		if strings.HasPrefix(route.Title, "Service ") {
+			return route
+		}
+	}
+	return Route{}
 }
 
 func eachState(visit func(serviceCase, endpointCase, podCase, Report)) {
@@ -138,21 +179,45 @@ func broken(r Report) []Step {
 	return out
 }
 
+func bothFamilies(s serviceCase) bool {
+	return strings.HasPrefix(s.name, "headless") || strings.HasPrefix(s.name, "dual-stack")
+}
+
+func publishes(s serviceCase) bool {
+	return strings.Contains(s.name, "publishNotReady")
+}
+
 func endpointClass(s serviceCase, e endpointCase) string {
 	switch {
 	case e.name == "número diferente do targetPort" && (s.name == "sem selector" || s.name == "targetPort nomeada"):
 		return "ready"
-	case e.name == "só IPv6 para Service IPv4" && s.name == "headless":
+	case e.name == "só IPv6 para Service IPv4" && bothFamilies(s):
 		return "ready"
+	case e.class6 == "":
+		return e.class
 	}
-	return e.class
+	classes := []string{e.class, e.class6}
+	if !bothFamilies(s) {
+		classes = []string{e.class}
+		if e.class6 != "down" && e.class != "ready" && e.class != "draining" {
+			return "unclear"
+		}
+	}
+	for _, best := range []string{"ready", "draining", "unclear", "down"} {
+		if slices.Contains(classes, best) {
+			return best
+		}
+	}
+	return "none"
 }
 
 func TestNoCombinationIsFalselyReadyOrFalselyBroken(t *testing.T) {
 	seen := map[string]int{}
 	eachState(func(s serviceCase, e endpointCase, p podCase, r Report) {
 		name := s.name + " | " + e.name + " | " + p.name
-		a := r.Addresses[0]
+		a := originAddress(r, OriginIngress)
+		literal := originAddress(r, OriginClusterIP)
+		verdict := serviceRouteOf(r).Verdict()
 		class := endpointClass(s, e)
 		seen[class]++
 		bad := broken(r)
@@ -165,7 +230,7 @@ func TestNoCombinationIsFalselyReadyOrFalselyBroken(t *testing.T) {
 		if len(bad) > 0 && (class == "ready" || class == "draining" || class == "unclear") {
 			t.Errorf("falso quebrado: %s: %+v", name, bad)
 		}
-		if len(bad) > 0 && class == "unknown" && (p.class != "down" && p.class != "none" || s.name == "publishNotReadyAddresses" && p.class == "down") {
+		if len(bad) > 0 && class == "unknown" && (p.class != "down" && p.class != "none" || publishes(s) && p.class == "down") {
 			t.Errorf("falso quebrado sem leitura dos endpoints: %s: %+v", name, bad)
 		}
 		if len(bad) == 0 && (class == "down" || class == "none" || class == "noport") {
@@ -175,21 +240,39 @@ func TestNoCombinationIsFalselyReadyOrFalselyBroken(t *testing.T) {
 			t.Errorf("drenagem não apontada: %s: %s", name, a.State)
 		}
 		if class == "ready" && a.State != StateReady {
-			if s.name != "publishNotReadyAddresses" || p.class == "ready" {
+			if !publishes(s) || p.class == "ready" {
 				t.Errorf("pronta não apontada: %s: %s", name, a.State)
 			}
 		}
-		if s.name == "publishNotReadyAddresses" && a.State == StateReady && p.class != "ready" {
+		if publishes(s) && a.State == StateReady && p.class != "ready" {
 			t.Errorf("publishNotReadyAddresses sem pod pronto vira pronta: %s", name)
 		}
 		if a.State == StateDraining && !strings.Contains(a.Reason, " em drenagem") {
 			t.Errorf("drenagem sem contagem: %s: %q", name, a.Reason)
 		}
-		if a.State == StateDraining && !strings.HasPrefix(r.Routes[0].Verdict(), "em drenagem: ") {
-			t.Errorf("veredito: %s: %q", name, r.Routes[0].Verdict())
+		if a.State == StateDraining && !strings.HasPrefix(verdict, "em drenagem: ") {
+			t.Errorf("veredito: %s: %q", name, verdict)
 		}
-		if strings.HasPrefix(r.Routes[0].Verdict(), "em drenagem") != (a.State == StateDraining) {
-			t.Errorf("estado e veredito divergem: %s: %s, %q", name, a.State, r.Routes[0].Verdict())
+		if strings.HasPrefix(verdict, "em drenagem") != (a.State == StateDraining) {
+			t.Errorf("estado e veredito divergem: %s: %s, %q", name, a.State, verdict)
+		}
+		ipv4 := e.class
+		if e.name == "só IPv6 para Service IPv4" {
+			ipv4 = "none"
+		}
+		if strings.HasPrefix(s.name, "dual-stack") && literal.State == StateReady && ipv4 != "ready" {
+			t.Errorf("endereço IPv4 pronto por causa de outra família: %s: %+v", name, literal)
+		}
+		if strings.HasPrefix(s.name, "dual-stack") && literal.State == StateDraining && ipv4 != "draining" {
+			t.Errorf("endereço IPv4 em drenagem por causa de outra família: %s: %+v", name, literal)
+		}
+		if e.class6 != "" && bothFamilies(s) {
+			text := fmt.Sprintf("%+v", serviceRouteOf(r).Steps)
+			if !strings.Contains(text, "IPv4: ") && e.class != "none" || !strings.Contains(text, "IPv6: ") {
+				if class != "none" {
+					t.Errorf("contagem por família ausente: %s: %s", name, text)
+				}
+			}
 		}
 		if len(bad) > 0 && a.State == StateReady {
 			t.Errorf("pronta e quebrada ao mesmo tempo: %s", name)
@@ -204,9 +287,9 @@ func TestNoCombinationIsFalselyReadyOrFalselyBroken(t *testing.T) {
 
 func TestStateTableGolden(t *testing.T) {
 	var b strings.Builder
-	b.WriteString("Service | EndpointSlice | Pods | Estado mostrado | Veredito da rota\n")
+	b.WriteString("Service | EndpointSlice | Pods | Estado por host | Estado do ClusterIP | Veredito da rota do Service\n")
 	eachState(func(s serviceCase, e endpointCase, p podCase, r Report) {
-		fmt.Fprintf(&b, "%s | %s | %s | %s | %s\n", s.name, e.name, p.name, r.Addresses[0].State, r.Routes[0].Verdict())
+		fmt.Fprintf(&b, "%s | %s | %s | %s | %s | %s\n", s.name, e.name, p.name, originAddress(r, OriginIngress).State, originAddress(r, OriginClusterIP).State, serviceRouteOf(r).Verdict())
 	})
 	path := filepath.Join("testdata", "estados.txt.golden")
 	if *update {

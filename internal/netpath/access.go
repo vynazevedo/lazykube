@@ -122,7 +122,7 @@ func AccessContext(ctx context.Context, g Graph, t Target) (Report, error) {
 	if err != nil {
 		return Report{}, err
 	}
-	b := builder{x: x, g: g, notes: map[string]bool{}}
+	b := builder{x: x, notes: map[string]bool{}}
 	switch t.Kind {
 	case TargetIngress:
 		b.ingressTarget(t)
@@ -142,7 +142,6 @@ func AccessContext(ctx context.Context, g Graph, t Target) (Report, error) {
 
 type builder struct {
 	x     *index
-	g     Graph
 	out   Report
 	notes map[string]bool
 }
@@ -275,7 +274,7 @@ func (b *builder) workloadTarget(t Target) {
 	}
 	var names []string
 	selecting := map[string]bool{}
-	for i, r := range b.g.Services.Rows {
+	for i, r := range b.x.services.order {
 		if i%cancelStride == 0 && b.canceled() {
 			return
 		}
@@ -305,11 +304,10 @@ func (b *builder) pathsTo(namespace string, services map[string]bool) []ingressP
 	if len(services) == 0 {
 		return nil
 	}
-	for i := range b.g.Ingresses.Rows {
+	for i, row := range b.x.ingresses.order {
 		if i%cancelStride == 0 && b.canceled() {
 			return nil
 		}
-		row := &b.g.Ingresses.Rows[i]
 		if row.Ref.Namespace != namespace || row.Network == nil || row.Network.Ingress == nil {
 			continue
 		}
@@ -478,7 +476,7 @@ func (b *builder) servicePort(namespace, name, src string, svc *data.ServiceFact
 	for _, l := range svc.LoadBalancer {
 		a := base
 		a.Origin = OriginLoadBalancer
-		if !b.port(a, cmp.Or(l.Hostname, l.IP), p.Port, p) {
+		if !b.port(a, cmp.Or(l.Hostname, l.IP), p.Port, p, result.eps) {
 			return false
 		}
 	}
@@ -490,11 +488,11 @@ func (b *builder) servicePort(namespace, name, src string, svc *data.ServiceFact
 	for _, ip := range svc.ExternalIPs {
 		a := base
 		a.Origin = OriginExternalIP
-		if !b.port(a, ip, p.Port, p) {
+		if !b.port(a, ip, p.Port, p, result.eps) {
 			return false
 		}
 	}
-	if p.NodePort > 0 && (svc.Type == "NodePort" || svc.Type == "LoadBalancer" && len(svc.LoadBalancer) == 0) && !b.nodePort(base, p) {
+	if p.NodePort > 0 && (svc.Type == "NodePort" || svc.Type == "LoadBalancer" && len(svc.LoadBalancer) == 0) && !b.nodePort(base, p, result.eps) {
 		return false
 	}
 	a := base
@@ -503,10 +501,11 @@ func (b *builder) servicePort(namespace, name, src string, svc *data.ServiceFact
 		a.Display, a.Refused = name+"."+namespace+".svc headless "+portText(p), "Service headless não tem ClusterIP"
 		return b.address(a)
 	}
-	return b.port(a, svc.ClusterIPs[0], p.Port, p)
+	return b.port(a, svc.ClusterIPs[0], p.Port, p, result.eps)
 }
 
-func (b *builder) port(a Address, host string, port int, p data.ServicePort) bool {
+func (b *builder) port(a Address, host string, port int, p data.ServicePort, eps endpointCount) bool {
+	a.narrow(host, eps)
 	cluster := a.Reach == ReachCluster
 	scheme, why := schemeOf(p)
 	if scheme == "" {
@@ -529,6 +528,16 @@ func (b *builder) port(a Address, host string, port int, p data.ServicePort) boo
 	return b.address(a)
 }
 
+func (a *Address) narrow(host string, eps endpointCount) {
+	if _, err := netip.ParseAddr(host); err != nil {
+		return
+	}
+	own := eps.family(familyOf(host))
+	if a.State == StateReady && own.Ready == 0 || a.State == StateDraining && own.Draining == 0 {
+		a.State, a.Reason = StateUnknown, "endpoints de outra família de IP: "+strings.TrimPrefix(eps.outside(), "; ")
+	}
+}
+
 func hostReach(host string) Reach {
 	u, err := weburl.New("http", host, 80, "/")
 	if err != nil {
@@ -537,12 +546,12 @@ func hostReach(host string) Reach {
 	return [...]Reach{ReachDeclared, ReachPrivate, ReachCluster}[u.Reach()]
 }
 
-func (b *builder) nodePort(base Address, p data.ServicePort) bool {
+func (b *builder) nodePort(base Address, p data.ServicePort, eps endpointCount) bool {
 	base.Origin = OriginNodePort
 	for _, n := range b.x.nodeIPs {
 		a := base
 		a.Source += ", node " + n.name
-		if !b.port(a, n.ip, p.NodePort, p) {
+		if !b.port(a, n.ip, p.NodePort, p, eps) {
 			return false
 		}
 	}
@@ -570,7 +579,7 @@ func (b *builder) policies(t Target) PolicyReport {
 		return out
 	}
 	out.Known = b.x.policies.authoritative()
-	for i, r := range b.g.Policies.Rows {
+	for i, r := range b.x.policies.order {
 		if i%cancelStride == 0 && b.canceled() {
 			return PolicyReport{}
 		}
