@@ -83,16 +83,16 @@ func (securityScreen) Keys(m Model) []key.Binding {
 		k.PageUp, k.PageDown, k.Home, k.End,
 		k.SecurityAck, k.Palette, k.Pause, k.Help, k.Quit,
 		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads, k.Nodes, k.Security, k.Events, k.Radar,
-		k.Context, k.Namespace, k.Tree, k.Yank,
+		k.Context, k.Namespace, k.Tree, k.Yank, k.Actions,
 	}
 }
 
-func (securityScreen) Help(Model) []ui.KeyHelp {
-	return ui.SecurityHelp()
+func (securityScreen) Help(m Model) []ui.KeyHelp {
+	return m.actionHelp(ui.SecurityHelp(), "actions")
 }
 
-func (securityScreen) FullHelp(Model) []ui.KeyHelp {
-	return ui.FullHelpSecurity()
+func (securityScreen) FullHelp(m Model) []ui.KeyHelp {
+	return m.actionHelp(ui.FullHelpSecurity(), "actions on the pod")
 }
 
 func (securityScreen) View(m Model, body draw.Region, ctx ui.Ctx) {

@@ -135,6 +135,8 @@ type actionRows struct {
 	uid    string
 	gone   bool
 	noUID  bool
+	keep   bool
+	noRV   bool
 	cordon bool
 }
 
@@ -152,7 +154,14 @@ func (s actionLive) Snapshot() data.Snapshot {
 	suffix := s.stamp.uid
 	pods := append([]data.Pod(nil), snap.Pods...)
 	for i := range pods {
-		pods[i].UID, pods[i].ResourceVersion = "uid-"+pods[i].Name+suffix, "41"
+		uid := "uid-" + pods[i].Name
+		if s.stamp.keep {
+			uid = pods[i].UID
+		}
+		pods[i].UID, pods[i].ResourceVersion = uid+suffix, "41"
+		if s.stamp.noRV {
+			pods[i].ResourceVersion = ""
+		}
 		if s.stamp.noUID {
 			pods[i].UID, pods[i].ResourceVersion = "", ""
 		}
@@ -194,6 +203,7 @@ type actionRig struct {
 	exec  *guard.Executor
 	rows  *actionRows
 	clock *actionClock
+	demo  *data.Demo
 }
 
 func newActionRig(t *testing.T, w, h int, env guard.Environment, writes bool) *actionRig {
@@ -206,7 +216,9 @@ func newActionRig(t *testing.T, w, h int, env guard.Environment, writes bool) *a
 	}
 	t.Cleanup(exec.Close)
 	rig.exec = exec
-	src := actionLive{Demo: data.NewDemo(), exec: exec, stamp: rig.rows}
+	rig.demo = data.NewDemo()
+	rig.demo.ObserveWith(rig.clock)
+	src := actionLive{Demo: rig.demo, exec: exec, stamp: rig.rows}
 	rig.m = New(Options{Source: src, Palette: theme.DefaultPalette(), InitialPod: 1, NoAnim: true, Now: rig.clock.Now, Session: data.SessionRef{Context: "laboratorio", Generation: 12, Mode: sessionMode(exec)}})
 	rig.m.after = func(time.Duration, func(time.Time) tea.Msg) tea.Cmd { return nil }
 	rig.m.actTick = func(context.Context, time.Duration, tea.Msg) tea.Cmd { return nil }
@@ -321,10 +333,14 @@ func (r *actionRig) plain() string { return r.m.Render().Plain() }
 
 func (r *actionRig) dialog() string { return dialogText(r.m) }
 
-func dialogText(m Model) string {
+func dialogCanvas(m Model) *draw.Canvas {
 	c := draw.NewCanvas(m.w, m.h, theme.BgApp)
 	ui.ActionDialog(c.Region(), m.actionDialog(), ui.Ctx{Pal: m.pal, Clock: m.clock})
-	return flat(c.Plain())
+	return c
+}
+
+func dialogText(m Model) string {
+	return flat(dialogCanvas(m).Plain())
 }
 
 func flat(s string) string {

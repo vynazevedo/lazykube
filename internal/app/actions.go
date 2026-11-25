@@ -184,6 +184,10 @@ func (m Model) actionTarget() (guard.Target, bool) {
 		return m.tableTarget()
 	case m.onScreen(ScreenNodes):
 		return m.nodeTarget()
+	case m.onScreen(ScreenRadar):
+		return m.signalTarget()
+	case m.onScreen(ScreenSecurity):
+		return m.postureTarget()
 	case !m.onScreen(ScreenDashboard) && !m.onScreen(ScreenWorkloads):
 		return guard.Target{}, false
 	}
@@ -198,6 +202,40 @@ func (m Model) actionTarget() (guard.Target, bool) {
 		}
 	}
 	return guard.Target{}, false
+}
+
+func exactPod(p *data.Pod) (guard.Target, bool) {
+	t, ok := podTarget(p)
+	return t, ok && t.UID != "" && t.ResourceVersion != ""
+}
+
+func (m Model) signalTarget() (guard.Target, bool) {
+	p, _ := m.signalPod(m.selectedSignal())
+	return exactPod(p)
+}
+
+func (m Model) postureTarget() (guard.Target, bool) {
+	if m.sec.Tab != ui.SecTabWorkloads || !m.sec.have || m.sec.Cursor < 0 || m.sec.Cursor >= len(m.sec.result.workloads) {
+		return guard.Target{}, false
+	}
+	w := m.sec.result.workloads[m.sec.Cursor]
+	if w.Key != m.sec.Selected || w.Key.Pod == "" {
+		return guard.Target{}, false
+	}
+	for i := range m.snap.Pods {
+		p := &m.snap.Pods[i]
+		if p.Key() == w.Key.Pod && p.UID == w.Key.UID {
+			return exactPod(p)
+		}
+	}
+	return guard.Target{}, false
+}
+
+func (m Model) actionHelp(help []ui.KeyHelp, desc string) []ui.KeyHelp {
+	if _, ok := m.actionTarget(); !ok {
+		return help
+	}
+	return append(slices.Clone(help), ui.KeyHelp{Key: "o", Desc: desc})
 }
 
 func (m Model) tableTarget() (guard.Target, bool) {
@@ -276,6 +314,9 @@ func (m Model) openActions() (Model, tea.Cmd) {
 		}
 	}
 	if len(items) == 0 {
+		if m.onScreen(ScreenRadar) || m.onScreen(ScreenSecurity) {
+			return m, nil
+		}
 		return m, m.showNotice(textNoAction)
 	}
 	m.endEditing()
