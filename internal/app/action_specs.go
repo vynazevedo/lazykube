@@ -1,3 +1,3 @@
 package app
 
-var actionSpecs = []actionSpec{scaleAction, restartAction}
+var actionSpecs = []actionSpec{scaleAction, restartAction, deleteAction}
