@@ -135,13 +135,17 @@ func Breadcrumbs(r draw.Region, labels []string, ctx Ctx) {
 	}
 }
 
-func PodMissing(r draw.Region, key string, ctx Ctx) {
+func PodMissing(r draw.Region, key string, recreated bool, ctx Ctx) {
 	inner := Panel(r, "Pod", true, ctx)
 	if inner.Empty() {
 		return
 	}
 	mid := max(0, inner.H/2-1)
-	centered(inner.Sub(0, mid, inner.W, 1), "recurso não observado neste escopo: "+draw.Sanitize(key))
+	text := "recurso não observado neste escopo: "
+	if recreated {
+		text = "pod original não existe mais, recriado com outro UID: "
+	}
+	centered(inner.Sub(0, mid, inner.W, 1), text+draw.Sanitize(key))
 	centeredColor(inner.Sub(0, mid+1, inner.W, 1), "esc voltar · nenhum outro pod foi selecionado", theme.Muted)
 }
 

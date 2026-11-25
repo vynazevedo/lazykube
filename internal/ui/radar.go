@@ -26,7 +26,36 @@ type RadarState struct {
 	Scroll    int
 	Gone      bool
 	Selected  *insight.Signal
-	PodOpen   bool
+	Target    PodTarget
+}
+
+type PodTarget int
+
+const (
+	PodGone PodTarget = iota
+	PodCurrent
+	PodRecreated
+	PodUnidentified
+)
+
+func podTargetText(t PodTarget) string {
+	switch t {
+	case PodRecreated:
+		return "Pod original não existe mais: recriado com outro UID; nada é aberto por homônimo."
+	case PodUnidentified:
+		return "UID do pod não observado; nada é aberto só pelo nome."
+	}
+	return "Pod não está na lista atual; nada é aberto por homônimo."
+}
+
+func PodTargetNotice(t PodTarget) string {
+	switch t {
+	case PodRecreated:
+		return "pod original não existe mais (recriado); nada foi aberto"
+	case PodUnidentified:
+		return "UID do pod não observado; nada foi aberto"
+	}
+	return "alvo original não existe mais no inventário; nada foi aberto"
 }
 
 type RadarCounts struct {
@@ -420,7 +449,7 @@ func podPhaseLabel(p insight.PodPhase) string {
 const radarOpenPod = "[Abrir pod]"
 
 func RadarPodButton(st RadarState, width int) (Span, int, bool) {
-	if !st.PodOpen {
+	if st.Target != PodCurrent {
 		return Span{}, 0, false
 	}
 	return Span{X: 0, W: draw.Width(radarOpenPod)}, len(RadarDetailLines(st, width)) - 1, true
@@ -470,10 +499,10 @@ func RadarDetailLines(st RadarState, width int) []draw.Line {
 		draw.Line{faint("Os campos acima são observações, não causa confirmada.")},
 		nil,
 	)
-	if st.PodOpen {
+	if st.Target == PodCurrent {
 		lines = append(lines, draw.Line{bold(radarOpenPod, theme.Text), faint(" enter")})
 	} else if !st.Gone {
-		lines = append(lines, draw.Line{colored("Pod não está na lista atual; nada é aberto por homônimo.", theme.Warn)})
+		lines = append(lines, draw.Line{colored(podTargetText(st.Target), theme.Warn)})
 	}
 	var out []draw.Line
 	for _, l := range lines {

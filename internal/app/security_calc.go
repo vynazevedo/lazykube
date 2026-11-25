@@ -7,6 +7,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 
 	"github.com/vynazevedo/lazykube/internal/data"
+	"github.com/vynazevedo/lazykube/internal/ui"
 )
 
 type securityView struct {
@@ -165,22 +166,34 @@ func (m *Model) followSecurity() tea.Cmd {
 	}
 }
 
-func (m Model) updateSecurityCalc(msg tea.Msg) (Model, bool) {
+func (m Model) updateSecurityCalc(msg tea.Msg) (Model, tea.Cmd, bool) {
 	calc, ok := msg.(securityCalcMsg)
 	if !ok {
-		return m, false
+		return m, nil, false
 	}
 	if calc.session != m.session.Generation || calc.seq != m.secCalc.seq || !m.secCalc.running {
-		return m, true
+		return m, nil, true
 	}
 	m.cancelSecurityCalc()
 	m.secCalc = securityCalc{seq: m.secCalc.seq}
 	if calc.canceled || m.life.Err() != nil || !m.onScreen(ScreenSecurity) || calc.result.key.securityView != m.wantedSecurityKey().securityView {
-		return m, true
+		return m, nil, true
 	}
+	lost := m.sec.have && m.sec.Selected != (data.WorkloadKey{}) && !slices.ContainsFunc(calc.result.workloads, func(w data.WorkloadPosture) bool { return w.Key == m.sec.Selected })
 	m.sec.have, m.sec.result = true, calc.result
 	m.adoptSecurityWorkload(selectedWorkload(calc.result.workloads, m.sec.Selected, m.sec.Cursor))
 	m.sec.rules, m.sec.rulesFor, m.sec.rulesKey = calc.rules, calc.rulesFor, calc.result.key
-	m.clampSecurityScroll()
-	return m, true
+	if !lost {
+		m.clampSecurityScroll()
+		return m, nil, true
+	}
+	m.sec.Scroll = 0
+	if m.sec.Tab != ui.SecTabWorkloads {
+		return m, nil, true
+	}
+	focus := m.sec.Focus
+	m.sec.Focus = ui.SecurityFocusList
+	m.syncCompactSecurity(focus)
+	cmd := m.showNotice("workload selecionado não existe mais; seleção movida")
+	return m, cmd, true
 }

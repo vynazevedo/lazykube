@@ -9,8 +9,8 @@
  ╭─ Sinais · focus ───────────────────╮ ╭─ Evidências do sinal ─────────────────────────────────────────────────────────────────╮ 
  │   EST  SINAL     POD/CONTAINER     │ │ Sinal: CrashLoop | regra v1                                                           │ 
  │ > High CrashLoop svclb-traefik-8c… │ │ Alvo: Pod kube-system/svclb-traefik-8c2f1-6n2vb                                       │ 
- │   Warn ImagePull local-path-provi… │ │ Container: lb-tcp-80 (regular)                                                        │ 
- │   Warn Pending   local-path-provi… │ │ Estado: ativo | severidade High | pico High                                           │ 
+ │   Warn Pending   local-path-provi… │ │ Container: lb-tcp-80 (regular)                                                        │ 
+ │   Warn ImagePull local-path-provi… │ │ Estado: ativo | severidade High | pico High                                           │ 
  │   res. OOMKilled odoo-7575bf6d8-9… │ │ Preexistente: sim (já presente na primeira observação desta sessão)                   │ 
  │                                    │ │ Primeira observação: 20:15:00 | última: 20:21:40                                      │ 
  │                                    │ │                                                                                       │ 

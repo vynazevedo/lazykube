@@ -62,7 +62,7 @@ func BenchmarkSecurityUpdateThread(b *testing.B) {
 			msg.session, msg.seq = m.session.Generation, m.secCalc.seq
 			b.ReportAllocs()
 			for b.Loop() {
-				if applied, ok := m.updateSecurityCalc(msg); !ok || !applied.sec.have {
+				if applied, _, ok := m.updateSecurityCalc(msg); !ok || !applied.sec.have {
 					b.Fatal("result not applied")
 				}
 			}

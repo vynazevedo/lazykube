@@ -8,8 +8,8 @@
  ╭─ Sinais · focus ───────────────────────────────────────────────────────────╮ 
  │   EST  SINAL     POD/CONTAINER                                       DESDE │ 
  │ > High CrashLoop svclb-traefik-8c2f1-6n2vb/lb-tcp-80                 20:15 │ 
- │   Warn ImagePull local-path-provisioner-84db5d-h4/app                20:15 │ 
  │   Warn Pending   local-path-provisioner-84db5d-h4                    20:15 │ 
+ │   Warn ImagePull local-path-provisioner-84db5d-h4/app                20:15 │ 
  │   res. OOMKilled odoo-7575bf6d8-9wjvk/app                            20:15 │ 
  │                                                                            │ 
  │                                                                            │ 

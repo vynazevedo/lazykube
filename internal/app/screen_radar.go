@@ -40,8 +40,8 @@ func (s radarScreen) Update(m Model, msg tea.Msg) (Model, tea.Cmd) {
 		return m.handleRadarKey(msg)
 	case tea.MouseClickMsg:
 		if !m.helpOpen && msg.Button == tea.MouseLeft {
-			m.handleRadarClick(tea.Mouse(msg))
-			return m, nil
+			cmd := m.handleRadarClick(tea.Mouse(msg))
+			return m, cmd
 		}
 	case tea.MouseWheelMsg:
 		m.handleRadarWheel(tea.Mouse(msg))
@@ -122,20 +122,21 @@ func (m Model) handleRadarKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 	case key.Matches(msg, k.End):
 		m.moveRadar(len(m.radar.rows))
 	case key.Matches(msg, k.Enter):
-		m.openSignalPod()
+		cmd := m.openSignalPod()
+		return m, cmd
 	default:
 		return updateBody(m, msg)
 	}
 	return m, nil
 }
 
-func (m *Model) handleRadarClick(ms tea.Mouse) {
+func (m *Model) handleRadarClick(ms tea.Mouse) tea.Cmd {
 	switch {
 	case m.layout.Events.Contains(ms.X, ms.Y):
 		row := ms.Y - (m.layout.Events.Y + 1 + ui.RadarListTop)
 		rows := ui.RadarListRows(m.layout.Events.H)
 		if row < 0 || row >= rows {
-			return
+			return nil
 		}
 		idx := ui.ScrollOffset(m.radar.cursor, len(m.radar.rows), rows) + row
 		if idx < len(m.radar.rows) {
@@ -143,9 +144,10 @@ func (m *Model) handleRadarClick(ms tea.Mouse) {
 		}
 	case m.layout.Message.Contains(ms.X, ms.Y):
 		if m.radarButtonAt(ms) {
-			m.openSignalPod()
+			return m.openSignalPod()
 		}
 	}
+	return nil
 }
 
 func (m Model) radarButtonAt(ms tea.Mouse) bool {

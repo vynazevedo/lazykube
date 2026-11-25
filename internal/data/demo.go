@@ -77,6 +77,7 @@ func NewDemoScoped(context, namespace string) *Demo {
 		d.pods = append(d.pods, demoPod{
 			cpuBase: r.cpu,
 			pod: Pod{
+				UID:        "demo-" + PodKey(r.ns, r.name),
 				Name:       r.name,
 				Namespace:  r.ns,
 				Status:     r.status,

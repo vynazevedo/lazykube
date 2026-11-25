@@ -343,8 +343,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if next, cmd, ok := m.handleResourceMsg(msg); ok {
 		return next.settled(cmd)
 	}
-	if next, ok := m.updateSecurityCalc(msg); ok {
-		return next.settled(nil)
+	if next, cmd, ok := m.updateSecurityCalc(msg); ok {
+		return next.settled(cmd)
 	}
 	if next, cmd, ok := m.updateAudit(msg); ok {
 		return next.settled(cmd)

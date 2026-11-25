@@ -8,9 +8,9 @@
   [+] Storage           │ ╭─ Sinais · focus ────────────────────────────────────────────────────────────────────────────────────╮ 
   [+] Access Control    │ │   EST  SINAL     POD/CONTAINER                                                                DESDE │ 
   [+] Custom Resources  │ │ > High CrashLoop svclb-traefik-8c2f1-6n2vb/lb-tcp-80                                          20:15 │ 
-  [+] Helm              │ │   Warn ImagePull local-path-provisioner-84db5d-h4/app                                         20:15 │ 
-  Security (5)          │ │   Warn Pending   lingqu-1605489600-b7xsd                                                      20:15 │ 
- ›Radar (7)             │ │   Warn Pending   local-path-provisioner-84db5d-h4                                             20:15 │ 
+  [+] Helm              │ │   Warn Pending   local-path-provisioner-84db5d-h4                                             20:15 │ 
+  Security (5)          │ │   Warn ImagePull local-path-provisioner-84db5d-h4/app                                         20:15 │ 
+ ›Radar (7)             │ │   Warn Pending   lingqu-1605489600-b7xsd                                                      20:15 │ 
                         │ │   res. OOMKilled odoo-7575bf6d8-9wjvk/app                                                     20:15 │ 
                         │ │                                                                                                     │ 
                         │ │                                                                                                     │ 

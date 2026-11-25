@@ -1,9 +1,12 @@
 package app
 
 import (
+	"slices"
+
 	"charm.land/bubbles/v2/key"
 	tea "charm.land/bubbletea/v2"
 
+	"github.com/vynazevedo/lazykube/internal/data"
 	"github.com/vynazevedo/lazykube/internal/draw"
 	"github.com/vynazevedo/lazykube/internal/ui"
 )
@@ -54,7 +57,9 @@ func (podScreen) Keys(m Model) []key.Binding {
 func (podScreen) View(m Model, body draw.Region, ctx ui.Ctx) {
 	pod := m.selectedPod()
 	if pod == nil {
-		ui.PodMissing(region(body, m.layout.Details), m.nav.Active().Pod, ctx)
+		r := m.nav.Active()
+		recreated := slices.ContainsFunc(m.snap.Pods, func(p data.Pod) bool { return p.Key() == r.Pod })
+		ui.PodMissing(region(body, m.layout.Details), r.Pod, recreated, ctx)
 		return
 	}
 	st := m.detailsState(pod)

@@ -49,7 +49,7 @@ func (m Model) selectedIndex(pods []data.Pod) int {
 func (m Model) selectedPod() *data.Pod {
 	if r := m.nav.Active(); r.Kind == RoutePod {
 		for _, p := range m.snap.Pods {
-			if p.Key() == r.Pod {
+			if p.Key() == r.Pod && (r.Ref.UID == "" || p.UID == r.Ref.UID) {
 				return &p
 			}
 		}

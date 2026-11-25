@@ -91,12 +91,12 @@ func workloadOf(key string, p PodPosture) workloadIdentity {
 	id := workloadIdentity{key: WorkloadKey{Context: p.Target.Context, Generation: p.Target.Generation, Namespace: p.Target.Namespace}, name: p.Target.Name, resolution: OwnerStandalone}
 	o := p.Owner
 	if o == nil {
-		id.key.Pod = key
+		id.key.Pod, id.key.UID = key, p.Target.UID
 		return id
 	}
 	group, version, ok := parseGroupVersion(o.APIVersion)
 	if !ok || o.UID == "" || o.Kind == "" || o.Name == "" {
-		id.key.Pod = key
+		id.key.Pod, id.key.UID = key, p.Target.UID
 		id.resolution = OwnerUnresolved
 		return id
 	}

@@ -9,9 +9,9 @@
   [+] Access Control      │ ╭─ Sinais · focus ───────────────────╮ ╭─ Evidências do sinal ────────────────────────────────────────────────────────────────────╮ 
   [+] Custom Resources    │ │   EST  SINAL     POD/CONTAINER     │ │ Sinal: CrashLoop | regra v1                                                              │ 
   [+] Helm                │ │ > High CrashLoop svclb-traefik-8c… │ │ Alvo: Pod kube-system/svclb-traefik-8c2f1-6n2vb                                          │ 
-  Security (5)            │ │   Warn ImagePull local-path-provi… │ │ Container: lb-tcp-80 (regular)                                                           │ 
- ›Radar (7)               │ │   Warn Pending   lingqu-160548960… │ │ Estado: ativo | severidade High | pico High                                              │ 
-                          │ │   Warn Pending   local-path-provi… │ │ Preexistente: sim (já presente na primeira observação desta sessão)                      │ 
+  Security (5)            │ │   Warn Pending   local-path-provi… │ │ Container: lb-tcp-80 (regular)                                                           │ 
+ ›Radar (7)               │ │   Warn ImagePull local-path-provi… │ │ Estado: ativo | severidade High | pico High                                              │ 
+                          │ │   Warn Pending   lingqu-160548960… │ │ Preexistente: sim (já presente na primeira observação desta sessão)                      │ 
                           │ │   res. OOMKilled odoo-7575bf6d8-9… │ │ Primeira observação: 20:15:00 | última: 20:21:40                                         │ 
                           │ │                                    │ │                                                                                          │ 
                           │ │                                    │ │ EVIDÊNCIAS                                                                               │ 

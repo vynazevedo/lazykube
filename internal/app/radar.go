@@ -297,27 +297,40 @@ func (m Model) selectedSignal() *insight.Signal {
 	return &s
 }
 
-func (m Model) signalPod(s *insight.Signal) *data.Pod {
+func (m Model) signalPod(s *insight.Signal) (*data.Pod, ui.PodTarget) {
 	if s == nil || s.Entity.Kind != "Pod" || m.radar.gone {
-		return nil
+		return nil, ui.PodGone
 	}
 	key := data.PodKey(s.Entity.Namespace, s.Entity.Name)
 	for i := range m.snap.Pods {
-		if m.snap.Pods[i].Key() == key {
-			return &m.snap.Pods[i]
+		p := &m.snap.Pods[i]
+		if p.Key() != key {
+			continue
 		}
+		posture := m.security.Pods[key].Target.UID
+		switch {
+		case p.UID == "" || s.Entity.UID == "":
+			return nil, ui.PodUnidentified
+		case p.UID != s.Entity.UID || (posture != "" && posture != s.Entity.UID):
+			return nil, ui.PodRecreated
+		}
+		return p, ui.PodCurrent
 	}
-	return nil
+	return nil, ui.PodGone
 }
 
-func (m *Model) openSignalPod() {
+func (m *Model) openSignalPod() tea.Cmd {
 	s := m.selectedSignal()
-	p := m.signalPod(s)
+	if s == nil {
+		return nil
+	}
+	p, target := m.signalPod(s)
 	if p == nil {
-		return
+		return m.showNotice(ui.PodTargetNotice(target))
 	}
 	ref := ResourceRef{Version: "v1", Resource: "pods", Namespace: s.Entity.Namespace, Name: s.Entity.Name, UID: s.Entity.UID}
 	m.navigate(Route{Kind: RoutePod, Screen: ScreenPodDetail, Pod: p.Key(), Ref: ref})
+	return nil
 }
 
 func (m Model) radarViewState() ui.RadarState {
@@ -336,6 +349,6 @@ func (m Model) radarViewState() ui.RadarState {
 		Gone:      m.radar.gone,
 		Selected:  m.selectedSignal(),
 	}
-	st.PodOpen = m.signalPod(st.Selected) != nil
+	_, st.Target = m.signalPod(st.Selected)
 	return st
 }

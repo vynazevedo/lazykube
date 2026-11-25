@@ -54,17 +54,17 @@ func (d *Demo) publishObservations(step int) bool {
 	d.obs.step = step
 	source := insight.SourceIdentity{SessionID: "demo", Context: d.context, Generation: 1}
 	pods := make([]insight.PodObservation, 0, len(d.pods))
-	for i, p := range d.pods {
-		pods = append(pods, demoObservation(p.pod, i, step, d.obs.base))
+	for _, p := range d.pods {
+		pods = append(pods, demoObservation(p.pod, step, d.obs.base))
 	}
 	return d.obs.inventory.Publish(source, d.namespace, true, pods, insight.Coverage{State: insight.CoverageComplete})
 }
 
-func demoObservation(p Pod, i, step int, base time.Time) insight.PodObservation {
+func demoObservation(p Pod, step int, base time.Time) insight.PodObservation {
 	ready := insight.Condition{Kind: insight.ConditionReady, Name: "Ready", Status: insight.TruthTrue}
 	obs := insight.PodObservation{
 		Entity: insight.EntityRef{
-			EntityKey:       insight.EntityKey{Version: "v1", Kind: "Pod", Namespace: p.Namespace, Name: p.Name, UID: "demo-uid-" + strconv.Itoa(i)},
+			EntityKey:       insight.EntityKey{Version: "v1", Kind: "Pod", Namespace: p.Namespace, Name: p.Name, UID: p.UID},
 			ResourceVersion: "1",
 		},
 		CreatedAt: base.Add(-119 * 24 * time.Hour),
