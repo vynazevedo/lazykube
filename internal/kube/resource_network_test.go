@@ -52,7 +52,7 @@ func TestNetworkFactsProjectEachKind(t *testing.T) {
 		{"service", servicesGVR, object("Service", "v1", map[string]any{"spec": map[string]any{"type": "LoadBalancer", "clusterIP": "10.1.2.3", "selector": map[string]any{"b": "2", "a": "1"}, "ports": []any{map[string]any{"name": "http", "port": int64(80), "targetPort": "web", "nodePort": int64(30080), "protocol": "TCP", "appProtocol": "http"}}}, "status": map[string]any{"loadBalancer": map[string]any{"ingress": []any{map[string]any{"hostname": "lb.example.com"}}}}}),
 			data.NetworkFacts{Service: &data.ServiceFacts{Type: "LoadBalancer", ClusterIPs: []string{"10.1.2.3"}, Selector: data.Labels{{Key: "a", Value: "1"}, {Key: "b", Value: "2"}}, Ports: []data.ServicePort{{Name: "http", Port: 80, Protocol: "TCP", Target: "web", NodePort: 30080, AppProtocol: "http"}}, LoadBalancer: []data.LoadBalancerAddress{{Hostname: "lb.example.com"}}}}},
 		{"slice", schema.GroupVersionResource{Group: "discovery.k8s.io", Version: "v1", Resource: "endpointslices"}, sliceObj,
-			data.NetworkFacts{Slice: &data.SliceFacts{Service: "web", AddressType: "IPv4", Ports: []data.SlicePort{{Name: "http", Port: 8080, Protocol: "TCP"}}, Total: 3, Ready: 2, Endpoints: []data.SliceEndpoint{
+			data.NetworkFacts{Slice: &data.SliceFacts{Service: "web", AddressType: "IPv4", Ports: []data.SlicePort{{Name: "http", Port: 8080, Protocol: "TCP"}}, Total: 3, Ready: 2, Unclear: 1, Endpoints: []data.SliceEndpoint{
 				{Addresses: []string{"10.0.0.1"}, Ready: data.TriTrue, TargetKind: "Pod", TargetName: "web-1", Node: "n1"},
 				{Addresses: []string{"10.0.0.2"}, Ready: data.TriFalse, Terminating: data.TriTrue},
 				{Addresses: []string{"10.0.0.3"}},

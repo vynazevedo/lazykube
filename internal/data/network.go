@@ -95,6 +95,64 @@ type SliceEndpoint struct {
 	Node        string
 }
 
+type EndpointCondition int
+
+const (
+	EndpointReady EndpointCondition = iota
+	EndpointDraining
+	EndpointUnclear
+	EndpointUnavailable
+)
+
+func EndpointConditionOf(ready, serving, terminating Tri) EndpointCondition {
+	accepts := ready != TriFalse
+	switch {
+	case terminating == TriTrue && serving == TriTrue:
+		return EndpointDraining
+	case terminating == TriTrue && serving == TriUnknown && accepts:
+		return EndpointDraining
+	case terminating == TriTrue && serving == TriFalse && !accepts:
+		return EndpointUnavailable
+	case terminating == TriTrue:
+		return EndpointUnclear
+	case accepts && serving != TriFalse:
+		return EndpointReady
+	case !accepts && serving != TriTrue:
+		return EndpointUnavailable
+	}
+	return EndpointUnclear
+}
+
+type EndpointTally struct {
+	Total       int
+	Ready       int
+	Draining    int
+	Unclear     int
+	Unavailable int
+}
+
+func (t *EndpointTally) Add(c EndpointCondition) {
+	t.Total++
+	switch c {
+	case EndpointReady:
+		t.Ready++
+	case EndpointDraining:
+		t.Draining++
+	case EndpointUnclear:
+		t.Unclear++
+	default:
+		t.Unavailable++
+	}
+}
+
+func (t *EndpointTally) Merge(o EndpointTally) {
+	t.Total += o.Total
+	t.Ready += o.Ready
+	t.Draining += o.Draining
+	t.Unclear += o.Unclear
+	t.Unavailable += o.Unavailable
+}
+
 type SlicePort struct {
 	Name     string
 	Port     int
@@ -108,6 +166,19 @@ type SliceFacts struct {
 	Endpoints   []SliceEndpoint
 	Total       int
 	Ready       int
+	Draining    int
+	Unclear     int
+}
+
+func (s SliceFacts) Tally() EndpointTally {
+	if len(s.Endpoints) == s.Total {
+		var out EndpointTally
+		for _, e := range s.Endpoints {
+			out.Add(EndpointConditionOf(e.Ready, e.Serving, e.Terminating))
+		}
+		return out
+	}
+	return EndpointTally{Total: s.Total, Ready: s.Ready, Draining: s.Draining, Unclear: s.Unclear, Unavailable: max(0, s.Total-s.Ready-s.Draining-s.Unclear)}
 }
 
 type IngressBackend struct {

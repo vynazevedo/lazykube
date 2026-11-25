@@ -265,10 +265,9 @@ func (b *factBuilder) slice(s *discoveryv1.EndpointSlice) *data.SliceFacts {
 		out.Ports = append(out.Ports, port)
 	}
 	out.Endpoints = exact[data.SliceEndpoint](len(s.Endpoints), factEndpoints)
+	var tally data.EndpointTally
 	for _, ep := range s.Endpoints {
-		if ep.Conditions.Ready == nil || *ep.Conditions.Ready {
-			out.Ready++
-		}
+		tally.Add(data.EndpointConditionOf(tri(ep.Conditions.Ready), tri(ep.Conditions.Serving), tri(ep.Conditions.Terminating)))
 		if len(out.Endpoints) == factEndpoints {
 			continue
 		}
@@ -282,6 +281,7 @@ func (b *factBuilder) slice(s *discoveryv1.EndpointSlice) *data.SliceFacts {
 		}
 		out.Endpoints = append(out.Endpoints, data.SliceEndpoint{Addresses: b.texts(ep.Addresses, factAddresses, factTextLimit), Ready: tri(ep.Conditions.Ready), Serving: tri(ep.Conditions.Serving), Terminating: tri(ep.Conditions.Terminating), TargetKind: kind, TargetName: name, Node: node})
 	}
+	out.Ready, out.Draining, out.Unclear = tally.Ready, tally.Draining, tally.Unclear
 	return out
 }
 

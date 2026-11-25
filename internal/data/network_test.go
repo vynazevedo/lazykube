@@ -61,3 +61,35 @@ func TestRowMatchesNamesAndFacts(t *testing.T) {
 		}
 	}
 }
+
+func TestEndpointConditionTable(t *testing.T) {
+	const u, y, n = TriUnknown, TriTrue, TriFalse
+	for _, tc := range []struct {
+		ready, serving, terminating Tri
+		want                        EndpointCondition
+	}{
+		{u, u, u, EndpointReady}, {u, u, n, EndpointReady}, {u, y, u, EndpointReady}, {u, y, n, EndpointReady},
+		{y, u, u, EndpointReady}, {y, u, n, EndpointReady}, {y, y, u, EndpointReady}, {y, y, n, EndpointReady},
+		{u, n, u, EndpointUnclear}, {u, n, n, EndpointUnclear}, {y, n, u, EndpointUnclear}, {y, n, n, EndpointUnclear},
+		{n, u, u, EndpointUnavailable}, {n, u, n, EndpointUnavailable}, {n, n, u, EndpointUnavailable}, {n, n, n, EndpointUnavailable},
+		{n, y, u, EndpointUnclear}, {n, y, n, EndpointUnclear},
+		{u, u, y, EndpointDraining}, {u, y, y, EndpointDraining}, {y, u, y, EndpointDraining}, {y, y, y, EndpointDraining}, {n, y, y, EndpointDraining},
+		{u, n, y, EndpointUnclear}, {y, n, y, EndpointUnclear}, {n, u, y, EndpointUnclear},
+		{n, n, y, EndpointUnavailable},
+	} {
+		if got := EndpointConditionOf(tc.ready, tc.serving, tc.terminating); got != tc.want {
+			t.Errorf("ready=%d serving=%d terminating=%d: got %d want %d", tc.ready, tc.serving, tc.terminating, got, tc.want)
+		}
+	}
+}
+
+func TestSliceTallyUsesEveryEndpointOrTheCounters(t *testing.T) {
+	full := SliceFacts{Total: 2, Endpoints: []SliceEndpoint{{Ready: TriFalse, Serving: TriTrue, Terminating: TriTrue}, {}}}
+	if got := full.Tally(); got != (EndpointTally{Total: 2, Ready: 1, Draining: 1}) {
+		t.Fatalf("%+v", got)
+	}
+	cut := SliceFacts{Total: 40, Ready: 30, Draining: 4, Unclear: 1, Endpoints: make([]SliceEndpoint, 32)}
+	if got := cut.Tally(); got != (EndpointTally{Total: 40, Ready: 30, Draining: 4, Unclear: 1, Unavailable: 5}) {
+		t.Fatalf("%+v", got)
+	}
+}
