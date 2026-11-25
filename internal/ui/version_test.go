@@ -78,8 +78,11 @@ func TestHeaderVersionIsBounded(t *testing.T) {
 			if draw.Width(headerVersion(w)) > versionHeaderMax+4 {
 				t.Fatalf("%q takes %d columns", v, draw.Width(headerVersion(w)))
 			}
-			if shown := strings.Contains(plain, v); len(v) <= versionHeaderMax && shown != (w >= headerVersionFrom) {
+			if shown := strings.Contains(plain, v); len(v) <= versionHeaderMax && (shown && w < headerVersionFrom || !shown && w >= 130) {
 				t.Fatalf("%q at %d columns: shown %v", v, w, shown)
+			}
+			if !strings.Contains(plain, "producao") || !strings.Contains(plain, "apps") {
+				t.Fatalf("%q at %d columns hides the target: %q", v, w, plain)
 			}
 			if !strings.Contains(plain, "live") || !strings.Contains(plain, "[PROTECTED]") {
 				t.Fatalf("%q at %d columns hides the state: %q", v, w, plain)

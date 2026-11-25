@@ -30,11 +30,11 @@ func Header(r draw.Region, st HeaderState, ctx Ctx) {
 		r.Put(x+i, 0, ch, draw.Fg(colors[i]).WithBold())
 	}
 	x += len(logo)
-	x += r.Line(x, 0, headerBadges(st, r.W))
-	x += r.Line(x, 0, draw.Line{muted(headerVersion(r.W))})
-
-	pill := headerPill(st, ctx, r.W)
 	g := HeaderLayout(st, r.W)
+	x += r.Line(x, 0, headerBadges(st, g.form))
+	x += r.Line(x, 0, draw.Line{muted(g.form.versionText(r.W))})
+
+	pill := headerPill(st, ctx, g.form)
 	right := g.Right
 	if g.End > g.CtxStart {
 		r.Line(g.CtxStart, 0, headerTarget(g, ctx))
@@ -76,10 +76,52 @@ func headerNamespace(c data.Cluster) string {
 }
 
 const (
-	headerCtxLabel = " ◎ context "
+	headerCtxMark  = " ◎ "
+	headerCtxLabel = headerCtxMark + "context "
 	headerNsLabel  = "namespace "
+	headerNsShort  = "ns "
+	headerMinCtx   = 8
 	headerMinNs    = 6
+	headerMaxAlert = 99
 )
+
+type headerForm struct {
+	version     bool
+	shortBadges bool
+	shortPill   bool
+	shortAlerts bool
+	shortLabels bool
+}
+
+func headerForms(w int) []headerForm {
+	if w < headerVersionFrom {
+		return []headerForm{
+			{shortBadges: true, shortPill: true},
+			{shortBadges: true, shortPill: true, shortAlerts: true},
+		}
+	}
+	return []headerForm{
+		{version: true},
+		{},
+		{shortBadges: true},
+		{shortBadges: true, shortPill: true},
+		{shortBadges: true, shortPill: true, shortAlerts: true},
+	}
+}
+
+func (f headerForm) versionText(w int) string {
+	if !f.version {
+		return " "
+	}
+	return headerVersion(w)
+}
+
+func (f headerForm) labels() (string, string) {
+	if f.shortLabels {
+		return headerCtxMark, headerNsShort
+	}
+	return headerCtxLabel, headerNsLabel
+}
 
 type HeaderGeometry struct {
 	CtxStart  int
@@ -88,17 +130,28 @@ type HeaderGeometry struct {
 	Right     int
 	Context   string
 	Namespace string
+	form      headerForm
 }
 
-func headerPill(st HeaderState, ctx Ctx, w int) draw.Line {
-	pill := statusPill(st, ctx, w < headerVersionFrom)
+func headerPill(st HeaderState, ctx Ctx, f headerForm) draw.Line {
+	pill := statusPill(st, ctx, f.shortPill)
 	if st.SecurityAlerts > 0 {
-		pill = append(draw.Line{draw.S(fmt.Sprintf("! %d high new  ", st.SecurityAlerts), draw.Fg(theme.Err).WithBold())}, pill...)
+		pill = append(draw.Line{draw.S(headerAlerts(st.SecurityAlerts, f.shortAlerts), draw.Fg(theme.Err).WithBold())}, pill...)
 	}
 	return pill
 }
 
-func headerBadges(st HeaderState, w int) draw.Line {
+func headerAlerts(n int, short bool) string {
+	switch {
+	case !short:
+		return fmt.Sprintf("! %d high new  ", n)
+	case n > headerMaxAlert:
+		return fmt.Sprintf("!%d+ ", headerMaxAlert)
+	}
+	return fmt.Sprintf("!%d ", n)
+}
+
+func headerBadges(st HeaderState, f headerForm) draw.Line {
 	var l draw.Line
 	if st.Synthetic {
 		l = append(l, draw.S(" [DEMO]", draw.Fg(theme.Warn).WithBold()))
@@ -107,24 +160,24 @@ func headerBadges(st HeaderState, w int) draw.Line {
 	case st.ReadOnly:
 		l = append(l, draw.S(" [RO]", draw.Fg(theme.Warn).WithBold()))
 	case st.Writable:
-		l = append(l, draw.S(headerLabel(w, " [RW: --read-write]", " [RW]"), draw.Fg(theme.Err).WithBold()))
+		l = append(l, draw.S(f.badge(" [RW: --read-write]", " [RW]"), draw.Fg(theme.Err).WithBold()))
 	}
 	switch {
 	case st.ConfigInvalid:
-		l = append(l, draw.S(headerLabel(w, " [CONFIG INVALIDA]", " [CONFIG]"), draw.Fg(theme.Err).WithBold()))
+		l = append(l, draw.S(f.badge(" [CONFIG INVALIDA]", " [CONFIG]"), draw.Fg(theme.Err).WithBold()))
 	case st.Protected:
 		l = append(l, draw.S(" [PROTECTED]", draw.Fg(theme.Err).WithBold()))
 	}
 	if st.AuditBlocked {
-		l = append(l, draw.S(headerLabel(w, " [ACOES BLOQUEADAS: AUDIT]", " [AUDIT]"), draw.Fg(theme.Err).WithBold()))
+		l = append(l, draw.S(f.badge(" [ACOES BLOQUEADAS: AUDIT]", " [AUDIT]"), draw.Fg(theme.Err).WithBold()))
 	}
 	return l
 }
 
 const headerVersionFrom = 100
 
-func headerLabel(w int, full, short string) string {
-	if w < headerVersionFrom {
+func (f headerForm) badge(full, short string) string {
+	if f.shortBadges {
 		return short
 	}
 	return full
@@ -137,39 +190,77 @@ func headerVersion(w int) string {
 	return "  " + draw.Truncate(Version, versionHeaderMax) + "  "
 }
 
+func (f headerForm) frame(st HeaderState, w int) (int, int, int) {
+	start := len("lazykube") + headerBadges(st, f).Width() + draw.Width(f.versionText(w))
+	right := w - headerPill(st, Ctx{Pal: theme.DefaultPalette(), Clock: anim.Fixed(0, 0, 0)}, f).Width()
+	ctxLabel, nsLabel := f.labels()
+	return start, right, right - start - 2 - draw.Width(ctxLabel) - draw.Width(nsLabel) - 2
+}
+
+func headerFit(st HeaderState, w, need int) headerForm {
+	forms := headerForms(w)
+	for _, f := range forms {
+		if _, _, room := f.frame(st, w); room >= need {
+			return f
+		}
+	}
+	last := forms[len(forms)-1]
+	if _, _, room := last.frame(st, w); room < headerMinCtx+headerMinNs {
+		last.shortLabels = true
+	}
+	return last
+}
+
 func HeaderLayout(st HeaderState, w int) HeaderGeometry {
-	start := len("lazykube") + headerBadges(st, w).Width() + draw.Width(headerVersion(w))
-	g := HeaderGeometry{CtxStart: start, NsStart: start, End: start}
-	g.Right = w - headerPill(st, Ctx{Pal: theme.DefaultPalette(), Clock: anim.Fixed(0, 0, 0)}, w).Width()
-	room := g.Right - start - 2 - draw.Width(headerCtxLabel) - draw.Width(headerNsLabel) - 2
+	name, ns := draw.Sanitize(st.Cluster.Context), headerNamespace(st.Cluster)
+	cw, nw := draw.Width(name), draw.Width(ns)
+	f := headerFit(st, w, cw+nw)
+	start, right, room := f.frame(st, w)
+	g := HeaderGeometry{CtxStart: start, NsStart: start, End: start, Right: right, form: f}
 	if room < 2 {
 		return g
 	}
-	name, ns := draw.Sanitize(st.Cluster.Context), headerNamespace(st.Cluster)
-	cw, nw := draw.Width(name), draw.Width(ns)
 	if cw+nw > room {
-		nsW := min(nw, max(headerMinNs, room*2/5), room-1)
-		ctxW := room - nsW
-		if cw < ctxW {
-			ctxW, nsW = cw, min(nw, room-cw)
-		}
-		name, ns = draw.Truncate(name, ctxW), draw.Truncate(ns, nsW)
+		ctxW := min(cw, room-min(nw, headerMinNs, room/2))
+		name, ns = truncateMiddle(name, ctxW), truncateMiddle(ns, min(nw, room-ctxW))
 	}
+	ctxLabel, nsLabel := f.labels()
 	g.Context, g.Namespace = name, ns
-	g.NsStart = start + draw.Width(headerCtxLabel+name+" ")
-	g.End = g.NsStart + draw.Width(headerNsLabel+ns+" ")
+	g.NsStart = start + draw.Width(ctxLabel+name+" ")
+	g.End = g.NsStart + draw.Width(nsLabel+ns+" ")
 	return g
+}
+
+func truncateMiddle(s string, width int) string {
+	if draw.Width(s) <= width {
+		return s
+	}
+	if width <= 1 {
+		return draw.Truncate(s, width)
+	}
+	gs := draw.Graphemes(s)
+	head, used := "", 0
+	for _, g := range gs {
+		if used+g.Width > (width-1)/3 {
+			break
+		}
+		head, used = head+g.Text, used+g.Width
+	}
+	return head + "…" + fieldTail(s, width-1-used)
 }
 
 func headerTarget(g HeaderGeometry, ctx Ctx) draw.Line {
 	chip := theme.BgChip
-	return draw.Line{
-		draw.S(headerCtxLabel[:len(" ◎ ")], draw.Fg(ctx.Pal.C).WithBg(chip)),
-		draw.S("context ", draw.Fg(theme.Muted).WithBg(chip)),
-		draw.S(g.Context+" ", draw.Fg(ctx.Pal.C).WithBg(chip).WithBold()),
-		draw.S(headerNsLabel, draw.Fg(theme.Muted).WithBg(chip)),
-		draw.S(g.Namespace+" ", draw.Fg(ctx.Pal.C).WithBg(chip).WithBold()),
+	ctxLabel, nsLabel := g.form.labels()
+	line := draw.Line{draw.S(headerCtxMark, draw.Fg(ctx.Pal.C).WithBg(chip))}
+	if rest := ctxLabel[len(headerCtxMark):]; rest != "" {
+		line = append(line, draw.S(rest, draw.Fg(theme.Muted).WithBg(chip)))
 	}
+	return append(line,
+		draw.S(g.Context+" ", draw.Fg(ctx.Pal.C).WithBg(chip).WithBold()),
+		draw.S(nsLabel, draw.Fg(theme.Muted).WithBg(chip)),
+		draw.S(g.Namespace+" ", draw.Fg(ctx.Pal.C).WithBg(chip).WithBold()),
+	)
 }
 
 func HeaderTargetAt(st HeaderState, w, x int) int {
