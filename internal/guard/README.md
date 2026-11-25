@@ -19,7 +19,11 @@ e executa dry-run server-side. O preview tem prazo de dois minutos e um ID de us
 unico. `Execute` exige confirmacao, repete SSAR e valida a identidade do recurso,
 sincroniza a intencao no audit e faz uma unica requisicao, sem repeticao do
 cliente. Leituras, SSAR e escritas do executor fazem uma tentativa cada; a falha
-vira recusa e so um gesto novo repete. Informers e listas mantem os proprios
+vira recusa e so um gesto novo repete. O cliente de acoes e a SSAR usam
+transporte proprio, so HTTP/1.1 e uma conexao por requisicao, para que o net/http
+tambem nao reenvie em conexao ociosa fechada ou GOAWAY. TLS, CA e certificados em
+arquivo sao relidos a cada conexao; exec plugin, impersonation, proxy e
+tls-server-name do kubeconfig sao preservados. Informers e listas mantem os proprios
 retries. Todo redirect HTTP e recusado no cliente de acoes e
 na SSAR: um 3xx em dry-run reprova o preview, sem segundo request. Delete, edit, cordon, uncordon e scale para zero
 exigem o nome do recurso. Nao existe create. Edit usa PUT de um objeto
