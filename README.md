@@ -214,7 +214,9 @@ nenhuma tecla a liga ou desliga. A política do contexto sempre prevalece.
 vírgula e bloqueiam ações mesmo com a flag. O cabeçalho mostra o modo, a proteção e o
 bloqueio por audit em todas as telas.
 
-A tecla `o` abre as ações do alvo em foco:
+A tecla `o` abre as ações do alvo em foco. Com o diálogo aberto, todas as teclas são
+dele, inclusive `u` e `y`, e nenhum link clicável fica na tela; com o seletor de URLs
+aberto, `o` não faz nada:
 
 | Alvo | Ações |
 | --- | --- |
@@ -224,7 +226,10 @@ A tecla `o` abre as ações do alvo em foco:
 | Node da tela Nodes | impedir ou permitir agendamentos (cordon e uncordon) |
 
 No Radar e na Security a tecla só age quando a linha é um pod exato, com UID e
-resourceVersion observados; nas demais linhas não faz nada. Edit, exec, port-forward,
+resourceVersion observados; nas demais linhas não faz nada. O detalhe de um workload age
+sobre o objeto aberto, preso ao UID. Nas listas e nos detalhes de Network `o` não abre
+ações, e nunca recai sobre o pod selecionado em outra tela; com o filtro da lista ainda
+em andamento, ela espera o resultado. Edit, exec, port-forward,
 drain, rollback e CronJob sob demanda não fazem parte desta versão. A tela Nodes só
 alcança o node de um pod selecionado.
 
@@ -382,7 +387,8 @@ Secrets e não afirma que a aplicação responde. Host vazio ou curinga não vir
 URL. Para NetworkPolicy, só diz quais políticas selecionam o pod, porque o
 efeito depende do CNI. Em Network, só Endpoints (o recurso legado) segue como
 `(futuro)`. No detalhe de um pod, a seção Acesso fica presa ao UID: se o pod for
-trocado por outro com o mesmo nome, as URLs saem da tela e o seletor fecha.
+trocado por outro com o mesmo nome, as URLs saem da tela, o seletor fecha e uma
+ação ainda não enviada é cancelada.
 
 `u` abre o seletor de URLs: mostra a URL escolhida inteira, quebrada em linhas e
 com o host em destaque, e `enter` copia exatamente esse texto; se ela não couber
@@ -392,8 +398,9 @@ URL http ou https com host ASCII validado, sem credencial, controle ou bidi, e
 visível por inteiro na linha; endereços internos do cluster podem ser copiados,
 mas não são links. O lazykube nunca abre navegador nem executa comando externo.
 
-O lazykube só lê o cluster: lista e observa recursos, segue logs e consulta
-métricas. Nenhuma ação de escrita é executada.
+Por padrão o lazykube só lê o cluster: lista e observa recursos, segue logs e
+consulta métricas. Escrever exige `--read-write` e a confirmação descrita em
+[Ações no cluster](#ações-no-cluster).
 
 ---
 
