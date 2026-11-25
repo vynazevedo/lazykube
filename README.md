@@ -160,9 +160,11 @@ go install github.com/vynazevedo/lazykube/cmd/lazykube@latest
 O binário fica em `GOBIN` ou em `$(go env GOPATH)/bin`. Adicione esse diretório
 ao `PATH`. Para fixar uma versão, substitua `@latest` por uma tag publicada.
 Essa instalação compila o código e não usa os arquivos de checksum das releases.
-A versão no cabeçalho pode diferir da tag, pois `go install` não usa os ldflags
-do GoReleaser. Para identificação da versão e verificação dos pacotes publicados,
-prefira os binários da release.
+O cabeçalho e `lazykube --version` mostram a tag instalada. Fora de uma tag, como em
+`@main` ou `go build` num clone, mostram `dev` com o commit curto quando o Go o
+registra, por exemplo `dev-1a2b3c4`, e o sufixo `-dirty` quando havia mudanças não
+commitadas. Em terminais com menos de 100 colunas o cabeçalho não mostra a versão.
+Para verificar os pacotes publicados, prefira os binários da release.
 
 ### SBOM e assinatura da release
 

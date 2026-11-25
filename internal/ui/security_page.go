@@ -50,6 +50,7 @@ type SecurityPageState struct {
 	RuleVersion string
 	Loading     bool
 	Stale       bool
+	LeftCovered bool
 	RulesReady  bool
 	Tab         SecurityPageTab
 	Focus       int
@@ -68,11 +69,18 @@ func (st SecurityPageState) Selected() *data.WorkloadPosture {
 	return &st.Workloads[st.Cursor]
 }
 
-func (st SecurityPageState) staleTitle(title string) string {
-	if st.Stale {
-		return "recalculando | " + title
+const staleLabel = "recalculando"
+
+func (st SecurityPageState) panel(r draw.Region, title string, focused bool, ctx Ctx) draw.Region {
+	if st.Stale && !st.LeftCovered {
+		title = staleLabel + " | " + title
 	}
-	return title
+	inner := Panel(r, title, focused, ctx)
+	if st.Stale && st.LeftCovered && !r.Empty() {
+		tag := " " + staleLabel + " "
+		r.Text(max(0, r.W-2-draw.Width(tag)), 0, tag, draw.Fg(theme.Warn).WithBold())
+	}
+	return inner
 }
 
 func gradeColor(s data.PostureScore) theme.RGB {
@@ -169,7 +177,7 @@ func SecuritySummaryLines(st SecurityPageState) []draw.Line {
 }
 
 func SecuritySummary(r draw.Region, st SecurityPageState, ctx Ctx) {
-	inner := Panel(r, st.staleTitle("Postura de segurança"), false, ctx).Inset(1, 0, 1, 0)
+	inner := st.panel(r, "Postura de segurança", false, ctx).Inset(1, 0, 1, 0)
 	for y, l := range SecuritySummaryLines(st) {
 		if y >= inner.H {
 			break
@@ -279,7 +287,7 @@ func resolutionText(w data.WorkloadPosture) string {
 
 func SecurityWorkloadsPanel(r draw.Region, st SecurityPageState, ctx Ctx) {
 	title := fmt.Sprintf("Workloads (%d) | %s", len(st.Workloads), st.Cohort)
-	inner := Panel(r, st.staleTitle(title), st.Focus == SecurityFocusList, ctx).Inset(1, 0, 1, 0)
+	inner := st.panel(r, title, st.Focus == SecurityFocusList, ctx).Inset(1, 0, 1, 0)
 	if inner.Empty() {
 		return
 	}
@@ -400,7 +408,7 @@ func SecurityEvidenceRows(panelH int) int {
 }
 
 func SecurityEvidencePanel(r draw.Region, st SecurityPageState, ctx Ctx) {
-	inner := Panel(r, st.staleTitle("Evidência e remediação"), st.Focus == SecurityFocusEvidence, ctx).Inset(1, 0, 1, 0)
+	inner := st.panel(r, "Evidência e remediação", st.Focus == SecurityFocusEvidence, ctx).Inset(1, 0, 1, 0)
 	if inner.Empty() {
 		return
 	}
