@@ -302,6 +302,7 @@ func (e *Executor) Execute(parent context.Context, id string, c Confirmation) (R
 			result.Outcome = Succeeded
 		case errors.As(err, &unsent):
 			result.Outcome, state.Sent = safeReason(unsent.Reason, Unavailable), false
+			e.dispatched(id, state)
 		case errors.Is(err, Denied):
 			result.Outcome = Denied
 		case errors.Is(err, Stale):

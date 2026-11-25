@@ -28,6 +28,7 @@ type actionBackendFake struct {
 	dryErr     error
 	sendErr    error
 	failPhase  string
+	onRecord   func(guard.AuditEvent)
 	block      chan struct{}
 	blockSend  chan struct{}
 	sending    chan struct{}
@@ -103,6 +104,9 @@ func (f *actionBackendFake) Send(ctx context.Context, r guard.Request, dry bool)
 }
 
 func (f *actionBackendFake) Record(e guard.AuditEvent) error {
+	if f.onRecord != nil {
+		f.onRecord(e)
+	}
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	f.events = append(f.events, e)

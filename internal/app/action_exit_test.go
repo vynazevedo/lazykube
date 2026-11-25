@@ -269,3 +269,44 @@ func TestPasteAndResizeNeverConfirm(t *testing.T) {
 		r.sent(1, 0)
 	}
 }
+
+func TestExitWhileAuditIsSlowPrintsOnlyPossibleSends(t *testing.T) {
+	for _, tc := range []struct {
+		name string
+		err  error
+		want []PendingOperation
+	}{
+		{"not sent", guard.NotSent{Reason: guard.Unavailable}, nil},
+		{"unknown", errors.New("reset"), []PendingOperation{{}}},
+		{"succeeded", nil, []PendingOperation{{}}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			r := writableRig(t)
+			r.scalePreview("5")
+			id := r.m.act.preview.ID
+			recording, release := make(chan struct{}), make(chan struct{})
+			r.back.sendErr = tc.err
+			r.back.onRecord = func(e guard.AuditEvent) {
+				if e.Phase == "result" {
+					close(recording)
+					<-release
+				}
+			}
+			r.toButton(controlConfirm)
+			execute := r.send(keyPress("enter"))
+			done := make(chan struct{})
+			go func() { defer close(done); execute() }()
+			<-recording
+			r.send(keyPress("ctrl+c"))
+			got := Unfinished(r.m)
+			close(release)
+			<-done
+			for i := range tc.want {
+				tc.want[i].Context, tc.want[i].OperationID = "laboratorio", id
+			}
+			if len(got) != len(tc.want) || len(got) == 1 && got[0] != tc.want[0] {
+				t.Fatalf("%+v, want %+v", got, tc.want)
+			}
+		})
+	}
+}
