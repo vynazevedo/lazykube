@@ -34,7 +34,7 @@ em um único layout, atualizado em tempo real por informers e com animações
 suaves. Funciona com qualquer contexto do seu kubeconfig e degrada com
 elegância quando falta permissão ou metrics-server.
 
-*Somente leitura: o lazykube observa o cluster e nunca altera nada.*
+*Somente leitura por padrão: ações só existem com `--read-write`, nesta execução, e nunca em contexto protegido.*
 
 ---
 
@@ -205,9 +205,14 @@ O uso com um cluster requer um kubeconfig válido.
 
 O processo inicia somente leitura (`[RO]`). A flag `--read-write` libera
 a tentativa de acoes apenas neste processo, sujeita a RBAC e a politica do
-contexto. Contextos protegidos continuam bloqueados. O executor e os contratos
-para futuros handlers de acoes estao descritos em
-[Guardrails](internal/guard/README.md); esta entrega nao adiciona teclas de mutacao.
+contexto. Contextos protegidos continuam bloqueados. A tecla `o` abre as acoes do
+alvo em foco: escalar, reiniciar rollout e excluir workloads e pods, e impedir ou
+permitir agendamentos em nodes. Toda acao congela UID e resourceVersion, roda
+dry-run no servidor, mostra um preview de dois minutos e exige confirmacao
+explicita, com o nome digitado quando o risco e alto. Em somente leitura o menu
+explica o bloqueio e nao chama a API; a demo nunca executa acoes. Edit, exec,
+port-forward, drain, rollback e CronJob nao fazem parte desta versao. O executor
+esta descrito em [Guardrails](internal/guard/README.md).
 `--protected-contexts` e `--read-only-contexts` recebem nomes exatos separados
 por virgula. `--audit-file` permite escolher um caminho absoluto para o audit
 privado. Nenhuma tecla desativa a politica.
@@ -223,7 +228,7 @@ as ações planejadas para a 1.0 ou prometer vantagem de desempenho.
 | --- | --- | --- | --- |
 | Interface | TUI no terminal | TUI no terminal | Aplicativo gráfico |
 | Pods, deployments e logs | Visualização no terminal | Navegação de recursos e logs | Visualização de workloads e logs |
-| Alterar recursos | Não exposto na TUI desta revisão | Operações de gestão; modo `--readonly` disponível | Edição disponível conforme RBAC |
+| Alterar recursos | Scale, restart, delete e cordon com `--read-write` | Operações de gestão; modo `--readonly` disponível | Edição disponível conforme RBAC |
 | Foco | Inspeção, diagnóstico e contexto em uma tela | Gestão de recursos pelo terminal | Gestão por interface gráfica |
 
 Fontes: [k9s](https://k9scli.io/),
@@ -380,6 +385,7 @@ os painéis: clique seleciona, a roda rola e o clique na aba troca de aba.
  ├─ GERAL ───────────────────────────────────────────────┤
  │                                                       │
  │  y                 copia nome, YAML ou linha do log   │
+ │  o                 ações do alvo em foco              │
  │  p                 troca a paleta de cores            │
  │  ctrl+p            pausa / retoma animações           │
  │  ?                 ajuda                              │

@@ -17,8 +17,9 @@ pelo servidor. Nenhuma credencial participa dela.
 `Prepare` valida politica, SSAR exata e UID/resourceVersion, registra a tentativa
 e executa dry-run server-side. O preview tem prazo de dois minutos e um ID de uso
 unico. `Execute` exige confirmacao, repete SSAR e valida a identidade do recurso,
-sincroniza a intencao no audit e faz uma unica requisicao. Delete, edit e scale
-para zero exigem o nome do recurso. Nao existe create. Edit usa PUT de um objeto
+sincroniza a intencao no audit e faz uma unica requisicao, sem repeticao do
+cliente mesmo com Retry-After. Delete, edit, cordon, uncordon e scale para zero
+exigem o nome do recurso. Nao existe create. Edit usa PUT de um objeto
 existente com UID e resourceVersion. `SupportsAction` e a allowlist compartilhada
 pelo executor e pelos futuros handlers: todos os GVRs abaixo usam versao v1.
 
@@ -29,6 +30,7 @@ pelo executor e pelos futuros handlers: todos os GVRs abaixo usam versao v1.
 | apps | deployments, statefulsets | delete, edit, scale, restart |
 | apps | daemonsets | delete, edit, restart |
 | batch | jobs, cronjobs | delete, edit |
+| core | nodes | cordon, uncordon |
 
 Grupos, versoes e recursos fora dessa lista sao negados antes de SSAR ou dry-run.
 Nao ha acao generica para Secrets, RBAC, admission, PV ou CRs. Prepare audita
@@ -43,6 +45,7 @@ envio. Vencimento antes do envio e cancelamento, nunca sucesso ou tentativa nova
 | Scale | get em recurso/scale | update em recurso/scale | All |
 | Restart | get no recurso | patch no recurso | All |
 | Edit existente | get no recurso | update no recurso | All |
+| Cordon e uncordon | get nodes | patch nodes | All |
 | Exec reservado | get pods | create pods/exec para POST | sem suporte ativo |
 | Port-forward reservado | get pods | create pods/portforward para POST | sem suporte ativo |
 
@@ -73,7 +76,18 @@ validada: o audit falha fechado e bloqueia acoes. Nao ha afirmacao de suporte de
 mutacoes nessa plataforma. A matriz alvo Kubernetes e 1.34, 1.35 e 1.36; fakes e
 HTTP sintetico validam contratos, nao substituem evidencia por versao de servidor.
 
-O executor e a fundacao para os proximos handlers de acoes. Os handlers devem
-mostrar efeito, alvo e politica antes de chamar Execute. Nenhuma tecla de mutacao
-foi adicionada nesta entrega; o header mostra RO e PROTECTED independentemente de
-cores. A demo continua sintetica e somente leitura.
+Nodes sao o unico alvo de escopo cluster: o namespace do alvo e vazio. O PATCH
+JSON testa UID e resourceVersion e altera somente `spec.unschedulable`, com os
+mesmos bytes no dry-run e no envio. Estado ja igual, em scale ou node, e recusado
+com `no_change` antes do dry-run. Conflito dos testes do PATCH e alvo obsoleto.
+
+`Observe` faz uma leitura pontual do alvo, sem mutex, e so depois da politica e da
+allowlist: em somente leitura nenhuma requisicao sai. `Discard` consome um preview
+sem enviar nada e registra o cancelamento. `AuditBlocked` informa a falha de audit
+para a tela. `Close` cancela as operacoes e espera ate dois segundos pelo registro
+do resultado em andamento.
+
+A tecla `o` da TUI usa apenas scale, restart, delete, cordon e uncordon. Edit,
+exec e port-forward continuam sem handler. O header mostra o modo, a protecao, a
+configuracao invalida e o bloqueio por audit independentemente de cores. A demo
+continua sintetica e somente leitura.
