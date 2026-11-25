@@ -42,9 +42,16 @@ func TestAccessStopsWhenTheSessionOrTheTargetGoes(t *testing.T) {
 		return pages
 	}
 	for name, stop := range map[string]func(*Model, context.CancelFunc){
-		"session":  func(_ *Model, cancel context.CancelFunc) { cancel() },
-		"release":  func(m *Model, _ context.CancelFunc) { m.releaseResources() },
-		"leaving":  func(m *Model, _ context.CancelFunc) { m.followAccess() },
+		"session": func(_ *Model, cancel context.CancelFunc) { cancel() },
+		"release": func(m *Model, _ context.CancelFunc) { m.releaseResources() },
+		"leaving": func(m *Model, _ context.CancelFunc) { m.followAccess() },
+		"target": func(m *Model, _ context.CancelFunc) {
+			m.openPod()
+			m.tab = ui.TabDescribe
+			if m.followAccess(); !m.acc.target.active || m.acc.target.name == "web-00000" {
+				panic("the target did not change")
+			}
+		},
 		"shutdown": func(m *Model, _ context.CancelFunc) { m.acc = m.acc.closed() },
 	} {
 		t.Run(name, func(t *testing.T) {

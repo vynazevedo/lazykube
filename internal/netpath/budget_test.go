@@ -51,6 +51,13 @@ func TestCancellationStopsAtEveryPoint(t *testing.T) {
 	if _, err := AccessContext(total, g, largeTarget); err != nil {
 		t.Fatal(err)
 	}
+	indexing := &countingContext{Context: context.Background()}
+	if _, err := newIndex(indexing, g); err != nil {
+		t.Fatal(err)
+	}
+	if least := 4 * (3000 / cancelStride); indexing.calls < least {
+		t.Fatalf("only %d cancellation checks for 12000 rows, want at least %d", indexing.calls, least)
+	}
 	for limit := 1; limit <= total.calls; limit++ {
 		ctx := &countingContext{Context: context.Background(), limit: limit}
 		r, err := AccessContext(ctx, g, largeTarget)
@@ -127,7 +134,9 @@ func TestSelectorCacheNeverMixesSelectors(t *testing.T) {
 	two := data.Labels{{Key: "a", Value: "1"}, {Key: "b", Value: "2"}}
 	x.countPods("apps", one)
 	x.countPods("apps", two)
-	if len(x.podCounts) != 2 {
+	x.countPods("apps", data.Labels{{Key: "a", Value: "9,b=2"}})
+	x.countPods("other", one)
+	if len(x.podCounts) != 4 {
 		t.Fatal("selectors that print alike are different selectors")
 	}
 }
