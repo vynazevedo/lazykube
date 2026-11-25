@@ -2,6 +2,7 @@ package netpath
 
 import (
 	"cmp"
+	"context"
 	"fmt"
 	"net/netip"
 	"slices"
@@ -12,9 +13,11 @@ import (
 )
 
 const (
-	maxAddresses = 64
-	maxRoutes    = 32
+	MaxAddresses = 64
+	MaxRoutes    = 32
 	maxNodes     = 2
+	maxNotes     = 32
+	maxPolicies  = 32
 )
 
 type Origin int
@@ -35,13 +38,14 @@ type State int
 
 const (
 	StateReady State = iota
+	StateDraining
 	StatePending
 	StateNoBackend
 	StateUnknown
 )
 
 func (s State) String() string {
-	return [...]string{"pronta", "pendente", "sem backend", "desconhecida"}[s]
+	return [...]string{"pronta", "em drenagem", "pendente", "sem backend", "desconhecida"}[s]
 }
 
 type Reach int
@@ -75,6 +79,7 @@ type PolicyReport struct {
 	Uncertain []string
 	Note      string
 	Known     bool
+	Truncated bool
 }
 
 type Report struct {
@@ -108,7 +113,16 @@ func (t Target) is(row *data.ResourceRow) bool {
 }
 
 func Access(g Graph, t Target) Report {
-	b := builder{g: g}
+	out, _ := AccessContext(context.Background(), g, t)
+	return out
+}
+
+func AccessContext(ctx context.Context, g Graph, t Target) (Report, error) {
+	x, err := newIndex(ctx, g)
+	if err != nil {
+		return Report{}, err
+	}
+	b := builder{x: x, g: g, notes: map[string]bool{}}
 	switch t.Kind {
 	case TargetIngress:
 		b.ingressTarget(t)
@@ -117,69 +131,140 @@ func Access(g Graph, t Target) Report {
 	default:
 		b.workloadTarget(t)
 	}
+	if ctx.Err() != nil {
+		return Report{}, ctx.Err()
+	}
 	slices.SortStableFunc(b.out.Addresses, func(x, y Address) int {
 		return cmp.Or(cmp.Compare(x.Origin, y.Origin), cmp.Compare(x.State, y.State))
 	})
-	return b.out
+	return b.out, nil
 }
 
 type builder struct {
-	g   Graph
-	out Report
+	x     *index
+	g     Graph
+	out   Report
+	notes map[string]bool
+}
+
+func (b *builder) canceled() bool {
+	return b.x.ctx.Err() != nil
+}
+
+func (b *builder) full() bool {
+	return len(b.out.Addresses) >= MaxAddresses
 }
 
 func (b *builder) note(text string) {
-	if text != "" && !slices.Contains(b.out.Notes, text) {
-		b.out.Notes = append(b.out.Notes, text)
+	if text == "" || b.notes[text] {
+		return
 	}
-}
-
-func (b *builder) address(a Address) {
-	if len(b.out.Addresses) == maxAddresses {
+	if len(b.out.Notes) >= maxNotes {
 		b.out.Truncated = true
 		return
+	}
+	b.notes[text] = true
+	b.out.Notes = append(b.out.Notes, text)
+}
+
+func (b *builder) address(a Address) bool {
+	if b.full() {
+		b.out.Truncated = true
+		return false
 	}
 	b.out.Addresses = append(b.out.Addresses, a)
+	return true
 }
 
-func (b *builder) route(r Route) {
-	if len(b.out.Routes) == maxRoutes {
+func (b *builder) wantsRoute() bool {
+	if len(b.out.Routes) >= MaxRoutes {
 		b.out.Truncated = true
-		return
+		return false
 	}
-	b.out.Routes = append(b.out.Routes, r)
+	return true
+}
+
+type ingressPath struct {
+	row     *data.ResourceRow
+	host    string
+	path    string
+	backend data.IngressBackend
+	dead    bool
+}
+
+func (b *builder) paths(row *data.ResourceRow, only map[string]bool, limit int) []ingressPath {
+	ing := row.Network.Ingress
+	var out []ingressPath
+	add := func(p ingressPath) bool {
+		if only != nil && (p.dead || !only[p.backend.Service]) {
+			return true
+		}
+		if len(out) == limit {
+			return false
+		}
+		p.row = row
+		out = append(out, p)
+		return true
+	}
+	for _, rule := range ing.Rules {
+		for _, p := range rule.Paths {
+			if !add(ingressPath{host: rule.Host, path: cmp.Or(p.Path, "/"), backend: p.Backend}) {
+				return out
+			}
+		}
+		if len(rule.Paths) > 0 {
+			continue
+		}
+		next := ingressPath{host: rule.Host, path: "/", dead: true}
+		if ing.Default != nil {
+			next.backend, next.dead = *ing.Default, false
+		}
+		if !add(next) {
+			return out
+		}
+	}
+	if ing.Default != nil {
+		add(ingressPath{path: "/", backend: *ing.Default})
+	}
+	return out
 }
 
 func (b *builder) ingressTarget(t Target) {
-	row := b.g.Ingresses.find(t.Namespace, t.Name)
+	row := b.x.ingresses.find(t.Namespace, t.Name)
 	if !t.is(row) || row.Network == nil || row.Network.Ingress == nil {
-		b.note(cmp.Or(b.g.Ingresses.gap("Ingresses"), "o Ingress não está mais na lista"))
+		b.note(cmp.Or(b.x.ingresses.gap("Ingresses"), "o Ingress não está mais na lista"))
 		return
 	}
-	b.ingress(*row, "")
+	b.oversized(row)
+	b.evaluate(t.Namespace, b.paths(row, nil, MaxAddresses+1), nil)
 	b.gaps()
+}
+
+func (b *builder) oversized(row *data.ResourceRow) {
+	if row.Network.Truncated {
+		b.note(source(*row) + " é grande demais: só parte das regras foi lida")
+	}
 }
 
 func (b *builder) gaps() {
-	b.note(b.g.Services.gap("Services"))
-	b.note(b.g.Slices.gap("EndpointSlices"))
+	b.note(b.x.services.gap("Services"))
+	b.note(b.x.slices.gap("EndpointSlices"))
 }
 
 func (b *builder) serviceTarget(t Target) {
-	svc, found := b.g.service(t.Namespace, t.Name)
-	if found != data.TriTrue || !t.is(b.g.Services.find(t.Namespace, t.Name)) {
-		b.note(cmp.Or(b.g.Services.gap("Services"), "o Service não está mais na lista"))
+	_, found := b.x.service(t.Namespace, t.Name)
+	if found != data.TriTrue || !t.is(b.x.services.find(t.Namespace, t.Name)) {
+		b.note(cmp.Or(b.x.services.gap("Services"), "o Service não está mais na lista"))
 		return
 	}
-	b.service(t.Namespace, t.Name, svc)
-	b.ingressesFor(t.Namespace, []string{t.Name})
+	b.evaluate(t.Namespace, b.pathsTo(t.Namespace, map[string]bool{t.Name: true}), []string{t.Name})
 	b.gaps()
-	b.note(b.g.Ingresses.gap("Ingresses"))
+	b.note(b.x.ingresses.gap("Ingresses"))
 }
 
 func (b *builder) workloadTarget(t Target) {
 	if t.Kind == TargetPod && !t.LabelsKnown {
-		if row := b.g.Pods.find(t.Namespace, t.Name); t.is(row) && row.Network != nil && row.Network.Pod != nil && !row.Network.Truncated {
+		if row := b.x.pods.find(t.Namespace, t.Name); t.is(row) && row.Network != nil && row.Network.Pod != nil && !row.Network.Truncated {
 			t.Labels, t.LabelsKnown = row.Network.Pod.Labels, true
 		}
 	}
@@ -189,65 +274,91 @@ func (b *builder) workloadTarget(t Target) {
 		return
 	}
 	var names []string
-	for _, r := range b.g.Services.Rows {
+	selecting := map[string]bool{}
+	for i, r := range b.g.Services.Rows {
+		if i%cancelStride == 0 && b.canceled() {
+			return
+		}
 		if r.Ref.Namespace != t.Namespace || r.Network == nil || r.Network.Service == nil || r.Network.Truncated {
 			continue
 		}
 		if selects(r.Network.Service.Selector, t.Labels) {
-			names = append(names, r.Ref.Name)
-			b.service(t.Namespace, r.Ref.Name, r.Network.Service)
+			selecting[r.Ref.Name] = true
+			if len(names) <= MaxAddresses {
+				names = append(names, r.Ref.Name)
+			}
 		}
 	}
-	if len(names) == 0 && b.g.Services.authoritative() {
+	if len(selecting) == 0 && b.x.services.authoritative() {
 		b.note("nenhum Service da lista lida seleciona este alvo")
 	}
-	b.ingressesFor(t.Namespace, names)
+	if len(selecting) > len(names) {
+		b.out.Truncated = true
+	}
+	b.evaluate(t.Namespace, b.pathsTo(t.Namespace, selecting), names)
 	b.gaps()
-	b.note(b.g.Ingresses.gap("Ingresses"))
+	b.note(b.x.ingresses.gap("Ingresses"))
 }
 
-func (b *builder) ingressesFor(namespace string, services []string) {
-	for _, r := range b.g.Ingresses.Rows {
-		if r.Ref.Namespace != namespace || r.Network == nil || r.Network.Ingress == nil {
+func (b *builder) pathsTo(namespace string, services map[string]bool) []ingressPath {
+	var out []ingressPath
+	if len(services) == 0 {
+		return nil
+	}
+	for i := range b.g.Ingresses.Rows {
+		if i%cancelStride == 0 && b.canceled() {
+			return nil
+		}
+		row := &b.g.Ingresses.Rows[i]
+		if row.Ref.Namespace != namespace || row.Network == nil || row.Network.Ingress == nil {
 			continue
 		}
-		for _, name := range services {
-			b.ingress(r, name)
+		found := b.paths(row, services, MaxAddresses+1-len(out))
+		if len(found) > 0 {
+			b.oversized(row)
+		}
+		if out = append(out, found...); len(out) > MaxAddresses {
+			break
 		}
 	}
+	return out
 }
 
-func (b *builder) ingress(row data.ResourceRow, only string) {
-	ing := row.Network.Ingress
-	if row.Network.Truncated {
-		b.note(source(row) + " é grande demais: só parte das regras foi lida")
+func (b *builder) evaluate(namespace string, paths []ingressPath, services []string) {
+	ingresses := len(paths)
+	if len(services) > 0 {
+		ingresses = min(ingresses, max(MaxAddresses/2, MaxAddresses-len(services)))
 	}
-	emit := func(host, path string, backend data.IngressBackend) {
-		if only != "" && backend.Service != only {
+	for _, p := range paths[:ingresses] {
+		if b.canceled() || !b.evaluateIngress(p) {
 			return
 		}
-		route, result := ingressRoute(b.g, row.Ref.Namespace, row.Ref.Name, ing, host, path, backend)
-		b.route(route)
-		b.address(ingressAddress(row, ing, host, path, result))
 	}
-	for _, rule := range ing.Rules {
-		for _, p := range rule.Paths {
-			emit(rule.Host, cmp.Or(p.Path, "/"), p.Backend)
-		}
-		if len(rule.Paths) > 0 {
-			continue
-		}
-		switch {
-		case ing.Default != nil:
-			emit(rule.Host, "/", *ing.Default)
-		case only == "":
-			text := "regra sem path e sem backend padrão"
-			b.address(Address{Origin: OriginIngress, Source: source(row), Display: shownHost(rule.Host), Reach: ReachUnknown, State: StateNoBackend, Reason: text, Refused: text})
+	for _, name := range services {
+		if b.canceled() || !b.evaluateService(namespace, name) {
+			break
 		}
 	}
-	if ing.Default != nil {
-		emit("", "/", *ing.Default)
+	if ingresses < len(paths) {
+		b.out.Truncated = true
 	}
+}
+
+func (b *builder) evaluateIngress(p ingressPath) bool {
+	ing := p.row.Network.Ingress
+	if p.dead {
+		text := "regra sem path e sem backend padrão"
+		return b.address(Address{Origin: OriginIngress, Source: source(*p.row), Display: shownHost(p.host), Reach: ReachUnknown, State: StateNoBackend, Reason: text, Refused: text})
+	}
+	if b.full() {
+		b.out.Truncated = true
+		return false
+	}
+	result := checkIngressBackend(b.x, p.row.Ref.Namespace, p.backend)
+	if b.wantsRoute() {
+		b.out.Routes = append(b.out.Routes, ingressRoute(b.x, p.row.Ref.Namespace, p.row.Ref.Name, ing, p.host, p.path, p.backend, result))
+	}
+	return b.address(ingressAddress(*p.row, ing, p.host, p.path, result))
 }
 
 func source(row data.ResourceRow) string {
@@ -332,54 +443,75 @@ func schemeOf(p data.ServicePort) (string, string) {
 	return "", ""
 }
 
-func (b *builder) service(namespace, name string, svc *data.ServiceFacts) {
-	route, _ := serviceRoute(b.g, namespace, name)
-	b.route(route)
+func (b *builder) evaluateService(namespace, name string) bool {
+	if b.full() {
+		b.out.Truncated = true
+		return false
+	}
+	svc, found := b.x.service(namespace, name)
+	if found != data.TriTrue {
+		return true
+	}
+	if b.wantsRoute() {
+		b.out.Routes = append(b.out.Routes, serviceRoute(b.x, namespace, name))
+	}
 	src := "Service " + namespace + "/" + name
 	if svc.Type == "ExternalName" {
 		b.note(src + " declara ExternalName " + svc.ExternalName + ": alias DNS, destino não verificado")
-		return
-	}
-	for i, p := range svc.Ports {
-		result := backendResult{}
-		result.serve(b.g, namespace, name, svc, &svc.Ports[i])
-		base := Address{Source: src, State: result.state, Reason: result.reason}
-		for _, l := range svc.LoadBalancer {
-			a := base
-			a.Origin = OriginLoadBalancer
-			b.port(a, cmp.Or(l.Hostname, l.IP), p.Port, p)
-		}
-		if svc.Type == "LoadBalancer" && len(svc.LoadBalancer) == 0 {
-			b.address(Address{Origin: OriginLoadBalancer, Source: src, Display: "(sem endereço) " + portText(p), Reach: ReachUnknown, State: StatePending, Reason: "LoadBalancer pendente: nenhum endereço publicado em status", Refused: "sem endereço publicado"})
-		}
-		for _, ip := range svc.ExternalIPs {
-			a := base
-			a.Origin = OriginExternalIP
-			b.port(a, ip, p.Port, p)
-		}
-		if p.NodePort > 0 && (svc.Type == "NodePort" || svc.Type == "LoadBalancer" && len(svc.LoadBalancer) == 0) {
-			b.nodePort(base, p)
-		}
-		a := base
-		a.Origin, a.Reach = OriginClusterIP, ReachCluster
-		if svc.Headless() {
-			a.Display, a.Refused = name+"."+namespace+".svc headless "+portText(p), "Service headless não tem ClusterIP"
-			b.address(a)
-			continue
-		}
-		b.port(a, svc.ClusterIPs[0], p.Port, p)
+		return true
 	}
 	if len(svc.Ports) == 0 {
 		b.note(src + " não declara portas")
 	}
+	for i, p := range svc.Ports {
+		if b.canceled() || !b.servicePort(namespace, name, src, svc, &svc.Ports[i], p) {
+			return false
+		}
+	}
+	return true
 }
 
-func (b *builder) port(a Address, host string, port int, p data.ServicePort) {
+func (b *builder) servicePort(namespace, name, src string, svc *data.ServiceFacts, port *data.ServicePort, p data.ServicePort) bool {
+	result := backendResult{}
+	result.serve(b.x, namespace, name, svc, port)
+	base := Address{Source: src, State: result.state, Reason: result.reason}
+	for _, l := range svc.LoadBalancer {
+		a := base
+		a.Origin = OriginLoadBalancer
+		if !b.port(a, cmp.Or(l.Hostname, l.IP), p.Port, p) {
+			return false
+		}
+	}
+	if svc.Type == "LoadBalancer" && len(svc.LoadBalancer) == 0 {
+		if !b.address(Address{Origin: OriginLoadBalancer, Source: src, Display: "(sem endereço) " + portText(p), Reach: ReachUnknown, State: StatePending, Reason: "LoadBalancer pendente: nenhum endereço publicado em status", Refused: "sem endereço publicado"}) {
+			return false
+		}
+	}
+	for _, ip := range svc.ExternalIPs {
+		a := base
+		a.Origin = OriginExternalIP
+		if !b.port(a, ip, p.Port, p) {
+			return false
+		}
+	}
+	if p.NodePort > 0 && (svc.Type == "NodePort" || svc.Type == "LoadBalancer" && len(svc.LoadBalancer) == 0) && !b.nodePort(base, p) {
+		return false
+	}
+	a := base
+	a.Origin, a.Reach = OriginClusterIP, ReachCluster
+	if svc.Headless() {
+		a.Display, a.Refused = name+"."+namespace+".svc headless "+portText(p), "Service headless não tem ClusterIP"
+		return b.address(a)
+	}
+	return b.port(a, svc.ClusterIPs[0], p.Port, p)
+}
+
+func (b *builder) port(a Address, host string, port int, p data.ServicePort) bool {
 	cluster := a.Reach == ReachCluster
 	scheme, why := schemeOf(p)
 	if scheme == "" {
 		a.Refused = "porta sem esquema http ou https conhecido"
-		a.Display = fmt.Sprintf("%s %d/%s", host, port, cmp.Or(p.Protocol, "TCP"))
+		a.Display = fmt.Sprintf("%s %d/%s", host, port, protocolOf(p.Protocol))
 		a.Reach = hostReach(host)
 	} else {
 		a.Scheme = why
@@ -394,7 +526,7 @@ func (b *builder) port(a Address, host string, port int, p data.ServicePort) {
 	if cluster {
 		a.Reach, a.URL = ReachCluster, a.URL.WithinCluster()
 	}
-	b.address(a)
+	return b.address(a)
 }
 
 func hostReach(host string) Reach {
@@ -405,61 +537,58 @@ func hostReach(host string) Reach {
 	return [...]Reach{ReachDeclared, ReachPrivate, ReachCluster}[u.Reach()]
 }
 
-func (b *builder) nodePort(base Address, p data.ServicePort) {
+func (b *builder) nodePort(base Address, p data.ServicePort) bool {
 	base.Origin = OriginNodePort
-	shown, total := 0, 0
-	for _, r := range b.g.Nodes.Rows {
-		if r.Network == nil || r.Network.Node == nil || r.Network.Node.Ready == data.TriFalse {
-			continue
-		}
-		n := r.Network.Node
-		ips := n.External
-		if len(ips) == 0 {
-			ips = n.Internal
-		}
-		if len(ips) == 0 {
-			continue
-		}
-		total++
-		if shown == maxNodes {
-			continue
-		}
-		shown++
+	for _, n := range b.x.nodeIPs {
 		a := base
-		a.Source += ", node " + r.Ref.Name
-		b.port(a, ips[0], p.NodePort, p)
+		a.Source += ", node " + n.name
+		if !b.port(a, n.ip, p.NodePort, p) {
+			return false
+		}
 	}
-	if total > shown {
-		b.note(fmt.Sprintf("NodePort %d, outros nodes não listados: %d; porta alocada no node, alcance não verificado", p.NodePort, total-shown))
+	if hidden := b.x.nodeTotal - len(b.x.nodeIPs); hidden > 0 {
+		b.note(fmt.Sprintf("NodePort %d, outros nodes não listados: %d; porta alocada no node, alcance não verificado", p.NodePort, hidden))
 	}
-	if total == 0 {
-		a := base
-		a.Display, a.Reach = fmt.Sprintf("(node não identificado):%d", p.NodePort), ReachNodePort
-		a.Refused = cmp.Or(b.g.Nodes.gap("Nodes"), "nenhum node pronto com IP na lista lida")
-		b.address(a)
+	if b.x.nodeTotal > 0 {
+		return true
 	}
+	a := base
+	a.Display, a.Reach = fmt.Sprintf("(node não identificado):%d", p.NodePort), ReachNodePort
+	a.Refused = cmp.Or(b.x.nodes.gap("Nodes"), "nenhum node pronto com IP na lista lida")
+	return b.address(a)
 }
 
 const policyCaveat = "o efeito real depende do CNI e não foi avaliado"
 
 func (b *builder) policies(t Target) PolicyReport {
 	out := PolicyReport{Note: policyCaveat}
-	if gap := b.g.Policies.gap("NetworkPolicies"); gap != "" {
+	if gap := b.x.policies.gap("NetworkPolicies"); gap != "" {
 		out.Note = gap
 	}
 	if !t.LabelsKnown {
 		out.Note = "labels desconhecidas"
 		return out
 	}
-	out.Known = b.g.Policies.authoritative()
-	for _, r := range b.g.Policies.Rows {
+	out.Known = b.x.policies.authoritative()
+	for i, r := range b.g.Policies.Rows {
+		if i%cancelStride == 0 && b.canceled() {
+			return PolicyReport{}
+		}
 		if r.Ref.Namespace != t.Namespace {
 			continue
 		}
 		switch policySelects(r.Network, t.Labels) {
 		case data.TriTrue:
+			if len(out.Selecting) == maxPolicies {
+				out.Truncated = true
+				continue
+			}
 			out.Selecting = append(out.Selecting, r.Ref.Name)
 		case data.TriUnknown:
+			if len(out.Uncertain) == maxPolicies {
+				out.Truncated = true
+				continue
+			}
 			out.Uncertain = append(out.Uncertain, r.Ref.Name)
 		}
 	}

@@ -25,16 +25,16 @@
  │           ↳ u escolhe e copia uma URL                                                                                        │ 
  │                                                                                                                              │ 
  │ Rota  primeiro elo quebrado pelos objetos lidos                                                                              │ 
- │ ● Service lgo/lgo                                                                                                            │ 
- │           ↳ nenhum elo quebrado nos objetos lidos; o tráfego não foi testado                                                 │ 
- │ ● Service      lgo/lgo                                                                                                       │ 
- │ ● Pods         1 de 1 prontos                                                                                                │ 
- │ ● Endpoints    1 de 1 prontos                                                                                                │ 
  │ ● Ingress lgo/lgo lgo.example.com/ para lgo:http                                                                             │ 
  │           ↳ nenhum elo quebrado nos objetos lidos; o tráfego não foi testado                                                 │ 
  │ ● IngressClass traefik                                                                                                       │ 
  │ ● TLS          sem TLS declarado para este host                                                                              │ 
  │ ● Service      lgo/lgo                                                                                                       │ 
+ │ ● Porta        http 80/TCP                                                                                                   │ 
+ │ ● Pods         1 de 1 prontos                                                                                                │ 
+ │ ● Endpoints    http 80/TCP: 1 de 1 prontos                                                                                   │ 
+ │ ● Endereço     endereço publicado no Ingress                                                                                 │ 
+ │ ● Service lgo/lgo                                                                                                            │ 
  ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
 ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
   ↑↓  scroll   u  URLs   y  copy name   r  reload   esc  back   b  tree   m  menu   ?  help   q  quit           bubbletea · 0 fps 

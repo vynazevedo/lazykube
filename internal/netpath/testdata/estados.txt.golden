@@ -1,0 +1,1051 @@
+Service | EndpointSlice | Pods | Estado mostrado | Veredito da rota
+ClusterIP com selector | pronto | pronto | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+ClusterIP com selector | pronto | não pronto | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | pronto | Pending | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | pronto | Ready desconhecido | pronta | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+ClusterIP com selector | pronto | encerrando e Ready | pronta | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+ClusterIP com selector | pronto | encerrando e não Ready | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | pronto | só concluídos | pronta | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | pronto | nenhum pod | pronta | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | pronto | leitura negada | pronta | indeterminado: Pods, sem permissão para ler Pods
+ClusterIP com selector | pronto | leitura parcial | pronta | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+ClusterIP com selector | pronto, condições nil | pronto | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+ClusterIP com selector | pronto, condições nil | não pronto | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | pronto, condições nil | Pending | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | pronto, condições nil | Ready desconhecido | pronta | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+ClusterIP com selector | pronto, condições nil | encerrando e Ready | pronta | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+ClusterIP com selector | pronto, condições nil | encerrando e não Ready | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | pronto, condições nil | só concluídos | pronta | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | pronto, condições nil | nenhum pod | pronta | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | pronto, condições nil | leitura negada | pronta | indeterminado: Pods, sem permissão para ler Pods
+ClusterIP com selector | pronto, condições nil | leitura parcial | pronta | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+ClusterIP com selector | pronto e outro drenando | pronto | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+ClusterIP com selector | pronto e outro drenando | não pronto | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | pronto e outro drenando | Pending | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | pronto e outro drenando | Ready desconhecido | pronta | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+ClusterIP com selector | pronto e outro drenando | encerrando e Ready | pronta | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+ClusterIP com selector | pronto e outro drenando | encerrando e não Ready | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | pronto e outro drenando | só concluídos | pronta | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | pronto e outro drenando | nenhum pod | pronta | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | pronto e outro drenando | leitura negada | pronta | indeterminado: Pods, sem permissão para ler Pods
+ClusterIP com selector | pronto e outro drenando | leitura parcial | pronta | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+ClusterIP com selector | só drenando | pronto | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+ClusterIP com selector | só drenando | não pronto | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+ClusterIP com selector | só drenando | Pending | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+ClusterIP com selector | só drenando | Ready desconhecido | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+ClusterIP com selector | só drenando | encerrando e Ready | em drenagem | em drenagem: Pods, 1 de 1 pods encerrando e ainda Ready, nenhum outro pronto; o tráfego não foi testado
+ClusterIP com selector | só drenando | encerrando e não Ready | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+ClusterIP com selector | só drenando | só concluídos | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+ClusterIP com selector | só drenando | nenhum pod | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+ClusterIP com selector | só drenando | leitura negada | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+ClusterIP com selector | só drenando | leitura parcial | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+ClusterIP com selector | drenando e indisponível | pronto | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+ClusterIP com selector | drenando e indisponível | não pronto | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+ClusterIP com selector | drenando e indisponível | Pending | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+ClusterIP com selector | drenando e indisponível | Ready desconhecido | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+ClusterIP com selector | drenando e indisponível | encerrando e Ready | em drenagem | em drenagem: Pods, 1 de 1 pods encerrando e ainda Ready, nenhum outro pronto; o tráfego não foi testado
+ClusterIP com selector | drenando e indisponível | encerrando e não Ready | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+ClusterIP com selector | drenando e indisponível | só concluídos | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+ClusterIP com selector | drenando e indisponível | nenhum pod | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+ClusterIP com selector | drenando e indisponível | leitura negada | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+ClusterIP com selector | drenando e indisponível | leitura parcial | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+ClusterIP com selector | encerrando sem atender | pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+ClusterIP com selector | encerrando sem atender | não pronto | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | encerrando sem atender | Pending | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | encerrando sem atender | Ready desconhecido | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+ClusterIP com selector | encerrando sem atender | encerrando e Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+ClusterIP com selector | encerrando sem atender | encerrando e não Ready | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | encerrando sem atender | só concluídos | pendente | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+ClusterIP com selector | encerrando sem atender | nenhum pod | pendente | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+ClusterIP com selector | encerrando sem atender | leitura negada | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+ClusterIP com selector | encerrando sem atender | leitura parcial | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+ClusterIP com selector | encerrando, serving nil | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+ClusterIP com selector | encerrando, serving nil | não pronto | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | encerrando, serving nil | Pending | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | encerrando, serving nil | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+ClusterIP com selector | encerrando, serving nil | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+ClusterIP com selector | encerrando, serving nil | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | encerrando, serving nil | só concluídos | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | encerrando, serving nil | nenhum pod | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | encerrando, serving nil | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+ClusterIP com selector | encerrando, serving nil | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+ClusterIP com selector | não pronto | pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+ClusterIP com selector | não pronto | não pronto | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | não pronto | Pending | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | não pronto | Ready desconhecido | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+ClusterIP com selector | não pronto | encerrando e Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+ClusterIP com selector | não pronto | encerrando e não Ready | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | não pronto | só concluídos | pendente | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+ClusterIP com selector | não pronto | nenhum pod | pendente | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+ClusterIP com selector | não pronto | leitura negada | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+ClusterIP com selector | não pronto | leitura parcial | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+ClusterIP com selector | não pronto, serving nil | pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+ClusterIP com selector | não pronto, serving nil | não pronto | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | não pronto, serving nil | Pending | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | não pronto, serving nil | Ready desconhecido | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+ClusterIP com selector | não pronto, serving nil | encerrando e Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+ClusterIP com selector | não pronto, serving nil | encerrando e não Ready | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | não pronto, serving nil | só concluídos | pendente | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+ClusterIP com selector | não pronto, serving nil | nenhum pod | pendente | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+ClusterIP com selector | não pronto, serving nil | leitura negada | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+ClusterIP com selector | não pronto, serving nil | leitura parcial | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+ClusterIP com selector | não pronto mas serving | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+ClusterIP com selector | não pronto mas serving | não pronto | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | não pronto mas serving | Pending | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | não pronto mas serving | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+ClusterIP com selector | não pronto mas serving | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+ClusterIP com selector | não pronto mas serving | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | não pronto mas serving | só concluídos | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | não pronto mas serving | nenhum pod | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | não pronto mas serving | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+ClusterIP com selector | não pronto mas serving | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+ClusterIP com selector | pronto mas sem serving | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+ClusterIP com selector | pronto mas sem serving | não pronto | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | pronto mas sem serving | Pending | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | pronto mas sem serving | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+ClusterIP com selector | pronto mas sem serving | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+ClusterIP com selector | pronto mas sem serving | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | pronto mas sem serving | só concluídos | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | pronto mas sem serving | nenhum pod | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | pronto mas sem serving | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+ClusterIP com selector | pronto mas sem serving | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+ClusterIP com selector | porta com outro protocolo | pronto | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+ClusterIP com selector | porta com outro protocolo | não pronto | sem backend | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | porta com outro protocolo | Pending | sem backend | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | porta com outro protocolo | Ready desconhecido | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+ClusterIP com selector | porta com outro protocolo | encerrando e Ready | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+ClusterIP com selector | porta com outro protocolo | encerrando e não Ready | sem backend | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | porta com outro protocolo | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+ClusterIP com selector | porta com outro protocolo | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+ClusterIP com selector | porta com outro protocolo | leitura negada | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+ClusterIP com selector | porta com outro protocolo | leitura parcial | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+ClusterIP com selector | porta com outro nome | pronto | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+ClusterIP com selector | porta com outro nome | não pronto | sem backend | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | porta com outro nome | Pending | sem backend | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | porta com outro nome | Ready desconhecido | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+ClusterIP com selector | porta com outro nome | encerrando e Ready | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+ClusterIP com selector | porta com outro nome | encerrando e não Ready | sem backend | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | porta com outro nome | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+ClusterIP com selector | porta com outro nome | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+ClusterIP com selector | porta com outro nome | leitura negada | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+ClusterIP com selector | porta com outro nome | leitura parcial | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+ClusterIP com selector | número diferente do targetPort | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+ClusterIP com selector | número diferente do targetPort | não pronto | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | número diferente do targetPort | Pending | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | número diferente do targetPort | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+ClusterIP com selector | número diferente do targetPort | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+ClusterIP com selector | número diferente do targetPort | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | número diferente do targetPort | só concluídos | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | número diferente do targetPort | nenhum pod | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | número diferente do targetPort | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+ClusterIP com selector | número diferente do targetPort | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+ClusterIP com selector | número nil | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+ClusterIP com selector | número nil | não pronto | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | número nil | Pending | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | número nil | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+ClusterIP com selector | número nil | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+ClusterIP com selector | número nil | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | número nil | só concluídos | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | número nil | nenhum pod | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | número nil | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+ClusterIP com selector | número nil | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+ClusterIP com selector | só IPv6 para Service IPv4 | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+ClusterIP com selector | só IPv6 para Service IPv4 | não pronto | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | só IPv6 para Service IPv4 | Pending | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | só IPv6 para Service IPv4 | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+ClusterIP com selector | só IPv6 para Service IPv4 | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+ClusterIP com selector | só IPv6 para Service IPv4 | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | só IPv6 para Service IPv4 | só concluídos | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | só IPv6 para Service IPv4 | nenhum pod | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+ClusterIP com selector | só IPv6 para Service IPv4 | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+ClusterIP com selector | só IPv6 para Service IPv4 | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+ClusterIP com selector | sem EndpointSlice | pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+ClusterIP com selector | sem EndpointSlice | não pronto | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | sem EndpointSlice | Pending | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | sem EndpointSlice | Ready desconhecido | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+ClusterIP com selector | sem EndpointSlice | encerrando e Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+ClusterIP com selector | sem EndpointSlice | encerrando e não Ready | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | sem EndpointSlice | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+ClusterIP com selector | sem EndpointSlice | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+ClusterIP com selector | sem EndpointSlice | leitura negada | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+ClusterIP com selector | sem EndpointSlice | leitura parcial | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+ClusterIP com selector | EndpointSlice vazio | pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+ClusterIP com selector | EndpointSlice vazio | não pronto | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | EndpointSlice vazio | Pending | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | EndpointSlice vazio | Ready desconhecido | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+ClusterIP com selector | EndpointSlice vazio | encerrando e Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+ClusterIP com selector | EndpointSlice vazio | encerrando e não Ready | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | EndpointSlice vazio | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+ClusterIP com selector | EndpointSlice vazio | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+ClusterIP com selector | EndpointSlice vazio | leitura negada | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+ClusterIP com selector | EndpointSlice vazio | leitura parcial | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+ClusterIP com selector | leitura negada | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: sem permissão para ler EndpointSlices
+ClusterIP com selector | leitura negada | não pronto | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | leitura negada | Pending | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | leitura negada | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+ClusterIP com selector | leitura negada | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+ClusterIP com selector | leitura negada | encerrando e não Ready | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | leitura negada | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+ClusterIP com selector | leitura negada | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+ClusterIP com selector | leitura negada | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+ClusterIP com selector | leitura negada | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+ClusterIP com selector | não servido | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices não é servido por este cluster
+ClusterIP com selector | não servido | não pronto | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | não servido | Pending | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | não servido | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+ClusterIP com selector | não servido | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+ClusterIP com selector | não servido | encerrando e não Ready | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | não servido | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+ClusterIP com selector | não servido | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+ClusterIP com selector | não servido | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+ClusterIP com selector | não servido | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+ClusterIP com selector | leitura parcial | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices: leitura incompleta, estado desconhecido
+ClusterIP com selector | leitura parcial | não pronto | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | leitura parcial | Pending | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | leitura parcial | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+ClusterIP com selector | leitura parcial | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+ClusterIP com selector | leitura parcial | encerrando e não Ready | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+ClusterIP com selector | leitura parcial | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+ClusterIP com selector | leitura parcial | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+ClusterIP com selector | leitura parcial | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+ClusterIP com selector | leitura parcial | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+sem selector | pronto | pronto | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto | não pronto | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto | Pending | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto | Ready desconhecido | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto | encerrando e Ready | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto | encerrando e não Ready | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto | só concluídos | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto | nenhum pod | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto | leitura negada | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto | leitura parcial | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto, condições nil | pronto | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto, condições nil | não pronto | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto, condições nil | Pending | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto, condições nil | Ready desconhecido | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto, condições nil | encerrando e Ready | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto, condições nil | encerrando e não Ready | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto, condições nil | só concluídos | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto, condições nil | nenhum pod | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto, condições nil | leitura negada | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto, condições nil | leitura parcial | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto e outro drenando | pronto | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto e outro drenando | não pronto | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto e outro drenando | Pending | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto e outro drenando | Ready desconhecido | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto e outro drenando | encerrando e Ready | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto e outro drenando | encerrando e não Ready | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto e outro drenando | só concluídos | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto e outro drenando | nenhum pod | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto e outro drenando | leitura negada | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | pronto e outro drenando | leitura parcial | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | só drenando | pronto | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+sem selector | só drenando | não pronto | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+sem selector | só drenando | Pending | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+sem selector | só drenando | Ready desconhecido | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+sem selector | só drenando | encerrando e Ready | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+sem selector | só drenando | encerrando e não Ready | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+sem selector | só drenando | só concluídos | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+sem selector | só drenando | nenhum pod | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+sem selector | só drenando | leitura negada | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+sem selector | só drenando | leitura parcial | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+sem selector | drenando e indisponível | pronto | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+sem selector | drenando e indisponível | não pronto | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+sem selector | drenando e indisponível | Pending | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+sem selector | drenando e indisponível | Ready desconhecido | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+sem selector | drenando e indisponível | encerrando e Ready | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+sem selector | drenando e indisponível | encerrando e não Ready | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+sem selector | drenando e indisponível | só concluídos | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+sem selector | drenando e indisponível | nenhum pod | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+sem selector | drenando e indisponível | leitura negada | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+sem selector | drenando e indisponível | leitura parcial | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+sem selector | encerrando sem atender | pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | encerrando sem atender | não pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | encerrando sem atender | Pending | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | encerrando sem atender | Ready desconhecido | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | encerrando sem atender | encerrando e Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | encerrando sem atender | encerrando e não Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | encerrando sem atender | só concluídos | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | encerrando sem atender | nenhum pod | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | encerrando sem atender | leitura negada | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | encerrando sem atender | leitura parcial | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | encerrando, serving nil | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | encerrando, serving nil | não pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | encerrando, serving nil | Pending | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | encerrando, serving nil | Ready desconhecido | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | encerrando, serving nil | encerrando e Ready | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | encerrando, serving nil | encerrando e não Ready | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | encerrando, serving nil | só concluídos | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | encerrando, serving nil | nenhum pod | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | encerrando, serving nil | leitura negada | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | encerrando, serving nil | leitura parcial | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | não pronto | pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | não pronto | não pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | não pronto | Pending | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | não pronto | Ready desconhecido | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | não pronto | encerrando e Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | não pronto | encerrando e não Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | não pronto | só concluídos | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | não pronto | nenhum pod | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | não pronto | leitura negada | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | não pronto | leitura parcial | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | não pronto, serving nil | pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | não pronto, serving nil | não pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | não pronto, serving nil | Pending | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | não pronto, serving nil | Ready desconhecido | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | não pronto, serving nil | encerrando e Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | não pronto, serving nil | encerrando e não Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | não pronto, serving nil | só concluídos | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | não pronto, serving nil | nenhum pod | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | não pronto, serving nil | leitura negada | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | não pronto, serving nil | leitura parcial | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+sem selector | não pronto mas serving | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | não pronto mas serving | não pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | não pronto mas serving | Pending | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | não pronto mas serving | Ready desconhecido | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | não pronto mas serving | encerrando e Ready | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | não pronto mas serving | encerrando e não Ready | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | não pronto mas serving | só concluídos | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | não pronto mas serving | nenhum pod | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | não pronto mas serving | leitura negada | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | não pronto mas serving | leitura parcial | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | pronto mas sem serving | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | pronto mas sem serving | não pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | pronto mas sem serving | Pending | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | pronto mas sem serving | Ready desconhecido | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | pronto mas sem serving | encerrando e Ready | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | pronto mas sem serving | encerrando e não Ready | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | pronto mas sem serving | só concluídos | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | pronto mas sem serving | nenhum pod | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | pronto mas sem serving | leitura negada | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | pronto mas sem serving | leitura parcial | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+sem selector | porta com outro protocolo | pronto | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+sem selector | porta com outro protocolo | não pronto | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+sem selector | porta com outro protocolo | Pending | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+sem selector | porta com outro protocolo | Ready desconhecido | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+sem selector | porta com outro protocolo | encerrando e Ready | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+sem selector | porta com outro protocolo | encerrando e não Ready | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+sem selector | porta com outro protocolo | só concluídos | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+sem selector | porta com outro protocolo | nenhum pod | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+sem selector | porta com outro protocolo | leitura negada | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+sem selector | porta com outro protocolo | leitura parcial | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+sem selector | porta com outro nome | pronto | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+sem selector | porta com outro nome | não pronto | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+sem selector | porta com outro nome | Pending | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+sem selector | porta com outro nome | Ready desconhecido | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+sem selector | porta com outro nome | encerrando e Ready | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+sem selector | porta com outro nome | encerrando e não Ready | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+sem selector | porta com outro nome | só concluídos | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+sem selector | porta com outro nome | nenhum pod | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+sem selector | porta com outro nome | leitura negada | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+sem selector | porta com outro nome | leitura parcial | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+sem selector | número diferente do targetPort | pronto | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | número diferente do targetPort | não pronto | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | número diferente do targetPort | Pending | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | número diferente do targetPort | Ready desconhecido | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | número diferente do targetPort | encerrando e Ready | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | número diferente do targetPort | encerrando e não Ready | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | número diferente do targetPort | só concluídos | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | número diferente do targetPort | nenhum pod | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | número diferente do targetPort | leitura negada | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | número diferente do targetPort | leitura parcial | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+sem selector | número nil | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+sem selector | número nil | não pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+sem selector | número nil | Pending | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+sem selector | número nil | Ready desconhecido | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+sem selector | número nil | encerrando e Ready | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+sem selector | número nil | encerrando e não Ready | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+sem selector | número nil | só concluídos | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+sem selector | número nil | nenhum pod | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+sem selector | número nil | leitura negada | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+sem selector | número nil | leitura parcial | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+sem selector | só IPv6 para Service IPv4 | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+sem selector | só IPv6 para Service IPv4 | não pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+sem selector | só IPv6 para Service IPv4 | Pending | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+sem selector | só IPv6 para Service IPv4 | Ready desconhecido | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+sem selector | só IPv6 para Service IPv4 | encerrando e Ready | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+sem selector | só IPv6 para Service IPv4 | encerrando e não Ready | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+sem selector | só IPv6 para Service IPv4 | só concluídos | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+sem selector | só IPv6 para Service IPv4 | nenhum pod | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+sem selector | só IPv6 para Service IPv4 | leitura negada | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+sem selector | só IPv6 para Service IPv4 | leitura parcial | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+sem selector | sem EndpointSlice | pronto | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+sem selector | sem EndpointSlice | não pronto | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+sem selector | sem EndpointSlice | Pending | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+sem selector | sem EndpointSlice | Ready desconhecido | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+sem selector | sem EndpointSlice | encerrando e Ready | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+sem selector | sem EndpointSlice | encerrando e não Ready | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+sem selector | sem EndpointSlice | só concluídos | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+sem selector | sem EndpointSlice | nenhum pod | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+sem selector | sem EndpointSlice | leitura negada | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+sem selector | sem EndpointSlice | leitura parcial | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+sem selector | EndpointSlice vazio | pronto | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+sem selector | EndpointSlice vazio | não pronto | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+sem selector | EndpointSlice vazio | Pending | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+sem selector | EndpointSlice vazio | Ready desconhecido | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+sem selector | EndpointSlice vazio | encerrando e Ready | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+sem selector | EndpointSlice vazio | encerrando e não Ready | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+sem selector | EndpointSlice vazio | só concluídos | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+sem selector | EndpointSlice vazio | nenhum pod | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+sem selector | EndpointSlice vazio | leitura negada | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+sem selector | EndpointSlice vazio | leitura parcial | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+sem selector | leitura negada | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: sem permissão para ler EndpointSlices
+sem selector | leitura negada | não pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: sem permissão para ler EndpointSlices
+sem selector | leitura negada | Pending | desconhecida | indeterminado: Endpoints, http 80/TCP: sem permissão para ler EndpointSlices
+sem selector | leitura negada | Ready desconhecido | desconhecida | indeterminado: Endpoints, http 80/TCP: sem permissão para ler EndpointSlices
+sem selector | leitura negada | encerrando e Ready | desconhecida | indeterminado: Endpoints, http 80/TCP: sem permissão para ler EndpointSlices
+sem selector | leitura negada | encerrando e não Ready | desconhecida | indeterminado: Endpoints, http 80/TCP: sem permissão para ler EndpointSlices
+sem selector | leitura negada | só concluídos | desconhecida | indeterminado: Endpoints, http 80/TCP: sem permissão para ler EndpointSlices
+sem selector | leitura negada | nenhum pod | desconhecida | indeterminado: Endpoints, http 80/TCP: sem permissão para ler EndpointSlices
+sem selector | leitura negada | leitura negada | desconhecida | indeterminado: Endpoints, http 80/TCP: sem permissão para ler EndpointSlices
+sem selector | leitura negada | leitura parcial | desconhecida | indeterminado: Endpoints, http 80/TCP: sem permissão para ler EndpointSlices
+sem selector | não servido | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices não é servido por este cluster
+sem selector | não servido | não pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices não é servido por este cluster
+sem selector | não servido | Pending | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices não é servido por este cluster
+sem selector | não servido | Ready desconhecido | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices não é servido por este cluster
+sem selector | não servido | encerrando e Ready | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices não é servido por este cluster
+sem selector | não servido | encerrando e não Ready | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices não é servido por este cluster
+sem selector | não servido | só concluídos | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices não é servido por este cluster
+sem selector | não servido | nenhum pod | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices não é servido por este cluster
+sem selector | não servido | leitura negada | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices não é servido por este cluster
+sem selector | não servido | leitura parcial | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices não é servido por este cluster
+sem selector | leitura parcial | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices: leitura incompleta, estado desconhecido
+sem selector | leitura parcial | não pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices: leitura incompleta, estado desconhecido
+sem selector | leitura parcial | Pending | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices: leitura incompleta, estado desconhecido
+sem selector | leitura parcial | Ready desconhecido | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices: leitura incompleta, estado desconhecido
+sem selector | leitura parcial | encerrando e Ready | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices: leitura incompleta, estado desconhecido
+sem selector | leitura parcial | encerrando e não Ready | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices: leitura incompleta, estado desconhecido
+sem selector | leitura parcial | só concluídos | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices: leitura incompleta, estado desconhecido
+sem selector | leitura parcial | nenhum pod | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices: leitura incompleta, estado desconhecido
+sem selector | leitura parcial | leitura negada | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices: leitura incompleta, estado desconhecido
+sem selector | leitura parcial | leitura parcial | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices: leitura incompleta, estado desconhecido
+publishNotReadyAddresses | pronto | pronto | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+publishNotReadyAddresses | pronto | não pronto | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | pronto | Pending | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | pronto | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+publishNotReadyAddresses | pronto | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+publishNotReadyAddresses | pronto | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | pronto | só concluídos | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+publishNotReadyAddresses | pronto | nenhum pod | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+publishNotReadyAddresses | pronto | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+publishNotReadyAddresses | pronto | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+publishNotReadyAddresses | pronto, condições nil | pronto | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+publishNotReadyAddresses | pronto, condições nil | não pronto | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | pronto, condições nil | Pending | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | pronto, condições nil | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+publishNotReadyAddresses | pronto, condições nil | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+publishNotReadyAddresses | pronto, condições nil | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | pronto, condições nil | só concluídos | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+publishNotReadyAddresses | pronto, condições nil | nenhum pod | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+publishNotReadyAddresses | pronto, condições nil | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+publishNotReadyAddresses | pronto, condições nil | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+publishNotReadyAddresses | pronto e outro drenando | pronto | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+publishNotReadyAddresses | pronto e outro drenando | não pronto | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | pronto e outro drenando | Pending | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | pronto e outro drenando | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+publishNotReadyAddresses | pronto e outro drenando | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+publishNotReadyAddresses | pronto e outro drenando | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | pronto e outro drenando | só concluídos | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+publishNotReadyAddresses | pronto e outro drenando | nenhum pod | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+publishNotReadyAddresses | pronto e outro drenando | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+publishNotReadyAddresses | pronto e outro drenando | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+publishNotReadyAddresses | só drenando | pronto | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+publishNotReadyAddresses | só drenando | não pronto | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+publishNotReadyAddresses | só drenando | Pending | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+publishNotReadyAddresses | só drenando | Ready desconhecido | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+publishNotReadyAddresses | só drenando | encerrando e Ready | em drenagem | em drenagem: Pods, 1 de 1 pods encerrando e ainda Ready, nenhum outro pronto; o tráfego não foi testado
+publishNotReadyAddresses | só drenando | encerrando e não Ready | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+publishNotReadyAddresses | só drenando | só concluídos | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+publishNotReadyAddresses | só drenando | nenhum pod | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+publishNotReadyAddresses | só drenando | leitura negada | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+publishNotReadyAddresses | só drenando | leitura parcial | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+publishNotReadyAddresses | drenando e indisponível | pronto | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+publishNotReadyAddresses | drenando e indisponível | não pronto | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+publishNotReadyAddresses | drenando e indisponível | Pending | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+publishNotReadyAddresses | drenando e indisponível | Ready desconhecido | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+publishNotReadyAddresses | drenando e indisponível | encerrando e Ready | em drenagem | em drenagem: Pods, 1 de 1 pods encerrando e ainda Ready, nenhum outro pronto; o tráfego não foi testado
+publishNotReadyAddresses | drenando e indisponível | encerrando e não Ready | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+publishNotReadyAddresses | drenando e indisponível | só concluídos | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+publishNotReadyAddresses | drenando e indisponível | nenhum pod | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+publishNotReadyAddresses | drenando e indisponível | leitura negada | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+publishNotReadyAddresses | drenando e indisponível | leitura parcial | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+publishNotReadyAddresses | encerrando sem atender | pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+publishNotReadyAddresses | encerrando sem atender | não pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+publishNotReadyAddresses | encerrando sem atender | Pending | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+publishNotReadyAddresses | encerrando sem atender | Ready desconhecido | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+publishNotReadyAddresses | encerrando sem atender | encerrando e Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+publishNotReadyAddresses | encerrando sem atender | encerrando e não Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+publishNotReadyAddresses | encerrando sem atender | só concluídos | pendente | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+publishNotReadyAddresses | encerrando sem atender | nenhum pod | pendente | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+publishNotReadyAddresses | encerrando sem atender | leitura negada | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+publishNotReadyAddresses | encerrando sem atender | leitura parcial | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+publishNotReadyAddresses | encerrando, serving nil | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+publishNotReadyAddresses | encerrando, serving nil | não pronto | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | encerrando, serving nil | Pending | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | encerrando, serving nil | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+publishNotReadyAddresses | encerrando, serving nil | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+publishNotReadyAddresses | encerrando, serving nil | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | encerrando, serving nil | só concluídos | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+publishNotReadyAddresses | encerrando, serving nil | nenhum pod | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+publishNotReadyAddresses | encerrando, serving nil | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+publishNotReadyAddresses | encerrando, serving nil | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+publishNotReadyAddresses | não pronto | pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+publishNotReadyAddresses | não pronto | não pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+publishNotReadyAddresses | não pronto | Pending | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+publishNotReadyAddresses | não pronto | Ready desconhecido | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+publishNotReadyAddresses | não pronto | encerrando e Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+publishNotReadyAddresses | não pronto | encerrando e não Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+publishNotReadyAddresses | não pronto | só concluídos | pendente | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+publishNotReadyAddresses | não pronto | nenhum pod | pendente | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+publishNotReadyAddresses | não pronto | leitura negada | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+publishNotReadyAddresses | não pronto | leitura parcial | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+publishNotReadyAddresses | não pronto, serving nil | pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+publishNotReadyAddresses | não pronto, serving nil | não pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+publishNotReadyAddresses | não pronto, serving nil | Pending | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+publishNotReadyAddresses | não pronto, serving nil | Ready desconhecido | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+publishNotReadyAddresses | não pronto, serving nil | encerrando e Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+publishNotReadyAddresses | não pronto, serving nil | encerrando e não Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+publishNotReadyAddresses | não pronto, serving nil | só concluídos | pendente | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+publishNotReadyAddresses | não pronto, serving nil | nenhum pod | pendente | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+publishNotReadyAddresses | não pronto, serving nil | leitura negada | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+publishNotReadyAddresses | não pronto, serving nil | leitura parcial | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+publishNotReadyAddresses | não pronto mas serving | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+publishNotReadyAddresses | não pronto mas serving | não pronto | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | não pronto mas serving | Pending | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | não pronto mas serving | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+publishNotReadyAddresses | não pronto mas serving | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+publishNotReadyAddresses | não pronto mas serving | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | não pronto mas serving | só concluídos | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+publishNotReadyAddresses | não pronto mas serving | nenhum pod | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+publishNotReadyAddresses | não pronto mas serving | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+publishNotReadyAddresses | não pronto mas serving | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+publishNotReadyAddresses | pronto mas sem serving | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+publishNotReadyAddresses | pronto mas sem serving | não pronto | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | pronto mas sem serving | Pending | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | pronto mas sem serving | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+publishNotReadyAddresses | pronto mas sem serving | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+publishNotReadyAddresses | pronto mas sem serving | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | pronto mas sem serving | só concluídos | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+publishNotReadyAddresses | pronto mas sem serving | nenhum pod | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+publishNotReadyAddresses | pronto mas sem serving | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+publishNotReadyAddresses | pronto mas sem serving | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+publishNotReadyAddresses | porta com outro protocolo | pronto | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+publishNotReadyAddresses | porta com outro protocolo | não pronto | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+publishNotReadyAddresses | porta com outro protocolo | Pending | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+publishNotReadyAddresses | porta com outro protocolo | Ready desconhecido | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+publishNotReadyAddresses | porta com outro protocolo | encerrando e Ready | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+publishNotReadyAddresses | porta com outro protocolo | encerrando e não Ready | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+publishNotReadyAddresses | porta com outro protocolo | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+publishNotReadyAddresses | porta com outro protocolo | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+publishNotReadyAddresses | porta com outro protocolo | leitura negada | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+publishNotReadyAddresses | porta com outro protocolo | leitura parcial | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+publishNotReadyAddresses | porta com outro nome | pronto | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+publishNotReadyAddresses | porta com outro nome | não pronto | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+publishNotReadyAddresses | porta com outro nome | Pending | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+publishNotReadyAddresses | porta com outro nome | Ready desconhecido | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+publishNotReadyAddresses | porta com outro nome | encerrando e Ready | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+publishNotReadyAddresses | porta com outro nome | encerrando e não Ready | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+publishNotReadyAddresses | porta com outro nome | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+publishNotReadyAddresses | porta com outro nome | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+publishNotReadyAddresses | porta com outro nome | leitura negada | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+publishNotReadyAddresses | porta com outro nome | leitura parcial | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+publishNotReadyAddresses | número diferente do targetPort | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+publishNotReadyAddresses | número diferente do targetPort | não pronto | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | número diferente do targetPort | Pending | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | número diferente do targetPort | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+publishNotReadyAddresses | número diferente do targetPort | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+publishNotReadyAddresses | número diferente do targetPort | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | número diferente do targetPort | só concluídos | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+publishNotReadyAddresses | número diferente do targetPort | nenhum pod | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+publishNotReadyAddresses | número diferente do targetPort | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+publishNotReadyAddresses | número diferente do targetPort | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+publishNotReadyAddresses | número nil | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+publishNotReadyAddresses | número nil | não pronto | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | número nil | Pending | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | número nil | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+publishNotReadyAddresses | número nil | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+publishNotReadyAddresses | número nil | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | número nil | só concluídos | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+publishNotReadyAddresses | número nil | nenhum pod | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+publishNotReadyAddresses | número nil | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+publishNotReadyAddresses | número nil | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+publishNotReadyAddresses | só IPv6 para Service IPv4 | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+publishNotReadyAddresses | só IPv6 para Service IPv4 | não pronto | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | só IPv6 para Service IPv4 | Pending | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | só IPv6 para Service IPv4 | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+publishNotReadyAddresses | só IPv6 para Service IPv4 | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+publishNotReadyAddresses | só IPv6 para Service IPv4 | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | só IPv6 para Service IPv4 | só concluídos | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+publishNotReadyAddresses | só IPv6 para Service IPv4 | nenhum pod | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+publishNotReadyAddresses | só IPv6 para Service IPv4 | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+publishNotReadyAddresses | só IPv6 para Service IPv4 | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+publishNotReadyAddresses | sem EndpointSlice | pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+publishNotReadyAddresses | sem EndpointSlice | não pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+publishNotReadyAddresses | sem EndpointSlice | Pending | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+publishNotReadyAddresses | sem EndpointSlice | Ready desconhecido | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+publishNotReadyAddresses | sem EndpointSlice | encerrando e Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+publishNotReadyAddresses | sem EndpointSlice | encerrando e não Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+publishNotReadyAddresses | sem EndpointSlice | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+publishNotReadyAddresses | sem EndpointSlice | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+publishNotReadyAddresses | sem EndpointSlice | leitura negada | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+publishNotReadyAddresses | sem EndpointSlice | leitura parcial | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+publishNotReadyAddresses | EndpointSlice vazio | pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+publishNotReadyAddresses | EndpointSlice vazio | não pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+publishNotReadyAddresses | EndpointSlice vazio | Pending | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+publishNotReadyAddresses | EndpointSlice vazio | Ready desconhecido | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+publishNotReadyAddresses | EndpointSlice vazio | encerrando e Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+publishNotReadyAddresses | EndpointSlice vazio | encerrando e não Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+publishNotReadyAddresses | EndpointSlice vazio | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+publishNotReadyAddresses | EndpointSlice vazio | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+publishNotReadyAddresses | EndpointSlice vazio | leitura negada | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+publishNotReadyAddresses | EndpointSlice vazio | leitura parcial | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+publishNotReadyAddresses | leitura negada | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: sem permissão para ler EndpointSlices
+publishNotReadyAddresses | leitura negada | não pronto | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | leitura negada | Pending | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | leitura negada | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+publishNotReadyAddresses | leitura negada | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+publishNotReadyAddresses | leitura negada | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | leitura negada | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+publishNotReadyAddresses | leitura negada | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+publishNotReadyAddresses | leitura negada | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+publishNotReadyAddresses | leitura negada | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+publishNotReadyAddresses | não servido | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices não é servido por este cluster
+publishNotReadyAddresses | não servido | não pronto | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | não servido | Pending | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | não servido | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+publishNotReadyAddresses | não servido | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+publishNotReadyAddresses | não servido | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | não servido | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+publishNotReadyAddresses | não servido | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+publishNotReadyAddresses | não servido | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+publishNotReadyAddresses | não servido | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+publishNotReadyAddresses | leitura parcial | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices: leitura incompleta, estado desconhecido
+publishNotReadyAddresses | leitura parcial | não pronto | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | leitura parcial | Pending | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | leitura parcial | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+publishNotReadyAddresses | leitura parcial | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+publishNotReadyAddresses | leitura parcial | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods, nenhum pronto; o Service declara publishNotReadyAddresses
+publishNotReadyAddresses | leitura parcial | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+publishNotReadyAddresses | leitura parcial | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+publishNotReadyAddresses | leitura parcial | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+publishNotReadyAddresses | leitura parcial | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+headless | pronto | pronto | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+headless | pronto | não pronto | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | pronto | Pending | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | pronto | Ready desconhecido | pronta | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+headless | pronto | encerrando e Ready | pronta | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+headless | pronto | encerrando e não Ready | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | pronto | só concluídos | pronta | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | pronto | nenhum pod | pronta | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | pronto | leitura negada | pronta | indeterminado: Pods, sem permissão para ler Pods
+headless | pronto | leitura parcial | pronta | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+headless | pronto, condições nil | pronto | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+headless | pronto, condições nil | não pronto | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | pronto, condições nil | Pending | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | pronto, condições nil | Ready desconhecido | pronta | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+headless | pronto, condições nil | encerrando e Ready | pronta | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+headless | pronto, condições nil | encerrando e não Ready | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | pronto, condições nil | só concluídos | pronta | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | pronto, condições nil | nenhum pod | pronta | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | pronto, condições nil | leitura negada | pronta | indeterminado: Pods, sem permissão para ler Pods
+headless | pronto, condições nil | leitura parcial | pronta | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+headless | pronto e outro drenando | pronto | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+headless | pronto e outro drenando | não pronto | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | pronto e outro drenando | Pending | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | pronto e outro drenando | Ready desconhecido | pronta | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+headless | pronto e outro drenando | encerrando e Ready | pronta | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+headless | pronto e outro drenando | encerrando e não Ready | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | pronto e outro drenando | só concluídos | pronta | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | pronto e outro drenando | nenhum pod | pronta | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | pronto e outro drenando | leitura negada | pronta | indeterminado: Pods, sem permissão para ler Pods
+headless | pronto e outro drenando | leitura parcial | pronta | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+headless | só drenando | pronto | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+headless | só drenando | não pronto | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+headless | só drenando | Pending | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+headless | só drenando | Ready desconhecido | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+headless | só drenando | encerrando e Ready | em drenagem | em drenagem: Pods, 1 de 1 pods encerrando e ainda Ready, nenhum outro pronto; o tráfego não foi testado
+headless | só drenando | encerrando e não Ready | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+headless | só drenando | só concluídos | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+headless | só drenando | nenhum pod | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+headless | só drenando | leitura negada | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+headless | só drenando | leitura parcial | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+headless | drenando e indisponível | pronto | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+headless | drenando e indisponível | não pronto | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+headless | drenando e indisponível | Pending | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+headless | drenando e indisponível | Ready desconhecido | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+headless | drenando e indisponível | encerrando e Ready | em drenagem | em drenagem: Pods, 1 de 1 pods encerrando e ainda Ready, nenhum outro pronto; o tráfego não foi testado
+headless | drenando e indisponível | encerrando e não Ready | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+headless | drenando e indisponível | só concluídos | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+headless | drenando e indisponível | nenhum pod | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+headless | drenando e indisponível | leitura negada | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+headless | drenando e indisponível | leitura parcial | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+headless | encerrando sem atender | pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+headless | encerrando sem atender | não pronto | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | encerrando sem atender | Pending | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | encerrando sem atender | Ready desconhecido | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+headless | encerrando sem atender | encerrando e Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+headless | encerrando sem atender | encerrando e não Ready | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | encerrando sem atender | só concluídos | pendente | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+headless | encerrando sem atender | nenhum pod | pendente | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+headless | encerrando sem atender | leitura negada | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+headless | encerrando sem atender | leitura parcial | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+headless | encerrando, serving nil | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+headless | encerrando, serving nil | não pronto | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | encerrando, serving nil | Pending | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | encerrando, serving nil | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+headless | encerrando, serving nil | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+headless | encerrando, serving nil | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | encerrando, serving nil | só concluídos | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | encerrando, serving nil | nenhum pod | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | encerrando, serving nil | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+headless | encerrando, serving nil | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+headless | não pronto | pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+headless | não pronto | não pronto | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | não pronto | Pending | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | não pronto | Ready desconhecido | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+headless | não pronto | encerrando e Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+headless | não pronto | encerrando e não Ready | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | não pronto | só concluídos | pendente | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+headless | não pronto | nenhum pod | pendente | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+headless | não pronto | leitura negada | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+headless | não pronto | leitura parcial | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+headless | não pronto, serving nil | pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+headless | não pronto, serving nil | não pronto | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | não pronto, serving nil | Pending | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | não pronto, serving nil | Ready desconhecido | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+headless | não pronto, serving nil | encerrando e Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+headless | não pronto, serving nil | encerrando e não Ready | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | não pronto, serving nil | só concluídos | pendente | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+headless | não pronto, serving nil | nenhum pod | pendente | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+headless | não pronto, serving nil | leitura negada | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+headless | não pronto, serving nil | leitura parcial | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+headless | não pronto mas serving | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+headless | não pronto mas serving | não pronto | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | não pronto mas serving | Pending | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | não pronto mas serving | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+headless | não pronto mas serving | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+headless | não pronto mas serving | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | não pronto mas serving | só concluídos | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | não pronto mas serving | nenhum pod | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | não pronto mas serving | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+headless | não pronto mas serving | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+headless | pronto mas sem serving | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+headless | pronto mas sem serving | não pronto | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | pronto mas sem serving | Pending | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | pronto mas sem serving | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+headless | pronto mas sem serving | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+headless | pronto mas sem serving | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | pronto mas sem serving | só concluídos | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | pronto mas sem serving | nenhum pod | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | pronto mas sem serving | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+headless | pronto mas sem serving | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+headless | porta com outro protocolo | pronto | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+headless | porta com outro protocolo | não pronto | sem backend | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | porta com outro protocolo | Pending | sem backend | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | porta com outro protocolo | Ready desconhecido | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+headless | porta com outro protocolo | encerrando e Ready | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+headless | porta com outro protocolo | encerrando e não Ready | sem backend | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | porta com outro protocolo | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+headless | porta com outro protocolo | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+headless | porta com outro protocolo | leitura negada | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+headless | porta com outro protocolo | leitura parcial | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+headless | porta com outro nome | pronto | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+headless | porta com outro nome | não pronto | sem backend | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | porta com outro nome | Pending | sem backend | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | porta com outro nome | Ready desconhecido | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+headless | porta com outro nome | encerrando e Ready | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+headless | porta com outro nome | encerrando e não Ready | sem backend | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | porta com outro nome | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+headless | porta com outro nome | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+headless | porta com outro nome | leitura negada | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+headless | porta com outro nome | leitura parcial | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+headless | número diferente do targetPort | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+headless | número diferente do targetPort | não pronto | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | número diferente do targetPort | Pending | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | número diferente do targetPort | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+headless | número diferente do targetPort | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+headless | número diferente do targetPort | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | número diferente do targetPort | só concluídos | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | número diferente do targetPort | nenhum pod | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | número diferente do targetPort | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+headless | número diferente do targetPort | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+headless | número nil | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+headless | número nil | não pronto | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | número nil | Pending | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | número nil | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+headless | número nil | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+headless | número nil | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | número nil | só concluídos | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | número nil | nenhum pod | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | número nil | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+headless | número nil | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+headless | só IPv6 para Service IPv4 | pronto | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+headless | só IPv6 para Service IPv4 | não pronto | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | só IPv6 para Service IPv4 | Pending | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | só IPv6 para Service IPv4 | Ready desconhecido | pronta | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+headless | só IPv6 para Service IPv4 | encerrando e Ready | pronta | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+headless | só IPv6 para Service IPv4 | encerrando e não Ready | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | só IPv6 para Service IPv4 | só concluídos | pronta | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | só IPv6 para Service IPv4 | nenhum pod | pronta | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+headless | só IPv6 para Service IPv4 | leitura negada | pronta | indeterminado: Pods, sem permissão para ler Pods
+headless | só IPv6 para Service IPv4 | leitura parcial | pronta | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+headless | sem EndpointSlice | pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+headless | sem EndpointSlice | não pronto | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | sem EndpointSlice | Pending | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | sem EndpointSlice | Ready desconhecido | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+headless | sem EndpointSlice | encerrando e Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+headless | sem EndpointSlice | encerrando e não Ready | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | sem EndpointSlice | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+headless | sem EndpointSlice | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+headless | sem EndpointSlice | leitura negada | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+headless | sem EndpointSlice | leitura parcial | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+headless | EndpointSlice vazio | pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+headless | EndpointSlice vazio | não pronto | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | EndpointSlice vazio | Pending | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | EndpointSlice vazio | Ready desconhecido | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+headless | EndpointSlice vazio | encerrando e Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+headless | EndpointSlice vazio | encerrando e não Ready | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | EndpointSlice vazio | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+headless | EndpointSlice vazio | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+headless | EndpointSlice vazio | leitura negada | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+headless | EndpointSlice vazio | leitura parcial | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+headless | leitura negada | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: sem permissão para ler EndpointSlices
+headless | leitura negada | não pronto | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | leitura negada | Pending | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | leitura negada | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+headless | leitura negada | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+headless | leitura negada | encerrando e não Ready | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | leitura negada | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+headless | leitura negada | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+headless | leitura negada | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+headless | leitura negada | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+headless | não servido | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices não é servido por este cluster
+headless | não servido | não pronto | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | não servido | Pending | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | não servido | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+headless | não servido | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+headless | não servido | encerrando e não Ready | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | não servido | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+headless | não servido | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+headless | não servido | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+headless | não servido | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+headless | leitura parcial | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices: leitura incompleta, estado desconhecido
+headless | leitura parcial | não pronto | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | leitura parcial | Pending | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | leitura parcial | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+headless | leitura parcial | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+headless | leitura parcial | encerrando e não Ready | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+headless | leitura parcial | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+headless | leitura parcial | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+headless | leitura parcial | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+headless | leitura parcial | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+targetPort nomeada | pronto | pronto | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+targetPort nomeada | pronto | não pronto | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | pronto | Pending | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | pronto | Ready desconhecido | pronta | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+targetPort nomeada | pronto | encerrando e Ready | pronta | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+targetPort nomeada | pronto | encerrando e não Ready | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | pronto | só concluídos | pronta | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | pronto | nenhum pod | pronta | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | pronto | leitura negada | pronta | indeterminado: Pods, sem permissão para ler Pods
+targetPort nomeada | pronto | leitura parcial | pronta | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+targetPort nomeada | pronto, condições nil | pronto | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+targetPort nomeada | pronto, condições nil | não pronto | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | pronto, condições nil | Pending | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | pronto, condições nil | Ready desconhecido | pronta | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+targetPort nomeada | pronto, condições nil | encerrando e Ready | pronta | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+targetPort nomeada | pronto, condições nil | encerrando e não Ready | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | pronto, condições nil | só concluídos | pronta | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | pronto, condições nil | nenhum pod | pronta | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | pronto, condições nil | leitura negada | pronta | indeterminado: Pods, sem permissão para ler Pods
+targetPort nomeada | pronto, condições nil | leitura parcial | pronta | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+targetPort nomeada | pronto e outro drenando | pronto | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+targetPort nomeada | pronto e outro drenando | não pronto | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | pronto e outro drenando | Pending | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | pronto e outro drenando | Ready desconhecido | pronta | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+targetPort nomeada | pronto e outro drenando | encerrando e Ready | pronta | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+targetPort nomeada | pronto e outro drenando | encerrando e não Ready | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | pronto e outro drenando | só concluídos | pronta | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | pronto e outro drenando | nenhum pod | pronta | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | pronto e outro drenando | leitura negada | pronta | indeterminado: Pods, sem permissão para ler Pods
+targetPort nomeada | pronto e outro drenando | leitura parcial | pronta | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+targetPort nomeada | só drenando | pronto | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+targetPort nomeada | só drenando | não pronto | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+targetPort nomeada | só drenando | Pending | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+targetPort nomeada | só drenando | Ready desconhecido | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+targetPort nomeada | só drenando | encerrando e Ready | em drenagem | em drenagem: Pods, 1 de 1 pods encerrando e ainda Ready, nenhum outro pronto; o tráfego não foi testado
+targetPort nomeada | só drenando | encerrando e não Ready | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+targetPort nomeada | só drenando | só concluídos | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+targetPort nomeada | só drenando | nenhum pod | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+targetPort nomeada | só drenando | leitura negada | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+targetPort nomeada | só drenando | leitura parcial | em drenagem | em drenagem: Endpoints, http 80/TCP: 2 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+targetPort nomeada | drenando e indisponível | pronto | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+targetPort nomeada | drenando e indisponível | não pronto | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+targetPort nomeada | drenando e indisponível | Pending | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+targetPort nomeada | drenando e indisponível | Ready desconhecido | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+targetPort nomeada | drenando e indisponível | encerrando e Ready | em drenagem | em drenagem: Pods, 1 de 1 pods encerrando e ainda Ready, nenhum outro pronto; o tráfego não foi testado
+targetPort nomeada | drenando e indisponível | encerrando e não Ready | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+targetPort nomeada | drenando e indisponível | só concluídos | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+targetPort nomeada | drenando e indisponível | nenhum pod | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+targetPort nomeada | drenando e indisponível | leitura negada | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+targetPort nomeada | drenando e indisponível | leitura parcial | em drenagem | em drenagem: Endpoints, http 80/TCP: 1 de 2 em drenagem: encerrando e ainda atendendo, nenhum pronto; o tráfego não foi testado
+targetPort nomeada | encerrando sem atender | pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+targetPort nomeada | encerrando sem atender | não pronto | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | encerrando sem atender | Pending | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | encerrando sem atender | Ready desconhecido | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+targetPort nomeada | encerrando sem atender | encerrando e Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+targetPort nomeada | encerrando sem atender | encerrando e não Ready | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | encerrando sem atender | só concluídos | pendente | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+targetPort nomeada | encerrando sem atender | nenhum pod | pendente | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+targetPort nomeada | encerrando sem atender | leitura negada | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+targetPort nomeada | encerrando sem atender | leitura parcial | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+targetPort nomeada | encerrando, serving nil | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+targetPort nomeada | encerrando, serving nil | não pronto | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | encerrando, serving nil | Pending | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | encerrando, serving nil | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+targetPort nomeada | encerrando, serving nil | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+targetPort nomeada | encerrando, serving nil | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | encerrando, serving nil | só concluídos | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | encerrando, serving nil | nenhum pod | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | encerrando, serving nil | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+targetPort nomeada | encerrando, serving nil | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+targetPort nomeada | não pronto | pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+targetPort nomeada | não pronto | não pronto | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | não pronto | Pending | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | não pronto | Ready desconhecido | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+targetPort nomeada | não pronto | encerrando e Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+targetPort nomeada | não pronto | encerrando e não Ready | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | não pronto | só concluídos | pendente | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+targetPort nomeada | não pronto | nenhum pod | pendente | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+targetPort nomeada | não pronto | leitura negada | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+targetPort nomeada | não pronto | leitura parcial | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+targetPort nomeada | não pronto, serving nil | pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+targetPort nomeada | não pronto, serving nil | não pronto | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | não pronto, serving nil | Pending | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | não pronto, serving nil | Ready desconhecido | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+targetPort nomeada | não pronto, serving nil | encerrando e Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+targetPort nomeada | não pronto, serving nil | encerrando e não Ready | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | não pronto, serving nil | só concluídos | pendente | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+targetPort nomeada | não pronto, serving nil | nenhum pod | pendente | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+targetPort nomeada | não pronto, serving nil | leitura negada | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+targetPort nomeada | não pronto, serving nil | leitura parcial | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: 1 endpoints, nenhum pronto
+targetPort nomeada | não pronto mas serving | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+targetPort nomeada | não pronto mas serving | não pronto | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | não pronto mas serving | Pending | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | não pronto mas serving | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+targetPort nomeada | não pronto mas serving | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+targetPort nomeada | não pronto mas serving | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | não pronto mas serving | só concluídos | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | não pronto mas serving | nenhum pod | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | não pronto mas serving | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+targetPort nomeada | não pronto mas serving | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+targetPort nomeada | pronto mas sem serving | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: 1 de 1 com condições que não permitem concluir
+targetPort nomeada | pronto mas sem serving | não pronto | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | pronto mas sem serving | Pending | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | pronto mas sem serving | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+targetPort nomeada | pronto mas sem serving | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+targetPort nomeada | pronto mas sem serving | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | pronto mas sem serving | só concluídos | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | pronto mas sem serving | nenhum pod | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | pronto mas sem serving | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+targetPort nomeada | pronto mas sem serving | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+targetPort nomeada | porta com outro protocolo | pronto | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+targetPort nomeada | porta com outro protocolo | não pronto | sem backend | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | porta com outro protocolo | Pending | sem backend | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | porta com outro protocolo | Ready desconhecido | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+targetPort nomeada | porta com outro protocolo | encerrando e Ready | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+targetPort nomeada | porta com outro protocolo | encerrando e não Ready | sem backend | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | porta com outro protocolo | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+targetPort nomeada | porta com outro protocolo | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+targetPort nomeada | porta com outro protocolo | leitura negada | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+targetPort nomeada | porta com outro protocolo | leitura parcial | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+targetPort nomeada | porta com outro nome | pronto | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+targetPort nomeada | porta com outro nome | não pronto | sem backend | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | porta com outro nome | Pending | sem backend | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | porta com outro nome | Ready desconhecido | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+targetPort nomeada | porta com outro nome | encerrando e Ready | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+targetPort nomeada | porta com outro nome | encerrando e não Ready | sem backend | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | porta com outro nome | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+targetPort nomeada | porta com outro nome | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+targetPort nomeada | porta com outro nome | leitura negada | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+targetPort nomeada | porta com outro nome | leitura parcial | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo
+targetPort nomeada | número diferente do targetPort | pronto | pronta | nenhum elo quebrado nos objetos lidos; o tráfego não foi testado
+targetPort nomeada | número diferente do targetPort | não pronto | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | número diferente do targetPort | Pending | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | número diferente do targetPort | Ready desconhecido | pronta | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+targetPort nomeada | número diferente do targetPort | encerrando e Ready | pronta | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+targetPort nomeada | número diferente do targetPort | encerrando e não Ready | pronta | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | número diferente do targetPort | só concluídos | pronta | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | número diferente do targetPort | nenhum pod | pronta | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | número diferente do targetPort | leitura negada | pronta | indeterminado: Pods, sem permissão para ler Pods
+targetPort nomeada | número diferente do targetPort | leitura parcial | pronta | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+targetPort nomeada | número nil | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+targetPort nomeada | número nil | não pronto | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | número nil | Pending | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | número nil | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+targetPort nomeada | número nil | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+targetPort nomeada | número nil | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | número nil | só concluídos | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | número nil | nenhum pod | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | número nil | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+targetPort nomeada | número nil | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+targetPort nomeada | só IPv6 para Service IPv4 | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: há EndpointSlices com número de porta ou família de IP diferente do Service
+targetPort nomeada | só IPv6 para Service IPv4 | não pronto | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | só IPv6 para Service IPv4 | Pending | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | só IPv6 para Service IPv4 | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+targetPort nomeada | só IPv6 para Service IPv4 | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+targetPort nomeada | só IPv6 para Service IPv4 | encerrando e não Ready | desconhecida | atenção: Pods, 1 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | só IPv6 para Service IPv4 | só concluídos | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | só IPv6 para Service IPv4 | nenhum pod | desconhecida | atenção: Pods, 0 pods selecionados, nenhum pronto, mas há endpoints que não estão indisponíveis
+targetPort nomeada | só IPv6 para Service IPv4 | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+targetPort nomeada | só IPv6 para Service IPv4 | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+targetPort nomeada | sem EndpointSlice | pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+targetPort nomeada | sem EndpointSlice | não pronto | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | sem EndpointSlice | Pending | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | sem EndpointSlice | Ready desconhecido | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+targetPort nomeada | sem EndpointSlice | encerrando e Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+targetPort nomeada | sem EndpointSlice | encerrando e não Ready | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | sem EndpointSlice | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+targetPort nomeada | sem EndpointSlice | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+targetPort nomeada | sem EndpointSlice | leitura negada | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+targetPort nomeada | sem EndpointSlice | leitura parcial | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+targetPort nomeada | EndpointSlice vazio | pronto | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+targetPort nomeada | EndpointSlice vazio | não pronto | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | EndpointSlice vazio | Pending | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | EndpointSlice vazio | Ready desconhecido | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+targetPort nomeada | EndpointSlice vazio | encerrando e Ready | pendente | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+targetPort nomeada | EndpointSlice vazio | encerrando e não Ready | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | EndpointSlice vazio | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+targetPort nomeada | EndpointSlice vazio | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+targetPort nomeada | EndpointSlice vazio | leitura negada | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+targetPort nomeada | EndpointSlice vazio | leitura parcial | sem backend | primeiro elo quebrado: Endpoints, http 80/TCP: nenhum endpoint do Service na lista lida
+targetPort nomeada | leitura negada | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: sem permissão para ler EndpointSlices
+targetPort nomeada | leitura negada | não pronto | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | leitura negada | Pending | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | leitura negada | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+targetPort nomeada | leitura negada | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+targetPort nomeada | leitura negada | encerrando e não Ready | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | leitura negada | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+targetPort nomeada | leitura negada | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+targetPort nomeada | leitura negada | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+targetPort nomeada | leitura negada | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+targetPort nomeada | não servido | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices não é servido por este cluster
+targetPort nomeada | não servido | não pronto | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | não servido | Pending | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | não servido | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+targetPort nomeada | não servido | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+targetPort nomeada | não servido | encerrando e não Ready | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | não servido | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+targetPort nomeada | não servido | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+targetPort nomeada | não servido | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+targetPort nomeada | não servido | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido
+targetPort nomeada | leitura parcial | pronto | desconhecida | indeterminado: Endpoints, http 80/TCP: EndpointSlices: leitura incompleta, estado desconhecido
+targetPort nomeada | leitura parcial | não pronto | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | leitura parcial | Pending | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | leitura parcial | Ready desconhecido | desconhecida | indeterminado: Pods, 1 de 1 pods sem condição Ready informada
+targetPort nomeada | leitura parcial | encerrando e Ready | desconhecida | atenção: Pods, 1 de 1 pods encerrando e ainda Ready; os EndpointSlices lidos não confirmam drenagem
+targetPort nomeada | leitura parcial | encerrando e não Ready | pendente | primeiro elo quebrado: Pods, 1 pods selecionados, nenhum pronto
+targetPort nomeada | leitura parcial | só concluídos | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+targetPort nomeada | leitura parcial | nenhum pod | sem backend | primeiro elo quebrado: Pods, o selector app=web não encontra pods na lista lida
+targetPort nomeada | leitura parcial | leitura negada | desconhecida | indeterminado: Pods, sem permissão para ler Pods
+targetPort nomeada | leitura parcial | leitura parcial | desconhecida | indeterminado: Pods, Pods: leitura incompleta, estado desconhecido

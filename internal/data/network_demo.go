@@ -1,6 +1,7 @@
 package data
 
 import (
+	"strconv"
 	"strings"
 	"time"
 
@@ -108,7 +109,11 @@ func (d *Demo) demoNetworkRows(resource string, at time.Time) ([]ResourceRow, bo
 func (d *Demo) demoSlice(s demoService) *SliceFacts {
 	out := &SliceFacts{Service: s.name, AddressType: "IPv4"}
 	for _, p := range s.ports {
-		out.Ports = append(out.Ports, SlicePort{Name: p.Name, Port: p.Port, Protocol: p.Protocol})
+		port := p.Port
+		if n, err := strconv.Atoi(p.Target); err == nil {
+			port = n
+		}
+		out.Ports = append(out.Ports, SlicePort{Name: p.Name, Port: port, Protocol: p.Protocol})
 	}
 	for _, p := range d.pods {
 		f := demoPodFacts(p.pod)

@@ -25,20 +25,20 @@
  │ │           ↳ u escolh│                                                                                                            │                     │ │ 
  │ │                     │                                                                                                            │                     │ │ 
  │ │ Rota  primeiro elo q│                                                                                                            │                     │ │ 
- │ │ ● Service bilibili-r│                                                                                                            │                     │ │ 
- │ │           ↳ nenhum e│  ────────────────────────────────────────────────────────────────────────────────────────────────────────  │                     │ │ 
- │ │ ● Service      bilib│  URL completa, 1 de 2; host em destaque                                                                    │                     │ │ 
- │ │ ● Pods         1 de │  https://live.example.com                                                                                  │                     │ │ 
- │ │ ● Endpoints    1 de │  pronta · provável rede privada, alcance não verificado                                                    │                     │ │ 
  │ │ ● Ingress bilibili-r│                                                                                                            │                     │ │ 
- │ │           ↳ nenhum e│  ↑↓ escolhe · enter copia o texto acima · esc fecha                                                        │                     │ │ 
- │ │ ● IngressClass traef│                                                                                                            │                     │ │ 
- │ │ ● TLS          secre╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯                     │ │ 
+ │ │           ↳ nenhum e│  ────────────────────────────────────────────────────────────────────────────────────────────────────────  │                     │ │ 
+ │ │ ● IngressClass traef│  URL completa, 1 de 2; host em destaque                                                                    │                     │ │ 
+ │ │ ● TLS          secre│  https://live.example.com                                                                                  │                     │ │ 
+ │ │ ● Service      bilib│  pronta · provável rede privada, alcance não verificado                                                    │                     │ │ 
+ │ │ ● Porta        http │                                                                                                            │                     │ │ 
+ │ │ ● Pods         1 de │  ↑↓ escolhe · enter copia o texto acima · esc fecha                                                        │                     │ │ 
+ │ │ ● Endpoints    http │                                                                                                            │                     │ │ 
+ │ │ ● Endereço     ender╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯                     │ │ 
+ │ │ ● Service bilibili-raffle/bilibili-live                                                                                                                │ │ 
+ │ │           ↳ nenhum elo quebrado nos objetos lidos; o tráfego não foi testado                                                                           │ │ 
  │ │ ● Service      bilibili-raffle/bilibili-live                                                                                                           │ │ 
- │ │ ● Porta        http 80/TCP                                                                                                                             │ │ 
  │ │ ● Pods         1 de 1 prontos                                                                                                                          │ │ 
- │ │ ● Endpoints    1 de 1 prontos                                                                                                                          │ │ 
- │ │ ● Endereço     endereço publicado no Ingress                                                                                                           │ │ 
+ │ │ ● Endpoints    http 80/TCP: 1 de 1 prontos                                                                                                             │ │ 
  │ │                                                                                                                                                        │ │ 
  │ │ NetworkPolicies  o efeito real depende do CNI e não foi avaliado                                                                                       │ │ 
  │ │           selecionamdefault-deny                                                                                                                       │ │ 

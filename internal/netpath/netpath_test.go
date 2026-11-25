@@ -103,11 +103,11 @@ func TestRouteFindsTheFirstBrokenLink(t *testing.T) {
 			g.Pods, g.Slices = known(p), known()
 		}, StepPods, StatusBroken, "não encontra pods", StateNoBackend},
 		{"pods not ready", func(g *Graph) { g.Pods, g.Slices = known(webPod("web-1", data.TriFalse)), known(webSlice(1, 0)) }, StepPods, StatusBroken, "1 pods selecionados, nenhum pronto", StatePending},
-		{"terminating pod is not ready", func(g *Graph) {
+		{"terminating pod without a serving endpoint", func(g *Graph) {
 			p := webPod("web-1", data.TriTrue)
 			p.Network.Pod.Terminating = true
 			g.Pods, g.Slices = known(p), known(webSlice(1, 0))
-		}, StepPods, StatusBroken, "nenhum pronto", StatePending},
+		}, StepEndpoints, StatusBroken, "1 endpoints, nenhum pronto", StatePending},
 		{"pods denied and no endpoints", func(g *Graph) { g.Pods, g.Slices = Set{State: SetDenied}, known() }, StepEndpoints, StatusBroken, "nenhum endpoint do Service na lista lida", StateNoBackend},
 		{"pods denied and healthy endpoints", func(g *Graph) { g.Pods = Set{State: SetDenied} }, StepPods, StatusUnknown, "sem permissão para ler Pods", StateReady},
 		{"no endpoints", func(g *Graph) { g.Slices = known() }, StepEndpoints, StatusBroken, "nenhum endpoint do Service na lista lida", StatePending},
@@ -116,7 +116,7 @@ func TestRouteFindsTheFirstBrokenLink(t *testing.T) {
 			s := webSlice(2, 2)
 			s.Network.Slice.Ports[0].Name = "grpc"
 			g.Slices = known(s)
-		}, StepEndpoints, StatusBroken, "nenhum EndpointSlice lido declara a porta http 80/TCP", StateNoBackend},
+		}, StepEndpoints, StatusBroken, "http 80/TCP: nenhum EndpointSlice lido declara esta porta e protocolo", StateNoBackend},
 		{"slices denied", func(g *Graph) { g.Slices = Set{State: SetDenied} }, StepEndpoints, StatusUnknown, "sem permissão para ler EndpointSlices", StateUnknown},
 		{"unreadable slice blocks negative claims", func(g *Graph) {
 			g.Slices = known(data.ResourceRow{Ref: data.ResourceMetadataRef{Namespace: "apps", Name: "x"}, Network: &data.NetworkFacts{Truncated: true}})
@@ -126,7 +126,7 @@ func TestRouteFindsTheFirstBrokenLink(t *testing.T) {
 			s.Network.Slice.Service = "other"
 			g.Slices = known(s)
 		}, StepEndpoints, StatusBroken, "nenhum endpoint do Service na lista lida", StatePending},
-		{"stale pods with ready endpoints", func(g *Graph) { g.Pods = known() }, StepPods, StatusAttention, "mas há endpoints prontos", StateReady},
+		{"stale pods with ready endpoints", func(g *Graph) { g.Pods = known() }, StepPods, StatusAttention, "mas há endpoints que não estão indisponíveis", StateReady},
 		{"address not published", func(g *Graph) { g.Ingresses = known(webIngress(func(i *data.IngressFacts) { i.Addresses = nil })) }, StepAddress, StatusAttention, "nenhum endereço publicado em status do Ingress", StatePending},
 		{"resource backend", func(g *Graph) {
 			g.Ingresses = known(webIngress(func(i *data.IngressFacts) {
@@ -289,7 +289,7 @@ func TestServiceAddresses(t *testing.T) {
 		{"unknown scheme", func(s *data.ServiceFacts) {
 			s.Ports[0] = data.ServicePort{Name: "http", Port: 5432, Protocol: "TCP", AppProtocol: "postgresql"}
 		}, known(), []string{"ClusterIP|10.1.0.1 5432/TCP|endereço interno do cluster|pronta"}},
-		{"udp", func(s *data.ServiceFacts) { s.Ports[0].Protocol = "UDP" }, known(), []string{"ClusterIP|10.1.0.1 80/UDP|endereço interno do cluster|pronta"}},
+		{"udp", func(s *data.ServiceFacts) { s.Ports[0].Protocol = "UDP" }, known(), []string{"ClusterIP|10.1.0.1 80/UDP|endereço interno do cluster|sem backend"}},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			g := healthy()
@@ -409,7 +409,7 @@ func TestDualStackSlicesAreNotCountedTwice(t *testing.T) {
 	v6.Ref.Name, v6.Network.Slice.AddressType = "web-6", "IPv6"
 	g.Slices = known(webSlice(2, 2), v6)
 	for _, s := range Access(g, ingressTarget).Routes[0].Steps {
-		if s.Kind == StepEndpoints && s.Evidence != "2 de 2 prontos" {
+		if s.Kind == StepEndpoints && s.Evidence != "http 80/TCP: 2 de 2 prontos" {
 			t.Fatal(s.Evidence)
 		}
 	}
@@ -460,7 +460,7 @@ func TestReportsAreBounded(t *testing.T) {
 		}
 	}))
 	r := Access(g, ingressTarget)
-	if len(r.Addresses) != maxAddresses || len(r.Routes) != maxRoutes || !r.Truncated {
+	if len(r.Addresses) != MaxAddresses || len(r.Routes) != MaxRoutes || !r.Truncated {
 		t.Fatalf("%d %d %v", len(r.Addresses), len(r.Routes), r.Truncated)
 	}
 }

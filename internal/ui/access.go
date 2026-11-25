@@ -77,7 +77,7 @@ func AccessRows(v AccessView) []DescribeRow {
 		rows = append(rows, DescribeRow{Kind: RowHint, Value: n})
 	}
 	if r.Truncated {
-		rows = append(rows, DescribeRow{Kind: RowHint, Value: "lista limitada; há mais endereços ou rotas"})
+		rows = append(rows, DescribeRow{Kind: RowHint, Value: fmt.Sprintf("lista limitada a %d endereços e %d rotas; o restante não foi calculado", netpath.MaxAddresses, netpath.MaxRoutes)})
 	}
 	if len(r.Addresses) > 0 {
 		rows = append(rows, DescribeRow{Kind: RowHint, Value: "u escolhe e copia uma URL"})
@@ -139,6 +139,9 @@ func policyRows(p netpath.PolicyReport) []DescribeRow {
 		rows = append(rows, detailRow("selecionam", strings.Join(p.Selecting, ", ")))
 	case p.Known && len(p.Uncertain) == 0:
 		rows = append(rows, detailRow("selecionam", "nenhuma política lida seleciona este alvo"))
+	}
+	if p.Truncated {
+		rows = append(rows, detailRow("limite", "há mais políticas; lista limitada"))
 	}
 	if len(p.Uncertain) > 0 {
 		rows = append(rows, detailRow("incertas", strings.Join(p.Uncertain, ", ")))
@@ -276,7 +279,8 @@ func sliceFields(add func(string, string), s data.SliceFacts) {
 	add("Service", s.Service)
 	add("Família", s.AddressType)
 	add("Portas", slicePorts(s.Ports))
-	add("Prontos", fmt.Sprintf("%d de %d", s.Ready, s.Total))
+	tally := s.Tally()
+	add("Prontos", fmt.Sprintf("%d de %d, %d em drenagem, %d indeterminados", tally.Ready, tally.Total, tally.Draining, tally.Unclear))
 	for _, e := range s.Endpoints {
 		text := strings.Join(e.Addresses, ",") + " pronto " + triText(e.Ready)
 		if e.Terminating == data.TriTrue {

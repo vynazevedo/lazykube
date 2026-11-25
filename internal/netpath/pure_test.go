@@ -10,7 +10,7 @@ import (
 )
 
 func TestDerivationHasNoWayToReachTheNetwork(t *testing.T) {
-	allowed := map[string]bool{"cmp": true, "errors": true, "fmt": true, "net/netip": true, "net/url": true, "slices": true, "strconv": true, "strings": true, "github.com/vynazevedo/lazykube/internal/data": true, "github.com/vynazevedo/lazykube/internal/weburl": true}
+	allowed := map[string]bool{"cmp": true, "context": true, "errors": true, "fmt": true, "net/netip": true, "net/url": true, "slices": true, "strconv": true, "strings": true, "github.com/vynazevedo/lazykube/internal/data": true, "github.com/vynazevedo/lazykube/internal/weburl": true}
 	for _, dir := range []string{".", filepath.Join("..", "weburl")} {
 		files, err := filepath.Glob(filepath.Join(dir, "*.go"))
 		if err != nil || len(files) == 0 {
