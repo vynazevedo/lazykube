@@ -165,14 +165,14 @@ func (d *Demo) namespaces() []Namespace {
 var demoNamespaces = []string{"default", "kube-system", "kube-public", "kube-node-lease", "bilibili-raffle", "lgo", "xcx", "ys-odoo"}
 
 var demoDeployments = []Deployment{
-	{"bilibili-raffle", "bilibili-live", 1, 1},
-	{"bilibili-raffle", "bilibili-raffle", 1, 1},
-	{"ys-odoo", "psql", 1, 1},
-	{"ys-odoo", "odoo", 1, 1},
-	{"lgo", "lgo", 1, 1},
-	{"kube-system", "coredns", 1, 1},
-	{"kube-system", "metrics-server", 1, 1},
-	{"kube-system", "traefik", 1, 1},
+	{Namespace: "bilibili-raffle", Name: "bilibili-live", Ready: 1, Desired: 1},
+	{Namespace: "bilibili-raffle", Name: "bilibili-raffle", Ready: 1, Desired: 1},
+	{Namespace: "ys-odoo", Name: "psql", Ready: 1, Desired: 1},
+	{Namespace: "ys-odoo", Name: "odoo", Ready: 1, Desired: 1},
+	{Namespace: "lgo", Name: "lgo", Ready: 1, Desired: 1},
+	{Namespace: "kube-system", Name: "coredns", Ready: 1, Desired: 1},
+	{Namespace: "kube-system", Name: "metrics-server", Ready: 1, Desired: 1},
+	{Namespace: "kube-system", Name: "traefik", Ready: 1, Desired: 1},
 }
 
 func (d *Demo) index(key string) int {
