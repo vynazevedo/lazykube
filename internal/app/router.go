@@ -51,6 +51,7 @@ type Frame struct {
 	Follow      bool
 	Tab         ui.Tab
 	Events      eventsFrame
+	Security    securityFrame
 }
 
 type router struct {

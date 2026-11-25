@@ -76,6 +76,7 @@ type Node struct {
 }
 
 type Pod struct {
+	UID        string
 	Name       string
 	Namespace  string
 	Status     PodStatus

@@ -21,7 +21,7 @@ func (resourceDetailScreen) Keys(m Model) []key.Binding {
 	return []key.Binding{
 		k.Up, k.Down, k.PageUp, k.PageDown, k.Home, k.End, k.Esc, k.Refresh, k.NextURL, k.Yank,
 		k.SecurityAck, k.Palette, k.Pause, k.Help, k.Quit,
-		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads, k.Nodes, k.Events,
+		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads, k.Nodes, k.Security, k.Events, k.Radar,
 		k.Context, k.Namespace, k.Tree,
 	}
 }

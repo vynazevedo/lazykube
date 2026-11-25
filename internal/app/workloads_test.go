@@ -64,7 +64,7 @@ func TestWorkloadsActivation(t *testing.T) {
 		t.Fatal("3 works inside the menu")
 	}
 	d := demoModel(t, 160, 48)
-	span := ui.MenuSpans(d.menuItems())[1]
+	span := ui.MenuSpans(d.menuItems(), d.layout.Menu.W)[1]
 	if click := navClick(d, d.layout.Menu.X+span.X+1, d.layout.Menu.Y); !click.onScreen(ScreenWorkloads) {
 		t.Fatal("clicking the Workloads title activates it")
 	}

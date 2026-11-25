@@ -8,6 +8,7 @@ import (
 
 	tea "charm.land/bubbletea/v2"
 
+	"github.com/vynazevedo/lazykube/internal/draw"
 	"github.com/vynazevedo/lazykube/internal/ui"
 )
 
@@ -45,6 +46,10 @@ func (m Model) yankTarget() (yank, bool) {
 		return m.yankEvent()
 	case m.onScreen(ScreenResources):
 		return m.yankTableRow()
+	case m.onScreen(ScreenRadar):
+		return m.yankSignal()
+	case m.onScreen(ScreenSecurity):
+		return m.yankWorkload()
 	case m.onScreen(ScreenOverview):
 		return yank{}, false
 	}
@@ -74,6 +79,13 @@ func named(s string) (yank, bool) {
 		return yank{}, false
 	}
 	return yank{label: s, text: s}, true
+}
+
+func exact(s string) (yank, bool) {
+	if draw.Sanitize(s) != s {
+		return yank{}, false
+	}
+	return named(s)
 }
 
 func (m Model) yankDetails() (yank, bool) {

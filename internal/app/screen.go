@@ -18,6 +18,8 @@ const (
 	ScreenEvents
 	ScreenResources
 	ScreenOverview
+	ScreenRadar
+	ScreenSecurity
 	ScreenResourceDetail
 )
 
@@ -49,6 +51,10 @@ func screenFor(id ScreenID) (Screen, bool) {
 		return resourcesScreen{}, true
 	case ScreenOverview:
 		return overviewScreen{}, true
+	case ScreenRadar:
+		return radarScreen{}, true
+	case ScreenSecurity:
+		return securityScreen{}, true
 	case ScreenResourceDetail:
 		return resourceDetailScreen{}, true
 	}

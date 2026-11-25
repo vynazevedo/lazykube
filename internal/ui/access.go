@@ -363,7 +363,7 @@ func FullHelpResourceDetail() []KeyHelp {
 		{"esc", "back"},
 		{"b", "navigation tree"},
 		{"m", "screens menu ← → enter"},
-		{"2 3 4 6", "Dashboard / Workloads / Nodes / Events"},
+		{"2 3 4 5 6 7", "open screen"},
 		{"c n", "switch context / namespace"},
 		{"A", "ack all Security alerts"},
 		{"p", "cycle palette"},

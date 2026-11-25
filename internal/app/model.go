@@ -54,6 +54,8 @@ type Model struct {
 	securityKey       string
 	securityNamespace bool
 	securityView      ui.SecurityView
+	secCalc           securityCalc
+	sec               securityPage
 
 	w, h     int
 	layout   Layout
@@ -70,7 +72,9 @@ type Model struct {
 	blurred  bool
 	fps      int
 	gen      int
+	auditSeq *uint64
 	now      func() time.Time
+	started  time.Time
 
 	keys      KeyMap
 	filter    textinput.Model
@@ -84,6 +88,7 @@ type Model struct {
 	events   data.EventFeed
 	dg       diagState
 	ev       eventsView
+	radar    radarState
 	wideFeed bool
 
 	workloadsLeaf DestinationID
@@ -136,6 +141,7 @@ func New(opts Options) Model {
 		animated: !opts.NoAnim,
 		fps:      fps,
 		now:      now,
+		started:  now(),
 		keys:     DefaultKeyMap(),
 		filter:   ti,
 		src:      opts.Source,
@@ -146,6 +152,7 @@ func New(opts Options) Model {
 		nav:      newRouter(),
 		after:    tea.Tick,
 		life:     opts.Context,
+		auditSeq: new(uint64),
 	}
 	if m.life == nil {
 		m.life = context.Background()
@@ -163,6 +170,7 @@ func New(opts Options) Model {
 		}
 		m.tree.cursor = DestDashboard
 	}
+	m.radar = newRadar(opts.Source, now)
 	m.snap = m.src.Snapshot()
 	m.loadSecurity()
 	if opts.InitialPod >= 0 && opts.InitialPod < len(m.snap.Pods) {
@@ -171,12 +179,15 @@ func New(opts Options) Model {
 		m.selName = m.snap.Pods[0].Key()
 	}
 	m.refresh()
+	if !m.radar.live {
+		m.syncRadar()
+	}
 	m.snapMotion()
 	return m
 }
 
 func (m Model) Init() tea.Cmd {
-	return tea.Batch(m.scheduleTick(), m.waitData(), m.screen().Init(m))
+	return tea.Batch(m.scheduleTick(), m.waitData(), m.screen().Init(m), m.radarInit())
 }
 
 func (m Model) waitData() tea.Cmd {
@@ -222,6 +233,10 @@ func (m *Model) screenLayout() func(w, h int) Layout {
 		return ComputeNodes
 	case m.onScreen(ScreenEvents):
 		return ComputeEvents
+	case m.onScreen(ScreenSecurity):
+		return ComputeSecurity
+	case m.onScreen(ScreenRadar):
+		return ComputeRadar
 	case m.onTables():
 		return ComputeTable
 	}
@@ -269,6 +284,18 @@ func (m *Model) applyCompact() {
 		} else {
 			l.Message = Rect{}
 		}
+	case m.onScreen(ScreenSecurity):
+		if m.sec.Focus == ui.SecurityFocusEvidence {
+			l.SecList = Rect{}
+		} else {
+			l.SecEvidence = Rect{}
+		}
+	case m.onScreen(ScreenRadar):
+		if m.focus == FocusDetails {
+			l.Events = Rect{}
+		} else {
+			l.Message = Rect{}
+		}
 	case m.onScreen(ScreenNodes):
 		if m.focus == FocusDetails {
 			l.keepOnly(&l.Node)
@@ -289,10 +316,14 @@ func (m *Model) heatCols() int {
 }
 
 func (m *Model) refresh() {
-	if demo, ok := m.src.(*data.Demo); ok && demo.AdvanceSecurity(m.clock.T) {
-		m.loadSecurity()
+	if demo, ok := m.src.(*data.Demo); ok {
+		if demo.AdvanceSecurity(m.clock.T) {
+			m.loadSecurity()
+		}
+		demo.AdvanceObservations(m.clock.T)
 	}
 	m.refreshSecurity()
+	m.followRadarScope()
 	m.metrics = m.src.Metrics(m.clock.T, m.activeName(), m.heatCols())
 	name := m.detailTarget()
 	m.refreshLogs(name)
@@ -312,23 +343,38 @@ func (m *Model) refresh() {
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if next, cmd, ok := m.handleResourceMsg(msg); ok {
-		return next.withResources(cmd)
+		return next.settled(cmd)
+	}
+	if next, cmd, ok := m.updateSecurityCalc(msg); ok {
+		return next.settled(cmd)
+	}
+	if next, cmd, ok := m.updateAudit(msg); ok {
+		return next.settled(cmd)
 	}
 	next, cmd := m.update(msg)
 	if nm, ok := next.(Model); ok {
-		return nm.withResources(cmd)
+		return nm.settled(cmd)
 	}
 	return next, cmd
 }
 
-func (m Model) withResources(cmd tea.Cmd) (tea.Model, tea.Cmd) {
-	if sync := m.syncResources(); sync != nil {
-		return m, tea.Batch(cmd, sync)
+func (m Model) settled(cmd tea.Cmd) (tea.Model, tea.Cmd) {
+	cmds := []tea.Cmd{cmd}
+	for _, sync := range []func() tea.Cmd{m.syncResources, m.followAudit, m.followSecurity} {
+		if c := sync(); c != nil {
+			cmds = append(cmds, c)
+		}
 	}
-	return m, cmd
+	if len(cmds) == 1 {
+		return m, cmd
+	}
+	return m, tea.Batch(cmds...)
 }
 
 func (m Model) update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if next, cmd, ok := m.updateRadar(msg); ok {
+		return next, cmd
+	}
 	switch msg := msg.(type) {
 	case noticeExpiredMsg:
 		m.expireNotice(msg)
@@ -338,7 +384,8 @@ func (m Model) update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 		m.reload()
-		return m, m.waitData()
+		cmd := m.requestRadar()
+		return m, tea.Batch(m.waitData(), cmd)
 	case frameMsg:
 		if msg.session != m.session.Generation || msg.gen != m.gen || !m.running() {
 			return m, nil

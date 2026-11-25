@@ -1,0 +1,24 @@
+ lazykube [RO]  ◎ context dev namespace Todos   k8s demo  nodes 1     ⠙ ● live  
+  2 Dashboard | 3 Workloads | 4 Nodes |[5 Security]| 6 Events | 7 Radar         
+ Security                                                                       
+ ╭─ Postura de segurança ─────────────────────────────────────────────────────╮ 
+ │ Cluster | Todos: Segurança 55 E | Higiene 97 A                             │ 
+ │ Sem sistema: Segurança 54 E | Higiene 97 A                                 │ 
+ │ High novos 0 | Cobertura 13/13 pods (complete in scope)                    │ 
+ ╰────────────────────────────────────────────────────────────────────────────╯ 
+  [Workloads] [RBAC] [Rede e exposição] [Conformidade PSS]                      
+  [Achados aceitos] [Audit]                                                     
+ ╭─ Audit local (6) ──────────────────────────────────────────────────────────╮ 
+ │ HORA      AÇÃO        RESULTADO                                            │ 
+ │ 12:07:00Z scale       read_only                                            │ 
+ │ 12:06:00Z scale       read_only                                            │ 
+ │ 12:04:00Z scale       read_only                                            │ 
+ │ 12:03:00Z scale       read_only                                            │ 
+ │ Ocultos de outras sessões: 3                                               │ 
+ │                                                                            │ 
+ │ [Mostrar outras sessões]                                                   │ 
+ │ Sem payload, comando ou credenciais.                                       │ 
+ ╰────────────────────────────────────────────────────────────────────────────╯ 
+  Nota não garante segurança. PSS v1.34: verificação local; não é admissão      
+────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   [ ]  tab   tab  panel   H  cohort   esc  back    bubbletea · 0 fps 

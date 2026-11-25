@@ -1,0 +1,24 @@
+ lazykube [DEMO] [RO]  ◎ context demo namespace Todos   k8s demo      ⠙ ● live  
+  2 Dashboard | 3 Workloads | 4 Nodes | 5 Security | 6 Events |[7 Radar]        
+ Radar                                                                          
+  [+] Cluster           │─────────────────────────────────────────────────────╮ 
+  [+] Workloads (3)     │3) | rec 0 | obs 0 | susp 0 | res 1 | normais 81     │ 
+  [+] Configuration     │inais não são incidentes correlacionados.            │ 
+  [+] Network           │─────────────────────────────────────────────────────╯ 
+  [+] Storage           │─────────────────────────────────────────────────────╮ 
+  [+] Access Control    │ONTAINER                                       DESDE │ 
+  [+] Custom Resources  │-traefik-8c2f1-6n2vb/lb-tcp-80                 20:15 │ 
+  [+] Helm              │-path-provisioner-84db5d-h4                    20:15 │ 
+  Security (5)          │-path-provisioner-84db5d-h4/app                20:15 │ 
+ ›Radar (7)             │u-1605489600-b7xsd                             20:15 │ 
+                        │7575bf6d8-9wjvk/app                            20:15 │ 
+                        │                                                     │ 
+                        │                                                     │ 
+                        │tivos, rec. obs. susp res.                           │ 
+                        │─────────────────────────────────────────────────────╯ 
+                        │─────────────────────────────────────────────────────╮ 
+                        │de pods completa 13/13                               │ 
+                        │ e métricas ainda não consumidos. Sem nodes/proxy.   │ 
+  enter abre · b fecha  │─────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   ←→  collapse / expand   enter  open              bubbletea · 0 fps 

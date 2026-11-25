@@ -1,5 +1,5 @@
  lazykube [DEMO] [RO]  v2.0   ◎ context demo namespace Todos   k8s demo  nodes 1  ns 8  pods 13  uptime 119d                         ⠙ metrics every 5s ● live  
-  2 Dashboard  |  3 Workloads  |  4 Nodes  |  6 Events                                                                                                  m menu  
+  2 Dashboard  |  3 Workloads  |  4 Nodes  |  5 Security  |  6 Events  |  7 Radar                                                                       m menu  
  Network · Services                                                                                                                                             
  ╭─ Services · focus ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
  │ filtro odoo▏ 2 de 8  ·  escopo todos os namespaces  ·  cobertura completa no escopo  ·  8 itens  ·  [DEMO]                                                 │ 

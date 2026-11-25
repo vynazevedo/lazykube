@@ -49,7 +49,7 @@ func (m Model) selectedIndex(pods []data.Pod) int {
 func (m Model) selectedPod() *data.Pod {
 	if r := m.nav.Active(); r.Kind == RoutePod {
 		for _, p := range m.snap.Pods {
-			if p.Key() == r.Pod {
+			if p.Key() == r.Pod && (r.Ref.UID == "" || p.UID == r.Ref.UID) {
 				return &p
 			}
 		}
@@ -124,10 +124,10 @@ func (m *Model) focusOrder() []Focus {
 	if m.onScreen(ScreenWorkloads) {
 		return []Focus{FocusPods, FocusDeployments, FocusDetails}
 	}
-	if m.onScreen(ScreenNodes) && m.layout.Compact {
+	if (m.onScreen(ScreenNodes) || m.onScreen(ScreenRadar)) && m.layout.Compact {
 		return []Focus{FocusPods, FocusDetails}
 	}
-	if m.onScreen(ScreenNodes) || m.onScreen(ScreenEvents) || m.onTables() {
+	if m.onScreen(ScreenNodes) || m.onScreen(ScreenEvents) || m.onTables() || m.onScreen(ScreenRadar) || m.onScreen(ScreenSecurity) {
 		return []Focus{FocusPods}
 	}
 	order := []Focus{FocusPods, FocusDetails}

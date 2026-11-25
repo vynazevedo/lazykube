@@ -154,7 +154,7 @@ func FullHelpTree() []KeyHelp {
 		{"b", "close tree"},
 		{"esc tab", "focus the body"},
 		{"m", "screens menu"},
-		{"2 3 4 6", "Dashboard / Workloads / Nodes / Events"},
+		{"2 3 4 5 6 7", "open screen"},
 		{"c n", "switch context / namespace"},
 		{"?", "toggle help"},
 		{"q ctrl+c", "quit"},
