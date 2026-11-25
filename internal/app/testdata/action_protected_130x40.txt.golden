@@ -1,0 +1,40 @@
+ lazykube [RO] [PROTECTED]  v2.0   ◎ context demo namespace Todos   k8s demo  nodes 1  ns 8  pods 13   ⠋ metrics every 5s ● live  
+  2 Dashboard  | [3 Workloads] |  4 Nodes  |  6 Events                                                                    m menu  
+ Workloads                                                                                                                        
+ ╭─ Pods ─────────────────────────────────────────────────────────────╮ ╭─ Preview ─────────────────────────────────────────────╮ 
+ │                                                                    │ │  Log   Config   Top   Describe   Events   Security    │ 
+ │ / filter pods…                                            13 items │ │ ───────────────────────────────────────────────────── │ 
+ │                                                                    │ │ ● bilibili-live-7f6b8d9c5-mn4tz             [Running] │ 
+ │   NAME                          NAMESPACE    RST   SEC CPU/STATUS  │ │   bilibili-raffle · Running · ready 2/2 · node demo-… │ 
+ │ ● bilibili-raffle-5d8f9c7b4-x2… bilibili-r…    0  75 C █░░░░░░     │ │                                                       │ 
+ │ ● bilibili-live-7f6b8d9c5-mn4tz bilibili-r…    2  20 F ████░░░     │ │ CPU 12m req 10m · lim 50m    streamline · braille 2×4 │ 
+ │ ● lgo-7c5d97584-hq8wd           lgo            0  20 F ███░░░░     │ │  20m │                                                │ 
+ │ ● psql-6bc7744f9-r7zlc          ys-odoo        0 100 A ████░░░     │ │      │                                            ⡄   │ 
+ │ ● odoo-7575bf6d8-9wjvk          ys-odoo        1  75 C ███████     │ │  15m │─────────⣸────────────────────⡀────────────⢰⣿── │ 
+ │ ○ qiandao-1605400800-k8f2m      xcx            0  20 F Completed   │ │      │ ⣀⣀⢠⣿⣦⣤⣄⢀⣿⡄ ⢰    ⢀  ⢀ ⣦⢀⣴⣤⣤⡄⢀⣼⡇     request 10m │ 
+ │ ○ lingqu-1╭─ Acoes - deployment/bilibili-live ───────────────────────────────────────────────────────────────────╮╌⢰⣽⣶⣾⣿⣿⣿⣿⣿ │ 
+ │ ⠋ lingqu-1│ Contexto: laboratorio | Namespace: bilibili-raffle | Geracao: 12                                     │⣠⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● coredns-│ Recurso: apps/v1 deployments/bilibili-live                                                           │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● metrics-│ UID: uid-bilibili-live | ResourceVersion: 42                                                         │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● traefik-│                                                                                                      │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● local-pa│ Contexto protegido. Acoes bloqueadas mesmo com --read-write.                                         │────────── │ 
+ │ ● svclb-tr│                                                                                                      │           │ 
+ │           │ > Escalar  indisponivel                                                                              │─────────╮ │ 
+ │           │   Reiniciar rollout  indisponivel                                                                    │↑4.6 kB… │ │ 
+ │           │   Excluir  indisponivel                                                                              │▆▁▆▆▄▆▁▃ │ │ 
+ ╰───────────│ j/k seleciona | Enter escolhe | Esc fecha                                                            │▅▄▃▇▃█▃▆ │ │ 
+ ╭─ Deploymen╰──────────────────────────────────────────────────────────────────────────────────────────────────────╯─────────╯ │ 
+ │                                                                    │ │                                                       │ 
+ │ bilibili-raffle/bilibili-live                                ● 1/1 │ │ ╭ logs · tail -f ──────────────────────── viewport ─╮ │ 
+ │ bilibili-raffle/bilibili-raffle                              ● 1/1 │ │ │ 20:14:12  INFO  join raffle ok id=883104 latency… │ │ 
+ │ ys-odoo/psql                                                 ● 1/1 │ │ │ 20:14:15  WARN  rate limited by upstream, backof… │ │ 
+ │ ys-odoo/odoo                                                 ● 1/1 │ │ │ 20:14:18  DEBUG heartbeat ok rtt=39ms             │ │ 
+ │ lgo/lgo                                                      ● 1/1 │ │ │ 20:14:21  INFO  danmaku batch received count=51   │ │ 
+ │ kube-system/coredns                                          ● 1/1 │ │ │ 20:14:24  INFO  raffle detected id=883117 type=g… │ │ 
+ │ kube-system/metrics-server                                   ● 1/1 │ │ │ 20:14:27  ERROR join raffle failed id=883117: al… │ │ 
+ │ kube-system/traefik                                          ● 1/1 │ │ │ 20:14:30  INFO  reconnecting ws in 1s             │ │ 
+ │                                                                    │ │ │ 20:14:33  INFO  ws connected room=21452505 shard… │ │ 
+ │                                                                    │ │ ╰───────────────────────────────────────────────────╯ │ 
+ ╰────────────────────────────────────────────────────────────────────╯ ╰───────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  tab  foco   enter  controle focado   esc  cancelar etapa                                                      bubbletea · 0 fps 

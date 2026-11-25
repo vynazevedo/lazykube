@@ -1,0 +1,24 @@
+ lazykube [RW]  ◎ context demo namespace Todos   k8s demo  nodes 1    ⠋ ● live  
+  ╭─ Excluir deployment/bilibili-live - preview validado ────────────────────╮  
+ W│ Contexto: laboratorio | Namespace: bilibili-raffle | Geracao: 12         │  
+ ╭│ Recurso: apps/v1 deployments/bilibili-live                               │╮ 
+ ││ UID: uid-bilibili-live | ResourceVersion: 42                             ││ 
+ ││                                                                          ││ 
+ ││ Excluir deployments/bilibili-live. Esta acao nao pode ser desfeita pela  ││ 
+ ││ TUI.                                                                     ││ 
+ ││ Propagacao: Background. Prazo de encerramento solicitado: 45s.           ││ 
+ ││ Finalizers podem adiar a remocao.                                        ││ 
+ ││ Politica: RW por --read-write; contexto nao protegido                    ││ 
+ ││ SSAR: get deployments e delete deployments                               ││ 
+ ││ Dry-run server-side aprovado.                                            ││ 
+ ││ Preview valido por 120s. Alterar parametros exige nova validacao.        ││ 
+ ││ ID: fixture-scal | expira: 2026-11-25 15:02:00 UTC                       ││ 
+ ││ Nenhuma alteracao real foi enviada.                                      ││ 
+ ││                                                                          ││ 
+ ││ > Digite exatamente bilibili-live para confirmar: [_]                    ││ 
+ ││                                                                          ││ 
+ ││ [Cancelar]  [Voltar aos parametros]  [Confirmar exclusao]                ││ 
+ ││ Tab foco | Enter controle focado | Esc cancelar                          ││ 
+ ╰╰──────────────────────────────────────────────────────────────────────────╯╯ 
+────────────────────────────────────────────────────────────────────────────────
+  tab  foco   enter  controle focado   esc  cancelar etapa    bubbletea · 0 fps 

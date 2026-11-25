@@ -1,0 +1,48 @@
+ lazykube [RW: --read-write]  v2.0   ◎ context demo namespace Todos   k8s demo  nodes 1  ns 8  pods 13  uptime 119d                  ⠋ metrics every 5s ● live  
+  2 Dashboard  | [3 Workloads] |  4 Nodes  |  6 Events                                                                                                  m menu  
+ Workloads                                                                                                                                                      
+ ╭─ Pods ─────────────────────────────────────────────────────────────────────────────────────╮ ╭─ Preview ───────────────────────────────────────────────────╮ 
+ │                                                                                            │ │  Log   Config   Top   Describe   Events   Security          │ 
+ │ / filter pods…                                                                    13 items │ │ ─────────────────────────────────────────────────────────── │ 
+ │                                                                                            │ │ ● bilibili-live-7f6b8d9c5-mn4tz                   [Running] │ 
+ │   NAME                                                  NAMESPACE    RST   SEC CPU/STATUS  │ │   bilibili-raffle · Running · ready 2/2 · node demo-node-0… │ 
+ │ ● bilibili-raffle-5d8f9c7b4-x2kqp                       bilibili-r…    0  75 C █░░░░░░     │ │                                                             │ 
+ │ ● bilibili-live-7f6b8d9c5-mn4tz                         bilibili-r…    2  20 F ████░░░     │ │ CPU 12m req 10m · lim 50m          streamline · braille 2×4 │ 
+ │ ● lgo-7c5d97584-hq8wd                                   lgo            0  20 F ███░░░░     │ │  20m │                                                      │ 
+ │ ● psql-6bc7744f9-r7zlc                                  ys-odoo        0 100 A ████░░░     │ │      │                                                  ⡄   │ 
+ │ ● odoo-7575bf6d8-9wjvk                                  ys-odoo        1  75 C ███████     │ │  15m │──────────⢸⡀──────────────────────⡀──────────────⣼⣧── │ 
+ │ ○ qiandao-1605400800-k8f2m                              xcx            0  20 F Completed   │ │      │ ⣀⣀ ⣼⣿⣦⣤⣄ ⣾⡇  ⡆    ⢀   ⡀⢀⣦⢀⣴⣤⣤⣤ ⡠⣼⡇       request 10m │ 
+ │ ○ lingqu-1605486000-4tq8n                               xcx            0  20 F Completed   │ │  10m │⣰⣿⣿⣿⣿⣿⣿⣿⣿⣶⣿⣷⢤⣠⣿╌╌╌⢀⣾⣆⣴⣰⣿⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⢀⣀╌╌╌╌╌╌⣰⣽⣶⣶⣿⣿⣿⣿⣿⣿ │ 
+ │ ⠋ lingqu-1605489600-b7xsd╭─ Escalar deployment/bilibili-live - preview validado ────────────────────────────────────────────────╮⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⡄⣠⣶⣦⣰⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● coredns-6799fbcd5-w9t4p│ Contexto: laboratorio | Namespace: bilibili-raffle | Geracao: 12                                     │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● metrics-server-67c65894│ Recurso: apps/v1 deployments/bilibili-live                                                           │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● traefik-f4564c4f4-zq7rn│ UID: uid-bilibili-live | ResourceVersion: 42                                                         │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● local-path-provisioner-│                                                                                                      │───────────────────────── │ 
+ │ ● svclb-traefik-8c2f1-6n2│ Replicas atuais: 3                                                                                   │                          │ 
+ │                          │ Replicas desejadas: 5                                                                                │────────────────────────╮ │ 
+ │                          │ Alterar replicas de 3 para 5. A convergencia sera observada apos a resposta.                         │t ↓3.0 kB/s ↑4.6 kB/s   │ │ 
+ │                          │ Politica: RW por --read-write; contexto nao protegido                                                │▂█▃▃█▃▄▅▃▆▅▄▅▂▃▆▁▆▆▄▆▁▃ │ │ 
+ │                          │ SSAR: get deployments/scale e update deployments/scale                                               │▃▇▂▇▄▇▂▆▃▂▁▅▆▄▆▅▄▃▇▃█▃▆ │ │ 
+ │                          │ Dry-run server-side aprovado.                                                                        │────────────────────────╯ │ 
+ │                          │ Preview valido por 120s. Alterar parametros exige nova validacao.                                    │                          │ 
+ │                          │ ID: fixture-scal | expira: 2026-11-25 15:02:00 UTC                                                   │───────────── viewport ─╮ │ 
+ │                          │ Nenhuma alteracao real foi enviada.                                                                  │m=21452505 shard=3      │ │ 
+ ╰──────────────────────────│                                                                                                      │=42ms                   │ │ 
+ ╭─ Deployments ────────────│ [Cancelar]  [Voltar aos parametros]  [Confirmar escala]                                              │ceived count=38         │ │ 
+ │                          │ Tab foco | Enter controle focado | Esc cancelar                                                      │id=883104 type=gift     │ │ 
+ │ bilibili-raffle/bilibili-╰──────────────────────────────────────────────────────────────────────────────────────────────────────╯d=883104 latency=118ms  │ │ 
+ │ bilibili-raffle/bilibili-raffle                                                      ● 1/1 │ │ │ 20:14:15  WARN  rate limited by upstream, backoff 2s    │ │ 
+ │ ys-odoo/psql                                                                         ● 1/1 │ │ │ 20:14:18  DEBUG heartbeat ok rtt=39ms                   │ │ 
+ │ ys-odoo/odoo                                                                         ● 1/1 │ │ │ 20:14:21  INFO  danmaku batch received count=51         │ │ 
+ │ lgo/lgo                                                                              ● 1/1 │ │ │ 20:14:24  INFO  raffle detected id=883117 type=guard    │ │ 
+ │ kube-system/coredns                                                                  ● 1/1 │ │ │ 20:14:27  ERROR join raffle failed id=883117: already … │ │ 
+ │ kube-system/metrics-server                                                           ● 1/1 │ │ │ 20:14:30  INFO  reconnecting ws in 1s                   │ │ 
+ │ kube-system/traefik                                                                  ● 1/1 │ │ │ 20:14:33  INFO  ws connected room=21452505 shard=3      │ │ 
+ │                                                                                            │ │ │                                                         │ │ 
+ │                                                                                            │ │ │                                                         │ │ 
+ │                                                                                            │ │ │                                                         │ │ 
+ │                                                                                            │ │ │                                                         │ │ 
+ │                                                                                            │ │ ╰─────────────────────────────────────────────────────────╯ │ 
+ ╰────────────────────────────────────────────────────────────────────────────────────────────╯ ╰─────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  tab  foco   enter  controle focado   esc  cancelar etapa                                                                                    bubbletea · 0 fps 

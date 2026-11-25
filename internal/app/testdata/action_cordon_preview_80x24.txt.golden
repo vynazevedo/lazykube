@@ -1,0 +1,24 @@
+ lazykube [RW]  ◎ context demo namespace Todos   k8s demo  nodes 1    ⠋ ● live  
+  ╭─ Cordon node/demo-node-01 - preview validado ────────────────────────────╮  
+ N│ Contexto: laboratorio | Escopo: cluster | Geracao: 12                    │  
+ ╭│ Recurso: v1 nodes/demo-node-01                                           │╮ 
+ ││ UID: uid-node | ResourceVersion: 43                                      ││ 
+ ││                                                                          ││ 
+ ││ Impedir novos agendamentos neste node. Pods existentes nao serao         ││ 
+ ││ removidos.                                                               ││ 
+ ││ Antes: novos agendamentos permitidos. Depois: novos agendamentos         ││ 
+ ││ impedidos.                                                               ││ 
+ ││ Politica: RW por --read-write; contexto nao protegido                    ││ 
+ ││ SSAR: get nodes e patch nodes                                            ││ 
+ ││ Dry-run server-side aprovado.                                            ││ 
+ ││ Preview valido por 120s. Alterar parametros exige nova validacao.        ││ 
+ ││ ID: fixture-scal | expira: 2026-11-25 15:02:00 UTC                       ││ 
+ ││ Nenhuma alteracao real foi enviada.                                      ││ 
+ ││                                                                          ││ 
+ ││ > Digite exatamente demo-node-01 para confirmar: [_]                     ││ 
+ ││                                                                          ││ 
+ ││ [Cancelar]  [Confirmar cordon]                                           ││ 
+ ││ Tab foco | Enter controle focado | Esc cancelar                          ││ 
+ ╰╰──────────────────────────────────────────────────────────────────────────╯╯ 
+────────────────────────────────────────────────────────────────────────────────
+  tab  foco   enter  controle focado   esc  cancelar etapa    bubbletea · 0 fps 
