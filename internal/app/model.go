@@ -109,6 +109,7 @@ type Model struct {
 
 	act     actionState
 	actSeq  uint64
+	left    []PendingOperation
 	actTick func(context.Context, time.Duration, tea.Msg) tea.Cmd
 }
 
@@ -397,10 +398,13 @@ func (m Model) update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	case tea.KeyPressMsg:
 		if msg.String() == "ctrl+c" {
-			return wake(!m.busy(), m, tea.Quit)
+			idle := !m.busy()
+			quit := m.leave()
+			return wake(idle, m, quit)
 		}
 		if m.layout.TooSmall {
-			return m, m.smallKey(msg)
+			cmd := m.smallKey(msg)
+			return m, cmd
 		}
 		idle := !m.busy()
 		next, cmd := m.routeKey(msg)
@@ -469,14 +473,14 @@ func (m *Model) suspendForSmall() {
 	m.helpOpen, m.menu.open, m.dep.open = false, false, false
 }
 
-func (m Model) smallKey(msg tea.KeyPressMsg) tea.Cmd {
+func (m *Model) smallKey(msg tea.KeyPressMsg) tea.Cmd {
 	switch {
 	case key.Matches(msg, m.keys.Context):
 		return requestPick(pickContext, m.session.Generation)
 	case key.Matches(msg, m.keys.Namespace):
 		return requestPick(pickNamespace, m.session.Generation)
 	case msg.String() == "q":
-		return tea.Quit
+		return m.leave()
 	}
 	return nil
 }

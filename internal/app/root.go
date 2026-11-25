@@ -47,6 +47,8 @@ type Root struct {
 	catalogs  uint64
 	w, h      int
 	late      []actionDone
+
+	unresolved []PendingOperation
 }
 
 type catalogMsg struct {
@@ -153,6 +155,10 @@ func (r Root) begin(t data.Target) (tea.Model, tea.Cmd) {
 	if m, ok := r.model(); ok {
 		opts.Palette = m.pal
 		opts.ShowTree = m.tree.visible
+		r.late = append(slices.Clone(r.late), m.act.late...)
+		if p, ok := m.sending(); ok {
+			r.unresolved = append(slices.Clone(r.unresolved), p)
+		}
 		m.releaseResources()
 	}
 	var prev *data.Target
@@ -234,6 +240,7 @@ func (r Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return r, nil
 		}
 	case actionDoneMsg:
+		r.resolve(msg.done)
 		if m, ok := r.model(); !ok || m.session.Generation != msg.done.session {
 			r.late = append(slices.Clone(r.late), msg.done)
 			return r.deliverLate(nil)

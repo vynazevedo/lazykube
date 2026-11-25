@@ -115,7 +115,7 @@ func (m Model) actionLines() []ui.ActionLine {
 		if a.waiting {
 			add(ui.ActionWarn, textWaitCanceled)
 		}
-		add(ui.ActionMuted, "Operacao: "+a.opID)
+		add(ui.ActionMuted, "Operacao: "+a.opID, textExitWhileSending)
 	case actionResult, actionReconciling:
 		add(ui.ActionPlain, "")
 		lines = append(lines, a.lines...)

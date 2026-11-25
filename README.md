@@ -210,8 +210,9 @@ alvo em foco: escalar, reiniciar rollout e excluir workloads e pods, e impedir o
 permitir agendamentos em nodes. Toda acao congela UID e resourceVersion, roda
 dry-run no servidor, mostra um preview de dois minutos e exige confirmacao
 explicita, com o nome digitado quando o risco e alto. Em somente leitura o menu
-explica o bloqueio e nao chama a API; a demo nunca executa acoes. Edit, exec,
-port-forward, drain, rollback e CronJob nao fazem parte desta versao. O executor
+explica o bloqueio e nao chama a API; a demo nunca executa acoes. Sair durante um
+envio nao desfaz a operacao: o terminal mostra o contexto e o ID para conferencia.
+Edit, exec, port-forward, drain, rollback e CronJob nao fazem parte desta versao. O executor
 esta descrito em [Guardrails](internal/guard/README.md).
 `--protected-contexts` e `--read-only-contexts` recebem nomes exatos separados
 por virgula. `--audit-file` permite escolher um caminho absoluto para o audit

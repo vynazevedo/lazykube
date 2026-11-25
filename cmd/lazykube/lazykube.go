@@ -126,6 +126,12 @@ func newModel(f flags, connect connector) (tea.Model, func(), error) {
 	return r, r.Shutdown, nil
 }
 
+func writeUnfinished(stderr io.Writer, pending []app.PendingOperation) {
+	for _, p := range pending {
+		_, _ = fmt.Fprintf(stderr, "lazykube: operacao sem resultado exibido ao sair: contexto %s, operacao %s. Sair nao desfaz a operacao; confira o alvo e o audit antes de repetir.\n", p.Context, p.OperationID)
+	}
+}
+
 func finish(final tea.Model, stderr io.Writer) int {
 	if stage, msg, failed := app.Failure(final); failed {
 		_, _ = fmt.Fprintf(stderr, "lazykube: %s: %s\n", stage, msg)
@@ -160,10 +166,11 @@ func start(f flags, stderr io.Writer, connect connector, progOpts ...tea.Program
 		box.mu.Unlock()
 		return p.Run()
 	}()
+	final = unwrapGuarded(final)
+	writeUnfinished(stderr, app.Unfinished(final))
 	if box.write(stderr) {
 		return app.ExitFailure
 	}
-	final = unwrapGuarded(final)
 	if errors.Is(err, tea.ErrInterrupted) {
 		return app.ExitCancelled
 	}
