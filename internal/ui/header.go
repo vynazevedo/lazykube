@@ -9,8 +9,6 @@ import (
 	"github.com/vynazevedo/lazykube/internal/theme"
 )
 
-var Version = "v2.0"
-
 type HeaderState struct {
 	ReadOnly       bool
 	Writable       bool
@@ -136,7 +134,7 @@ func headerVersion(w int) string {
 	if w < headerVersionFrom {
 		return " "
 	}
-	return "  " + Version + "  "
+	return "  " + draw.Truncate(Version, versionHeaderMax) + "  "
 }
 
 func HeaderLayout(st HeaderState, w int) HeaderGeometry {
