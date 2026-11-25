@@ -38,3 +38,9 @@ func (c *Canvas) SealLinks() {
 		}
 	}
 }
+
+func (c *Canvas) DropLinks() {
+	for i := range c.cells {
+		c.cells[i].Link = weburl.URL{}
+	}
+}

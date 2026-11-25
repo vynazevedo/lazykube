@@ -63,6 +63,7 @@ func (m Model) Render() *draw.Canvas {
 	}
 	if m.act.stage != actionClosed {
 		ui.ActionDialog(screen, m.actionDialog(), ctx)
+		c.DropLinks()
 	}
 	c.SealLinks()
 	return c
