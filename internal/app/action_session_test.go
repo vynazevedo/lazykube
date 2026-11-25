@@ -212,3 +212,29 @@ func TestShutdownDuringExecutionRecordsUnknown(t *testing.T) {
 	d.drain()
 	goleak.VerifyNone(t, baseline)
 }
+
+func TestPendingPreviewIsCanceledOnShutdownAndSwitch(t *testing.T) {
+	for _, switching := range []bool{false, true} {
+		d, s := sessionDriver(t)
+		d.restartPreview()
+		m, _ := d.r.model()
+		id, exec, f := m.act.preview.ID, m.executor(), s.byContext["alpha"]
+		if switching {
+			d.switchTo("beta")
+			exec.Close()
+		} else {
+			d.r.Shutdown()
+		}
+		f.locked(func() {
+			var outcomes []guard.Reason
+			for _, e := range f.events {
+				if e.OperationID == id && e.Outcome != "" {
+					outcomes = append(outcomes, e.Outcome)
+				}
+			}
+			if len(outcomes) != 1 || outcomes[0] != guard.Canceled || len(f.real) != 0 {
+				t.Errorf("switching %v: %v, %d sends", switching, outcomes, len(f.real))
+			}
+		})
+	}
+}

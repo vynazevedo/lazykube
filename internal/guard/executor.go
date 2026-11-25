@@ -58,9 +58,10 @@ func (e *Executor) Close() {
 	e.cancel()
 	idle := make(chan struct{})
 	go func() {
+		defer close(idle)
 		e.mu.Lock()
 		defer e.mu.Unlock()
-		close(idle)
+		_ = e.cancelPlans(e.plansWhere(func(plan) bool { return true }))
 	}()
 	timer := time.NewTimer(closeWait)
 	defer timer.Stop()
@@ -102,12 +103,7 @@ func (e *Executor) Observe(parent context.Context, action Action, t Target) (Obs
 func (e *Executor) Discard(id string) error {
 	e.mu.Lock()
 	defer e.mu.Unlock()
-	p, ok := e.plans[id]
-	if !ok {
-		return nil
-	}
-	delete(e.plans, id)
-	return e.event(id, p.request, p.preview.Decision, "canceled", Canceled)
+	return e.cancelPlans(e.plansWhere(func(p plan) bool { return p.preview.ID == id }))
 }
 func (e *Executor) operationContext(parent context.Context) (context.Context, func()) {
 	ctx, cancel := context.WithCancel(parent)
@@ -207,11 +203,9 @@ func (e *Executor) Prepare(parent context.Context, r Request) (Preview, error) {
 		return reject(Canceled)
 	}
 	now := e.clock.Now()
-	for _, old := range e.expiredPlans(now) {
-		delete(e.plans, old.preview.ID)
-		if err = e.event(old.preview.ID, old.request, old.preview.Decision, "canceled", Canceled); err != nil {
-			return Preview{}, err
-		}
+	expired := e.plansWhere(func(p plan) bool { return !now.Before(p.preview.ExpiresAt) })
+	if err = e.cancelPlans(expired); err != nil {
+		return Preview{}, err
 	}
 	if len(e.plans) >= 16 {
 		return reject(Unavailable)
@@ -226,6 +220,10 @@ func (e *Executor) Execute(parent context.Context, id string, c Confirmation) (R
 	result := Result{OperationID: id}
 	p, ok := e.plans[id]
 	if !ok {
+		if e.ctx.Err() != nil {
+			result.Outcome = Canceled
+			return result, Canceled
+		}
 		return result, Invalid
 	}
 	delete(e.plans, id)
@@ -294,14 +292,26 @@ func (e *Executor) Execute(parent context.Context, id string, c Confirmation) (R
 	return result, nil
 }
 
-func (e *Executor) expiredPlans(now time.Time) []plan {
+func (e *Executor) plansWhere(match func(plan) bool) []plan {
 	var out []plan
 	for _, p := range e.plans {
-		if !now.Before(p.preview.ExpiresAt) {
+		if match(p) {
 			out = append(out, p)
 		}
 	}
+	slices.SortFunc(out, func(a, b plan) int { return a.preview.ExpiresAt.Compare(b.preview.ExpiresAt) })
 	return out
+}
+
+func (e *Executor) cancelPlans(plans []plan) error {
+	var failed error
+	for _, p := range plans {
+		delete(e.plans, p.preview.ID)
+		if err := e.event(p.preview.ID, p.request, p.preview.Decision, "canceled", Canceled); err != nil {
+			failed = err
+		}
+	}
+	return failed
 }
 
 func (e *Executor) planExpired(ctx context.Context, p plan) bool {

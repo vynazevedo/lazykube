@@ -236,10 +236,10 @@ func TestEveryConsumedPlanLeavesOneOutcome(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
+			before := len(f.events)
 			if tc.change != nil {
 				tc.change(e, f, now)
 			}
-			before := len(f.events)
 			r, err := e.Execute(context.Background(), p.ID, tc.confirm)
 			if r.Outcome != tc.want || tc.want != Succeeded && !errors.Is(err, tc.want) || len(f.sends) != tc.sends {
 				t.Fatal(r, err, f.sends)
@@ -257,7 +257,11 @@ func TestEveryConsumedPlanLeavesOneOutcome(t *testing.T) {
 				t.Fatalf("%d outcomes, last %+v", outcomes, last)
 			}
 			after := len(f.events)
-			if _, err = e.Execute(context.Background(), p.ID, tc.confirm); !errors.Is(err, Invalid) || len(f.events) != after {
+			gone := Invalid
+			if tc.name == "closed" {
+				gone = Canceled
+			}
+			if _, err = e.Execute(context.Background(), p.ID, tc.confirm); !errors.Is(err, gone) || len(f.events) != after {
 				t.Fatal("a consumed id has no second outcome", err)
 			}
 		})
@@ -355,6 +359,180 @@ func TestOnlyProvenUnsentFailuresLeaveUnknown(t *testing.T) {
 		}
 		if last := f.events[len(f.events)-1]; last.Phase != "result" || last.Outcome != tc.want {
 			t.Fatal(last)
+		}
+	}
+}
+
+func outcomesFor(f *guardFake, id string) []Reason {
+	var out []Reason
+	for _, ev := range f.events {
+		if ev.OperationID == id && ev.Outcome != "" {
+			out = append(out, ev.Outcome)
+		}
+	}
+	return out
+}
+
+func TestCloseCancelsEveryPendingPlanOnce(t *testing.T) {
+	e, f, _ := guardExecutor(t)
+	var ids []string
+	for range 5 {
+		p, err := e.Prepare(context.Background(), guardRequest())
+		if err != nil {
+			t.Fatal(err)
+		}
+		ids = append(ids, p.ID)
+	}
+	if err := e.Discard(ids[0]); err != nil {
+		t.Fatal(err)
+	}
+	e.Close()
+	e.Close()
+	for _, id := range ids {
+		if got := outcomesFor(f, id); len(got) != 1 || got[0] != Canceled {
+			t.Fatal(id, got)
+		}
+		if err := e.Discard(id); err != nil {
+			t.Fatal(err)
+		}
+		if r, err := e.Execute(context.Background(), id, Confirmation{Approved: true, Resource: "pod"}); r.Outcome != Canceled || !errors.Is(err, Canceled) {
+			t.Fatal(r, err)
+		}
+		if len(outcomesFor(f, id)) != 1 {
+			t.Fatal("a closed plan has a single outcome")
+		}
+	}
+	if len(f.sends) != 5 || len(e.plans) != 0 {
+		t.Fatal(f.sends, len(e.plans))
+	}
+	if _, err := e.Prepare(context.Background(), guardRequest()); !errors.Is(err, Canceled) || len(e.plans) != 0 {
+		t.Fatal(err)
+	}
+}
+
+func TestCloseDuringExecuteKeepsItsOwnOutcome(t *testing.T) {
+	e, h, _ := reviewExecutor(t)
+	sent, err := e.Prepare(context.Background(), guardRequest())
+	if err != nil {
+		t.Fatal(err)
+	}
+	idle, err := e.Prepare(context.Background(), guardRequest())
+	if err != nil {
+		t.Fatal(err)
+	}
+	started := make(chan struct{})
+	e.backend = blockingSend{Backend: h, started: started}
+	done := make(chan Result, 1)
+	go func() {
+		r, _ := e.Execute(context.Background(), sent.ID, Confirmation{Approved: true, Resource: "pod"})
+		done <- r
+	}()
+	<-started
+	e.Close()
+	if r := <-done; r.Outcome != Unknown {
+		t.Fatal(r)
+	}
+	if got := outcomesFor(h.guardFake, sent.ID); len(got) != 1 || got[0] != Unknown {
+		t.Fatal("close must not rewrite an operation in flight", got)
+	}
+	if got := outcomesFor(h.guardFake, idle.ID); len(got) != 1 || got[0] != Canceled {
+		t.Fatal(got)
+	}
+}
+
+func TestCloseWithBrokenAuditInventsNothing(t *testing.T) {
+	e, f, _ := guardExecutor(t)
+	for range 3 {
+		if _, err := e.Prepare(context.Background(), guardRequest()); err != nil {
+			t.Fatal(err)
+		}
+	}
+	recorded := len(f.events)
+	f.failPhase = "canceled"
+	e.Close()
+	if len(f.events) != recorded+1 || !e.AuditBlocked() || len(e.plans) != 0 {
+		t.Fatal(len(f.events)-recorded, e.AuditBlocked(), len(e.plans))
+	}
+}
+
+type stuckBackend struct {
+	Backend
+	started, release chan struct{}
+}
+
+func (b stuckBackend) Send(_ context.Context, _ Request, dry bool) error {
+	if dry {
+		return nil
+	}
+	close(b.started)
+	<-b.release
+	return errors.New("late")
+}
+
+func TestCloseStaysBoundedWhenBackendIgnoresCancel(t *testing.T) {
+	e, h, _ := reviewExecutor(t)
+	var ids []string
+	for range 2 {
+		p, err := e.Prepare(context.Background(), guardRequest())
+		if err != nil {
+			t.Fatal(err)
+		}
+		ids = append(ids, p.ID)
+	}
+	b := stuckBackend{Backend: h, started: make(chan struct{}), release: make(chan struct{})}
+	e.backend = b
+	done := make(chan Result, 1)
+	go func() {
+		r, _ := e.Execute(context.Background(), ids[0], Confirmation{Approved: true, Resource: "pod"})
+		done <- r
+	}()
+	<-b.started
+	started := time.Now()
+	e.Close()
+	if took := time.Since(started); took < closeWait || took > closeWait+time.Second {
+		t.Fatal(took)
+	}
+	close(b.release)
+	if r := <-done; r.Outcome != Unknown {
+		t.Fatal(r)
+	}
+	e.Close()
+	for i, want := range []Reason{Unknown, Canceled} {
+		if got := outcomesFor(h.guardFake, ids[i]); len(got) != 1 || got[0] != want {
+			t.Fatal(i, got)
+		}
+	}
+}
+
+func TestConcurrentLifecycleLeavesOneOutcomePerPlan(t *testing.T) {
+	for range 30 {
+		e, f, _ := guardExecutor(t)
+		var ids []string
+		for range 6 {
+			p, err := e.Prepare(context.Background(), guardRequest())
+			if err != nil {
+				t.Fatal(err)
+			}
+			ids = append(ids, p.ID)
+		}
+		var wg sync.WaitGroup
+		for i, id := range ids {
+			switch i % 3 {
+			case 0:
+				wg.Go(func() { _ = e.Discard(id) })
+			case 1:
+				wg.Go(func() {
+					_, _ = e.Execute(context.Background(), id, Confirmation{Approved: true, Resource: "pod"})
+				})
+			}
+		}
+		wg.Go(e.Close)
+		wg.Wait()
+		e.Close()
+		for _, id := range ids {
+			if got := outcomesFor(f, id); len(got) != 1 {
+				t.Fatal(got)
+			}
 		}
 	}
 }

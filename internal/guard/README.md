@@ -89,7 +89,9 @@ mesmos bytes no dry-run e no envio. Estado ja igual, em scale ou node, e recusad
 com `no_change` antes do dry-run. Conflito dos testes do PATCH e alvo obsoleto.
 
 Todo plano valido consumido deixa um unico desfecho no audit: recusa de politica ou
-de confirmacao, cancelamento, expiracao, remocao de plano vencido ou resultado. Um
+de confirmacao, cancelamento, expiracao, remocao de plano vencido, encerramento da
+sessao ou resultado. `Close` cancela os planos pendentes dentro do mesmo prazo e
+nunca muda o desfecho de um Execute em voo. Um
 ID inexistente nao gera evento, porque nao ha alvo conhecido. Se o registro da
 recusa falhar, o plano continua consumido e novas acoes ficam bloqueadas.
 
