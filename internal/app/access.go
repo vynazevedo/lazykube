@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"slices"
 
 	tea "charm.land/bubbletea/v2"
@@ -38,14 +39,16 @@ type accessState struct {
 	seq       uint64
 	computing bool
 	dirty     bool
+	stop      context.CancelFunc
 	view      *accessView
 	scroll    int
 }
 
 type accessMsg struct {
-	session uint64
-	seq     uint64
-	view    accessView
+	session  uint64
+	seq      uint64
+	canceled bool
+	view     accessView
 }
 
 type graphSource struct {
@@ -59,7 +62,14 @@ type accessRequest struct {
 	sources map[schema.GroupVersionResource]graphSource
 }
 
+func (a accessState) halt() {
+	if a.stop != nil {
+		a.stop()
+	}
+}
+
 func (a accessState) closed() accessState {
+	a.halt()
 	return accessState{seq: a.seq + 1}
 }
 
@@ -133,6 +143,7 @@ func (m *Model) followAccess() []workloadLeaf {
 	}
 	if t != m.acc.target {
 		m.urls = urlPicker{}
+		m.acc.halt()
 		subs, seq := m.acc.subs, m.acc.seq+1
 		m.acc = accessState{target: t, subs: subs, seq: seq, dirty: true}
 	}
@@ -175,8 +186,14 @@ func (m *Model) computeAccess() tea.Cmd {
 	for gvr, s := range a.subs {
 		req.sources[gvr] = m.graphSource(gvr, s)
 	}
+	ctx, cancel := context.WithCancel(m.life)
+	a.stop = cancel
 	session, seq := m.session.Generation, a.seq
-	return func() tea.Msg { return accessMsg{session: session, seq: seq, view: req.run()} }
+	return func() tea.Msg {
+		defer cancel()
+		view, err := req.run(ctx)
+		return accessMsg{session: session, seq: seq, canceled: err != nil, view: view}
+	}
 }
 
 func (m Model) graphSource(gvr schema.GroupVersionResource, s *resourceSub) graphSource {
@@ -200,6 +217,11 @@ func (m *Model) storeAccess(msg accessMsg) {
 		return
 	}
 	m.acc.computing = false
+	m.acc.halt()
+	m.acc.stop = nil
+	if msg.canceled {
+		return
+	}
 	view := msg.view
 	m.acc.view = &view
 	if view.gone {
@@ -208,16 +230,19 @@ func (m *Model) storeAccess(msg accessMsg) {
 	m.clampAccess()
 }
 
-func (s graphSource) read() (netpath.Set, data.Coverage, bool) {
+func (s graphSource) read(ctx context.Context) (netpath.Set, data.Coverage, bool) {
 	if s.handle == nil {
 		return netpath.Set{State: s.state}, data.Coverage{}, s.loading
 	}
 	for range graphAttempts {
+		if ctx.Err() != nil {
+			return netpath.Set{}, data.Coverage{}, false
+		}
 		page := s.handle.Page("", resourcePageLimit)
 		coverage, truncated := page.Coverage, page.Truncated
 		rows := slices.Clone(page.Items)
 		moved := false
-		for page.Continue != "" && len(rows) < graphRowLimit {
+		for page.Continue != "" && len(rows) < graphRowLimit && ctx.Err() == nil {
 			page = s.handle.Page(page.Continue, resourcePageLimit)
 			if len(page.Items) == 0 {
 				moved = true
@@ -242,15 +267,15 @@ func (s graphSource) read() (netpath.Set, data.Coverage, bool) {
 	return netpath.Set{}, data.Coverage{}, false
 }
 
-func (r accessRequest) run() accessView {
+func (r accessRequest) run(ctx context.Context) (accessView, error) {
 	var view accessView
 	var listOnly []string
 	set := func(gvr schema.GroupVersionResource) netpath.Set {
 		src, ok := r.sources[gvr]
-		if !ok {
+		if !ok || ctx.Err() != nil {
 			return netpath.Set{}
 		}
-		out, coverage, loading := src.read()
+		out, coverage, loading := src.read(ctx)
 		view.loading = view.loading || loading
 		if coverage.State == data.CoverageListOnly {
 			listOnly = append(listOnly, gvr.Resource)
@@ -272,6 +297,9 @@ func (r accessRequest) run() accessView {
 		own = g.Pods
 	}
 	replaced := false
+	if err := ctx.Err(); err != nil {
+		return accessView{}, err
+	}
 	for _, row := range own.Rows {
 		if row.Ref.Namespace != t.namespace || row.Ref.Name != t.name {
 			continue
@@ -287,13 +315,17 @@ func (r accessRequest) run() accessView {
 		target.Labels, target.LabelsKnown = view.row.Network.Template.Labels, true
 	}
 	if view.gone {
-		return view
+		return view, nil
 	}
-	view.report = netpath.Access(g, target)
+	report, err := netpath.AccessContext(ctx, g, target)
+	if err != nil {
+		return accessView{}, err
+	}
+	view.report = report
 	for _, name := range listOnly {
 		view.report.Notes = append(view.report.Notes, name+": leitura pontual, sem acompanhamento; r recarrega")
 	}
-	return view
+	return view, nil
 }
 
 func (m Model) accessView() *ui.AccessView {
