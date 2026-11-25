@@ -75,6 +75,83 @@ func TestReadAuditRefusesLinkedDirectoryAndRotation(t *testing.T) {
 	refused(t, path, "a fifo rotation")
 }
 
+func TestReadAuditRefusesLinkedAncestors(t *testing.T) {
+	base, err := filepath.EvalSymlinks(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	real := filepath.Join(base, "real")
+	writeAudit(t, filepath.Join(real, "deep", "audit", "audit.jsonl"), 0, 1)
+	if page, err := ReadAudit(t.Context(), filepath.Join(real, "deep", "audit", "audit.jsonl"), AuditCursor{}, 0); err != nil || len(page.Events) != 1 {
+		t.Fatalf("a path without links is read: %+v %v", page, err)
+	}
+	if err := os.Symlink(real, filepath.Join(base, "alias")); err != nil {
+		t.Fatal(err)
+	}
+	refused(t, filepath.Join(base, "alias", "deep", "audit", "audit.jsonl"), "a symlinked ancestor")
+	if err := os.Symlink(filepath.Join(real, "deep"), filepath.Join(real, "link")); err != nil {
+		t.Fatal(err)
+	}
+	refused(t, filepath.Join(real, "link", "audit", "audit.jsonl"), "a symlinked parent")
+	refused(t, real+"/../real/deep/audit/audit.jsonl", "an unclean path")
+	if page, err := ReadAudit(t.Context(), filepath.Join(base, "none", "audit", "audit.jsonl"), AuditCursor{}, 0); err != nil || !page.Missing {
+		t.Fatalf("a missing ancestor is missing, not a failure: %+v %v", page, err)
+	}
+}
+
+func TestReadAuditSurvivesAncestorSwap(t *testing.T) {
+	base, err := filepath.EvalSymlinks(t.TempDir())
+	if err != nil {
+		t.Fatal(err)
+	}
+	live, parked, foreign := filepath.Join(base, "live"), filepath.Join(base, "parked"), filepath.Join(base, "foreign")
+	path := filepath.Join(live, "audit", "audit.jsonl")
+	writeAudit(t, path, 0, 1)
+	writeAudit(t, filepath.Join(foreign, "audit", "audit.jsonl"), 0, 3)
+	stop, swapped := make(chan struct{}), make(chan error, 1)
+	go func() {
+		for {
+			select {
+			case <-stop:
+				swapped <- nil
+				return
+			default:
+			}
+			for _, op := range []func() error{
+				func() error { return os.Rename(live, parked) },
+				func() error { return os.Symlink(foreign, live) },
+				func() error { return os.Remove(live) },
+				func() error { return os.Rename(parked, live) },
+			} {
+				if err := op(); err != nil {
+					swapped <- err
+					return
+				}
+			}
+		}
+	}()
+	read, refusals := 0, 0
+	for range 4000 {
+		page, err := ReadAudit(t.Context(), path, AuditCursor{}, 0)
+		switch {
+		case err != nil || page.Missing:
+			refusals++
+		case len(page.Events) == 1:
+			read++
+		case len(page.Events) > 1:
+			t.Errorf("followed the swapped ancestor: %d events", len(page.Events))
+		}
+	}
+	close(stop)
+	if err := <-swapped; err != nil {
+		t.Fatal(err)
+	}
+	if refusals == 0 {
+		t.Fatal("the swap never overlapped a read")
+	}
+	t.Logf("read %d, refused %d", read, refusals)
+}
+
 func TestReadAuditOpenNeverFollowsOrBlocks(t *testing.T) {
 	dir := t.TempDir()
 	root, err := os.OpenRoot(dir)

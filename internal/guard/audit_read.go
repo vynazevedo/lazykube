@@ -52,15 +52,20 @@ func ReadAudit(ctx context.Context, path string, cursor AuditCursor, limit int) 
 	if limit <= 0 || limit > AuditPageSize {
 		limit = AuditPageSize
 	}
-	if !filepath.IsAbs(path) {
+	if !filepath.IsAbs(path) || filepath.Clean(path) != path {
 		return page, ErrAuditUnreadable
 	}
 	dir, name := filepath.Dir(path), filepath.Base(path)
-	info, err := os.Lstat(dir)
-	if os.IsNotExist(err) {
+	walked, err := openAuditDir(dir)
+	if errors.Is(err, os.ErrNotExist) {
 		page.Missing = true
 		return page, nil
 	}
+	if err != nil {
+		return page, ErrAuditUnreadable
+	}
+	defer func() { readErr = errors.Join(readErr, walked.Close()) }()
+	info, err := walked.Stat()
 	if err != nil || !private(info, true) {
 		return page, ErrAuditUnreadable
 	}

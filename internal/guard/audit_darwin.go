@@ -3,11 +3,14 @@ package guard
 import (
 	"os"
 	"syscall"
+
+	"golang.org/x/sys/unix"
 )
 
 const (
 	auditNoFollow  = syscall.O_NOFOLLOW
 	auditReadFlags = syscall.O_NOFOLLOW | syscall.O_NONBLOCK
+	auditWalkFlags = unix.O_RDONLY
 )
 
 func private(info os.FileInfo, dir bool) bool {
