@@ -76,13 +76,19 @@ func normalizeArgs(cmd *cobra.Command, args []string) []string {
 		case a == "--":
 			return append(out, args[i:]...)
 		case strings.HasPrefix(a, "--"):
-			name, _, inline := strings.Cut(a[2:], "=")
-			value = !inline && takesValue(fs.Lookup(name))
+			name, rest, inline := strings.Cut(a[2:], "=")
+			f := fs.Lookup(name)
+			if short := valueShorthand(fs, name); f == nil && short != nil {
+				a, f = longArg(short, rest, inline), short
+			}
+			value = !inline && takesValue(f)
 		case len(a) > 1 && a[0] == '-':
-			name, _, inline := strings.Cut(a[1:], "=")
+			name, rest, inline := strings.Cut(a[1:], "=")
 			if f := fs.Lookup(name); len(name) > 1 && f != nil {
 				a = "-" + a
 				value = !inline && takesValue(f)
+			} else if short := valueShorthand(fs, name); inline && short != nil {
+				a = longArg(short, rest, inline)
 			} else {
 				value = len(a) == 2 && takesValue(fs.ShorthandLookup(a[1:2]))
 			}
@@ -94,6 +100,23 @@ func normalizeArgs(cmd *cobra.Command, args []string) []string {
 
 func takesValue(f *pflag.Flag) bool {
 	return f != nil && f.NoOptDefVal == ""
+}
+
+func valueShorthand(fs *pflag.FlagSet, name string) *pflag.Flag {
+	if len(name) != 1 {
+		return nil
+	}
+	if f := fs.ShorthandLookup(name); takesValue(f) {
+		return f
+	}
+	return nil
+}
+
+func longArg(f *pflag.Flag, value string, inline bool) string {
+	if inline {
+		return "--" + f.Name + "=" + value
+	}
+	return "--" + f.Name
 }
 
 func helpColors(c lipgloss.LightDarkFunc) fang.ColorScheme {

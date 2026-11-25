@@ -13,6 +13,7 @@ import (
 	"testing"
 
 	"github.com/vynazevedo/lazykube/internal/app"
+	"github.com/vynazevedo/lazykube/internal/theme"
 	"github.com/vynazevedo/lazykube/internal/ui"
 )
 
@@ -182,7 +183,7 @@ func TestHelpGolden(t *testing.T) {
 	if err != nil {
 		t.Fatalf("missing golden %s, run go test -update: %v", path, err)
 	}
-	if string(want) != got {
+	if strings.ReplaceAll(string(want), "\r\n", "\n") != got {
 		t.Fatalf("help differs from golden; run go test ./cmd/lazykube -update and review the diff\n%s", got)
 	}
 }
@@ -204,7 +205,7 @@ func TestNormalizeArgsKeepsFlagValues(t *testing.T) {
 		{[]string{"--namespace", "-demo"}, []string{"--namespace", "-demo"}},
 		{[]string{"-n", "-demo"}, []string{"-n", "-demo"}},
 		{[]string{"-n", "-fps=12", "-demo"}, []string{"-n", "-fps=12", "--demo"}},
-		{[]string{"-n=-demo", "-demo"}, []string{"-n=-demo", "--demo"}},
+		{[]string{"-n=-demo", "-demo"}, []string{"--namespace=-demo", "--demo"}},
 		{[]string{"--palette", "-ocean"}, []string{"--palette", "-ocean"}},
 		{[]string{"-palette", "-demo"}, []string{"--palette", "-demo"}},
 		{[]string{"--audit-file", "-demo"}, []string{"--audit-file", "-demo"}},
@@ -259,5 +260,189 @@ func TestFlagValuesStartingWithDash(t *testing.T) {
 				t.Fatalf("got %+v want %+v", got, tc.want)
 			}
 		})
+	}
+}
+
+var namespaceAliasCases = [][]string{
+	{"--n", "default"},
+	{"--n=default"},
+	{"-n", "default"},
+	{"-n=default"},
+	{"--namespace", "x", "--n", "y"},
+	{"--n", "y", "--namespace", "x"},
+	{"-n", "a", "--n=b"},
+	{"--context", "--n"},
+	{"--context=dev", "--n", "-demo"},
+	{"-palette", "ocean", "--n", "apps", "-demo"},
+	{"--n="},
+	{"-n="},
+	{"--namespace", "apps", "--n="},
+	{"--namespace", "apps", "-n="},
+	{"--n=", "--namespace", "apps"},
+}
+
+func legacyParse(args []string) (flags, error) {
+	f := defaults()
+	fs := flag.NewFlagSet("lazykube", flag.ContinueOnError)
+	fs.SetOutput(io.Discard)
+	fs.BoolVar(&f.readWrite, "read-write", false, "")
+	fs.StringVar(&f.protectedContexts, "protected-contexts", "", "")
+	fs.StringVar(&f.readOnlyContexts, "read-only-contexts", "", "")
+	fs.StringVar(&f.auditPath, "audit-file", "", "")
+	fs.BoolVar(&f.demo, "demo", false, "")
+	fs.StringVar(&f.context, "context", "", "")
+	fs.StringVar(&f.kubeconfig, "kubeconfig", "", "")
+	fs.StringVar(&f.namespace, "namespace", "", "")
+	fs.StringVar(&f.namespace, "n", "", "")
+	fs.StringVar(&f.palette, "palette", "charm", "")
+	fs.BoolVar(&f.noAnim, "no-anim", false, "")
+	fs.IntVar(&f.fps, "fps", app.DefaultFPS, "")
+	if err := fs.Parse(args); err != nil {
+		return f, err
+	}
+	if fs.NArg() > 0 {
+		return f, errParse
+	}
+	if f.fps < 1 || f.fps > app.MaxFPS {
+		return f, errParse
+	}
+	if _, err := theme.PaletteByName(f.palette); err != nil {
+		return f, err
+	}
+	return f, nil
+}
+
+func TestNamespaceLongAliasN(t *testing.T) {
+	with := func(change func(*flags)) flags {
+		f := defaults()
+		change(&f)
+		return f
+	}
+	for i, want := range []flags{
+		with(func(f *flags) { f.namespace = "default" }),
+		with(func(f *flags) { f.namespace = "default" }),
+		with(func(f *flags) { f.namespace = "default" }),
+		with(func(f *flags) { f.namespace = "default" }),
+		with(func(f *flags) { f.namespace = "y" }),
+		with(func(f *flags) { f.namespace = "x" }),
+		with(func(f *flags) { f.namespace = "b" }),
+		with(func(f *flags) { f.context = "--n" }),
+		with(func(f *flags) { f.context, f.namespace, f.demo = "dev", "-demo", false }),
+		with(func(f *flags) { f.palette, f.namespace, f.demo = "ocean", "apps", true }),
+		defaults(),
+		defaults(),
+		defaults(),
+		defaults(),
+		with(func(f *flags) { f.namespace = "apps" }),
+	} {
+		args := namespaceAliasCases[i]
+		t.Run(strings.Join(args, " "), func(t *testing.T) {
+			got, err := parseFlags(args, &bytes.Buffer{})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !reflect.DeepEqual(got, want) {
+				t.Fatalf("got %+v want %+v", got, want)
+			}
+		})
+	}
+}
+
+func TestNamespaceAliasMatchesLegacyFlag(t *testing.T) {
+	for _, args := range namespaceAliasCases {
+		t.Run(strings.Join(args, " "), func(t *testing.T) {
+			want, wantErr := legacyParse(args)
+			got, err := parseFlags(args, &bytes.Buffer{})
+			if (err != nil) != (wantErr != nil) {
+				t.Fatalf("err=%v legacy err=%v", err, wantErr)
+			}
+			if err == nil && !reflect.DeepEqual(got, want) {
+				t.Fatalf("got %+v legacy %+v", got, want)
+			}
+		})
+	}
+}
+
+func TestNamespaceAliasStaysOutOfHelpAndCompletions(t *testing.T) {
+	var help bytes.Buffer
+	if code := execute(context.Background(), []string{"--help"}, &help, io.Discard, func(flags) int { return 1 }); code != 0 {
+		t.Fatal(code)
+	}
+	if strings.Contains(help.String(), "--n ") || strings.Contains(help.String(), "--n=") {
+		t.Fatalf("help lists --n as a long flag:\n%s", help.String())
+	}
+	var comp bytes.Buffer
+	if code := execute(context.Background(), []string{"__complete", "--"}, &comp, io.Discard, func(flags) int { return 1 }); code != 0 {
+		t.Fatal(code)
+	}
+	for _, line := range strings.Split(comp.String(), "\n") {
+		if name, _, _ := strings.Cut(line, "\t"); name == "--n" {
+			t.Fatalf("completions offer --n:\n%s", comp.String())
+		}
+	}
+	if !strings.Contains(comp.String(), "--namespace") {
+		t.Fatalf("completions lost --namespace:\n%s", comp.String())
+	}
+}
+
+func TestDoubleDashShorthandOnlyForValueFlags(t *testing.T) {
+	cmd := newCommand(&flags{})
+	for _, tc := range []struct {
+		args []string
+		want []string
+	}{
+		{[]string{"--n", "a"}, []string{"--namespace", "a"}},
+		{[]string{"-n", "a"}, []string{"-n", "a"}},
+		{[]string{"-na"}, []string{"-na"}},
+		{[]string{"-n="}, []string{"--namespace="}},
+		{[]string{"--n=a"}, []string{"--namespace=a"}},
+		{[]string{"--n="}, []string{"--namespace="}},
+		{[]string{"--h"}, []string{"--h"}},
+		{[]string{"--v"}, []string{"--v"}},
+		{[]string{"--x", "-demo"}, []string{"--x", "--demo"}},
+		{[]string{"-demo", "--", "--n", "a"}, []string{"--demo", "--", "--n", "a"}},
+	} {
+		if got := normalizeArgs(cmd, tc.args); !reflect.DeepEqual(got, tc.want) {
+			t.Fatalf("%q: got %q want %q", tc.args, got, tc.want)
+		}
+	}
+}
+
+func TestShorthandNKeepsAttachedValue(t *testing.T) {
+	for args, want := range map[string]string{"-n x": "x", "-nx": "x", "-n=x": "x", "--n=x": "x", "-n=": "", "--n=": ""} {
+		got, err := parseFlags(strings.Fields(args), &bytes.Buffer{})
+		if err != nil || got.namespace != want {
+			t.Fatalf("%q: namespace=%q err=%v want %q", args, got.namespace, err, want)
+		}
+	}
+}
+
+func TestNamespaceAliasMatchesLegacyGrid(t *testing.T) {
+	values := []string{"default", "", "--n", "--n=x", "-n", "-n=", "--n=", "--", "-", "-demo", "-fps=12", "help", "man"}
+	tails := [][]string{nil, {"--n=last"}, {"--n="}, {"-n="}, {"-n", "last", "--namespace", "last2"}, {"--namespace", "apps", "--n="}, {"-demo=false"}, {"--fps=0"}, {"--palette=nope"}}
+	count := 0
+	for _, prefix := range []string{"--n", "-n", "--namespace", "-namespace", "--context", "-context", "--audit-file", "--kubeconfig"} {
+		for _, value := range values {
+			for _, tail := range tails {
+				args := append([]string{prefix, value}, tail...)
+				want, wantErr := legacyParse(args)
+				got, err := parseFlags(args, &bytes.Buffer{})
+				if (err != nil) != (wantErr != nil) || (err == nil && !reflect.DeepEqual(got, want)) {
+					t.Errorf("%q: got %+v err=%v legacy %+v err=%v", args, got, err, want, wantErr)
+				}
+				count++
+			}
+		}
+	}
+	for _, args := range [][]string{{"--n="}, {"-n="}, {"--n=="}, {"--n"}, {"--n", ""}, {"--namespace="}, {"--namespace", "apps", "--n="}, {"--namespace", "apps", "-n="}, {"--", "--n", "x"}} {
+		want, wantErr := legacyParse(args)
+		got, err := parseFlags(args, &bytes.Buffer{})
+		if (err != nil) != (wantErr != nil) || (err == nil && !reflect.DeepEqual(got, want)) {
+			t.Errorf("%q: got %+v err=%v legacy %+v err=%v", args, got, err, want, wantErr)
+		}
+		count++
+	}
+	if count < 900 {
+		t.Fatalf("grid shrank to %d cases", count)
 	}
 }
