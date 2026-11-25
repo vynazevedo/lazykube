@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"slices"
 	"strings"
 	"testing"
@@ -9,6 +10,7 @@ import (
 	"go.uber.org/goleak"
 
 	"github.com/vynazevedo/lazykube/internal/data"
+	"github.com/vynazevedo/lazykube/internal/ui"
 )
 
 func pendingSecurity(t *testing.T) Model {
@@ -131,6 +133,53 @@ func TestSecurityRecomputeFollowsRevisions(t *testing.T) {
 	rules.securitySession.Update(rules.security)
 	if rules = deliver(t, rules, tea.FocusMsg{}); rules.sec.have {
 		t.Fatal("a new rule version drops scores of the previous one")
+	}
+}
+
+func staleSecurity(t *testing.T, w, h int, keys ...string) Model {
+	t.Helper()
+	m := press(t, onSecurity(t, demoModel(t, w, h)), keys...)
+	m.security = m.security.Clone()
+	m.security.Revision++
+	m.securitySession.Update(m.security)
+	m = deliver(t, m, tea.FocusMsg{})
+	if !m.securityPageState().Stale || !m.secCalc.running {
+		t.Fatal("the fixture shows an older revision while the next one runs")
+	}
+	return m
+}
+
+func TestSecurityStaleDataIsLabelledInEveryVisiblePanel(t *testing.T) {
+	const label = "recalculando"
+	for _, size := range [][2]int{{160, 48}, {130, 40}, {100, 30}, {80, 24}} {
+		for _, keys := range [][]string{nil, {"tab"}, {"]"}, {"]", "]"}, {"]", "]", "]"}, {"[", "["}, {"["}, {"[", "tab"}, {"b"}} {
+			m := staleSecurity(t, size[0], size[1], keys...)
+			l, lines := m.layout, strings.Split(m.Render().Plain(), "\n")
+			panels := []Rect{l.SecSummary}
+			if m.sec.Tab == ui.SecTabWorkloads {
+				panels = append(panels, l.SecList, l.SecEvidence)
+			}
+			for _, r := range panels {
+				if l.TreeOverlay || r.Empty() {
+					continue
+				}
+				row := []rune(lines[r.Y])
+				if title := string(row[r.X:min(len(row), r.X+r.W)]); !strings.Contains(title, label) {
+					t.Fatalf("%v %v panel without the label: %q", size, keys, title)
+				}
+			}
+			if !l.TreeOverlay && strings.Count(lines[l.SecSummary.Y], label) != 1 {
+				t.Fatalf("%v %v the summary is labelled in every tab", size, keys)
+			}
+			if fresh := settleSecurity(m); strings.Contains(fresh.Render().Plain(), label) {
+				t.Fatalf("%v %v the label leaves with the new result", size, keys)
+			}
+		}
+	}
+	for _, size := range [][2]int{{80, 24}, {130, 40}} {
+		suffix := fmt.Sprintf("_%dx%d.txt", size[0], size[1])
+		golden(t, "security_stale"+suffix, staleSecurity(t, size[0], size[1]).Render().Plain())
+		golden(t, "security_stale_evidence"+suffix, staleSecurity(t, size[0], size[1], "tab").Render().Plain())
 	}
 }
 

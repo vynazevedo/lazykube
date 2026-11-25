@@ -68,6 +68,13 @@ func (st SecurityPageState) Selected() *data.WorkloadPosture {
 	return &st.Workloads[st.Cursor]
 }
 
+func (st SecurityPageState) staleTitle(title string) string {
+	if st.Stale {
+		return "recalculando | " + title
+	}
+	return title
+}
+
 func gradeColor(s data.PostureScore) theme.RGB {
 	if !s.Available {
 		return theme.Muted
@@ -162,7 +169,7 @@ func SecuritySummaryLines(st SecurityPageState) []draw.Line {
 }
 
 func SecuritySummary(r draw.Region, st SecurityPageState, ctx Ctx) {
-	inner := Panel(r, "Postura de segurança", false, ctx).Inset(1, 0, 1, 0)
+	inner := Panel(r, st.staleTitle("Postura de segurança"), false, ctx).Inset(1, 0, 1, 0)
 	for y, l := range SecuritySummaryLines(st) {
 		if y >= inner.H {
 			break
@@ -272,10 +279,7 @@ func resolutionText(w data.WorkloadPosture) string {
 
 func SecurityWorkloadsPanel(r draw.Region, st SecurityPageState, ctx Ctx) {
 	title := fmt.Sprintf("Workloads (%d) | %s", len(st.Workloads), st.Cohort)
-	if st.Stale {
-		title += " | recalculando"
-	}
-	inner := Panel(r, title, st.Focus == SecurityFocusList, ctx).Inset(1, 0, 1, 0)
+	inner := Panel(r, st.staleTitle(title), st.Focus == SecurityFocusList, ctx).Inset(1, 0, 1, 0)
 	if inner.Empty() {
 		return
 	}
@@ -396,7 +400,7 @@ func SecurityEvidenceRows(panelH int) int {
 }
 
 func SecurityEvidencePanel(r draw.Region, st SecurityPageState, ctx Ctx) {
-	inner := Panel(r, "Evidência e remediação", st.Focus == SecurityFocusEvidence, ctx).Inset(1, 0, 1, 0)
+	inner := Panel(r, st.staleTitle("Evidência e remediação"), st.Focus == SecurityFocusEvidence, ctx).Inset(1, 0, 1, 0)
 	if inner.Empty() {
 		return
 	}
