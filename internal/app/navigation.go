@@ -499,7 +499,7 @@ func (m Model) handleShellClick(ms tea.Mouse) (Model, bool) {
 	case AreaMenu:
 		m.endEditing()
 		m.menu.open = false
-		if i, ok := ui.MenuItemAt(m.menuItems(), ms.X-m.layout.Menu.X); ok {
+		if i, ok := ui.MenuItemAt(m.menuItems(), ms.X-m.layout.Menu.X, m.layout.Menu.W); ok {
 			m.activateScreen(registeredScreens()[i])
 		}
 		return m, true

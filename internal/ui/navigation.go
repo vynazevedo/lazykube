@@ -21,7 +21,10 @@ type Span struct {
 	X, W int
 }
 
-const menuSeparator = " | "
+const (
+	menuSeparator      = " | "
+	menuTightSeparator = "|"
+)
 
 func menuLabel(it MenuItem, active bool) string {
 	if active {
@@ -30,19 +33,30 @@ func menuLabel(it MenuItem, active bool) string {
 	return " " + it.Key + " " + it.Title + " "
 }
 
-func MenuSpans(items []MenuItem) []Span {
+func menuSeparatorFor(items []MenuItem, width int) string {
+	total := len(menuSeparator) * max(0, len(items)-1)
+	for _, it := range items {
+		total += draw.Width(menuLabel(it, false))
+	}
+	if total > width {
+		return menuTightSeparator
+	}
+	return menuSeparator
+}
+
+func MenuSpans(items []MenuItem, width int) []Span {
 	out := make([]Span, len(items))
-	x := 0
+	x, gap := 0, len(menuSeparatorFor(items, width))
 	for i, it := range items {
 		w := draw.Width(menuLabel(it, false))
 		out[i] = Span{X: x, W: w}
-		x += w + len(menuSeparator)
+		x += w + gap
 	}
 	return out
 }
 
-func MenuItemAt(items []MenuItem, x int) (int, bool) {
-	for i, s := range MenuSpans(items) {
+func MenuItemAt(items []MenuItem, x, width int) (int, bool) {
+	for i, s := range MenuSpans(items, width) {
 		if x >= s.X && x < s.X+s.W {
 			return i, true
 		}
@@ -52,11 +66,11 @@ func MenuItemAt(items []MenuItem, x int) (int, bool) {
 
 func Menu(r draw.Region, st MenuState, ctx Ctx) {
 	r.Fill(theme.BgApp)
-	spans := MenuSpans(st.Items)
+	spans, separator := MenuSpans(st.Items, r.W), menuSeparatorFor(st.Items, r.W)
 	for i, it := range st.Items {
 		s := spans[i]
 		if i > 0 {
-			r.Text(s.X-len(menuSeparator), 0, menuSeparator, draw.Fg(theme.Faint))
+			r.Text(s.X-len(separator), 0, separator, draw.Fg(theme.Faint))
 		}
 		style := draw.Fg(theme.Muted)
 		if i == st.Active {

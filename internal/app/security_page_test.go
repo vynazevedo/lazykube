@@ -49,7 +49,7 @@ func TestSecurityPageActivation(t *testing.T) {
 	if menu := press(t, demoModel(t, 160, 48), "m", "right", "right", "right", "enter"); !menu.onScreen(ScreenSecurity) {
 		t.Fatal("the menu activates Security")
 	}
-	x := ui.MenuSpans(m.menuItems())[3].X + m.layout.Menu.X + 1
+	x := ui.MenuSpans(m.menuItems(), m.layout.Menu.W)[3].X + m.layout.Menu.X + 1
 	if click, _ := demoModel(t, 160, 48).Update(tea.MouseClickMsg{X: x, Y: 1, Button: tea.MouseLeft}); !click.(Model).onScreen(ScreenSecurity) {
 		t.Fatal("clicking the menu item activates Security")
 	}

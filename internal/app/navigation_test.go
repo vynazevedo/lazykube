@@ -266,7 +266,7 @@ func TestMenuAndCrumbsByMouse(t *testing.T) {
 	m := navNamespace(t, demoModel(t, 160, 48))
 	m = press(t, m, "tab", "tab", "enter")
 	root := m.nav.Frames(0)
-	span := ui.MenuSpans(m.menuItems())[0]
+	span := ui.MenuSpans(m.menuItems(), m.layout.Menu.W)[0]
 	click := func(m Model, x, y int) Model {
 		next, _ := m.Update(tea.MouseClickMsg{X: x, Y: y, Button: tea.MouseLeft})
 		return next.(Model)
@@ -526,7 +526,7 @@ func navCrumbX(m Model, i int) int {
 }
 
 func navMenuX(m Model) int {
-	return m.layout.Menu.X + ui.MenuSpans(m.menuItems())[0].X + 1
+	return m.layout.Menu.X + ui.MenuSpans(m.menuItems(), m.layout.Menu.W)[0].X + 1
 }
 
 func navAssertKeysWork(t *testing.T, m Model) {

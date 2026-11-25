@@ -101,7 +101,7 @@ func TestNodesActivation(t *testing.T) {
 	if menu := press(t, demoModel(t, 160, 48), "m", "4"); !menu.onScreen(ScreenNodes) || menu.menu.open {
 		t.Fatal("4 inside the menu activates Nodes")
 	}
-	x := ui.MenuSpans(m.menuItems())[2].X + m.layout.Menu.X + 1
+	x := ui.MenuSpans(m.menuItems(), m.layout.Menu.W)[2].X + m.layout.Menu.X + 1
 	if click, _ := demoModel(t, 160, 48).Update(tea.MouseClickMsg{X: x, Y: 1, Button: tea.MouseLeft}); !click.(Model).onScreen(ScreenNodes) {
 		t.Fatal("clicking the menu item activates Nodes")
 	}
