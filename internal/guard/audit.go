@@ -35,6 +35,7 @@ type FileAudit struct {
 	path   string
 	limit  int64
 	failed bool
+	reason AuditRefusal
 	clock  Clock
 }
 
@@ -71,13 +72,52 @@ func (a *FileAudit) Record(event AuditEvent) error {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 	if a.failed {
-		return AuditFailed
+		return a.refused()
 	}
 	if err := a.record(event); err != nil {
-		a.failed = true
-		return AuditFailed
+		return a.refuse(err)
 	}
 	return nil
+}
+func (a *FileAudit) Check(create bool) error {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	if a.failed {
+		return a.refused()
+	}
+	if err := a.check(create); err != nil {
+		return a.refuse(err)
+	}
+	return nil
+}
+func (a *FileAudit) refuse(err error) error {
+	a.failed = true
+	_ = errors.As(err, &a.reason)
+	return a.refused()
+}
+func (a *FileAudit) refused() error {
+	if a.reason != "" {
+		return a.reason
+	}
+	return AuditFailed
+}
+func (a *FileAudit) check(create bool) (checkErr error) {
+	dir, err := openAudit(a.path, create)
+	if errors.Is(err, os.ErrNotExist) && !create {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	defer func() { checkErr = errors.Join(checkErr, dir.close()) }()
+	file, _, err := openAuditFile(dir.root, filepath.Base(a.path), os.O_APPEND|os.O_WRONLY)
+	if errors.Is(err, os.ErrNotExist) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	return file.Close()
 }
 func (a *FileAudit) record(event AuditEvent) (recordErr error) {
 	event.OperationID = auditText(event.OperationID)

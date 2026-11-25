@@ -58,7 +58,7 @@ func (radarScreen) Keys(m Model) []key.Binding {
 		k.Up, k.Down, k.PageUp, k.PageDown, k.Home, k.End, k.Enter, k.Esc,
 		k.SecurityAck, k.Palette, k.Pause, k.Help, k.Quit,
 		k.Menu, k.MenuPrev, k.MenuNext, k.Dashboard, k.Workloads, k.Nodes, k.Security, k.Events, k.Radar,
-		k.Context, k.Namespace, k.Tree, k.Yank,
+		k.Context, k.Namespace, k.Tree, k.Yank, k.Actions,
 	}
 	if m.layout.Compact {
 		keys = append(keys, k.NextPanel, k.PrevPanel)
@@ -67,11 +67,11 @@ func (radarScreen) Keys(m Model) []key.Binding {
 }
 
 func (radarScreen) Help(m Model) []ui.KeyHelp {
-	return compactPanels(m, "signals / evidence", ui.RadarHelp())
+	return m.actionHelp(compactPanels(m, "signals / evidence", ui.RadarHelp()), "actions")
 }
 
 func (radarScreen) FullHelp(m Model) []ui.KeyHelp {
-	return compactPanels(m, "signals / evidence", ui.FullHelpRadar())
+	return m.actionHelp(compactPanels(m, "signals / evidence", ui.FullHelpRadar()), "actions on the pod")
 }
 
 func compactPanels(m Model, desc string, help []ui.KeyHelp) []ui.KeyHelp {

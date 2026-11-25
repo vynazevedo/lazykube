@@ -17,8 +17,16 @@ pelo servidor. Nenhuma credencial participa dela.
 `Prepare` valida politica, SSAR exata e UID/resourceVersion, registra a tentativa
 e executa dry-run server-side. O preview tem prazo de dois minutos e um ID de uso
 unico. `Execute` exige confirmacao, repete SSAR e valida a identidade do recurso,
-sincroniza a intencao no audit e faz uma unica requisicao. Delete, edit e scale
-para zero exigem o nome do recurso. Nao existe create. Edit usa PUT de um objeto
+sincroniza a intencao no audit e faz uma unica requisicao, sem repeticao do
+cliente. Leituras, SSAR e escritas do executor fazem uma tentativa cada; a falha
+vira recusa e so um gesto novo repete. O cliente de acoes e a SSAR usam
+transporte proprio, so HTTP/1.1 e uma conexao por requisicao, para que o net/http
+tambem nao reenvie em conexao ociosa fechada ou GOAWAY. TLS, CA e certificados em
+arquivo sao relidos a cada conexao; exec plugin, impersonation, proxy e
+tls-server-name do kubeconfig sao preservados. Informers e listas mantem os proprios
+retries. Todo redirect HTTP e recusado no cliente de acoes e
+na SSAR: um 3xx em dry-run reprova o preview, sem segundo request. Delete, edit,
+cordon, uncordon e scale para zero exigem o nome do recurso. Nao existe create. Edit usa PUT de um objeto
 existente com UID e resourceVersion. `SupportsAction` e a allowlist compartilhada
 pelo executor e pelos futuros handlers: todos os GVRs abaixo usam versao v1.
 
@@ -29,6 +37,7 @@ pelo executor e pelos futuros handlers: todos os GVRs abaixo usam versao v1.
 | apps | deployments, statefulsets | delete, edit, scale, restart |
 | apps | daemonsets | delete, edit, restart |
 | batch | jobs, cronjobs | delete, edit |
+| core | nodes | cordon, uncordon |
 
 Grupos, versoes e recursos fora dessa lista sao negados antes de SSAR ou dry-run.
 Nao ha acao generica para Secrets, RBAC, admission, PV ou CRs. Prepare audita
@@ -43,6 +52,7 @@ envio. Vencimento antes do envio e cancelamento, nunca sucesso ou tentativa nova
 | Scale | get em recurso/scale | update em recurso/scale | All |
 | Restart | get no recurso | patch no recurso | All |
 | Edit existente | get no recurso | update no recurso | All |
+| Cordon e uncordon | get nodes | patch nodes | All |
 | Exec reservado | get pods | create pods/exec para POST | sem suporte ativo |
 | Port-forward reservado | get pods | create pods/portforward para POST | sem suporte ativo |
 
@@ -83,7 +93,7 @@ por descritores desde a raiz, um componente por vez, sem deixar o kernel seguir 
 
 Nao existe excecao para grupo privado: com umask 002, um `~/.local` em 0775 e recusado.
 Nenhuma permissao ou link e reparado automaticamente. Quando o caminho e recusado, a
-aba Audit mostra o motivo e as acoes ficam bloqueadas. Para resolver, retire a escrita
+aba Audit e a tela de acao mostram o motivo e as acoes ficam bloqueadas. Para resolver, retire a escrita
 de grupo do ancestral ou use `--audit-file` com um caminho absoluto em disco local,
 sem links do usuario. A regra protege contra outro usuario sem privilegios; nao protege
 contra root nem contra processos do proprio usuario. Dono nao reconhecido, como em
@@ -95,7 +105,43 @@ plataformas o audit falha fechado e bloqueia acoes. Nao ha afirmacao de suporte 
 mutacoes nelas. A matriz alvo Kubernetes e 1.34, 1.35 e 1.36; fakes e
 HTTP sintetico validam contratos, nao substituem evidencia por versao de servidor.
 
-O executor e a fundacao para os proximos handlers de acoes. Os handlers devem
-mostrar efeito, alvo e politica antes de chamar Execute. Nenhuma tecla de mutacao
-foi adicionada nesta entrega; o header mostra RO e PROTECTED independentemente de
-cores. A demo continua sintetica e somente leitura.
+Nodes sao o unico alvo de escopo cluster: o namespace do alvo e vazio. O PATCH
+JSON testa UID e resourceVersion e altera somente `spec.unschedulable`, com os
+mesmos bytes no dry-run e no envio. Estado ja igual, em scale ou node, e recusado
+com `no_change` antes do dry-run. Conflito dos testes do PATCH e alvo obsoleto.
+
+Todo plano valido consumido deixa um unico desfecho no audit: recusa de politica ou
+de confirmacao, cancelamento, expiracao, remocao de plano vencido, encerramento da
+sessao ou resultado. `Close` cancela os planos pendentes dentro do mesmo prazo e
+nunca muda o desfecho de um Execute em voo. Um
+ID inexistente nao gera evento, porque nao ha alvo conhecido. Se o registro da
+recusa falhar, o plano continua consumido e novas acoes ficam bloqueadas.
+
+`NotSent` e a unica forma de um backend afirmar que falhou antes da requisicao
+mutante, como a leitura interna do restart. Qualquer outro erro de envio continua
+`outcome_unknown`, inclusive cancelamento e timeout.
+
+`Dispatch` informa se a requisicao mutante pode ter saido e o resultado gravado no
+audit. E a fonte da linha de saida da TUI: sem envio possivel nao ha linha.
+
+Antes de qualquer requisicao, `Observe`, `Prepare` e `Execute` conferem o caminho do
+audit. Caminho recusado devolve `audit_failed` sem chamar a API, bloqueia novas acoes
+nesta sessao e guarda o motivo fixo em `AuditRefusal`, que a tela mostra com a saida
+por `--audit-file` ou, em plataforma sem verificacao, com o aviso de que ela nao ajuda.
+Abrir o menu confere sem criar nada; diretorio ausente so nasce quando uma acao e
+escolhida. Em somente leitura o caminho nao e tocado. Depois de corrigir o caminho e
+preciso reconectar. Um plano consumido enquanto o audit esta recusado nao tem desfecho
+gravado, porque nao ha onde gravar, e nada e enviado.
+
+`Observe` faz uma leitura pontual do alvo, sem mutex, e so depois da politica e da
+allowlist: em somente leitura nenhuma requisicao sai. `Verify` faz a mesma leitura sem
+depender do audit, so para conferir uma operacao ja enviada. `Discard` consome um preview
+sem enviar nada e registra o cancelamento. `AuditBlocked` informa a falha de audit
+para a tela. `Close` cancela as operacoes e espera ate dois segundos pelo registro
+do resultado em andamento.
+
+A tecla `o` da TUI usa apenas scale, restart, delete, cordon e uncordon. Edit,
+exec e port-forward continuam sem handler. No Radar e na Security so age em pod exato
+por UID e resourceVersion. O header mostra o modo, a protecao, a
+configuracao invalida e o bloqueio por audit independentemente de cores. A demo
+continua sintetica e somente leitura.

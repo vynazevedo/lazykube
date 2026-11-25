@@ -731,7 +731,7 @@ func TestRootSessionFollowsGuardPolicy(t *testing.T) {
 	d := newRootDriver(t, newFakeCluster(), data.Target{Context: "alpha"})
 	d.until("initial", connectedTo("alpha", ""))
 	m, _ := d.r.model()
-	if plain := d.r.Render().Plain(); !strings.Contains(plain, "[RW]") || strings.Contains(plain, "[RO]") || m.session.Identity != "id-alpha" {
+	if plain := d.r.Render().Plain(); !strings.Contains(plain, "[RW: --read-write]") || strings.Contains(plain, "[RO]") || m.session.Identity != "id-alpha" {
 		t.Fatalf("the header shows the guard mode of the session: %+v", m.session)
 	}
 	d.pickTarget(pickContext, "gamma")

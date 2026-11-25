@@ -429,6 +429,7 @@ func FullHelpResources() []KeyHelp {
 		{"home/end", "first / last"},
 		{"r", "reload list (retry denied or list-only)"},
 		{"y", "copy namespace/name"},
+		{"o", "actions on the row"},
 		{"esc", "back"},
 		{"b", "navigation tree"},
 		{"m", "screens menu ← → enter"},

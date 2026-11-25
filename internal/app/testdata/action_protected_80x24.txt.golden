@@ -1,0 +1,24 @@
+ lazykube [RO] [PROTECTED]  ◎ context demo namespace Todos            ⠋ ● live  
+  2 Dashboard |[3 Workloads]| 4 Nodes | 5 Security | 6 Events | 7 Radar         
+ Workloads                                                                      
+ ╭─ Deployments ──────────────────────────────────────────────────────────────╮ 
+ │                                                                            │ 
+ │ bilibili-raffle/bilibili-live                                        ● 1/1 │ 
+ │╭─ Acoes - deployment/bilibili-live ───────────────────────────────────────╮│ 
+ ││ Contexto: laboratorio | Namespace: bilibili-raffle | Geracao: 12         ││ 
+ ││ Recurso: apps/v1 deployments/bilibili-live                               ││ 
+ ││ UID: uid-bilibili-live | ResourceVersion: 42                             ││ 
+ ││                                                                          ││ 
+ ││ Contexto protegido. Acoes bloqueadas mesmo com --read-write.             ││ 
+ ││                                                                          ││ 
+ ││ > Escalar  indisponivel                                                  ││ 
+ ││   Reiniciar rollout  indisponivel                                        ││ 
+ ││   Excluir  indisponivel                                                  ││ 
+ ││ j/k seleciona | Enter escolhe | Esc fecha                                ││ 
+ │╰──────────────────────────────────────────────────────────────────────────╯│ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ ╰────────────────────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────
+  tab  foco   enter  controle focado   esc  cancelar etapa    bubbletea · 0 fps 

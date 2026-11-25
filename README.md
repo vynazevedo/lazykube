@@ -34,7 +34,7 @@ em um único layout, atualizado em tempo real por informers e com animações
 suaves. Funciona com qualquer contexto do seu kubeconfig e degrada com
 elegância quando falta permissão ou metrics-server.
 
-*Somente leitura: o lazykube observa o cluster e nunca altera nada.*
+*Somente leitura por padrão: ações só existem com `--read-write`, nesta execução, e nunca em contexto protegido.*
 
 ---
 
@@ -205,20 +205,48 @@ lazykube --demo --no-anim
 
 O uso com um cluster requer um kubeconfig válido.
 
-O processo inicia somente leitura (`[RO]`). A flag `--read-write` libera
-a tentativa de acoes apenas neste processo, sujeita a RBAC e a politica do
-contexto. Contextos protegidos continuam bloqueados. O executor e os contratos
-para futuros handlers de acoes estao descritos em
-[Guardrails](internal/guard/README.md); esta entrega nao adiciona teclas de mutacao.
-`--protected-contexts` e `--read-only-contexts` recebem nomes exatos separados
-por virgula. `--audit-file` permite escolher um caminho absoluto para o audit
-privado. Nenhuma tecla desativa a politica.
+### Ações no cluster
 
-Sem audit confiavel nao ha acao. No macOS e no Windows as acoes ficam bloqueadas
-nesta versao, porque a privacidade do audit ainda nao e verificada. Em Linux tambem
-ficam quando o caminho passa por link do usuario, por diretorio com escrita de grupo
-ou outros sem sticky, ou por filesystem de rede ou FUSE. A aba Audit da tela Security
-mostra o motivo.
+O processo inicia somente leitura (`[RO]`) e a demo nunca executa ações. A flag
+`--read-write` libera a tentativa de ações apenas neste processo: não é gravada e
+nenhuma tecla a liga ou desliga. A política do contexto sempre prevalece.
+`--protected-contexts` e `--read-only-contexts` recebem nomes exatos separados por
+vírgula e bloqueiam ações mesmo com a flag. O cabeçalho mostra o modo, a proteção e o
+bloqueio por audit em todas as telas.
+
+A tecla `o` abre as ações do alvo em foco:
+
+| Alvo | Ações |
+| --- | --- |
+| Deployments e StatefulSets | escalar, reiniciar rollout, excluir |
+| DaemonSets | reiniciar rollout, excluir |
+| Pods, Jobs e CronJobs | excluir |
+| Node da tela Nodes | impedir ou permitir agendamentos (cordon e uncordon) |
+
+No Radar e na Security a tecla só age quando a linha é um pod exato, com UID e
+resourceVersion observados; nas demais linhas não faz nada. Edit, exec, port-forward,
+drain, rollback e CronJob sob demanda não fazem parte desta versão. A tela Nodes só
+alcança o node de um pod selecionado.
+
+Toda ação congela UID e resourceVersion do alvo, confere a permissão exata no
+servidor, roda dry-run no servidor e mostra um preview de dois minutos. Confirmar exige
+ir até o botão e, quando o risco é alto, digitar o nome do alvo. Mudança de seleção ou
+de sessão cancela. Cada confirmação faz no máximo uma requisição de escrita, sem
+repetição automática: resultado desconhecido nunca vira sucesso. Sair durante um envio
+não desfaz a operação; se a requisição pode ter saído, o terminal mostra o contexto, o
+ID e o resultado que o audit registrou.
+
+Sem audit confiável não há ação, e a recusa acontece antes de qualquer chamada à API.
+`--audit-file` aponta um caminho absoluto para o audit privado. A tela de ação e a aba
+Audit da Security mostram o motivo fixo da regra.
+
+| Plataforma | Ações |
+| --- | --- |
+| Linux, audit em disco local | liberadas com `--read-write` |
+| Linux, link do usuário, escrita de grupo ou de outros sem sticky, NFS, CIFS, 9p ou FUSE | bloqueadas; corrija o caminho ou use `--audit-file` |
+| macOS e Windows | bloqueadas nesta versão; `--audit-file` não muda isso |
+
+O contrato completo está em [Guardrails](internal/guard/README.md).
 
 ---
 
@@ -231,7 +259,7 @@ as ações planejadas para a 1.0 ou prometer vantagem de desempenho.
 | --- | --- | --- | --- |
 | Interface | TUI no terminal | TUI no terminal | Aplicativo gráfico |
 | Pods, deployments e logs | Visualização no terminal | Navegação de recursos e logs | Visualização de workloads e logs |
-| Alterar recursos | Não exposto na TUI desta revisão | Operações de gestão; modo `--readonly` disponível | Edição disponível conforme RBAC |
+| Alterar recursos | Scale, restart, delete e cordon com `--read-write` | Operações de gestão; modo `--readonly` disponível | Edição disponível conforme RBAC |
 | Foco | Inspeção, diagnóstico e contexto em uma tela | Gestão de recursos pelo terminal | Gestão por interface gráfica |
 
 Fontes: [k9s](https://k9scli.io/),
@@ -243,7 +271,8 @@ planejados para a 1.0 dependem de implementação e validação próprias.
 ## Matriz de suporte da 1.0
 
 A matriz alvo é Kubernetes 1.34 a 1.36. O CI usa envtest para validar conexão,
-leitura de pods/deployments/events e alternância entre dois servidores isolados.
+leitura de pods/deployments/events, alternância entre dois servidores isolados e as
+ações de scale, restart, delete, cordon e uncordon pelo executor.
 
 | Linha | API local testada | Estado além desse teste |
 | --- | --- | --- |
@@ -373,7 +402,8 @@ os painéis: clique seleciona, a roda rola e o clique na aba troca de aba.
  │  c                 troca de contexto do kubeconfig    │
  │  n                 namespace; Todos só se escolhido   │
  │  b                 árvore de navegação lateral        │
- │  2 3 4 6           Dashboard, Workloads, Nodes, Events│
+ │  2 3 4             Dashboard, Workloads, Nodes       │
+ │  5 6 7             Security, Events, Radar           │
  │                                                       │
  ├─ DETALHES ────────────────────────────────────────────┤
  │                                                       │
@@ -388,6 +418,7 @@ os painéis: clique seleciona, a roda rola e o clique na aba troca de aba.
  ├─ GERAL ───────────────────────────────────────────────┤
  │                                                       │
  │  y                 copia nome, YAML ou linha do log   │
+ │  o                 ações do alvo em foco              │
  │  p                 troca a paleta de cores            │
  │  ctrl+p            pausa / retoma animações           │
  │  ?                 ajuda                              │

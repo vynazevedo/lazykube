@@ -11,4 +11,4 @@ export USE_EXISTING_CLUSTER=false
 export KUBECONFIG=/dev/null
 KUBEBUILDER_ASSETS=$(go run sigs.k8s.io/controller-runtime/tools/setup-envtest@4d452bc0517cf4c6b20e727352f52bb50cbf0df4 use "$version" --bin-dir "$PWD/.local/envtest" -p path)
 export KUBEBUILDER_ASSETS
-go test -tags=integration -race -count=1 -timeout=5m -run '^TestEnvtestConnectAndSwitchContexts$' ./internal/kube
+go test -tags=integration -race -count=1 -timeout=8m -run '^TestEnvtest' ./internal/kube

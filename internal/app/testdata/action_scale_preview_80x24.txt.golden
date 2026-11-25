@@ -1,0 +1,24 @@
+ lazykube [RW]  ◎ context demo namespace Todos   k8s demo  nodes 1    ⠋ ● live  
+  2 Dashboard |[3 Workloads]| 4 Nodes | 5 Security | 6 Events | 7 Radar         
+ W╭─ Escalar deployment/bilibili-live - preview validado ────────────────────╮  
+ ╭│ Contexto: laboratorio | Namespace: bilibili-raffle | Geracao: 12         │╮ 
+ ││ Recurso: apps/v1 deployments/bilibili-live                               ││ 
+ ││ UID: uid-bilibili-live | ResourceVersion: 42                             ││ 
+ ││                                                                          ││ 
+ ││ Replicas atuais: 3                                                       ││ 
+ ││ Replicas desejadas: 5                                                    ││ 
+ ││ Alterar replicas de 3 para 5. A convergencia sera observada apos a       ││ 
+ ││ resposta.                                                                ││ 
+ ││ Politica: RW por --read-write; contexto nao protegido                    ││ 
+ ││ SSAR: get deployments/scale e update deployments/scale                   ││ 
+ ││ Dry-run server-side aprovado.                                            ││ 
+ ││ Preview valido por 120s. Alterar parametros exige nova validacao.        ││ 
+ ││ ID: fixture-scal | expira: 2026-11-25 15:02:00 UTC                       ││ 
+ ││ Nenhuma alteracao real foi enviada.                                      ││ 
+ ││                                                                          ││ 
+ ││ [Cancelar]  [Voltar aos parametros]  [Confirmar escala]                  ││ 
+ ││ Tab foco | Enter controle focado | Esc cancelar                          ││ 
+ │╰──────────────────────────────────────────────────────────────────────────╯│ 
+ ╰────────────────────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────
+  tab  foco   enter  controle focado   esc  cancelar etapa    bubbletea · 0 fps 

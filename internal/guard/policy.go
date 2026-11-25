@@ -16,6 +16,8 @@ const (
 	Edit
 	Exec
 	PortForward
+	Cordon
+	Uncordon
 )
 
 type Reason string
@@ -33,10 +35,16 @@ const (
 	DryRunFailed         Reason = "dry_run_failed"
 	ConfirmationRequired Reason = "confirmation_required"
 	Unknown              Reason = "outcome_unknown"
+	Unchanged            Reason = "no_change"
 	Succeeded            Reason = "succeeded"
 )
 
 func (r Reason) Error() string { return string(r) }
+
+type NotSent struct{ Reason Reason }
+
+func (n NotSent) Error() string { return string(n.Reason) }
+func (n NotSent) Unwrap() error { return n.Reason }
 
 type Environment struct{ ReadOnly, Protected, Valid bool }
 type Session struct {
@@ -61,6 +69,18 @@ func DefaultEnvironment(name string) Environment {
 }
 
 type Target struct{ Group, Version, Resource, Namespace, Name, UID, ResourceVersion string }
+type Observation struct {
+	Target           Target
+	Replicas         int32
+	ObservedReplicas int32
+	GraceSeconds     int64
+	GraceKnown       bool
+	Owner            string
+	Strategy         string
+	Finalizers       int
+	Terminating      bool
+	Unschedulable    bool
+}
 type Parameters struct {
 	Replicas              int32
 	Container             string
@@ -91,7 +111,7 @@ func (p Policy) Evaluate(s Session, r Request) (Decision, error) {
 		return d, ReadOnly
 	}
 	t := r.Target
-	if s.Context == "" || s.Identity == "" || s.Generation == 0 || t.Version == "" || t.Resource == "" || t.Name == "" || t.UID == "" || t.ResourceVersion == "" || strings.Contains(t.Resource, "/") || strings.ContainsAny(t.Name, "/\\") || s.Namespace != "" && t.Namespace != s.Namespace {
+	if s.Context == "" || s.Identity == "" || s.Generation == 0 || t.Version == "" || t.Resource == "" || t.Name == "" || t.UID == "" || t.ResourceVersion == "" || strings.Contains(t.Resource, "/") || strings.ContainsAny(t.Name, "/\\") || !inScope(s, t) {
 		return d, Invalid
 	}
 	if !SupportsAction(r.Action, t) {
@@ -128,6 +148,8 @@ func (p Policy) Evaluate(s Session, r Request) (Decision, error) {
 		if t.Group != "" || t.Resource != "pods" || r.Parameters.LocalPort == 0 || r.Parameters.RemotePort == 0 || r.Parameters.Address != "127.0.0.1" && r.Parameters.Address != "::1" {
 			return d, Invalid
 		}
+	case Cordon, Uncordon:
+		d.HighRisk, d.DryRun = true, true
 	default:
 		return d, Unsupported
 	}
@@ -135,6 +157,17 @@ func (p Policy) Evaluate(s Session, r Request) (Decision, error) {
 		d.HighRisk = true
 	}
 	return d, nil
+}
+
+func ClusterScoped(t Target) bool {
+	return t.Group == "" && t.Resource == "nodes"
+}
+
+func inScope(s Session, t Target) bool {
+	if ClusterScoped(t) {
+		return t.Namespace == ""
+	}
+	return t.Namespace != "" && (s.Namespace == "" || t.Namespace == s.Namespace)
 }
 
 func Requirements(r Request) []Access {
@@ -151,7 +184,7 @@ func Requirements(r Request) []Access {
 		a.Subresource = "scale"
 		write.Subresource = "scale"
 		write.Verb = "update"
-	case Restart:
+	case Restart, Cordon, Uncordon:
 		write.Verb = "patch"
 	case Edit:
 		write.Verb = "update"
@@ -177,7 +210,9 @@ type Authorizer interface {
 }
 type Backend interface {
 	Supported(Action) bool
+	Observe(context.Context, Action, Target) (Observation, error)
 	Validate(context.Context, Request) error
 	Send(context.Context, Request, bool) error
 }
 type Auditor interface{ Record(AuditEvent) error }
+type AuditChecker interface{ Check(create bool) error }
