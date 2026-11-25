@@ -73,6 +73,10 @@ type Node struct {
 	PodCapacity int
 	Arch        string
 	Coverage    Coverage
+
+	UID             string
+	ResourceVersion string
+	Unschedulable   bool
 }
 
 type Pod struct {
@@ -94,6 +98,8 @@ type Pod struct {
 	Image      string
 	Controller string
 	QoS        string
+
+	ResourceVersion string
 }
 
 func PodKey(namespace, name string) string {
@@ -109,6 +115,9 @@ type Deployment struct {
 	Name      string
 	Ready     int
 	Desired   int
+
+	UID             string
+	ResourceVersion string
 }
 
 type Namespace struct {

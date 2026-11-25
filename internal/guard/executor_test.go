@@ -15,6 +15,10 @@ type guardFake struct {
 	invalid   bool
 	failPhase string
 	sendErr   error
+
+	observes   int
+	observeErr error
+	observeUID string
 }
 
 func (f *guardFake) Allowed(_ context.Context, a Access) (bool, error) {
@@ -22,6 +26,13 @@ func (f *guardFake) Allowed(_ context.Context, a Access) (bool, error) {
 	return f.allowed, nil
 }
 func (f *guardFake) Supported(Action) bool { return true }
+func (f *guardFake) Observe(_ context.Context, _ Action, t Target) (Observation, error) {
+	f.observes++
+	if f.observeUID != "" {
+		t.UID = f.observeUID
+	}
+	return Observation{Target: t}, f.observeErr
+}
 func (f *guardFake) Validate(context.Context, Request) error {
 	if f.invalid {
 		return Stale

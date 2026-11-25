@@ -113,6 +113,11 @@ type Model struct {
 	notice   notice
 	after    func(time.Duration, func(time.Time) tea.Msg) tea.Cmd
 	life     context.Context
+
+	act     actionState
+	actSeq  uint64
+	left    []operation
+	actTick func(context.Context, time.Duration, tea.Msg) tea.Cmd
 }
 
 func New(opts Options) Model {
@@ -152,6 +157,7 @@ func New(opts Options) Model {
 		nav:      newRouter(),
 		after:    tea.Tick,
 		life:     opts.Context,
+		actTick:  tickWithin,
 		auditSeq: new(uint64),
 	}
 	if m.life == nil {
@@ -342,6 +348,9 @@ func (m *Model) refresh() {
 }
 
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if next, cmd, ok := m.handleActionMsg(msg); ok {
+		return next.settled(cmd)
+	}
 	if next, cmd, ok := m.handleResourceMsg(msg); ok {
 		return next.settled(cmd)
 	}
@@ -363,6 +372,12 @@ func (m Model) settled(cmd tea.Cmd) (tea.Model, tea.Cmd) {
 	for _, sync := range []func() tea.Cmd{m.syncResources, m.followAudit, m.followSecurity} {
 		if c := sync(); c != nil {
 			cmds = append(cmds, c)
+		}
+	}
+	if m.act.stage.beforeSend() {
+		m.anchorAction()
+		if stop := m.checkAction(); stop != nil {
+			cmds = append(cmds, stop)
 		}
 	}
 	if len(cmds) == 1 {
@@ -425,17 +440,27 @@ func (m Model) update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, nil
 	case tea.KeyPressMsg:
 		if msg.String() == "ctrl+c" {
-			return wake(!m.busy(), m, tea.Quit)
+			idle := !m.busy()
+			quit := m.leave()
+			return wake(idle, m, quit)
 		}
 		if m.layout.TooSmall {
-			return m, m.smallKey(msg)
+			cmd := m.smallKey(msg)
+			return m, cmd
 		}
 		idle := !m.busy()
 		next, cmd := m.routeKey(msg)
 		return wake(idle, next, cmd)
+	case tea.PasteMsg:
+		if m.act.stage != actionClosed {
+			return m, nil
+		}
 	case tea.MouseClickMsg, tea.MouseWheelMsg, tea.MouseMotionMsg:
 		if m.layout.TooSmall {
 			return m, nil
+		}
+		if m.act.stage != actionClosed {
+			return m.actionMouse(msg)
 		}
 		if _, motion := msg.(tea.MouseMotionMsg); motion && m.tree.visible && m.layout.TreeOverlay {
 			return m, nil
@@ -495,14 +520,14 @@ func (m *Model) suspendForSmall() {
 	m.urls = urlPicker{}
 }
 
-func (m Model) smallKey(msg tea.KeyPressMsg) tea.Cmd {
+func (m *Model) smallKey(msg tea.KeyPressMsg) tea.Cmd {
 	switch {
 	case key.Matches(msg, m.keys.Context):
 		return requestPick(pickContext, m.session.Generation)
 	case key.Matches(msg, m.keys.Namespace):
 		return requestPick(pickNamespace, m.session.Generation)
 	case msg.String() == "q":
-		return tea.Quit
+		return m.leave()
 	}
 	return nil
 }

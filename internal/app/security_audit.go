@@ -183,6 +183,10 @@ func auditAction(a guard.Action) string {
 		return "exec"
 	case guard.PortForward:
 		return "port-forward"
+	case guard.Cordon:
+		return "cordon"
+	case guard.Uncordon:
+		return "uncordon"
 	}
 	return "desconhecida"
 }

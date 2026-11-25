@@ -1,0 +1,24 @@
+ lazykube [RW] [AUDIT]  ◎ context demo namespace Todos   k8s demo     ⠋ ● live  
+  2 Dashboard |[3 Workloads]| 4 Nodes | 5 Security | 6 Events | 7 Radar         
+ Workloads                                                                      
+ ╭─ Deployments ──────────────────────────────────────────────────────────────╮ 
+ │                                                                            │ 
+ │ bilibili-raffle/bilibili-live                                        ● 1/1 │ 
+ │╭─ Escalar deployment/bilibili-live - resultado ───────────────────────────╮│ 
+ ││ Contexto: laboratorio | Namespace: bilibili-raffle | Geracao: 12         ││ 
+ ││ Recurso: apps/v1 deployments/bilibili-live                               ││ 
+ ││ UID: uid-bilibili-live | ResourceVersion: 42                             ││ 
+ ││                                                                          ││ 
+ ││ Servidor confirmou a acao, mas o registro final de auditoria falhou.     ││ 
+ ││ Novas acoes bloqueadas.                                                  ││ 
+ ││ Operacao: fixture-operation-01                                           ││ 
+ ││                                                                          ││ 
+ ││ [Fechar]  [Verificar por leitura]                                        ││ 
+ ││ Esc fecha | Tab foco | Enter controle focado                             ││ 
+ │╰──────────────────────────────────────────────────────────────────────────╯│ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ ╰────────────────────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────
+  tab  foco   enter  controle focado   esc  cancelar etapa    bubbletea · 0 fps 

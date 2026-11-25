@@ -118,6 +118,8 @@ func toPod(p *corev1.Pod, now time.Time) data.Pod {
 		Image:      image,
 		Controller: controller(p),
 		QoS:        string(p.Status.QOSClass),
+
+		ResourceVersion: p.ResourceVersion,
 	}
 }
 
@@ -159,6 +161,10 @@ func toNode(n *corev1.Node, pods int, memUsed int64, memKnown bool) data.Node {
 		Pods:        pods,
 		PodCapacity: int(alloc.Pods().Value()),
 		Arch:        n.Status.NodeInfo.Architecture,
+
+		UID:             string(n.UID),
+		ResourceVersion: n.ResourceVersion,
+		Unschedulable:   n.Spec.Unschedulable,
 	}
 	if memKnown {
 		out.MemUsed = formatBytes(memUsed)
@@ -179,6 +185,9 @@ func toDeployment(d *appsv1.Deployment) data.Deployment {
 		Name:      d.Name,
 		Ready:     int(d.Status.ReadyReplicas),
 		Desired:   desired,
+
+		UID:             string(d.UID),
+		ResourceVersion: d.ResourceVersion,
 	}
 }
 

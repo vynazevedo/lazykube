@@ -1,0 +1,40 @@
+ lazykube [RW: --read-write]  v2.0   ◎ context demo namespace Todos   k8s demo  nodes 1  ns 8          ⠋ metrics every 5s ● live  
+  2 Dashboard  | [3 Workloads] |  4 Nodes  |  5 Security  |  6 Events  |  7 Radar                                         m menu  
+ Workloads                                                                                                                        
+ ╭─ Pods ─────────────────────────────────────────────────────────────╮ ╭─ Preview ─────────────────────────────────────────────╮ 
+ │                                                                    │ │  Log   Config   Top   Describe   Events   Security    │ 
+ │ / filter pods…                                            13 items │ │ ───────────────────────────────────────────────────── │ 
+ │                                                                    │ │ ● bilibili-live-7f6b8d9c5-mn4tz             [Running] │ 
+ │   NAME                          NAMESPACE    RST   SEC CPU/STATUS  │ │   bilibili-raffle · Running · ready 2/2 · node demo-… │ 
+ │ ● bilibili-raffle-5d8f9c7b4-x2… bilibili-r…    0  75 C █░░░░░░     │ │                                                       │ 
+ │ ● bilibili-live-7f6b8d9c5-mn4tz bilibili-r…    2  20 F ████░░░     │ │ CPU 12m req 10m · lim 50m    streamline · braille 2×4 │ 
+ │ ● lgo-7c5d╭─ Excluir deployment/bilibili-live - preview validado ────────────────────────────────────────────────╮           │ 
+ │ ● psql-6bc│ Contexto: laboratorio | Namespace: bilibili-raffle | Geracao: 12                                     │       ⡄   │ 
+ │ ● odoo-757│ Recurso: apps/v1 deployments/bilibili-live                                                           │──────⢰⣿── │ 
+ │ ○ qiandao-│ UID: uid-bilibili-live | ResourceVersion: 42                                                         │equest 10m │ 
+ │ ○ lingqu-1│                                                                                                      │╌⢰⣽⣶⣾⣿⣿⣿⣿⣿ │ 
+ │ ⠋ lingqu-1│ Excluir deployments/bilibili-live. Esta acao nao pode ser desfeita pela TUI.                         │⣠⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● coredns-│ Propagacao: Background. Prazo de encerramento solicitado: 45s. Finalizers podem adiar a remocao.     │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● metrics-│ Politica: RW por --read-write; contexto nao protegido                                                │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● traefik-│ SSAR: get deployments e delete deployments                                                           │⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿ │ 
+ │ ● local-pa│ Dry-run server-side aprovado.                                                                        │────────── │ 
+ │ ● svclb-tr│ Preview valido por 120s. Alterar parametros exige nova validacao.                                    │           │ 
+ │           │ ID: fixture-scal | expira: 2026-11-25 15:02:00 UTC                                                   │─────────╮ │ 
+ │           │ Nenhuma alteracao real foi enviada.                                                                  │↑4.6 kB… │ │ 
+ │           │                                                                                                      │▆▁▆▆▄▆▁▃ │ │ 
+ ╰───────────│ > Digite exatamente bilibili-live para confirmar: [_]                                                │▅▄▃▇▃█▃▆ │ │ 
+ ╭─ Deploymen│                                                                                                      │─────────╯ │ 
+ │           │ [Cancelar]  [Voltar aos parametros]  [Confirmar exclusao]                                            │           │ 
+ │ bilibili-r│ Tab foco | Enter controle focado | Esc cancelar                                                      │iewport ─╮ │ 
+ │ bilibili-r╰──────────────────────────────────────────────────────────────────────────────────────────────────────╯latency… │ │ 
+ │ ys-odoo/psql                                                 ● 1/1 │ │ │ 20:14:15  WARN  rate limited by upstream, backof… │ │ 
+ │ ys-odoo/odoo                                                 ● 1/1 │ │ │ 20:14:18  DEBUG heartbeat ok rtt=39ms             │ │ 
+ │ lgo/lgo                                                      ● 1/1 │ │ │ 20:14:21  INFO  danmaku batch received count=51   │ │ 
+ │ kube-system/coredns                                          ● 1/1 │ │ │ 20:14:24  INFO  raffle detected id=883117 type=g… │ │ 
+ │ kube-system/metrics-server                                   ● 1/1 │ │ │ 20:14:27  ERROR join raffle failed id=883117: al… │ │ 
+ │ kube-system/traefik                                          ● 1/1 │ │ │ 20:14:30  INFO  reconnecting ws in 1s             │ │ 
+ │                                                                    │ │ │ 20:14:33  INFO  ws connected room=21452505 shard… │ │ 
+ │                                                                    │ │ ╰───────────────────────────────────────────────────╯ │ 
+ ╰────────────────────────────────────────────────────────────────────╯ ╰───────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  tab  foco   enter  controle focado   esc  cancelar etapa                                                      bubbletea · 0 fps 

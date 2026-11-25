@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"errors"
+	"slices"
 	"sync"
 
 	tea "charm.land/bubbletea/v2"
@@ -45,6 +46,9 @@ type Root struct {
 	pick      *picker
 	catalogs  uint64
 	w, h      int
+	late      []actionDone
+
+	unresolved []operation
 }
 
 type catalogMsg struct {
@@ -151,6 +155,10 @@ func (r Root) begin(t data.Target) (tea.Model, tea.Cmd) {
 	if m, ok := r.model(); ok {
 		opts.Palette = m.pal
 		opts.ShowTree = m.tree.visible
+		r.late = append(slices.Clone(r.late), m.act.late...)
+		if p, ok := m.sending(); ok {
+			r.unresolved = append(slices.Clone(r.unresolved), p)
+		}
 		m.releaseResources()
 	}
 	var prev *data.Target
@@ -231,6 +239,12 @@ func (r Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if !r.attemptLive(msg.attempt) {
 			return r, nil
 		}
+	case actionDoneMsg:
+		r.resolve(msg.done)
+		if m, ok := r.model(); !ok || m.session.Generation != msg.done.session {
+			r.late = append(slices.Clone(r.late), msg.done)
+			return r.deliverLate(nil)
+		}
 	case tea.KeyPressMsg:
 		if r.pick != nil && msg.String() != "ctrl+c" {
 			return r.pickKey(msg)
@@ -257,7 +271,20 @@ func (r Root) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	r.cur = next
 	if _, ok := msg.(connectedMsg); ok {
 		r.publish()
+		return r.deliverLate(cmd)
 	}
+	return r, cmd
+}
+
+func (r Root) deliverLate(cmd tea.Cmd) (tea.Model, tea.Cmd) {
+	if _, ok := r.model(); !ok || r.published != r.attempt {
+		return r, cmd
+	}
+	for _, d := range r.late {
+		next, c := r.cur.Update(actionLateMsg{done: d})
+		r.cur, cmd = next, tea.Batch(cmd, c)
+	}
+	r.late = nil
 	return r, cmd
 }
 

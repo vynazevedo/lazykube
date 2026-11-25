@@ -84,6 +84,9 @@ func NodeSummaryLines(st NodeSummaryState) []draw.Line {
 	if cov.Reason != "" {
 		lines = append(lines, draw.Line{muted("  "), text(draw.Sanitize(cov.Reason))})
 	}
+	if st.Node != nil && st.Node.Unschedulable {
+		lines = append(lines, draw.Line{muted("Agendamento: "), colored("impedido (cordon)", theme.Warn)})
+	}
 	return append(lines, []draw.Line{
 		{muted("Ready: "), colored(ready, readyColor)},
 		{muted("CPU: "), text(st.cpu())},

@@ -11,6 +11,8 @@ func SupportsAction(action Action, target Target) bool {
 			return action == Delete || action == Edit || action == Exec || action == PortForward
 		case "configmaps", "services":
 			return action == Edit
+		case "nodes":
+			return action == Cordon || action == Uncordon
 		}
 	case "apps":
 		switch target.Resource {
