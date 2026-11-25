@@ -48,7 +48,7 @@ elegância quando falta permissão ou metrics-server.
  ║                 O F  C O N T E N T S                  ║
  ╠═══════════════════════════════════════════════════════╣
  ║                                                       ║
- ║  [0x01] .... Instalação                            ║
+ ║  [0x01] .... Instalação                               ║
  ║  [0x02] .... Uso                                      ║
  ║  [0x03] .... Layout                                   ║
  ║  [0x04] .... Atalhos                                  ║
@@ -245,10 +245,13 @@ Sem audit confiável não há ação, e a recusa acontece antes de qualquer cham
 `--audit-file` aponta um caminho absoluto para o audit privado. A tela de ação e a aba
 Audit da Security mostram o motivo fixo da regra.
 
+Sem `--audit-file`, o audit fica em `$XDG_STATE_HOME/lazykube/audit.jsonl` ou, sem
+essa variável, em `~/.local/state/lazykube/audit.jsonl`.
+
 | Plataforma | Ações |
 | --- | --- |
-| Linux, audit em disco local | liberadas com `--read-write` |
-| Linux, link do usuário, escrita de grupo ou de outros sem sticky, NFS, CIFS, 9p ou FUSE | bloqueadas; corrija o caminho ou use `--audit-file` |
+| Linux e WSL2, audit verificado em disco local (ext4, xfs, btrfs, tmpfs e afins) | liberadas com `--read-write` |
+| Linux e WSL2, caminho com link do usuário, escrita de grupo ou de outros sem sticky, NFS, CIFS, 9p (como `/mnt/c` no WSL2) ou FUSE | bloqueadas; corrija o caminho ou use `--audit-file` |
 | macOS e Windows | bloqueadas nesta versão; `--audit-file` não muda isso |
 
 O contrato completo está em [Guardrails](internal/guard/README.md).
@@ -264,18 +267,18 @@ as ações planejadas para a 1.0 ou prometer vantagem de desempenho.
 | --- | --- | --- | --- |
 | Interface | TUI no terminal | TUI no terminal | Aplicativo gráfico |
 | Pods, deployments e logs | Visualização no terminal | Navegação de recursos e logs | Visualização de workloads e logs |
-| Alterar recursos | Scale, restart, delete e cordon com `--read-write` | Operações de gestão; modo `--readonly` disponível | Edição disponível conforme RBAC |
+| Alterar recursos | Scale, restart, delete, cordon e uncordon, só com `--read-write`, audit verificado e contexto não protegido | Operações de gestão; modo `--readonly` disponível | Edição disponível conforme RBAC |
 | Foco | Inspeção, diagnóstico e contexto em uma tela | Gestão de recursos pelo terminal | Gestão por interface gráfica |
 
 Fontes: [k9s](https://k9scli.io/),
 [modo somente leitura do k9s](https://k9scli.io/topics/commands/),
 [pods no Lens](https://docs.lenshq.io/k8slens/using-lens/workloads/pods/).
-Não há benchmark comparativo neste repositório. Exec, port-forward e edição
-planejados para a 1.0 dependem de implementação e validação próprias.
+Não há benchmark comparativo neste repositório. Exec, port-forward, edição,
+drain, rollback, HPA e visão de capacidade não existem nesta versão.
 
-## Matriz de suporte da 1.0
+## Matriz de suporte
 
-A matriz alvo é Kubernetes 1.34 a 1.36. O CI usa envtest para validar conexão,
+A matriz alvo da 1.0 é Kubernetes 1.34 a 1.36. O CI usa envtest para validar conexão,
 leitura de pods/deployments/events, alternância entre dois servidores isolados e as
 ações de scale, restart, delete, cordon e uncordon pelo executor.
 
@@ -307,6 +310,10 @@ a cobertura; sua ausência deve resultar em degradação explícita da funcional
  │  lazykube --fps 30               # quadros por segundo (1 a 60)      │
  │  lazykube --no-anim              # desliga animações                 │
  │  lazykube --demo                 # dados sintéticos determinísticos  │
+ │  lazykube --read-write           # libera ações nesta execução       │
+ │  lazykube --protected-contexts a # bloqueia ações nesses contextos   │
+ │  lazykube --read-only-contexts b # força leitura nesses contextos    │
+ │  lazykube --audit-file /abs/f    # audit das ações, caminho absoluto │
  │  lazykube --version              # versão e commit do build          │
  │  lazykube --help                 # ajuda com todas as flags          │
  │                                                                      │
@@ -392,8 +399,8 @@ ação ainda não enviada é cancelada.
 
 `u` abre o seletor de URLs: mostra a URL escolhida inteira, quebrada em linhas e
 com o host em destaque, e `enter` copia exatamente esse texto; se ela não couber
-no terminal, a cópia é recusada. `y` continua copiando nome, YAML ou linha de
-log. Só vira link clicável (OSC8) a
+no terminal, a cópia é recusada. A URL só é copiada por esse seletor; `y` nunca
+copia URL (veja [Atalhos](#0x04-atalhos)). Só vira link clicável (OSC8) a
 URL http ou https com host ASCII validado, sem credencial, controle ou bidi, e
 visível por inteiro na linha; endereços internos do cluster podem ser copiados,
 mas não são links. O lazykube nunca abre navegador nem executa comando externo.
@@ -432,20 +439,24 @@ os painéis: clique seleciona, a roda rola e o clique na aba troca de aba.
  │                                                       │
  │  ↑ ↓  /  k j       move a seleção                     │
  │  tab / shift+tab   próximo / anterior painel          │
- │  /                 filtra pods (nome e namespace)     │
- │  enter             filtra pods pelo namespace         │
+ │  /                 filtra pods ou a lista da tela     │
+ │  enter             abre detalhe; Namespaces filtra    │
  │  espaço            marca namespaces, vários de uma vez│
  │  esc               limpa filtros e marcas             │
  │  1                 mostra / esconde coluna esquerda   │
  │  c                 troca de contexto do kubeconfig    │
  │  n                 namespace; Todos só se escolhido   │
  │  b                 árvore de navegação lateral        │
- │  2 3 4             Dashboard, Workloads, Nodes       │
- │  5 6 7             Security, Events, Radar           │
+ │  2 3 4             Dashboard, Workloads, Nodes        │
+ │  5 6 7             Security, Events, Radar            │
+ │  m  ←  →           menu de telas                      │
+ │  r                 relê a lista da tela               │
  │                                                       │
  ├─ DETALHES ────────────────────────────────────────────┤
  │                                                       │
  │  l  t  d  e        Log, Top, Describe, Events         │
+ │  S                 aba Security do pod                │
+ │  C  P              container do log, logs anteriores  │
  │  [  ]              aba anterior / próxima, Config     │
  │  /  alt+n  N       busca no Log; botão [Próxima]      │
  │  f                 liga / desliga follow dos logs     │
@@ -455,9 +466,10 @@ os painéis: clique seleciona, a roda rola e o clique na aba troca de aba.
  │                                                       │
  ├─ GERAL ───────────────────────────────────────────────┤
  │                                                       │
- │  y                 copia nome, YAML ou linha do log   │
+ │  y                 copia o item em foco (ver abaixo)  │
  │  u                 escolhe e copia URL da seção Acesso│
  │  o                 ações do alvo em foco              │
+ │  A                 reconhece os alertas da Security   │
  │  p                 troca a paleta de cores            │
  │  ctrl+p            pausa / retoma animações           │
  │  ?                 ajuda                              │
@@ -467,9 +479,22 @@ os painéis: clique seleciona, a roda rola e o clique na aba troca de aba.
 ```
 
 A tecla `y` copia para a área de transferência via OSC52, sem dependência do
-sistema: nas listas vai o nome do recurso (`namespace/nome` quando houver
-namespace), no detalhe e no manifest vai o YAML inteiro, e no Log vai a linha do
-match atual da busca ou a última linha visível. O rodapé mostra
+sistema. O que vai depende da tela:
+
+| Tela | `y` copia |
+| --- | --- |
+| Pods, Deployments e Namespaces do Dashboard | `namespace/nome` do pod ou deployment, ou o nome do namespace |
+| Listas de Workloads e de Network | `namespace/nome` da linha (só o nome em recurso de cluster) |
+| Detalhe de recurso (Service, Ingress, workload) | `namespace/nome` do objeto aberto, nunca o YAML |
+| Detalhe do pod e painel de detalhes, abas Describe, Config, Top, Events e Security | o YAML inteiro do pod, quando já lido |
+| Aba Log | a linha do match atual da busca ou a última linha visível |
+| Events | `namespace/objeto`; com o evento aberto para leitura, a mensagem |
+| Radar | `namespace/nome` da entidade do sinal |
+| Security, aba Workloads | `namespace/nome` do workload; nas demais abas, inclusive Audit, nada |
+
+Nome com caractere de controle não é copiado no Radar nem na Security. A URL da
+seção Acesso só sai pelo seletor de `u`. Sem item, o rodapé diz `nada para copiar`.
+O rodapé mostra
 `enviado ao clipboard: ...`, já que o OSC52 não confirma a cópia. Conteúdo cujo
 payload em base64 passe de 100000 bytes (cerca de 73 KiB de texto) é recusado
 inteiro, sem truncar, com o aviso `grande demais para copiar`; o teto cabe no
@@ -488,7 +513,10 @@ e, enquanto a janela enche, o painel mostra `coletando 12/60`.
  RECURSO                         USO                        SEM PERMISSÃO
  ───────                         ───                        ─────────────
  pods, deployments (list/watch)  base da interface          não inicia
+ pods/log (get)                  aba Log                    erro do servidor na aba
  events (list/watch)             aba Events                 aviso na aba
+ statefulsets, daemonsets, jobs, Workloads                  motivo na tela
+   cronjobs, replicasets (list/watch)
  namespaces (list/watch)         painel Namespaces          deriva dos pods
  nodes (list/watch)              painel Node                contagem pelos pods
  services (list/watch)           Network e Acesso           motivo na tela
@@ -499,7 +527,14 @@ e, enquanto a janela enche, o painel mostra `coletando 12/60`.
  httproutes (list/watch)         Network, se servido        motivo na tela
  metrics.k8s.io pods, nodes      CPU, memória, heatmap      motivo no painel
  nodes/proxy (get)               rede RX/TX                 motivo no card
+ selfsubjectaccessreviews        ações: confere cada verbo  ação recusada
+   (create)
+ alvo da ação (get e o verbo:    ações com --read-write     ação recusada
+   delete, update scale, patch)
 ```
+
+Com o audit verificado, a ação lê o alvo, confere leitura e escrita exatas com
+SelfSubjectAccessReview e só então roda o dry-run; sem audit, nada disso é enviado.
 
 Os recursos de Network só são lidos com a tela, o detalhe ou a seção Acesso
 abertos, no namespace do alvo quando há um, e a assinatura é liberada ao sair.
@@ -518,13 +553,18 @@ Quando algo falta, o painel diz o motivo em vez de ficar vazio, por exemplo
 lazykube/
 ├── cmd/lazykube/        # entrada, flags e conexao
 ├── internal/
-│   ├── app/             # modelo Bubble Tea, layout, teclas, mouse, loading
-│   ├── ui/              # painéis: node, pods, heatmap, detalhes, loading
-│   ├── kube/            # informers, logs, metrics-server e kubelet stats
+│   ├── app/             # modelo Bubble Tea, telas, teclas, mouse, loading
+│   ├── ui/              # painéis, cabeçalho, diálogos e ajuda
+│   ├── kube/            # informers, listas dinâmicas, logs, métricas e ações
 │   ├── data/            # contrato de dados e fonte demo
-│   ├── draw/            # canvas, braille, larguras de grafema
+│   ├── guard/           # política, executor e audit das ações
+│   ├── insight/         # motor de sinais do Radar
+│   ├── netpath/         # seção Acesso e diagnóstico de rota, sem rede
+│   ├── weburl/          # validação de URL para cópia e link OSC8
+│   ├── draw/            # canvas, braille, larguras de grafema, selo de links
 │   ├── anim/            # relógio, springs e fades
-│   └── theme/           # paletas e gradientes
+│   ├── theme/           # paletas e gradientes
+│   └── testversion/     # versão fixa usada pelos goldens
 └── assets/              # imagens do README
 ```
 
@@ -538,7 +578,8 @@ lazykube/
  Linux (amd64)       testado
  WSL2 (Ubuntu)       testado
  Linux (arm64)       não testado
- macOS               não testado
+ macOS               não testado; ações bloqueadas
+ Windows             não testado; ações bloqueadas
 ```
 
 O acesso ao cluster usa `client-go` v0.36 e funciona com qualquer
