@@ -378,6 +378,7 @@ func FullHelpEvents(full bool) []KeyHelp {
 		KeyHelp{"3", "Workloads screen"},
 		KeyHelp{"4", "Nodes screen"},
 		KeyHelp{"6", "Events screen"},
+		KeyHelp{"7", "Radar screen"},
 		KeyHelp{"c n", "switch context / namespace"},
 		KeyHelp{"b", "navigation tree"},
 		KeyHelp{"A", "ack all Security alerts"},

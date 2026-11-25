@@ -1,5 +1,5 @@
  lazykube [DEMO] [RO]  ◎ context demo namespace Todos   k8s demo  nodes 1  ns 8  pods 13  ⠙ ● live  
- [2 Dashboard] |  3 Workloads  |  4 Nodes  |  6 Events                                      m menu  
+ [2 Dashboard] |  3 Workloads  |  4 Nodes  |  6 Events  |  7 Radar                          m menu  
  Dashboard                                                                                          
  ╭─ Pods · focus ─────────────────────────────────────────────────────────────────────────────────╮ 
  │                                                                                                │ 

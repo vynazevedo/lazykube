@@ -118,7 +118,7 @@ func TestEventsActivation(t *testing.T) {
 	if back := press(t, m, "esc"); !back.onScreen(ScreenDashboard) || back.nav.Depth() != 0 {
 		t.Fatal("esc returns to the dashboard")
 	}
-	if menu := press(t, demoModel(t, 160, 48), "m", "end", "enter"); !menu.onScreen(ScreenEvents) {
+	if menu := press(t, demoModel(t, 160, 48), "m", "end", "left", "enter"); !menu.onScreen(ScreenEvents) {
 		t.Fatal("the menu activates Events")
 	}
 	if menu := press(t, demoModel(t, 160, 48), "m", "6"); !menu.onScreen(ScreenEvents) || menu.menu.open {

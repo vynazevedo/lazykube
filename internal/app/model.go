@@ -83,6 +83,7 @@ type Model struct {
 	events   data.EventFeed
 	dg       diagState
 	ev       eventsView
+	radar    radarState
 	wideFeed bool
 
 	workloadsLeaf DestinationID
@@ -161,6 +162,7 @@ func New(opts Options) Model {
 		}
 		m.tree.cursor = DestDashboard
 	}
+	m.radar = newRadar(opts.Source, now)
 	m.snap = m.src.Snapshot()
 	m.loadSecurity()
 	if opts.InitialPod >= 0 && opts.InitialPod < len(m.snap.Pods) {
@@ -169,12 +171,15 @@ func New(opts Options) Model {
 		m.selName = m.snap.Pods[0].Key()
 	}
 	m.refresh()
+	if !m.radar.live {
+		m.syncRadar()
+	}
 	m.snapMotion()
 	return m
 }
 
 func (m Model) Init() tea.Cmd {
-	return tea.Batch(m.scheduleTick(), m.waitData(), m.screen().Init(m))
+	return tea.Batch(m.scheduleTick(), m.waitData(), m.screen().Init(m), m.radarInit())
 }
 
 func (m Model) waitData() tea.Cmd {
@@ -220,6 +225,8 @@ func (m *Model) screenLayout() func(w, h int) Layout {
 		return ComputeNodes
 	case m.onScreen(ScreenEvents):
 		return ComputeEvents
+	case m.onScreen(ScreenRadar):
+		return ComputeRadar
 	case m.onScreen(ScreenResources), m.onScreen(ScreenOverview):
 		return ComputeTable
 	}
@@ -267,6 +274,12 @@ func (m *Model) applyCompact() {
 		} else {
 			l.Message = Rect{}
 		}
+	case m.onScreen(ScreenRadar):
+		if m.focus == FocusDetails {
+			l.Events = Rect{}
+		} else {
+			l.Message = Rect{}
+		}
 	case m.onScreen(ScreenNodes):
 		if m.focus == FocusDetails {
 			l.keepOnly(&l.Node)
@@ -287,8 +300,11 @@ func (m *Model) heatCols() int {
 }
 
 func (m *Model) refresh() {
-	if demo, ok := m.src.(*data.Demo); ok && demo.AdvanceSecurity(m.clock.T) {
-		m.loadSecurity()
+	if demo, ok := m.src.(*data.Demo); ok {
+		if demo.AdvanceSecurity(m.clock.T) {
+			m.loadSecurity()
+		}
+		demo.AdvanceObservations(m.clock.T)
 	}
 	m.refreshSecurity()
 	m.metrics = m.src.Metrics(m.clock.T, m.activeName(), m.heatCols())
@@ -327,6 +343,9 @@ func (m Model) withResources(cmd tea.Cmd) (tea.Model, tea.Cmd) {
 }
 
 func (m Model) update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if next, cmd, ok := m.updateRadar(msg); ok {
+		return next, cmd
+	}
 	switch msg := msg.(type) {
 	case noticeExpiredMsg:
 		m.expireNotice(msg)
@@ -336,7 +355,7 @@ func (m Model) update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, nil
 		}
 		m.reload()
-		return m, m.waitData()
+		return m, tea.Batch(m.waitData(), m.radarCmd())
 	case frameMsg:
 		if msg.session != m.session.Generation || msg.gen != m.gen || !m.running() {
 			return m, nil

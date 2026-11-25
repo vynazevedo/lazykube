@@ -28,6 +28,7 @@ type Demo struct {
 	pods      []demoPod
 	context   string
 	namespace string
+	obs       *demoObservations
 }
 
 const DemoContext = "demo"

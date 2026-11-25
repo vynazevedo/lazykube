@@ -10,10 +10,10 @@ func TestDestinationRegistryIsValid(t *testing.T) {
 	if _, err := newRegistry(buildDestinations()); err != nil {
 		t.Fatal(err)
 	}
-	if got := registeredScreens(); !reflect.DeepEqual(got, []ScreenID{ScreenDashboard, ScreenWorkloads, ScreenNodes, ScreenEvents}) {
+	if got := registeredScreens(); !reflect.DeepEqual(got, []ScreenID{ScreenDashboard, ScreenWorkloads, ScreenNodes, ScreenEvents, ScreenRadar}) {
 		t.Fatalf("the bar keeps the screens of the base: %v", got)
 	}
-	for id, key := range map[ScreenID]string{ScreenDashboard: "2", ScreenWorkloads: "3", ScreenNodes: "4", ScreenEvents: "6", ScreenPodDetail: ""} {
+	for id, key := range map[ScreenID]string{ScreenDashboard: "2", ScreenWorkloads: "3", ScreenNodes: "4", ScreenEvents: "6", ScreenRadar: "7", ScreenPodDetail: ""} {
 		if menuKey(id) != key {
 			t.Fatalf("screen %d shortcut %q, want %q", id, menuKey(id), key)
 		}
@@ -28,13 +28,16 @@ func TestDestinationRegistryIsValid(t *testing.T) {
 			}
 		}
 	}
-	for reserved, id := range map[string]DestinationID{"5": DestSecurity, "7": DestRadar} {
+	for reserved, id := range map[string]DestinationID{"5": DestSecurity} {
 		if _, ok := registry.shortcut(reserved); ok {
 			t.Fatalf("%s stays reserved until its screen exists", reserved)
 		}
 		if d, _ := registry.get(id); d.Reserved != reserved || d.Availability != AvailPlanned || d.Parent != "" {
 			t.Fatalf("%s reserves %s as a root destination", id, reserved)
 		}
+	}
+	if d, ok := registry.shortcut("7"); !ok || d.ID != DestRadar || !d.ready() || d.Parent != "" || d.Reserved != "" {
+		t.Fatalf("7 activates Radar as a ready root destination: %+v", d)
 	}
 	first := registry.Children("")
 	labels := make([]string, len(first))

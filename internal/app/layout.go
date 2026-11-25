@@ -61,6 +61,7 @@ type Layout struct {
 	Table       Rect
 	Events      Rect
 	Message     Rect
+	Coverage    Rect
 	DividerY    int
 	FooterY     int
 }
@@ -201,6 +202,32 @@ func ComputeEvents(w, h int) Layout {
 	return l
 }
 
+func ComputeRadar(w, h int) Layout {
+	if l, done := compactLayout(w, h); done {
+		if l.Compact {
+			b := l.Body
+			l.Scope = Rect{X: b.X, Y: b.Y, W: b.W, H: compactScope}
+			l.Coverage = Rect{X: b.X, Y: b.Y + b.H - compactScope, W: b.W, H: compactScope}
+			l.Events = Rect{X: b.X, Y: b.Y + compactScope, W: b.W, H: b.H - 2*compactScope}
+			l.Message = l.Events
+		}
+		return l
+	}
+	l := Layout{W: w, H: h}
+	l.shell(w, h)
+	b := l.Body
+	summary, coverage, list := 5, 4, 38
+	if w >= wideThreshold {
+		list = 46
+	}
+	mid := b.H - summary - coverage
+	l.Scope = Rect{X: b.X, Y: b.Y, W: b.W, H: summary}
+	l.Events = Rect{X: b.X, Y: b.Y + summary, W: list, H: mid}
+	l.Message = Rect{X: b.X + list + 1, Y: b.Y + summary, W: b.W - list - 1, H: mid}
+	l.Coverage = Rect{X: b.X, Y: b.Y + b.H - coverage, W: b.W, H: coverage}
+	return l
+}
+
 func ComputeTable(w, h int) Layout {
 	if l, done := compactLayout(w, h); done {
 		l.Table = l.Body
@@ -278,7 +305,7 @@ func (l *Layout) keepOnly(keep *Rect) {
 
 func (l *Layout) dock(w, h, tw int) {
 	dx := tw + 1
-	for _, r := range []*Rect{&l.Body, &l.Node, &l.Namespaces, &l.Deployments, &l.Pods, &l.Heatmap, &l.Details, &l.Scope, &l.Table, &l.Events, &l.Message} {
+	for _, r := range []*Rect{&l.Body, &l.Node, &l.Namespaces, &l.Deployments, &l.Pods, &l.Heatmap, &l.Details, &l.Scope, &l.Table, &l.Events, &l.Message, &l.Coverage} {
 		if !r.Empty() {
 			r.X += dx
 		}

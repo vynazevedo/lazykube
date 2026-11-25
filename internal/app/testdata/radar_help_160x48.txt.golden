@@ -1,0 +1,48 @@
+ lazykube [DEMO] [RO]  v2.0   ◎ context demo namespace Todos   k8s demo  nodes 1  ns 8  pods 13  uptime 119d                         ⠙ metrics every 5s ● live  
+  2 Dashboard  |  3 Workloads  |  4 Nodes  |  6 Events  | [7 Radar]                                                                                     m menu  
+ Radar                                                                                                                                                          
+ ╭─ Radar ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ │ Sinais ativos: 4 (High 1, Warning 3) | recuperando 0 | observando 0 | suspensos 0 | resolvidos 1 | normais 81                                              │ 
+ │ Saúde: indisponível - o motor ainda não publica a fórmula; nenhum número é estimado aqui.                                                                  │ 
+ │ Cada linha é um sinal por pod/container, não um incidente correlacionado. Ack e silêncio ainda não existem.                                                │ 
+ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+ ╭─ Sinais · focus ───────────────────────────╮ ╭─ Evidências do sinal ───────────────────────────────────────────────────────────────────────────────────────╮ 
+ │   EST  SINAL     POD/CONTAINER       DESDE │ │ Sinal: CrashLoop | regra v1                                                                                 │ 
+ │ > High CrashLoop svclb-traefik-8c2f… 20:15 │ │ Alvo: Pod kube-system/svclb-traefik-8c2f1-6n2vb                                                             │ 
+ │   Warn ImagePull local-path-provisi… 20:15 │ │ Container: lb-tcp-80 (regular)                                                                              │ 
+ │   Warn Pending   lingqu-1605489600-… 20:15 │ │ Estado: ativo | severidade High | pico High                                                                 │ 
+ │   Warn Pending   local-path-provisi… 20:15 │ │ Preexistente: sim (já presente na primeira observação desta sessão)                                         │ 
+ │   res. OOMKilled odoo-7575bf6d8-9wj… 20:15 │ │ Primeira observação: 20:15:00 | última: 20:21:40                                                            │ 
+ │                                            │ │                                                                                                             │ 
+ │                                            │ │ EVIDÊNCIAS                                                                                                  │ 
+ │                                 ╭─ Help ────────────────────────────────────────────────────────────────────────────────╮                                  │ 
+ │                                 │                                                                                       │                                  │ 
+ │                                 │  ↑/↓ k/j    move selection                 6          Events screen                   │                                  │ 
+ │                                 │  pgup/pgdn  scroll evidence                7          Radar screen                    │                                  │ 
+ │                                 │  home/end   first / last signal            c n        switch context / namespace      │                                  │ 
+ │                                 │  enter      open pod of the signal         A          ack all Security alerts         │                                  │ 
+ │                                 │  esc        back                           p          cycle palette                   │                                  │ 
+ │                                 │  m          screens menu ← → enter         ctrl+p     pause animations                │                                  │ 
+ │                                 │  2          Dashboard screen               ?          toggle help                     │                                  │ 
+ │                                 │  3          Workloads screen               q ctrl+c   quit                            │                                  │ 
+ │                                 │  4          Nodes screen                                                              │                                  │ 
+ │                                 │                                                                                       │                                  │ 
+ │                                 ╰───────────────────────────────────────────────────────────────────────────────────────╯                                  │ 
+ │                                            │ │                                                                                                             │ 
+ │                                            │ │                                                                                                             │ 
+ │                                            │ │                                                                                                             │ 
+ │                                            │ │                                                                                                             │ 
+ │                                            │ │                                                                                                             │ 
+ │                                            │ │                                                                                                             │ 
+ │                                            │ │                                                                                                             │ 
+ │                                            │ │                                                                                                             │ 
+ │                                            │ │                                                                                                             │ 
+ │                                            │ │                                                                                                             │ 
+ │ 5 sinais · High/Warn ativos, rec. obs. su… │ │                                                                                                             │ 
+ ╰────────────────────────────────────────────╯ ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+ ╭─ Cobertura ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ │ Cobertura: inventário de pods completa 13/13 | eventos, owners, nodes e métricas: ainda não consumidos pelo Radar                                          │ 
+ │ Rede indisponível; nodes/proxy não é utilizado. Histórico limitado a esta sessão.                                                                          │ 
+ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   enter  open pod   esc  back   m  menu   ?  help   q  quit                                                                        bubbletea · 0 fps 
