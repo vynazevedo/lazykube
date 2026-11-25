@@ -11,7 +11,7 @@
  ╭─ Audit local (9) ──────────────────────╮ ╭─ Registro ────────────────────────────────────────────────────────────────────────╮ 
  │ CONTEXTO    HORA      RESULTADO        │ │ Horário       2026-10-22 12:08:00Z                                                │ 
  │ prod        12:08:00Z outcome_unknown… │ │ Contexto      prod                                                                │ 
- │ dev         12:07:00Z read_only scale  │ │ Sessão        session-1                                                           │ 
+ │ dev         12:07:00Z read_only scale  │ │ Sessão        session-1-0123456789abcdef0123456789abcdef                          │ 
  │ dev         12:06:00Z read_only scale  │ │ Ação          scale                                                               │ 
  │ prod        12:05:00Z read_only scale  │ │ Alvo          apps/deployments.apps/api uid u-1                                   │ 
  │ dev         12:04:00Z read_only scale  │ │ Fase          result                                                              │ 

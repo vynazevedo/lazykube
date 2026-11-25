@@ -161,7 +161,7 @@ func (m Model) auditContext() string {
 
 func (m Model) auditOwn(e guard.AuditEvent) bool {
 	s := m.session
-	return s.Identity != "" && e.Identity == s.Identity && e.Context == m.auditContext() && !e.Timestamp.Before(m.started)
+	return guard.UniqueSessionIdentity(s.Identity) && e.Identity == s.Identity && e.Context == m.auditContext() && !e.Timestamp.Before(m.started)
 }
 
 func auditAction(a guard.Action) string {

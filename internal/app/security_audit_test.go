@@ -17,6 +17,11 @@ import (
 	"github.com/vynazevedo/lazykube/internal/ui"
 )
 
+const (
+	auditSelf  = "session-1-0123456789abcdef0123456789abcdef"
+	auditOther = "session-1-fedcba9876543210fedcba9876543210"
+)
+
 type auditSource struct {
 	*data.Demo
 	path string
@@ -43,7 +48,7 @@ func auditFixture(t *testing.T, n int) string {
 		if i%3 == 2 {
 			ctx = "prod"
 		}
-		e := guard.AuditEvent{SchemaVersion: 1, Timestamp: at.Add(time.Duration(i) * time.Minute), OperationID: fmt.Sprintf("op-%03d", i), Phase: "result", Action: guard.Scale, Context: ctx, Identity: "session-1", Namespace: "apps", Group: "apps", Resource: "deployments", Name: "api", UID: "u-1", ReadOnly: true, Outcome: guard.ReadOnly}
+		e := guard.AuditEvent{SchemaVersion: 1, Timestamp: at.Add(time.Duration(i) * time.Minute), OperationID: fmt.Sprintf("op-%03d", i), Phase: "result", Action: guard.Scale, Context: ctx, Identity: auditSelf, Namespace: "apps", Group: "apps", Resource: "deployments", Name: "api", UID: "u-1", ReadOnly: true, Outcome: guard.ReadOnly}
 		if i == n-1 {
 			e.Outcome = guard.Unknown
 		}
@@ -111,7 +116,7 @@ func step(t *testing.T, m Model, keys ...string) Model {
 func auditModel(t *testing.T, path string, w, h int) Model {
 	t.Helper()
 	m := nodeModel(t, auditSource{Demo: data.NewDemo(), path: path}, w, h)
-	m.session.Identity = "session-1"
+	m.session.Identity = auditSelf
 	return step(t, m, "5", "[")
 }
 
@@ -125,7 +130,7 @@ func TestSecurityAuditTabReadsLocalAudit(t *testing.T) {
 		t.Fatalf("only the current context by default, newest first: %d %+v", len(rows), rows[0])
 	}
 	plain := m.Render().Plain()
-	for _, want := range []string{"Audit local (6)", "Ocultos de outras sessões: 3", "[Mostrar outras sessões]", "Sem payload, comando ou credenciais.", "session-1", "apps/deployments.apps/api uid u-1", "read_only", "não é a identidade autenticada no Kubernetes"} {
+	for _, want := range []string{"Audit local (6)", "Ocultos de outras sessões: 3", "[Mostrar outras sessões]", "Sem payload, comando ou credenciais.", auditSelf, "apps/deployments.apps/api uid u-1", "read_only", "não é a identidade autenticada no Kubernetes"} {
 		if !strings.Contains(plain, want) {
 			t.Fatalf("audit tab missing %q", want)
 		}
@@ -244,26 +249,28 @@ func auditFile(t *testing.T, events ...guard.AuditEvent) string {
 func TestSecurityAuditIsolatesHomonymousContexts(t *testing.T) {
 	at := time.Date(2026, 11, 25, 12, 0, 0, 0, time.UTC)
 	path := auditFile(t,
-		guard.AuditEvent{Timestamp: at.Add(-time.Hour), Context: "dev", Identity: "session-1", Outcome: guard.Succeeded},
-		guard.AuditEvent{Timestamp: at.Add(time.Minute), Context: "dev", Identity: "session-2", Outcome: guard.Succeeded},
-		guard.AuditEvent{Timestamp: at.Add(time.Minute), Context: "prod", Identity: "session-1", Outcome: guard.Succeeded},
-		guard.AuditEvent{Timestamp: at.Add(2 * time.Minute), Context: "dev", Identity: "session-1", Outcome: guard.Unknown},
+		guard.AuditEvent{Timestamp: at.Add(-time.Hour), Context: "dev", Identity: auditSelf, Outcome: guard.Succeeded},
+		guard.AuditEvent{Timestamp: at.Add(time.Minute), Context: "dev", Identity: auditOther, Outcome: guard.Succeeded},
+		guard.AuditEvent{Timestamp: at.Add(time.Minute), Context: "prod", Identity: auditSelf, Outcome: guard.Succeeded},
+		guard.AuditEvent{Timestamp: at.Add(2 * time.Minute), Context: "dev", Identity: auditSelf, Outcome: guard.Unknown},
 	)
 	open := func(identity string) Model {
 		m := nodeModel(t, auditSource{Demo: data.NewDemo(), path: path}, 160, 48)
 		m.session.Identity, m.started = identity, at
 		return step(t, m, "5", "[")
 	}
-	m := open("session-1")
+	m := open(auditSelf)
 	rows := m.auditRows()
 	if len(rows) != 1 || rows[0].OperationID != "op-3" || rows[0].Outcome != "outcome_unknown" || m.auditState().Hidden != 3 {
 		t.Fatalf("the default filter isolates context, identity and session start: %+v", rows)
 	}
-	if other := open("session-2"); len(other.auditRows()) != 1 || other.auditRows()[0].OperationID != "op-1" {
+	if other := open(auditOther); len(other.auditRows()) != 1 || other.auditRows()[0].OperationID != "op-1" {
 		t.Fatal("the same context name under another identity is another session")
 	}
-	if none := open(""); len(none.auditRows()) != 0 || none.auditState().Hidden != 4 {
-		t.Fatal("a session without identity shows nothing by default")
+	for _, ambiguous := range []string{"", "session-1", "session-1-", auditSelf + "0"} {
+		if none := open(ambiguous); len(none.auditRows()) != 0 || none.auditState().Hidden != 4 {
+			t.Fatalf("a session without a unique identity (%q) shows nothing by default", ambiguous)
+		}
 	}
 	all := step(t, m, "tab", "enter")
 	if len(all.auditRows()) != 4 {
@@ -290,7 +297,7 @@ func TestSecurityAuditSessionSwitchAndOrder(t *testing.T) {
 	if !m.sec.audit.all {
 		t.Fatal("filter widened")
 	}
-	next := New(Options{Source: auditSource{Demo: data.NewDemo(), path: path}, NoAnim: true, Session: data.SessionRef{Identity: "session-2", Generation: m.session.Generation + 1}})
+	next := New(Options{Source: auditSource{Demo: data.NewDemo(), path: path}, NoAnim: true, Session: data.SessionRef{Identity: auditOther, Generation: m.session.Generation + 1}})
 	if next.sec.audit.all || next.sec.audit.events != nil {
 		t.Fatal("a new session starts without the widened filter or rows")
 	}
@@ -299,7 +306,7 @@ func TestSecurityAuditSessionSwitchAndOrder(t *testing.T) {
 	}
 
 	page := func(op string) guard.AuditPage {
-		return guard.AuditPage{Events: []guard.AuditEvent{{OperationID: op, Context: "dev", Identity: "session-1"}}}
+		return guard.AuditPage{Events: []guard.AuditEvent{{OperationID: op, Context: "dev", Identity: auditSelf}}}
 	}
 	waiting := m
 	waiting.sec.audit.loading = true
@@ -358,6 +365,35 @@ func TestSecurityAuditReaderEndsWithTabAndSession(t *testing.T) {
 	for _, msg := range runCmd(cmd) {
 		if p, ok := msg.(auditPageMsg); ok && p.err == nil {
 			t.Fatal("ending the session cancels the read")
+		}
+	}
+}
+
+func TestSecurityAuditSeparatesSimultaneousProcesses(t *testing.T) {
+	at := time.Date(2026, 11, 25, 12, 0, 0, 0, time.UTC)
+	first, err := guard.NewSessionIdentity(1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	second, err := guard.NewSessionIdentity(1)
+	if err != nil || first == second {
+		t.Fatalf("two processes share %q: %v", first, err)
+	}
+	path := auditFile(t,
+		guard.AuditEvent{Timestamp: at.Add(time.Minute), Context: "dev", Identity: first, Outcome: guard.Succeeded},
+		guard.AuditEvent{Timestamp: at.Add(time.Minute), Context: "dev", Identity: second, Outcome: guard.Succeeded},
+		guard.AuditEvent{Timestamp: at.Add(time.Minute), Context: "dev", Identity: "session-1", Outcome: guard.Succeeded},
+	)
+	for op, identity := range map[string]string{"op-0": first, "op-1": second, "": "session-1"} {
+		m := nodeModel(t, auditSource{Demo: data.NewDemo(), path: path}, 160, 48)
+		m.session.Identity, m.started = identity, at
+		m = step(t, m, "5", "[")
+		rows := m.auditRows()
+		if op == "" && len(rows) != 0 {
+			t.Fatalf("a legacy identity is ambiguous: %+v", rows)
+		}
+		if op != "" && (len(rows) != 1 || rows[0].OperationID != op) {
+			t.Fatalf("%s sees only its own process: %+v", identity, rows)
 		}
 	}
 }
