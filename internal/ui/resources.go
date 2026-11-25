@@ -27,6 +27,7 @@ type ResourceTableState struct {
 	ClusterScoped  bool
 	Filter         string
 	Filtering      bool
+	Searching      bool
 	Scope          string
 }
 
@@ -189,6 +190,8 @@ func (st ResourceTableState) blocked() (string, theme.RGB, bool) {
 		return "carregando " + label + "…", theme.Muted, true
 	case st.Page.Coverage.State == data.CoverageDenied:
 		return "sem permissão para listar " + label, theme.Err, true
+	case len(st.Page.Items) == 0 && st.Searching:
+		return "filtrando " + label + "…", theme.Muted, true
 	case len(st.Page.Items) == 0 && st.Page.Filtered && st.Page.Total > 0:
 		return "nenhum item lido corresponde ao filtro", theme.Muted, true
 	case len(st.Page.Items) == 0 && st.Page.Coverage.State == data.CoverageComplete:
@@ -218,7 +221,9 @@ func ResourceTable(r draw.Region, st ResourceTableState, ctx Ctx) {
 		if st.Filtering {
 			status = append(status, colored("▏", ctx.Pal.A))
 		}
-		if page.Filtered {
+		if st.Searching {
+			status = append(status, muted(" filtrando…"))
+		} else if page.Filtered {
 			status = append(status, muted(fmt.Sprintf(" %d de %d", page.Matched, page.Total)))
 			if page.Matched > len(page.Items) {
 				status = append(status, colored(fmt.Sprintf(", mostrando %d", len(page.Items)), theme.Warn))

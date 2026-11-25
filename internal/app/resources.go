@@ -64,6 +64,7 @@ type resourceSub struct {
 	done      <-chan struct{}
 	page      data.ResourcePage
 	offset    int
+	query     string
 	restarted bool
 	err       string
 	loading   bool
@@ -79,6 +80,16 @@ type resourceState struct {
 	cursor         int
 	card           int
 	opened         data.ResourceRow
+	searching      bool
+	searchDirty    bool
+	searchSeq      uint64
+}
+
+type tableSearchMsg struct {
+	tag   resourceTag
+	seq   uint64
+	query string
+	page  data.ResourcePage
 }
 
 type resourceCatalogMsg struct {
@@ -213,7 +224,7 @@ func (m *Model) syncResources() tea.Cmd {
 		m.acc.dirty = true
 	}
 	m.seekTable(m.res.cursor)
-	return tea.Batch(append(append(lists, graphs...), m.computeAccess())...)
+	return tea.Batch(append(append(lists, graphs...), m.computeAccess(), m.searchTable())...)
 }
 
 func (m *Model) syncSubs(b data.ResourceBrowser, current map[schema.GroupVersionResource]*resourceSub, want []workloadLeaf) (map[schema.GroupVersionResource]*resourceSub, []tea.Cmd, bool) {
@@ -310,26 +321,75 @@ func (m Model) tableLeaf() (workloadLeaf, bool) {
 	return workloadLeafFor(m.nav.Active().Dest)
 }
 
-func (m *Model) readTable(h data.ResourceSubscription, abs int) (data.ResourcePage, int, bool) {
-	q := m.filter.Value()
-	if q == "" {
-		return seekPage(h, abs)
-	}
+func searchRows(h data.ResourceSubscription, query string) data.ResourcePage {
 	if s, ok := h.(data.ResourceSearcher); ok {
-		return s.Search(q, resourcePageLimit), 0, false
+		return s.Search(query, resourcePageLimit)
 	}
 	page := h.Page("", resourcePageLimit)
 	items := page.Items
 	page.Items, page.Filtered = nil, true
 	for _, row := range items {
-		if row.Matches(q) {
+		if row.Matches(query) {
 			page.Items = append(page.Items, row)
 		}
 	}
 	page.Matched = len(page.Items)
 	page.Truncated = page.Truncated || page.Continue != ""
 	page.Continue = ""
-	return page, 0, false
+	return page
+}
+
+func (m *Model) searchTable() tea.Cmd {
+	q := m.filter.Value()
+	if q == "" {
+		m.res.searchDirty = false
+		return nil
+	}
+	w, ok := m.tableLeaf()
+	if !ok || m.res.searching {
+		return nil
+	}
+	s, ok := m.res.subs[w.gvr]
+	if !ok || s.handle == nil || !m.res.searchDirty && s.query == q {
+		return nil
+	}
+	m.res.searching, m.res.searchDirty = true, false
+	m.res.searchSeq++
+	msg := tableSearchMsg{tag: resourceTag{session: m.session.Generation, seq: s.seq, key: s.key}, seq: m.res.searchSeq, query: q}
+	handle := s.handle
+	return func() tea.Msg {
+		msg.page = searchRows(handle, msg.query)
+		return msg
+	}
+}
+
+func (m *Model) storeSearch(msg tableSearchMsg) {
+	if msg.tag.session != m.session.Generation || msg.seq != m.res.searchSeq {
+		return
+	}
+	m.res.searching = false
+	s := m.currentSub(msg.tag)
+	if s == nil {
+		return
+	}
+	if msg.query != m.filter.Value() {
+		m.res.searchDirty = true
+		return
+	}
+	next := *s
+	next.loading, next.page, next.offset, next.restarted, next.query = false, msg.page, 0, false, msg.query
+	m.storeSub(msg.tag.key.GVR, next)
+	m.res.cursor = clampToPage(m.res.cursor, next)
+}
+
+func (m Model) searchPending() bool {
+	q := m.filter.Value()
+	w, ok := m.tableLeaf()
+	if q == "" || !ok {
+		return false
+	}
+	s, ok := m.res.subs[w.gvr]
+	return ok && s.handle != nil && s.query != q
 }
 
 func (m *Model) reloadTable() {
@@ -342,8 +402,13 @@ func (m *Model) reloadTable() {
 	if !ok || s.handle == nil {
 		return
 	}
+	if m.filter.Value() != "" {
+		m.res.searchDirty = true
+		return
+	}
 	next := *s
-	next.page, next.offset, next.restarted = m.readTable(s.handle, 0)
+	next.query, next.loading = "", false
+	next.page, next.offset, next.restarted = seekPage(s.handle, 0)
 	m.storeSub(w.gvr, next)
 }
 
@@ -386,6 +451,9 @@ func (m *Model) seekTable(abs int) {
 
 func (m Model) handleResourceMsg(msg tea.Msg) (Model, tea.Cmd, bool) {
 	switch msg := msg.(type) {
+	case tableSearchMsg:
+		m.storeSearch(msg)
+		return m, nil, true
 	case accessMsg:
 		m.storeAccess(msg)
 		return m, nil, true
@@ -422,7 +490,11 @@ func (m Model) handleResourceMsg(msg tea.Msg) (Model, tea.Cmd, bool) {
 			return m, nil, true
 		}
 		next.handle = msg.handle
-		next.page, next.offset, _ = m.readTable(msg.handle, 0)
+		if _, table := m.tableLeaf(); table && m.filter.Value() != "" {
+			next.loading, m.res.searchDirty = true, true
+		} else {
+			next.page, next.offset = msg.handle.Page("", resourcePageLimit), 0
+		}
 		m.storeSub(gvr, next)
 		return m, waitResource(msg.handle, next.done, msg.tag), true
 	case resourceChangeMsg:
@@ -441,8 +513,12 @@ func (m Model) handleResourceMsg(msg tea.Msg) (Model, tea.Cmd, bool) {
 		if active {
 			abs = m.res.cursor
 		}
+		if active && m.filter.Value() != "" {
+			m.res.searchDirty = true
+			return m, waitResource(s.handle, s.done, msg.tag), true
+		}
 		next := *s
-		next.page, next.offset, next.restarted = m.readTable(s.handle, abs)
+		next.page, next.offset, next.restarted = seekPage(s.handle, abs)
 		m.storeSub(gvr, next)
 		if active {
 			m.res.cursor = clampToPage(abs, next)

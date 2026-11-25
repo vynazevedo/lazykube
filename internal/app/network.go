@@ -42,7 +42,7 @@ func (m Model) activeResource() (workloadLeaf, ResourceRef, bool) {
 func (m *Model) openResource() {
 	w, ok := m.tableLeaf()
 	st := m.tableState()
-	if !ok || st.Cursor < 0 || st.Cursor >= len(st.Page.Items) {
+	if !ok || m.searchPending() || st.Cursor < 0 || st.Cursor >= len(st.Page.Items) {
 		return
 	}
 	row := st.Page.Items[st.Cursor]

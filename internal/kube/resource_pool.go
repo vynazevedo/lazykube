@@ -328,20 +328,26 @@ func (h *resourceHandle) Search(query string, limit int) data.ResourcePage {
 	e := h.entry
 	p := e.pool
 	p.mu.Lock()
-	defer p.mu.Unlock()
 	if _, ok := e.handles[h]; !ok {
+		p.mu.Unlock()
 		return data.ResourcePage{Coverage: data.Coverage{State: data.CoverageUnavailable, Reason: "subscription canceled"}}
 	}
-	var keys []string
-	for k, row := range e.rows {
+	out := data.ResourcePage{Revision: e.revision, ObservedAt: e.observedAt, Coverage: e.coverage, Total: len(e.rows), Truncated: e.truncated, Borrowed: e.borrowed, Workloads: e.workloads, Filtered: true}
+	rows := make([]data.ResourceRow, 0, len(e.rows))
+	for _, row := range e.rows {
+		rows = append(rows, row)
+	}
+	p.mu.Unlock()
+	matches := rows[:0]
+	for _, row := range rows {
 		if row.Matches(query) {
-			keys = append(keys, k)
+			matches = append(matches, row)
 		}
 	}
-	sort.Strings(keys)
-	out := data.ResourcePage{Revision: e.revision, ObservedAt: e.observedAt, Coverage: e.coverage, Total: len(e.rows), Truncated: e.truncated, Borrowed: e.borrowed, Workloads: e.workloads, Filtered: true, Matched: len(keys)}
-	for _, k := range keys[:min(len(keys), min(max(limit, 1), resourcePageSize))] {
-		out.Items = append(out.Items, e.rows[k])
-	}
+	sort.Slice(matches, func(i, j int) bool {
+		return matches[i].Ref.Namespace+"/"+matches[i].Ref.Name < matches[j].Ref.Namespace+"/"+matches[j].Ref.Name
+	})
+	out.Matched = len(matches)
+	out.Items = append(out.Items, matches[:min(len(matches), min(max(limit, 1), resourcePageSize))]...)
 	return out
 }

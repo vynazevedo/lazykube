@@ -90,7 +90,7 @@ func (m Model) scopeLabel() string {
 
 func (m Model) leafTable(w workloadLeaf) ui.ResourceTableState {
 	_, supported := m.browser()
-	st := ui.ResourceTableState{Label: w.label, Kind: w.kind, Net: w.net, ClusterScoped: w.scope.cluster, Filter: m.filter.Value(), Filtering: m.filtering, Supported: supported, Scope: m.scopeLabel(), Cursor: m.res.cursor, AllNamespaces: m.resourceNamespace() == ""}
+	st := ui.ResourceTableState{Label: w.label, Kind: w.kind, Net: w.net, ClusterScoped: w.scope.cluster, Filter: m.filter.Value(), Filtering: m.filtering, Searching: m.searchPending(), Supported: supported, Scope: m.scopeLabel(), Cursor: m.res.cursor, AllNamespaces: m.resourceNamespace() == ""}
 	if w.scope.cluster {
 		st.Scope, st.AllNamespaces = "cluster", false
 	}
