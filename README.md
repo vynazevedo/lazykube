@@ -338,7 +338,9 @@ aponta o primeiro elo quebrado com a evidência. Tudo vem só de objetos da API 
 Kubernetes: o lazykube não faz requisição HTTP, DNS ou TLS ao endereço, não lê
 Secrets e não afirma que a aplicação responde. Host vazio ou curinga não vira
 URL. Para NetworkPolicy, só diz quais políticas selecionam o pod, porque o
-efeito depende do CNI.
+efeito depende do CNI. Em Network, só Endpoints (o recurso legado) segue como
+`(futuro)`. No detalhe de um pod, a seção Acesso fica presa ao UID: se o pod for
+trocado por outro com o mesmo nome, as URLs saem da tela e o seletor fecha.
 
 `u` abre o seletor de URLs: mostra a URL escolhida inteira, quebrada em linhas e
 com o host em destaque, e `enter` copia exatamente esse texto; se ela não couber
@@ -438,13 +440,20 @@ e, enquanto a janela enche, o painel mostra `coletando 12/60`.
  events (list/watch)             aba Events                 aviso na aba
  namespaces (list/watch)         painel Namespaces          deriva dos pods
  nodes (list/watch)              painel Node                contagem pelos pods
- services, ingresses,            Network e Acesso, só       motivo na tela, sem
- ingressclasses, networkpolicies com a tela aberta          concluir que está vazio
- endpointslices, httproutes
- (list/watch)
+ services (list/watch)           Network e Acesso           motivo na tela
+ endpointslices (list/watch)     Network e Acesso           motivo na tela
+ ingresses (list/watch)          Network e Acesso           motivo na tela
+ ingressclasses (list/watch)     Network e Acesso           motivo na tela
+ networkpolicies (list/watch)    Network e Acesso           motivo na tela
+ httproutes (list/watch)         Network, se servido        motivo na tela
  metrics.k8s.io pods, nodes      CPU, memória, heatmap      motivo no painel
  nodes/proxy (get)               rede RX/TX                 motivo no card
 ```
+
+Os recursos de Network só são lidos com a tela, o detalhe ou a seção Acesso
+abertos, no namespace do alvo quando há um, e a assinatura é liberada ao sair.
+Sem permissão, não servido e leitura parcial nunca viram lista vazia. Secrets não
+são lidos: de TLS, só o nome em `secretName`.
 
 Quando algo falta, o painel diz o motivo em vez de ficar vazio, por exemplo
 `metrics-server não instalado`, `sem permissão: nodes/proxy` ou
