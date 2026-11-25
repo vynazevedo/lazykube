@@ -18,7 +18,8 @@ pelo servidor. Nenhuma credencial participa dela.
 e executa dry-run server-side. O preview tem prazo de dois minutos e um ID de uso
 unico. `Execute` exige confirmacao, repete SSAR e valida a identidade do recurso,
 sincroniza a intencao no audit e faz uma unica requisicao, sem repeticao do
-cliente mesmo com Retry-After. Delete, edit, cordon, uncordon e scale para zero
+cliente mesmo com Retry-After. Todo redirect HTTP e recusado no cliente de acoes e
+na SSAR: um 3xx em dry-run reprova o preview, sem segundo request. Delete, edit, cordon, uncordon e scale para zero
 exigem o nome do recurso. Nao existe create. Edit usa PUT de um objeto
 existente com UID e resourceVersion. `SupportsAction` e a allowlist compartilhada
 pelo executor e pelos futuros handlers: todos os GVRs abaixo usam versao v1.

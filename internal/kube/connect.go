@@ -114,12 +114,12 @@ func Connect(ctx context.Context, opts ConnectOptions) (*Source, error) {
 	if auditPath == "" {
 		auditPath, _ = guard.DefaultAuditPath()
 	}
-	actionClient, clientErr := newActionClient(cfg)
+	authClient, actionClient, clientErr := newActionClients(cfg)
 	if clientErr != nil {
 		s.Close()
 		return nil, connectError(ErrorGuard, name, clientErr)
 	}
-	s.actions, err = NewActionExecutor(s.ctx, s.guardSession, opts.AllowWrites, client, actionClient, guard.NewFileAudit(auditPath), guard.ClockFunc(time.Now), nil)
+	s.actions, err = NewActionExecutor(s.ctx, s.guardSession, opts.AllowWrites, authClient, actionClient, guard.NewFileAudit(auditPath), guard.ClockFunc(time.Now), nil)
 	if err != nil {
 		s.Close()
 		return nil, connectError(ErrorGuard, name, err)
