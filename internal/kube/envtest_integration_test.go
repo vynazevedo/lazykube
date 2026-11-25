@@ -123,6 +123,12 @@ func isolatedEnvtest(t *testing.T, name, assets string) *rest.Config {
 			t.Errorf("parar envtest %s: %v", name, err)
 		}
 	})
+	user, err := environment.AddUser(envtest.User{Name: "reader-" + name}, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	reader := user.Config()
+	awaitCredentials(t, map[string]*rest.Config{"admin-" + name: admin, "reader-" + name: reader})
 	client, err := kubernetes.NewForConfig(admin)
 	if err != nil {
 		t.Fatal(err)
@@ -171,9 +177,5 @@ func isolatedEnvtest(t *testing.T, name, assets string) *rest.Config {
 	}, metav1.CreateOptions{}); err != nil {
 		t.Fatal(err)
 	}
-	user, err := environment.AddUser(envtest.User{Name: "reader-" + name}, nil)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return user.Config()
+	return reader
 }
