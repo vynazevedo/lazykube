@@ -25,8 +25,8 @@ tambem nao reenvie em conexao ociosa fechada ou GOAWAY. TLS, CA e certificados e
 arquivo sao relidos a cada conexao; exec plugin, impersonation, proxy e
 tls-server-name do kubeconfig sao preservados. Informers e listas mantem os proprios
 retries. Todo redirect HTTP e recusado no cliente de acoes e
-na SSAR: um 3xx em dry-run reprova o preview, sem segundo request. Delete, edit, cordon, uncordon e scale para zero
-exigem o nome do recurso. Nao existe create. Edit usa PUT de um objeto
+na SSAR: um 3xx em dry-run reprova o preview, sem segundo request. Delete, edit,
+cordon, uncordon e scale para zero exigem o nome do recurso. Nao existe create. Edit usa PUT de um objeto
 existente com UID e resourceVersion. `SupportsAction` e a allowlist compartilhada
 pelo executor e pelos futuros handlers: todos os GVRs abaixo usam versao v1.
 
@@ -93,7 +93,7 @@ por descritores desde a raiz, um componente por vez, sem deixar o kernel seguir 
 
 Nao existe excecao para grupo privado: com umask 002, um `~/.local` em 0775 e recusado.
 Nenhuma permissao ou link e reparado automaticamente. Quando o caminho e recusado, a
-aba Audit mostra o motivo e as acoes ficam bloqueadas. Para resolver, retire a escrita
+aba Audit e a tela de acao mostram o motivo e as acoes ficam bloqueadas. Para resolver, retire a escrita
 de grupo do ancestral ou use `--audit-file` com um caminho absoluto em disco local,
 sem links do usuario. A regra protege contra outro usuario sem privilegios; nao protege
 contra root nem contra processos do proprio usuario. Dono nao reconhecido, como em
@@ -124,13 +124,24 @@ mutante, como a leitura interna do restart. Qualquer outro erro de envio continu
 `Dispatch` informa se a requisicao mutante pode ter saido e o resultado gravado no
 audit. E a fonte da linha de saida da TUI: sem envio possivel nao ha linha.
 
+Antes de qualquer requisicao, `Observe`, `Prepare` e `Execute` conferem o caminho do
+audit. Caminho recusado devolve `audit_failed` sem chamar a API, bloqueia novas acoes
+nesta sessao e guarda o motivo fixo em `AuditRefusal`, que a tela mostra com a saida
+por `--audit-file` ou, em plataforma sem verificacao, com o aviso de que ela nao ajuda.
+Abrir o menu confere sem criar nada; diretorio ausente so nasce quando uma acao e
+escolhida. Em somente leitura o caminho nao e tocado. Depois de corrigir o caminho e
+preciso reconectar. Um plano consumido enquanto o audit esta recusado nao tem desfecho
+gravado, porque nao ha onde gravar, e nada e enviado.
+
 `Observe` faz uma leitura pontual do alvo, sem mutex, e so depois da politica e da
-allowlist: em somente leitura nenhuma requisicao sai. `Discard` consome um preview
+allowlist: em somente leitura nenhuma requisicao sai. `Verify` faz a mesma leitura sem
+depender do audit, so para conferir uma operacao ja enviada. `Discard` consome um preview
 sem enviar nada e registra o cancelamento. `AuditBlocked` informa a falha de audit
 para a tela. `Close` cancela as operacoes e espera ate dois segundos pelo registro
 do resultado em andamento.
 
 A tecla `o` da TUI usa apenas scale, restart, delete, cordon e uncordon. Edit,
-exec e port-forward continuam sem handler. O header mostra o modo, a protecao, a
+exec e port-forward continuam sem handler. No Radar e na Security so age em pod exato
+por UID e resourceVersion. O header mostra o modo, a protecao, a
 configuracao invalida e o bloqueio por audit independentemente de cores. A demo
 continua sintetica e somente leitura.
