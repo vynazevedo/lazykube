@@ -31,7 +31,7 @@ func readAll(t *testing.T, path string, limit int) ([]AuditEvent, int) {
 	var out []AuditEvent
 	cursor, pages := AuditCursor{}, 0
 	for {
-		page, err := ReadAudit(path, cursor, limit)
+		page, err := ReadAudit(t.Context(), path, cursor, limit)
 		if err != nil || page.Rotated {
 			t.Fatal(err, page.Rotated)
 		}
@@ -64,7 +64,7 @@ func TestReadAuditPagesNewestFirstAcrossSegments(t *testing.T) {
 func TestReadAuditPendingInvalidAndMissing(t *testing.T) {
 	dir := filepath.Join(t.TempDir(), "audit")
 	path := filepath.Join(dir, "audit.jsonl")
-	if page, err := ReadAudit(path, AuditCursor{}, 0); err != nil || !page.Missing || len(page.Events) != 0 {
+	if page, err := ReadAudit(t.Context(), path, AuditCursor{}, 0); err != nil || !page.Missing || len(page.Events) != 0 {
 		t.Fatalf("missing directory is an empty audit, not a failure: %+v %v", page, err)
 	}
 	writeAudit(t, path, 0, 3)
@@ -76,7 +76,7 @@ func TestReadAuditPendingInvalidAndMissing(t *testing.T) {
 	_, _ = f.WriteString(`{"schema_version":2,"timestamp":"2026-10-22T10:00:00Z"}` + "\n")
 	_, _ = f.WriteString(`{"schema_version":1,"timestamp":"2026-10-22T10:00:00Z","operation_id":"half`)
 	_ = f.Close()
-	page, err := ReadAudit(path, AuditCursor{}, 0)
+	page, err := ReadAudit(t.Context(), path, AuditCursor{}, 0)
 	if err != nil || !page.Pending || page.Invalid != 2 || len(page.Events) != 3 || page.More {
 		t.Fatalf("partial tail waits, unknown fields and schemas are skipped: %+v %v", page, err)
 	}
@@ -96,7 +96,7 @@ func TestReadAuditRejectsLinksAndPermissions(t *testing.T) {
 	if err := os.Symlink(other, path); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := ReadAudit(path, AuditCursor{}, 0); err == nil {
+	if _, err := ReadAudit(t.Context(), path, AuditCursor{}, 0); err == nil {
 		t.Fatal("symlinked segment must not be read")
 	}
 	if err := os.Remove(path); err != nil {
@@ -108,7 +108,7 @@ func TestReadAuditRejectsLinksAndPermissions(t *testing.T) {
 	if err := os.Chmod(path, 0644); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := ReadAudit(path, AuditCursor{}, 0); err == nil {
+	if _, err := ReadAudit(t.Context(), path, AuditCursor{}, 0); err == nil {
 		t.Fatal("group readable segment must not be read")
 	}
 	if err := os.Chmod(path, 0600); err != nil {
@@ -117,10 +117,10 @@ func TestReadAuditRejectsLinksAndPermissions(t *testing.T) {
 	if err := os.Chmod(dir, 0755); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := ReadAudit(path, AuditCursor{}, 0); err == nil {
+	if _, err := ReadAudit(t.Context(), path, AuditCursor{}, 0); err == nil {
 		t.Fatal("non private directory must not be read")
 	}
-	if _, err := ReadAudit("relative/audit.jsonl", AuditCursor{}, 0); err == nil {
+	if _, err := ReadAudit(t.Context(), "relative/audit.jsonl", AuditCursor{}, 0); err == nil {
 		t.Fatal("relative path refused")
 	}
 }
@@ -128,7 +128,7 @@ func TestReadAuditRejectsLinksAndPermissions(t *testing.T) {
 func TestReadAuditDetectsRotationAndDoesNotBlockWriter(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "audit", "audit.jsonl")
 	writeAudit(t, path, 0, 5)
-	page, err := ReadAudit(path, AuditCursor{}, 2)
+	page, err := ReadAudit(t.Context(), path, AuditCursor{}, 2)
 	if err != nil || !page.More || len(page.Events) != 2 {
 		t.Fatal(page, err)
 	}
@@ -136,7 +136,7 @@ func TestReadAuditDetectsRotationAndDoesNotBlockWriter(t *testing.T) {
 	if err := a.Record(AuditEvent{SchemaVersion: 1, Timestamp: time.Now().UTC(), OperationID: "during-read"}); err != nil {
 		t.Fatal("reader holds no lock that blocks the writer:", err)
 	}
-	next, err := ReadAudit(path, page.Next, 2)
+	next, err := ReadAudit(t.Context(), path, page.Next, 2)
 	if err != nil || next.Rotated || next.Events[0].OperationID != "op-002" {
 		t.Fatalf("appending keeps the cursor valid: %+v %v", next, err)
 	}
@@ -144,7 +144,7 @@ func TestReadAuditDetectsRotationAndDoesNotBlockWriter(t *testing.T) {
 		t.Fatal(err)
 	}
 	writeAudit(t, path, 0, 1)
-	if rot, err := ReadAudit(path, page.Next, 2); err != nil || !rot.Rotated {
+	if rot, err := ReadAudit(t.Context(), path, page.Next, 2); err != nil || !rot.Rotated {
 		t.Fatalf("rotation under the cursor is reported, not merged: %+v %v", rot, err)
 	}
 }
@@ -152,7 +152,7 @@ func TestReadAuditDetectsRotationAndDoesNotBlockWriter(t *testing.T) {
 func TestReadAuditBudget(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "audit", "audit.jsonl")
 	writeAudit(t, path, 0, 300)
-	page, err := ReadAudit(path, AuditCursor{}, 0)
+	page, err := ReadAudit(t.Context(), path, AuditCursor{}, 0)
 	if err != nil || len(page.Events) != AuditPageSize || !page.More {
 		t.Fatalf("page capped at %d: %d %v", AuditPageSize, len(page.Events), err)
 	}

@@ -475,7 +475,7 @@ func FullHelpSecurity() []KeyHelp {
 	return []KeyHelp{
 		{"↑/↓ k/j", "move workload / scroll evidence"},
 		{"tab shift+tab", "list / evidence or Audit filter"},
-		{"enter", "focus evidence, Audit context filter"},
+		{"enter", "focus evidence, Audit session filter"},
 		{"[ ]", "previous / next Security tab"},
 		{"H", "list cohort: all / without system"},
 		{"pgup/pgdn", "scroll evidence"},
@@ -531,7 +531,7 @@ type SecurityAuditState struct {
 	Pending     bool
 	Invalid     int
 	Hidden      int
-	AllContexts bool
+	AllSessions bool
 }
 
 func (a SecurityAuditState) Selected() *SecurityAuditRow {
@@ -541,7 +541,19 @@ func (a SecurityAuditState) Selected() *SecurityAuditRow {
 	return &a.Rows[a.Cursor]
 }
 
-const auditListFooter = 4
+const (
+	auditListFooter   = 4
+	auditContextWidth = 11
+)
+
+func auditRowLine(e SecurityAuditRow, allSessions bool) draw.Line {
+	outcome := colored(draw.Sanitize(e.Outcome), outcomeColor(e.Outcome))
+	if !allSessions {
+		return draw.Line{text(draw.PadRight(e.Time, 10)), text(draw.PadRight(e.Action, 12)), outcome}
+	}
+	name := draw.Truncate(draw.Sanitize(e.Context), auditContextWidth)
+	return draw.Line{muted(draw.PadRight(name, auditContextWidth) + " "), text(draw.PadRight(e.Time, 10)), outcome, faint(" " + e.Action)}
+}
 
 func SecurityAuditRows(panelH int) int {
 	return max(0, panelH-3-auditListFooter)
@@ -573,7 +585,7 @@ func auditStateText(a SecurityAuditState) (string, theme.RGB) {
 		return "Audit local indisponível; nenhum registro foi carregado.", theme.Warn
 	}
 	if len(a.Rows) == 0 {
-		return "Nenhum registro neste contexto.", theme.Muted
+		return "Nenhum registro nesta sessão.", theme.Muted
 	}
 	return "", theme.Muted
 }
@@ -584,7 +596,11 @@ func SecurityAuditList(r draw.Region, st SecurityPageState, ctx Ctx) {
 	if inner.Empty() {
 		return
 	}
-	inner.Line(0, 0, draw.Line{muted("HORA      AÇÃO        RESULTADO")}.Truncate(inner.W))
+	header := "HORA      AÇÃO        RESULTADO"
+	if a.AllSessions {
+		header = draw.PadRight("CONTEXTO", auditContextWidth) + " HORA      RESULTADO"
+	}
+	inner.Line(0, 0, draw.Line{muted(header)}.Truncate(inner.W))
 	rows := SecurityAuditRows(r.H)
 	if msg, color := auditStateText(a); msg != "" {
 		for i, l := range draw.Wrap(msg, max(1, inner.W)) {
@@ -600,11 +616,11 @@ func SecurityAuditList(r draw.Region, st SecurityPageState, ctx Ctx) {
 		if i == a.Cursor {
 			inner.Sub(-1, 1+row, inner.W+2, 1).FillBg(SelectionBg(ctx.Pal, selectionMix))
 		}
-		inner.Line(0, 1+row, draw.Line{text(draw.PadRight(e.Time, 10)), text(draw.PadRight(e.Action, 12)), colored(e.Outcome, outcomeColor(e.Outcome))}.Truncate(inner.W))
+		inner.Line(0, 1+row, auditRowLine(e, a.AllSessions).Truncate(inner.W))
 	}
-	counts := fmt.Sprintf("%d de outros contextos ocultos", a.Hidden)
-	if a.AllContexts {
-		counts = "Todos os contextos; sem reuso para ação"
+	counts := fmt.Sprintf("Ocultos de outras sessões: %d", a.Hidden)
+	if a.AllSessions {
+		counts = "Todas as sessões; sem reuso para ação"
 	}
 	if a.More {
 		counts += " | mais registros abaixo"
@@ -679,9 +695,9 @@ func SecurityAuditDetail(r draw.Region, st SecurityPageState, ctx Ctx) {
 }
 
 func auditFilterButton(st SecurityPageState, ctx Ctx) draw.Line {
-	label := "[Mostrar outros contextos]"
-	if st.Audit.AllContexts {
-		label = "[Somente o contexto atual]"
+	label := "[Mostrar outras sessões]"
+	if st.Audit.AllSessions {
+		label = "[Somente esta sessão]"
 	}
 	if st.Focus == SecurityFocusEvidence {
 		return draw.Line{draw.S(label, draw.Fg(ctx.Pal.A).WithBg(theme.BorderFaint).WithBold())}

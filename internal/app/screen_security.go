@@ -266,7 +266,7 @@ func (m Model) handleSecurityKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 	case key.Matches(msg, k.Enter):
 		switch {
 		case m.sec.Tab == ui.SecTabAudit && m.sec.Focus == ui.SecurityFocusEvidence:
-			m.toggleAuditContexts()
+			m.toggleAuditSessions()
 		case m.sec.Tab == ui.SecTabWorkloads && len(m.sec.result.workloads) > 0:
 			m.sec.Focus = ui.SecurityFocusEvidence
 		}

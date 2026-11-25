@@ -1,6 +1,7 @@
 package app
 
 import (
+	"context"
 	"strings"
 
 	tea "charm.land/bubbletea/v2"
@@ -28,6 +29,14 @@ type auditView struct {
 	capped  bool
 	cursor  int
 	all     bool
+	cancel  context.CancelFunc
+}
+
+func (a *auditView) stop() {
+	if a.cancel != nil {
+		a.cancel()
+		a.cancel = nil
+	}
 }
 
 type auditPageMsg struct {
@@ -56,6 +65,7 @@ func (m *Model) followAudit() tea.Cmd {
 	a := &m.sec.audit
 	if !m.auditWanted() {
 		if a.state != "" || a.loading {
+			a.stop()
 			m.sec.audit = auditView{}
 		}
 		return nil
@@ -71,6 +81,7 @@ func (m *Model) followAudit() tea.Cmd {
 
 func (m *Model) startAudit() tea.Cmd {
 	all := m.sec.audit.all
+	m.sec.audit.stop()
 	m.sec.audit = auditView{all: all, state: ui.AuditLoading}
 	path, reason := m.auditPath()
 	if path == "" {
@@ -88,9 +99,12 @@ func (m *Model) requestAudit() tea.Cmd {
 	*m.auditSeq++
 	a := &m.sec.audit
 	a.seq, a.loading = *m.auditSeq, true
+	a.stop()
+	ctx, cancel := context.WithCancel(m.life)
+	a.cancel = cancel
 	session, seq, cursor := m.session.Generation, a.seq, a.next
 	return func() tea.Msg {
-		page, err := guard.ReadAudit(path, cursor, guard.AuditPageSize)
+		page, err := guard.ReadAudit(ctx, path, cursor, guard.AuditPageSize)
 		return auditPageMsg{session: session, seq: seq, page: page, err: err}
 	}
 }
@@ -106,10 +120,11 @@ func (m Model) updateAudit(msg tea.Msg) (Model, tea.Cmd, bool) {
 
 func (m *Model) applyAudit(msg auditPageMsg) {
 	a := &m.sec.audit
-	if msg.session != m.session.Generation || msg.seq != a.seq || !a.loading || !m.auditWanted() {
+	if msg.session != m.session.Generation || msg.seq != a.seq || !a.loading || !m.auditWanted() || m.life.Err() != nil {
 		return
 	}
 	a.loading = false
+	a.stop()
 	switch {
 	case msg.err != nil:
 		*a = auditView{all: a.all, state: ui.AuditUnavailable}
@@ -142,6 +157,11 @@ func (m Model) auditContext() string {
 		return m.session.Context
 	}
 	return m.snap.Cluster.Context
+}
+
+func (m Model) auditOwn(e guard.AuditEvent) bool {
+	s := m.session
+	return s.Identity != "" && e.Identity == s.Identity && e.Context == m.auditContext() && !e.Timestamp.Before(m.started)
 }
 
 func auditAction(a guard.Action) string {
@@ -178,9 +198,9 @@ func (m Model) auditVisible() int {
 	if m.sec.audit.all {
 		return len(m.sec.audit.events)
 	}
-	current, n := m.auditContext(), 0
+	n := 0
 	for _, e := range m.sec.audit.events {
-		if e.Context == current {
+		if m.auditOwn(e) {
 			n++
 		}
 	}
@@ -189,10 +209,9 @@ func (m Model) auditVisible() int {
 
 func (m Model) auditRows() []ui.SecurityAuditRow {
 	a := m.sec.audit
-	current := m.auditContext()
 	rows := make([]ui.SecurityAuditRow, 0, len(a.events))
 	for _, e := range a.events {
-		if !a.all && e.Context != current {
+		if !a.all && !m.auditOwn(e) {
 			continue
 		}
 		rows = append(rows, ui.SecurityAuditRow{
@@ -215,7 +234,7 @@ func (m Model) auditRows() []ui.SecurityAuditRow {
 func (m Model) auditState() ui.SecurityAuditState {
 	a := m.sec.audit
 	rows := m.auditRows()
-	st := ui.SecurityAuditState{State: a.state, Reason: a.reason, Context: m.auditContext(), Rows: rows, Cursor: a.cursor, More: a.more || a.loading, Pending: a.pending, Invalid: a.invalid, Hidden: len(a.events) - len(rows), AllContexts: a.all}
+	st := ui.SecurityAuditState{State: a.state, Reason: a.reason, Context: m.auditContext(), Rows: rows, Cursor: a.cursor, More: a.more || a.loading, Pending: a.pending, Invalid: a.invalid, Hidden: len(a.events) - len(rows), AllSessions: a.all}
 	if st.State == "" {
 		st.State = ui.AuditLoading
 	}
@@ -230,19 +249,25 @@ func (m *Model) moveAudit(delta int) {
 	m.sec.audit.cursor = max(0, min(n-1, m.sec.audit.cursor+delta))
 }
 
-func (m *Model) toggleAuditContexts() {
+func (m *Model) toggleAuditSessions() {
 	m.sec.audit.all = !m.sec.audit.all
 	m.sec.audit.cursor = 0
 }
 
 func (m *Model) handleAuditClick(ms tea.Mouse) {
-	l := m.layout.SecList
+	l, detail := m.layout.SecList, m.layout.SecEvidence
+	if m.layout.Compact && detail.Contains(ms.X, ms.Y) {
+		if ms.Y == detail.Y+detail.H-2 {
+			m.toggleAuditSessions()
+		}
+		return
+	}
 	if !l.Contains(ms.X, ms.Y) {
 		return
 	}
 	if ms.Y == l.Y+ui.SecurityAuditButtonRow(l.H) {
 		m.sec.Focus = ui.SecurityFocusEvidence
-		m.toggleAuditContexts()
+		m.toggleAuditSessions()
 		return
 	}
 	m.sec.Focus = ui.SecurityFocusList

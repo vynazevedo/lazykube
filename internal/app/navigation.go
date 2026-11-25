@@ -122,6 +122,7 @@ func (m *Model) restore(f Frame) {
 	m.podOffset, m.nsCursor, m.depCursor = f.PodOffset, f.NSCursor, f.DepCursor
 	m.tab, m.scroll, m.follow = f.Tab, f.Scroll, f.Follow
 	m.restoreEvents(f.Events)
+	m.sec.audit.stop()
 	m.sec = securityPage{securityFrame: f.Security}
 	m.relayout()
 	m.fixSelection()

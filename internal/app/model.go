@@ -73,6 +73,7 @@ type Model struct {
 	gen      int
 	auditSeq *uint64
 	now      func() time.Time
+	started  time.Time
 
 	keys      KeyMap
 	filter    textinput.Model
@@ -138,6 +139,7 @@ func New(opts Options) Model {
 		animated: !opts.NoAnim,
 		fps:      fps,
 		now:      now,
+		started:  now(),
 		keys:     DefaultKeyMap(),
 		filter:   ti,
 		src:      opts.Source,

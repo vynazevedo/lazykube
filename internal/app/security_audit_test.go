@@ -111,6 +111,7 @@ func step(t *testing.T, m Model, keys ...string) Model {
 func auditModel(t *testing.T, path string, w, h int) Model {
 	t.Helper()
 	m := nodeModel(t, auditSource{Demo: data.NewDemo(), path: path}, w, h)
+	m.session.Identity = "session-1"
 	return step(t, m, "5", "[")
 }
 
@@ -124,7 +125,7 @@ func TestSecurityAuditTabReadsLocalAudit(t *testing.T) {
 		t.Fatalf("only the current context by default, newest first: %d %+v", len(rows), rows[0])
 	}
 	plain := m.Render().Plain()
-	for _, want := range []string{"Audit local (6)", "3 de outros contextos ocultos", "[Mostrar outros contextos]", "Sem payload, comando ou credenciais.", "session-1", "apps/deployments.apps/api uid u-1", "read_only", "não é a identidade autenticada no Kubernetes"} {
+	for _, want := range []string{"Audit local (6)", "Ocultos de outras sessões: 3", "[Mostrar outras sessões]", "Sem payload, comando ou credenciais.", "session-1", "apps/deployments.apps/api uid u-1", "read_only", "não é a identidade autenticada no Kubernetes"} {
 		if !strings.Contains(plain, want) {
 			t.Fatalf("audit tab missing %q", want)
 		}
@@ -201,8 +202,162 @@ func TestSecurityAuditStates(t *testing.T) {
 
 func TestSecurityAuditGoldens(t *testing.T) {
 	path := auditFixture(t, 9)
-	for _, size := range [][2]int{{160, 48}, {130, 40}} {
+	for _, size := range [][2]int{{160, 48}, {130, 40}, {80, 24}} {
 		m := auditModel(t, path, size[0], size[1])
 		golden(t, fmt.Sprintf("security_audit_%dx%d.txt", size[0], size[1]), m.Render().Plain())
+		golden(t, fmt.Sprintf("security_audit_all_%dx%d.txt", size[0], size[1]), step(t, m, "tab", "enter").Render().Plain())
+	}
+}
+
+func TestSecurityAuditCompactPanels(t *testing.T) {
+	m := auditModel(t, auditFixture(t, 9), 80, 24)
+	if m.layout.SecList.Empty() || !m.layout.SecEvidence.Empty() {
+		t.Fatal("the compact audit opens on the list")
+	}
+	detail := step(t, m, "tab")
+	if detail.layout.SecEvidence.Empty() || !strings.Contains(detail.Render().Plain(), "[Mostrar outras sessões]") {
+		t.Fatal("tab shows the record and the session filter")
+	}
+	l := detail.layout.SecEvidence
+	if all := deliver(t, detail, tea.MouseClickMsg{X: l.X + 3, Y: l.Y + l.H - 2, Button: tea.MouseLeft}); !all.sec.audit.all {
+		t.Fatal("clicking the filter in the record widens it")
+	}
+	if all := step(t, detail, "enter"); !all.sec.audit.all {
+		t.Fatal("enter on the filter widens it")
+	}
+}
+
+func auditFile(t *testing.T, events ...guard.AuditEvent) string {
+	t.Helper()
+	path := filepath.Join(t.TempDir(), "audit", "audit.jsonl")
+	a := guard.NewFileAudit(path)
+	for i, e := range events {
+		e.SchemaVersion, e.Phase, e.Action, e.Resource, e.Name = 1, "result", guard.Scale, "deployments", "api"
+		e.OperationID = fmt.Sprintf("op-%d", i)
+		if err := a.Record(e); err != nil {
+			t.Fatal(err)
+		}
+	}
+	return path
+}
+
+func TestSecurityAuditIsolatesHomonymousContexts(t *testing.T) {
+	at := time.Date(2026, 11, 25, 12, 0, 0, 0, time.UTC)
+	path := auditFile(t,
+		guard.AuditEvent{Timestamp: at.Add(-time.Hour), Context: "dev", Identity: "session-1", Outcome: guard.Succeeded},
+		guard.AuditEvent{Timestamp: at.Add(time.Minute), Context: "dev", Identity: "session-2", Outcome: guard.Succeeded},
+		guard.AuditEvent{Timestamp: at.Add(time.Minute), Context: "prod", Identity: "session-1", Outcome: guard.Succeeded},
+		guard.AuditEvent{Timestamp: at.Add(2 * time.Minute), Context: "dev", Identity: "session-1", Outcome: guard.Unknown},
+	)
+	open := func(identity string) Model {
+		m := nodeModel(t, auditSource{Demo: data.NewDemo(), path: path}, 160, 48)
+		m.session.Identity, m.started = identity, at
+		return step(t, m, "5", "[")
+	}
+	m := open("session-1")
+	rows := m.auditRows()
+	if len(rows) != 1 || rows[0].OperationID != "op-3" || rows[0].Outcome != "outcome_unknown" || m.auditState().Hidden != 3 {
+		t.Fatalf("the default filter isolates context, identity and session start: %+v", rows)
+	}
+	if other := open("session-2"); len(other.auditRows()) != 1 || other.auditRows()[0].OperationID != "op-1" {
+		t.Fatal("the same context name under another identity is another session")
+	}
+	if none := open(""); len(none.auditRows()) != 0 || none.auditState().Hidden != 4 {
+		t.Fatal("a session without identity shows nothing by default")
+	}
+	all := step(t, m, "tab", "enter")
+	if len(all.auditRows()) != 4 {
+		t.Fatal("other sessions only appear through the explicit filter")
+	}
+	plain := all.Render().Plain()
+	for _, want := range []string{"CONTEXTO", "prod        12:01:00Z", "dev         12:02:00Z", "Todas as sessões; sem reuso para ação", "[Somente esta sessão]"} {
+		if !strings.Contains(plain, want) {
+			t.Fatalf("every row names its context, missing %q", want)
+		}
+	}
+	nav := all.nav
+	for _, k := range []string{"down", "up", "shift+tab", "enter"} {
+		all = step(t, all, k)
+	}
+	if all.nav != nav {
+		t.Fatal("audit rows never become a route or an action target")
+	}
+}
+
+func TestSecurityAuditSessionSwitchAndOrder(t *testing.T) {
+	path := auditFixture(t, 450)
+	m := step(t, auditModel(t, path, 160, 48), "tab", "enter")
+	if !m.sec.audit.all {
+		t.Fatal("filter widened")
+	}
+	next := New(Options{Source: auditSource{Demo: data.NewDemo(), path: path}, NoAnim: true, Session: data.SessionRef{Identity: "session-2", Generation: m.session.Generation + 1}})
+	if next.sec.audit.all || next.sec.audit.events != nil {
+		t.Fatal("a new session starts without the widened filter or rows")
+	}
+	if got := step(t, m, "]", "["); got.sec.audit.all {
+		t.Fatal("reopening the tab restores the session filter")
+	}
+
+	page := func(op string) guard.AuditPage {
+		return guard.AuditPage{Events: []guard.AuditEvent{{OperationID: op, Context: "dev", Identity: "session-1"}}}
+	}
+	waiting := m
+	waiting.sec.audit.loading = true
+	before := len(waiting.sec.audit.events)
+	for _, msg := range []auditPageMsg{
+		{session: m.session.Generation, seq: m.sec.audit.seq - 1, page: page("older")},
+		{session: m.session.Generation, seq: m.sec.audit.seq + 1, page: page("newer")},
+		{session: m.session.Generation + 1, seq: m.sec.audit.seq, page: page("other")},
+	} {
+		if got := deliver(t, waiting, msg); len(got.sec.audit.events) != before {
+			t.Fatalf("out of order page applied: %+v", msg)
+		}
+	}
+
+	failed := waiting
+	if failed = deliver(t, failed, auditPageMsg{session: m.session.Generation, seq: m.sec.audit.seq, err: guard.ErrAuditUnreadable}); failed.sec.audit.state != ui.AuditUnavailable || len(failed.sec.audit.events) != 0 || len(failed.auditRows()) != 0 {
+		t.Fatal("an unavailable audit keeps no residual rows")
+	}
+}
+
+func TestSecurityAuditReaderEndsWithTabAndSession(t *testing.T) {
+	path := auditFixture(t, 450)
+	for name, leave := range map[string]func(Model) Model{
+		"tab":    func(m Model) Model { return step(t, m, "]") },
+		"screen": func(m Model) Model { return step(t, m, "2") },
+		"back":   func(m Model) Model { return step(t, m, "esc") },
+	} {
+		m := auditModel(t, path, 160, 48)
+		next, cmd := m.Update(keyPress("end"))
+		m = next.(Model)
+		if cmd == nil || !m.sec.audit.loading || m.sec.audit.cancel == nil {
+			t.Fatal("the next page is requested")
+		}
+		left := leave(m)
+		if left.sec.audit.cancel != nil || left.sec.audit.loading {
+			t.Fatalf("leaving by %s keeps the reader", name)
+		}
+		for _, msg := range runCmd(cmd) {
+			if p, ok := msg.(auditPageMsg); ok {
+				if p.err == nil {
+					t.Fatalf("leaving by %s must cancel the read", name)
+				}
+				if got := deliver(t, left, p); got.sec.audit.events != nil {
+					t.Fatal("a canceled page is discarded")
+				}
+			}
+		}
+	}
+
+	sess, life := newSession()
+	m := auditModel(t, path, 160, 48)
+	m.life = life
+	next, cmd := m.Update(keyPress("end"))
+	sess.cancel()
+	m = next.(Model)
+	for _, msg := range runCmd(cmd) {
+		if p, ok := msg.(auditPageMsg); ok && p.err == nil {
+			t.Fatal("ending the session cancels the read")
+		}
 	}
 }

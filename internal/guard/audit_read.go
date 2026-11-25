@@ -2,6 +2,7 @@ package guard
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -47,7 +48,7 @@ func auditSegmentName(name string, i int) string {
 	return fmt.Sprintf("%s.%d", name, i)
 }
 
-func ReadAudit(path string, cursor AuditCursor, limit int) (page AuditPage, readErr error) {
+func ReadAudit(ctx context.Context, path string, cursor AuditCursor, limit int) (page AuditPage, readErr error) {
 	if limit <= 0 || limit > AuditPageSize {
 		limit = AuditPageSize
 	}
@@ -71,12 +72,15 @@ func ReadAudit(path string, cursor AuditCursor, limit int) (page AuditPage, read
 	if current, statErr := root.Stat("."); statErr != nil || !os.SameFile(info, current) {
 		return page, ErrAuditUnreadable
 	}
-	r := auditReader{root: root, name: name, limit: limit, budget: auditReadBudget, page: &page}
+	r := auditReader{ctx: ctx, root: root, name: name, limit: limit, budget: auditReadBudget, page: &page}
 	start := 0
 	if cursor.started {
 		start = cursor.segment
 	}
 	for seg := start; seg < auditSegments; seg++ {
+		if ctx.Err() != nil {
+			return AuditPage{}, ErrAuditUnreadable
+		}
 		resume := cursor.started && seg == cursor.segment
 		done, err := r.segment(seg, resume, cursor)
 		if err != nil {
@@ -95,6 +99,7 @@ func ReadAudit(path string, cursor AuditCursor, limit int) (page AuditPage, read
 }
 
 type auditReader struct {
+	ctx    context.Context
 	root   *os.Root
 	name   string
 	limit  int
@@ -114,7 +119,7 @@ func (r *auditReader) segment(seg int, resume bool, cursor AuditCursor) (done bo
 	if err != nil || !private(linfo, false) || linfo.Size() > auditSegmentMax {
 		return false, ErrAuditUnreadable
 	}
-	file, err := r.root.OpenFile(entry, os.O_RDONLY|auditNoFollow, 0)
+	file, err := r.root.OpenFile(entry, os.O_RDONLY|auditReadFlags, 0)
 	if err != nil {
 		return false, ErrAuditUnreadable
 	}
@@ -133,6 +138,9 @@ func (r *auditReader) segment(seg int, resume bool, cursor AuditCursor) (done bo
 	}
 	trimTail := !resume
 	for end > 0 {
+		if r.ctx.Err() != nil {
+			return false, ErrAuditUnreadable
+		}
 		if len(r.page.Events) >= r.limit || r.budget <= auditLineLimit {
 			r.page.Next = AuditCursor{started: true, segment: seg, end: end, info: info}
 			return true, nil

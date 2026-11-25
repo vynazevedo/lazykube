@@ -2,7 +2,10 @@ package guard
 
 import "os"
 
-const auditNoFollow = 0
+const (
+	auditNoFollow  = 0
+	auditReadFlags = 0
+)
 
 func private(os.FileInfo, bool) bool { return false }
 
