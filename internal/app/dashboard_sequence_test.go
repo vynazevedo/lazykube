@@ -11,6 +11,7 @@ import (
 	tea "charm.land/bubbletea/v2"
 
 	"github.com/vynazevedo/lazykube/internal/draw"
+	"github.com/vynazevedo/lazykube/internal/theme"
 	"github.com/vynazevedo/lazykube/internal/ui"
 )
 
@@ -92,7 +93,14 @@ func regionCrop(c *draw.Canvas, r Rect) string {
 	for y := r.Y; y < r.Y+r.H; y++ {
 		for x := r.X; x < r.X+r.W; x++ {
 			cell := c.At(x, y)
-			fmt.Fprintf(&cells, "%v|", cell)
+			cells.WriteString(cell.Link.String())
+			fmt.Fprintf(&cells, "%v|", struct {
+				Rune   rune
+				Extra  string
+				Cont   bool
+				Fg, Bg theme.RGB
+				Bold   bool
+			}{cell.Rune, cell.Extra, cell.Cont, cell.Fg, cell.Bg, cell.Bold})
 			if !cell.Cont {
 				plain.WriteRune(cell.Rune)
 				plain.WriteString(cell.Extra)

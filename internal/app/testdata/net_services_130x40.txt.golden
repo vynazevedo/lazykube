@@ -1,0 +1,40 @@
+ lazykube [DEMO] [RO]  v2.0   ◎ context demo namespace Todos   k8s demo  nodes 1  ns 8  pods 13        ⠙ metrics every 5s ● live  
+  2 Dashboard  |  3 Workloads  |  4 Nodes  |  5 Security  |  6 Events  |  7 Radar                                         m menu  
+ Network · Services                                                                                                               
+ ╭─ Services · focus ───────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ │ escopo todos os namespaces  ·  cobertura completa no escopo  ·  8 itens  ·  [DEMO]                                           │ 
+ │   NAME                        NAMESPACE        TYPE         PORTS              CLUSTER-IP      EXTERNAL                 AGE  │ 
+ │ › bilibili-live               bilibili-raffle  ClusterIP    80                 10.43.10.11     -                         3d  │ 
+ │   bilibili-raffle             bilibili-raffle  ClusterIP    80                 10.43.10.12     -                         3d  │ 
+ │   lgo                         lgo              NodePort     80:30080           10.43.20.5      -                         3d  │ 
+ │   odoo                        ys-odoo          LoadBalancer 8069:31069         10.43.30.8      pendente                  3d  │ 
+ │   psql                        ys-odoo          ClusterIP    5432               10.43.30.9      -                         3d  │ 
+ │   qiandao                     xcx              ClusterIP    80                 10.43.40.2      -                         3d  │ 
+ │   kube-dns                    kube-system      ClusterIP    53/UDP             10.43.0.10      -                         3d  │ 
+ │   traefik                     kube-system      LoadBalancer 80:32080,443:32443 10.43.0.80      192.168.0.12              3d  │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │                                                                                                                              │ 
+ │ enter detalhe · / filtra · r recarrega                                                                                       │ 
+ ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   enter  detail   /  filter   r  reload   esc  back   b  tree   m  menu   ?  help   q  quit          bubbletea · 0 fps 

@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -38,6 +39,7 @@ type fakeBrowser struct {
 	cancels   *atomic.Int32
 	refreshes *atomic.Int32
 	keys      *[]data.ResourceSubscriptionKey
+	mu        *sync.Mutex
 }
 
 func newFakeBrowser(avail map[string]data.ResourceAvailability, pages map[schema.GroupVersionResource]data.ResourcePage) fakeBrowser {
@@ -52,7 +54,7 @@ func newFakeBrowser(avail map[string]data.ResourceAvailability, pages map[schema
 		}
 		snap.Resources = append(snap.Resources, data.ResourceDescriptor{GVR: w.gvr, Kind: string(w.kind), Namespaced: true, List: true, Watch: true, Availability: a})
 	}
-	return fakeBrowser{Demo: data.NewDemo(), snap: snap, pages: pages, catalogs: &atomic.Int32{}, subs: &atomic.Int32{}, cancels: &atomic.Int32{}, refreshes: &atomic.Int32{}, keys: &[]data.ResourceSubscriptionKey{}}
+	return fakeBrowser{Demo: data.NewDemo(), snap: snap, pages: pages, catalogs: &atomic.Int32{}, subs: &atomic.Int32{}, cancels: &atomic.Int32{}, refreshes: &atomic.Int32{}, keys: &[]data.ResourceSubscriptionKey{}, mu: &sync.Mutex{}}
 }
 
 func (b fakeBrowser) Catalog(context.Context, bool) data.ResourceCatalogSnapshot {
@@ -62,6 +64,8 @@ func (b fakeBrowser) Catalog(context.Context, bool) data.ResourceCatalogSnapshot
 
 func (b fakeBrowser) Subscribe(_ context.Context, key data.ResourceSubscriptionKey) (data.ResourceSubscription, error) {
 	b.subs.Add(1)
+	b.mu.Lock()
+	defer b.mu.Unlock()
 	*b.keys = append(*b.keys, key)
 	return &fakeHandle{page: b.pages[key.GVR], changes: make(chan struct{}, 1), cancels: b.cancels, refreshes: b.refreshes}, nil
 }
@@ -77,29 +81,43 @@ func drive(t *testing.T, m Model, cmd tea.Cmd) Model {
 	t.Helper()
 	queue := []tea.Cmd{cmd}
 	for len(queue) > 0 {
-		c := queue[0]
-		queue = queue[1:]
-		if c == nil {
-			continue
+		outs := make([]chan tea.Msg, len(queue))
+		for i, c := range queue {
+			outs[i] = make(chan tea.Msg, 1)
+			if c == nil {
+				outs[i] <- nil
+				continue
+			}
+			go func() { outs[i] <- c() }()
 		}
-		out := make(chan tea.Msg, 1)
-		go func() { out <- c() }()
-		var msg tea.Msg
-		select {
-		case msg = <-out:
-		case <-time.After(100 * time.Millisecond):
-			continue
+		queue = nil
+		deadline := time.After(100 * time.Millisecond)
+		expired := false
+		for _, out := range outs {
+			var msg tea.Msg
+			if expired {
+				select {
+				case msg = <-out:
+				default:
+				}
+			} else {
+				select {
+				case msg = <-out:
+				case <-deadline:
+					expired = true
+				}
+			}
+			if batch, ok := msg.(tea.BatchMsg); ok {
+				queue = append(queue, batch...)
+				continue
+			}
+			if msg == nil {
+				continue
+			}
+			next, more := m.Update(msg)
+			m = next.(Model)
+			queue = append(queue, more)
 		}
-		if batch, ok := msg.(tea.BatchMsg); ok {
-			queue = append(queue, batch...)
-			continue
-		}
-		if msg == nil {
-			continue
-		}
-		next, more := m.Update(msg)
-		m = next.(Model)
-		queue = append(queue, more)
 	}
 	return m
 }

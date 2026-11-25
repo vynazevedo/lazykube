@@ -1,6 +1,8 @@
 package app
 
 import (
+	"strings"
+
 	"charm.land/bubbles/v2/key"
 	tea "charm.land/bubbletea/v2"
 
@@ -104,10 +106,22 @@ func (m Model) handleOverlayKey(msg tea.KeyPressMsg) (Model, tea.Cmd) {
 	switch {
 	case key.Matches(msg, k.Esc), key.Matches(msg, k.Enter):
 		m.dep.open = false
+	case key.Matches(msg, k.NextURL):
+		m.openDeploymentAccess()
 	case key.Matches(msg, k.Quit):
 		return m, tea.Quit
 	}
 	return m, nil
+}
+
+func (m *Model) openDeploymentAccess() {
+	w, ok := workloadLeafFor(DestDeployments)
+	ns, name, found := strings.Cut(m.dep.key, "/")
+	if !ok || !found {
+		return
+	}
+	m.dep.open = false
+	m.openResourceRef(w, data.ResourceRow{Ref: data.ResourceMetadataRef{Namespace: ns, Name: name}})
 }
 
 func (m Model) deploymentOverlayState() ui.DeploymentOverlayState {

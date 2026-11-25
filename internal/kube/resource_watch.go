@@ -154,6 +154,7 @@ func (e *resourceEntry) list() (string, bool, bool, resourceResult) {
 		for i := range page.Items {
 			row, ok := projectResource(&page.Items[i])
 			row.Workload = resourceWorkload(&page.Items[i], e.key.GVR)
+			row.Network = e.facts(&page.Items[i])
 			ok = ok && resourceRowFits(row)
 			if !ok {
 				e.state(data.CoveragePartial, "object exceeds metadata limits")
@@ -242,6 +243,7 @@ func (e *resourceEntry) watch(rv string, complete bool) resourceResult {
 			}
 			row, valid := projectResource(object)
 			row.Workload = resourceWorkload(event.Object, e.key.GVR)
+			row.Network = e.facts(event.Object)
 			valid = valid && resourceRowFits(row)
 			if !valid {
 				e.state(data.CoveragePartial, "object exceeds metadata limits")

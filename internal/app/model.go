@@ -47,6 +47,7 @@ type Model struct {
 	nav  router
 	menu menuState
 	dep  depOverlay
+	urls urlPicker
 
 	security          data.SecuritySnapshot
 	securitySession   data.SecuritySession
@@ -93,6 +94,7 @@ type Model struct {
 	workloadsLeaf DestinationID
 	tree          treeState
 	res           resourceState
+	acc           accessState
 	manifest      []string
 	describe      []data.Field
 
@@ -241,7 +243,7 @@ func (m *Model) screenLayout() func(w, h int) Layout {
 		return ComputeSecurity
 	case m.onScreen(ScreenRadar):
 		return ComputeRadar
-	case m.onScreen(ScreenResources), m.onScreen(ScreenOverview):
+	case m.onTables():
 		return ComputeTable
 	}
 	mode := m.leftMode
@@ -281,7 +283,7 @@ func (m *Model) applyCompact() {
 		return
 	}
 	switch {
-	case m.inDetail(), m.onScreen(ScreenResources), m.onScreen(ScreenOverview):
+	case m.inDetail(), m.onTables():
 	case m.onScreen(ScreenEvents):
 		if m.ev.reading {
 			l.Events = Rect{}
@@ -471,6 +473,10 @@ func (m Model) update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.dep.open = false
 			return wake(idle, m, nil)
 		}
+		if m.urls.open {
+			m.urls = urlPicker{}
+			return wake(idle, m, nil)
+		}
 		next, consumed := m.treeMouse(tea.Mouse(msg))
 		if consumed {
 			return wake(idle, next, nil)
@@ -485,7 +491,7 @@ func (m Model) update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		next, cmd := m.screen().Update(m, msg)
 		return wake(idle, next, cmd)
 	case tea.MouseWheelMsg:
-		if m.menu.open || m.dep.open || m.helpOpen {
+		if m.menu.open || m.dep.open || m.urls.open || m.helpOpen {
 			return m, nil
 		}
 		if m.tree.visible && m.layout.Hit(msg.X, msg.Y) == AreaTree {
@@ -511,6 +517,7 @@ func (m *Model) suspendForSmall() {
 		m.dg.search.Blur()
 	}
 	m.helpOpen, m.menu.open, m.dep.open = false, false, false
+	m.urls = urlPicker{}
 }
 
 func (m *Model) smallKey(msg tea.KeyPressMsg) tea.Cmd {

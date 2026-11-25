@@ -27,6 +27,9 @@ func (d *Demo) Catalog(ctx context.Context, _ bool) ResourceCatalogSnapshot {
 	}{{"", "pods", WorkloadPod}, {"apps", "deployments", WorkloadDeployment}, {"apps", "statefulsets", WorkloadStatefulSet}, {"apps", "daemonsets", WorkloadDaemonSet}, {"batch", "jobs", WorkloadJob}, {"batch", "cronjobs", WorkloadCronJob}, {"apps", "replicasets", WorkloadReplicaSet}} {
 		out.Resources = append(out.Resources, ResourceDescriptor{GVR: schema.GroupVersionResource{Group: r.group, Version: "v1", Resource: r.resource}, Kind: string(r.kind), Namespaced: true, Preferred: true, List: true, Watch: true, Availability: ResourceServed})
 	}
+	for _, r := range demoNetworkResources {
+		out.Resources = append(out.Resources, ResourceDescriptor{GVR: r.gvr, Kind: r.kind, Namespaced: r.namespaced, Preferred: true, List: true, Watch: true, Availability: ResourceServed})
+	}
 	return out
 }
 
@@ -36,7 +39,7 @@ func (d *Demo) Subscribe(ctx context.Context, key ResourceSubscriptionKey) (Reso
 	if ctx.Err() != nil {
 		return nil, ctx.Err()
 	}
-	if key.Session != c.Session || key.Generation != c.Generation || key.ProjectionVersion != ResourceProjectionVersion || descriptor.Availability != ResourceServed || d.namespace != "" && key.Namespace != d.namespace {
+	if key.Session != c.Session || key.Generation != c.Generation || key.ProjectionVersion != ResourceProjectionVersion && key.ProjectionVersion != ResourceNetworkProjection || descriptor.Availability != ResourceServed || descriptor.Namespaced && d.namespace != "" && key.Namespace != d.namespace {
 		return nil, errors.New("demo resource scope unavailable")
 	}
 	ls, err := labels.Parse(key.LabelSelector)
@@ -47,7 +50,13 @@ func (d *Demo) Subscribe(ctx context.Context, key ResourceSubscriptionKey) (Reso
 	if err != nil {
 		return nil, errors.New("invalid demo selector")
 	}
-	rows := d.demoResourceRows(WorkloadKind(descriptor.Kind), c.ObservedAt)
+	rows, network := d.demoNetworkRows(key.GVR.Resource, c.ObservedAt)
+	if !network {
+		rows = d.demoResourceRows(WorkloadKind(descriptor.Kind), c.ObservedAt)
+		if key.ProjectionVersion == ResourceNetworkProjection {
+			d.addDemoFacts(rows, WorkloadKind(descriptor.Kind))
+		}
+	}
 	kept := make([]ResourceRow, 0, len(rows))
 	for _, row := range rows {
 		if (key.Namespace == "" || key.Namespace == row.Ref.Namespace) && ls.Matches(labels.Set{"app": "demo"}) && fs.Matches(fields.Set{"metadata.name": row.Ref.Name, "metadata.namespace": row.Ref.Namespace}) {

@@ -8,10 +8,10 @@ import (
 func TestDemoResourceBrowserWorkloads(t *testing.T) {
 	d := NewDemoScoped("demo", "apps")
 	catalog := d.Catalog(context.Background(), false)
-	if !catalog.Synthetic || len(catalog.Resources) != 7 {
+	if !catalog.Synthetic || len(catalog.Resources) != 7+len(demoNetworkResources) {
 		t.Fatal(catalog)
 	}
-	for _, descriptor := range catalog.Resources {
+	for _, descriptor := range catalog.Resources[:7] {
 		key := ResourceSubscriptionKey{Session: catalog.Session, Generation: catalog.Generation, GVR: descriptor.GVR, Namespace: "apps", ProjectionVersion: ResourceProjectionVersion}
 		h, err := d.Subscribe(context.Background(), key)
 		if err != nil {

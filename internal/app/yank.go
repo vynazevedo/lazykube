@@ -36,6 +36,12 @@ func (m Model) yankTarget() (yank, bool) {
 	switch {
 	case m.inDetail():
 		return m.yankDetails()
+	case m.onScreen(ScreenResourceDetail):
+		_, ref, ok := m.activeResource()
+		if !ok {
+			return yank{}, false
+		}
+		return yankRef(ref.Namespace, ref.Name)
 	case m.onScreen(ScreenEvents):
 		return m.yankEvent()
 	case m.onScreen(ScreenResources):
@@ -137,10 +143,14 @@ func (m Model) yankTableRow() (yank, bool) {
 		return yank{}, false
 	}
 	ref := st.Page.Items[st.Cursor].Ref
-	if ref.Namespace == "" {
-		return named(ref.Name)
+	return yankRef(ref.Namespace, ref.Name)
+}
+
+func yankRef(namespace, name string) (yank, bool) {
+	if namespace == "" {
+		return named(name)
 	}
-	return named(ref.Namespace + "/" + ref.Name)
+	return named(namespace + "/" + name)
 }
 
 func (m Model) yank() (Model, tea.Cmd) {
@@ -148,6 +158,10 @@ func (m Model) yank() (Model, tea.Cmd) {
 	if !ok {
 		return m, m.showNotice("nada para copiar")
 	}
+	return m.copyText(y)
+}
+
+func (m Model) copyText(y yank) (Model, tea.Cmd) {
 	if size := base64.StdEncoding.EncodedLen(len(y.text)); size > clipboardLimit {
 		return m, m.showNotice(fmt.Sprintf("grande demais para copiar (%d KiB, limite %d KiB)", (size+1023)/1024, clipboardLimit/1024))
 	}

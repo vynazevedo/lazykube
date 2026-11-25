@@ -117,6 +117,9 @@ func FullHelpDetail() []KeyHelp {
 		if h.Key == "esc" {
 			h.Desc = "clear search, back"
 		}
+		if h.Key == "y" {
+			out = append(out, KeyHelp{"u", "copy a URL (Describe)"})
+		}
 		out = append(out, h)
 	}
 	return out

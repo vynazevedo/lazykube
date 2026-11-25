@@ -1,0 +1,40 @@
+ lazykube [DEMO] [RO]  v2.0   ◎ context demo namespace Todos   k8s demo  nodes 1  ns 8  pods 13        ⠙ metrics every 5s ● live  
+ [2 Dashboard] |  3 Workloads  |  4 Nodes  |  5 Security  |  6 Events  |  7 Radar                                         m menu  
+ Dashboard > bilibili-live-7f6b8d9c5-mn4tz                                                                                        
+ ╭─ Pod bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz ──────────────────────────────────────────────────────────────────────────╮ 
+ │  Log   Config   Top   Describe   Events   Security                                                                           │ 
+ │ ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── │ 
+ │ ● bilibili-live-7f6b8d9c5-mn4tz                                                                                    [Running] │ 
+ │   bilibili-raffle · Running · ready 2/2 · node demo-node-01 · 10.42.0.24                                                     │ 
+ │        ╭─ Copiar URL · bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz ───────────────────────────────────────────────╮        │ 
+ │ ╭──────│                                                                                                            │──────╮ │ 
+ │ │ Conta│  › ● Ingress      https://live.example.com                                                                 │      │ │ 
+ │ │ ● app│    ● ClusterIP    http://10.43.10.11                                                                       │ logs │ │ 
+ │ │      │                                                                                                            │      │ │ 
+ │ │      │                                                                                                            │      │ │ 
+ │ │      │                                                                                                            │      │ │ 
+ │ │ ● app│                                                                                                            │      │ │ 
+ │ │      │                                                                                                            │      │ │ 
+ │ │ Acess│                                                                                                            │      │ │ 
+ │ │ ● Ing│                                                                                                            │      │ │ 
+ │ │      │                                                                                                            │      │ │ 
+ │ │      │                                                                                                            │      │ │ 
+ │ │ ● Clu│                                                                                                            │      │ │ 
+ │ │      │                                                                                                            │      │ │ 
+ │ │      │                                                                                                            │      │ │ 
+ │ │      │  ────────────────────────────────────────────────────────────────────────────────────────────────────────  │      │ │ 
+ │ │      │  URL completa, 1 de 2; host em destaque                                                                    │      │ │ 
+ │ │ Rota │  https://live.example.com                                                                                  │      │ │ 
+ │ │ ● Ing│  pronta · provável rede privada, alcance não verificado                                                    │      │ │ 
+ │ │      │                                                                                                            │      │ │ 
+ │ │ ● Ing│  ↑↓ escolhe · enter copia o texto acima · esc fecha                                                        │      │ │ 
+ │ │ ● TLS│                                                                                                            │      │ │ 
+ │ │ ● Ser╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯      │ │ 
+ │ │ ● Porta        http 80/TCP                                                                                               │ │ 
+ │ │ ● Pods         1 de 1 prontos                                                                                            │ │ 
+ │ │ ● Endpoints    http 80/TCP: 1 de 1 prontos                                                                               │ │ 
+ │ │ ● Endereço     endereço publicado no Ingress                                                                             │ │ 
+ │ ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │ 
+ ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  choose   enter  copy   esc  close   q  quit                                                               bubbletea · 0 fps 

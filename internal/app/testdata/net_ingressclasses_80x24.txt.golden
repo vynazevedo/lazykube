@@ -1,0 +1,24 @@
+ lazykube [DEMO] [RO]  ◎ context demo namespace Todos   k8s demo      ⠙ ● live  
+  2 Dashboard | 3 Workloads | 4 Nodes | 5 Security | 6 Events | 7 Radar         
+ Network · IngressClasses                                                       
+ ╭─ IngressClasses · focus ───────────────────────────────────────────────────╮ 
+ │ escopo cluster  ·  cobertura completa no escopo  ·  1 itens  ·  [DEMO]     │ 
+ │   NAME                       CONTROLLER                           DEFAULT  │ 
+ │ › traefik                    traefik.io/ingress-controller        sim      │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │ enter detalhe · / filtra · r recarrega                                     │ 
+ ╰────────────────────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   enter  detail   /  filter   r  reload            bubbletea · 0 fps 

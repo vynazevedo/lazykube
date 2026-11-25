@@ -42,7 +42,7 @@
  │                                                                                                                                                            │ 
  │                                                                                                                                                            │ 
  │                                                                                                                                                            │ 
- │ detalhe, YAML e relações: contrato futuro · r recarrega                                                                                                    │ 
+ │ enter detalhe · / filtra · r recarrega                                                                                                                     │ 
  ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
 ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-  ↑↓  move   r  reload   esc  back   b  tree   m  menu   ?  help   q  quit   y  copy                                                          bubbletea · 0 fps 
+  ↑↓  move   enter  detail   /  filter   r  reload   esc  back   b  tree   m  menu   ?  help   q  quit   y  copy                              bubbletea · 0 fps 

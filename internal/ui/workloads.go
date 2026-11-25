@@ -65,12 +65,13 @@ func DeploymentOverlay(screen draw.Region, st DeploymentOverlayState, ctx Ctx) {
 	line(2, draw.Line{muted("Ready/Desired  "), bold(fmt.Sprintf("%d/%d", d.Ready, d.Desired), ready)})
 	line(3, draw.Line{muted("Cobertura      "), text(draw.Sanitize(coverageText(st.Coverage)))})
 	line(5, draw.Line{faint("Sem relação inferida com pods; owners dependem de contrato futuro.")})
-	line(inner.H-1, draw.Line{faint("enter / esc fechar")})
+	line(inner.H-1, draw.Line{faint("u acesso (URLs e rota) · enter / esc fechar")})
 }
 
 func OverlayHelp() []KeyHelp {
 	return []KeyHelp{
 		{"enter esc", "close"},
+		{"u", "access"},
 		{"q", "quit"},
 	}
 }

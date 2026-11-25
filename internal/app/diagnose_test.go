@@ -48,7 +48,7 @@ func TestHelpIsHonest(t *testing.T) {
 			t.Fatalf("implemented key %q missing from help", k)
 		}
 	}
-	for _, list := range [][]ui.KeyHelp{ui.FullHelp(), ui.ShortHelp(), ui.PodDetailHelp(), ui.MenuHelp(), ui.NodesHelp(), ui.FullHelpNodes(), ui.EventsHelp(true), ui.FullHelpEvents(true), ui.EventsHelp(false), ui.FullHelpEvents(false), ui.TreeHelp(), ui.FullHelpTree(), ui.RadarHelp(), ui.FullHelpRadar(), ui.SecurityHelp(), ui.FullHelpSecurity()} {
+	for _, list := range [][]ui.KeyHelp{ui.FullHelp(), ui.ShortHelp(), ui.PodDetailHelp(), ui.MenuHelp(), ui.NodesHelp(), ui.FullHelpNodes(), ui.EventsHelp(true), ui.FullHelpEvents(true), ui.EventsHelp(false), ui.FullHelpEvents(false), ui.TreeHelp(), ui.FullHelpTree(), ui.RadarHelp(), ui.FullHelpRadar(), ui.SecurityHelp(), ui.FullHelpSecurity(), ui.ResourceHelp(), ui.ResourceDetailHelp(), ui.FullHelpResourceDetail()} {
 		for _, h := range list {
 			for _, k := range strings.Fields(h.Key) {
 				if _, ok := registry.shortcut(k); !ok && k != "1" && len(k) == 1 && k >= "0" && k <= "9" {

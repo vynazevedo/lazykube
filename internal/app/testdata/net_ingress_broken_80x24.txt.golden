@@ -1,0 +1,24 @@
+ lazykube [DEMO] [RO]  ◎ context demo namespace Todos   k8s demo      ⠙ ● live  
+  2 Dashboard | 3 Workloads | 4 Nodes | 5 Security | 6 Events | 7 Radar         
+ Network · Ingresses > erp                                                      
+ ╭─ Ingresses · ys-odoo/erp · [DEMO] ─────────────────────────────────────────╮ 
+ │ Nome              erp                                                      │ 
+ │ Namespace         ys-odoo                                                  │ 
+ │ Idade             3d                                                       │ 
+ │ Cobertura         cobertura completa no escopo                             │ 
+ │ Classe            traefik                                                  │ 
+ │ Endereço          192.168.0.12                                             │ 
+ │ Regra             erp.example.com/erp Prefix para erp:http                 │ 
+ │                                                                            │ 
+ │ Acesso  1 endereço · estado pelos endpoints lidos; nenhuma requisição foi… │ 
+ │ ✗ Ingress      http://erp.example.com/erp                                  │ 
+ │           estado    sem backend · Ingress ys-odoo/erp · sem TLS declarado  │ 
+ │           alcance   provável rede privada, alcance não verificado          │ 
+ │           motivo    o Service ys-odoo/erp não existe na lista lida         │ 
+ │           ↳ u escolhe e copia uma URL                                      │ 
+ │                                                                            │ 
+ │ Rota  primeiro elo quebrado pelos objetos lidos                            │ 
+ │ ✗ Ingress ys-odoo/erp erp.example.com/erp para erp:http                    │ 
+ ╰────────────────────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────
+  ↑↓  scroll   u  URLs   y  copy name   r  reload   esc  back bubbletea · 0 fps 

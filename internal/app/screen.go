@@ -20,6 +20,7 @@ const (
 	ScreenOverview
 	ScreenRadar
 	ScreenSecurity
+	ScreenResourceDetail
 )
 
 type Screen interface {
@@ -54,6 +55,8 @@ func screenFor(id ScreenID) (Screen, bool) {
 		return radarScreen{}, true
 	case ScreenSecurity:
 		return securityScreen{}, true
+	case ScreenResourceDetail:
+		return resourceDetailScreen{}, true
 	}
 	return nil, false
 }

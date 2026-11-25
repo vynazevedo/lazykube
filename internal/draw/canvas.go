@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/vynazevedo/lazykube/internal/theme"
+	"github.com/vynazevedo/lazykube/internal/weburl"
 )
 
 type Cell struct {
@@ -14,6 +15,7 @@ type Cell struct {
 	Fg    theme.RGB
 	Bg    theme.RGB
 	Bold  bool
+	Link  weburl.URL
 }
 
 func (cl Cell) write(b *strings.Builder) {
@@ -84,12 +86,28 @@ func (c *Canvas) String() string {
 	for y := 0; y < c.h; y++ {
 		row := c.cells[y*c.w : (y+1)*c.w]
 		var prev Cell
+		var link weburl.URL
 		for x, cl := range row {
 			if x == 0 || cl.Fg != prev.Fg || cl.Bg != prev.Bg || cl.Bold != prev.Bold {
 				writeSGR(&b, cl)
 				prev = cl
 			}
+			if x == 0 || cl.Link != row[x-1].Link {
+				next := cl.Link
+				if !next.IsZero() {
+					if _, whole := linkRun(row, x); !whole {
+						next = weburl.URL{}
+					}
+				}
+				if next != link {
+					writeLink(&b, next)
+					link = next
+				}
+			}
 			cl.write(&b)
+		}
+		if !link.IsZero() {
+			writeLink(&b, weburl.URL{})
 		}
 		b.WriteString("\x1b[0m")
 		if y < c.h-1 {
@@ -97,6 +115,12 @@ func (c *Canvas) String() string {
 		}
 	}
 	return b.String()
+}
+
+func writeLink(b *strings.Builder, u weburl.URL) {
+	b.WriteString("\x1b]8;;")
+	b.WriteString(u.String())
+	b.WriteString("\x1b\\")
 }
 
 func writeSGR(b *strings.Builder, cl Cell) {

@@ -96,6 +96,7 @@ type ResourceRow struct {
 	Ref       ResourceMetadataRef
 	Workload  WorkloadSummary
 	Truncated bool
+	Network   *NetworkFacts
 }
 
 type ResourcePage struct {
@@ -108,6 +109,8 @@ type ResourcePage struct {
 	Total      int
 	Truncated  bool
 	Borrowed   bool
+	Filtered   bool
+	Matched    int
 	Workloads  WorkloadDistribution
 }
 
@@ -116,6 +119,10 @@ type ResourceSubscription interface {
 	Changes() <-chan struct{}
 	Refresh()
 	Cancel()
+}
+
+type ResourceSearcher interface {
+	Search(query string, limit int) ResourcePage
 }
 
 type ResourceBrowser interface {

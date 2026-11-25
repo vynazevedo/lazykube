@@ -214,7 +214,9 @@ nenhuma tecla a liga ou desliga. A política do contexto sempre prevalece.
 vírgula e bloqueiam ações mesmo com a flag. O cabeçalho mostra o modo, a proteção e o
 bloqueio por audit em todas as telas.
 
-A tecla `o` abre as ações do alvo em foco:
+A tecla `o` abre as ações do alvo em foco. Com o diálogo aberto, todas as teclas são
+dele, inclusive `u` e `y`, e nenhum link clicável fica na tela; com o seletor de URLs
+aberto, `o` não faz nada:
 
 | Alvo | Ações |
 | --- | --- |
@@ -224,7 +226,10 @@ A tecla `o` abre as ações do alvo em foco:
 | Node da tela Nodes | impedir ou permitir agendamentos (cordon e uncordon) |
 
 No Radar e na Security a tecla só age quando a linha é um pod exato, com UID e
-resourceVersion observados; nas demais linhas não faz nada. Edit, exec, port-forward,
+resourceVersion observados; nas demais linhas não faz nada. O detalhe de um workload age
+sobre o objeto aberto, preso ao UID. Nas listas e nos detalhes de Network `o` não abre
+ações, e nunca recai sobre o pod selecionado em outra tela; com o filtro da lista ainda
+em andamento, ela espera o resultado. Edit, exec, port-forward,
 drain, rollback e CronJob sob demanda não fazem parte desta versão. A tela Nodes só
 alcança o node de um pod selecionado.
 
@@ -361,8 +366,41 @@ fica ao lado do conteúdo; em terminais estreitos ela abre por cima e fecha ao
 escolher um destino. O shell funciona a partir de 80x24: abaixo de 120x36 as
 telas mostram um painel por vez, e `tab` alterna entre eles.
 
-O lazykube só lê o cluster: lista e observa recursos, segue logs e consulta
-métricas. Nenhuma ação de escrita é executada.
+Em Network, as listas de Services, EndpointSlices, Ingresses, IngressClasses e
+NetworkPolicies (e HTTPRoutes, só quando o cluster serve a Gateway API) têm
+colunas próprias, filtro com `/` e detalhe com `enter`. O filtro percorre todos
+os itens lidos da lista (até 10 mil) em segundo plano e mostra até 500; a linha
+de estado diz quantos corresponderam. O detalhe de Service,
+Ingress, workload (`u` no overlay de Deployments) e a aba Describe do pod trazem
+a seção Acesso: cada endereço diz de onde veio (Ingress, LoadBalancer,
+ExternalIP, NodePort ou ClusterIP), o alcance pelo que foi declarado, nunca
+verificado (declarada, provável rede privada, porta alocada no node ou endereço
+interno do cluster) e se os endpoints lidos a deixam pronta, em drenagem,
+pendente, sem backend ou desconhecida. ExternalName aparece como alias DNS, com destino não
+verificado. A seção Rota percorre Ingress, Service, EndpointSlice e Pod e
+aponta o primeiro elo quebrado com a evidência; endpoints que encerram mas ainda
+atendem aparecem como drenagem, com a contagem, e condições que não permitem
+concluir ficam indeterminadas. A porta do EndpointSlice é conferida por nome e
+protocolo. A seção calcula até 64 endereços e 32 rotas e avisa quando limita. Tudo vem só de objetos da API do
+Kubernetes: o lazykube não faz requisição HTTP, DNS ou TLS ao endereço, não lê
+Secrets e não afirma que a aplicação responde. Host vazio ou curinga não vira
+URL. Para NetworkPolicy, só diz quais políticas selecionam o pod, porque o
+efeito depende do CNI. Em Network, só Endpoints (o recurso legado) segue como
+`(futuro)`. No detalhe de um pod, a seção Acesso fica presa ao UID: se o pod for
+trocado por outro com o mesmo nome, as URLs saem da tela, o seletor fecha e uma
+ação ainda não enviada é cancelada.
+
+`u` abre o seletor de URLs: mostra a URL escolhida inteira, quebrada em linhas e
+com o host em destaque, e `enter` copia exatamente esse texto; se ela não couber
+no terminal, a cópia é recusada. `y` continua copiando nome, YAML ou linha de
+log. Só vira link clicável (OSC8) a
+URL http ou https com host ASCII validado, sem credencial, controle ou bidi, e
+visível por inteiro na linha; endereços internos do cluster podem ser copiados,
+mas não são links. O lazykube nunca abre navegador nem executa comando externo.
+
+Por padrão o lazykube só lê o cluster: lista e observa recursos, segue logs e
+consulta métricas. Escrever exige `--read-write` e a confirmação descrita em
+[Ações no cluster](#ações-no-cluster).
 
 ---
 
@@ -418,6 +456,7 @@ os painéis: clique seleciona, a roda rola e o clique na aba troca de aba.
  ├─ GERAL ───────────────────────────────────────────────┤
  │                                                       │
  │  y                 copia nome, YAML ou linha do log   │
+ │  u                 escolhe e copia URL da seção Acesso│
  │  o                 ações do alvo em foco              │
  │  p                 troca a paleta de cores            │
  │  ctrl+p            pausa / retoma animações           │
@@ -452,9 +491,20 @@ e, enquanto a janela enche, o painel mostra `coletando 12/60`.
  events (list/watch)             aba Events                 aviso na aba
  namespaces (list/watch)         painel Namespaces          deriva dos pods
  nodes (list/watch)              painel Node                contagem pelos pods
+ services (list/watch)           Network e Acesso           motivo na tela
+ endpointslices (list/watch)     Network e Acesso           motivo na tela
+ ingresses (list/watch)          Network e Acesso           motivo na tela
+ ingressclasses (list/watch)     Network e Acesso           motivo na tela
+ networkpolicies (list/watch)    Network e Acesso           motivo na tela
+ httproutes (list/watch)         Network, se servido        motivo na tela
  metrics.k8s.io pods, nodes      CPU, memória, heatmap      motivo no painel
  nodes/proxy (get)               rede RX/TX                 motivo no card
 ```
+
+Os recursos de Network só são lidos com a tela, o detalhe ou a seção Acesso
+abertos, no namespace do alvo quando há um, e a assinatura é liberada ao sair.
+Sem permissão, não servido e leitura parcial nunca viram lista vazia. Secrets não
+são lidos: de TLS, só o nome em `secretName`.
 
 Quando algo falta, o painel diz o motivo em vez de ficar vazio, por exemplo
 `metrics-server não instalado`, `sem permissão: nodes/proxy` ou

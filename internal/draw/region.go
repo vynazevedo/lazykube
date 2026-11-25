@@ -4,6 +4,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/vynazevedo/lazykube/internal/theme"
+	"github.com/vynazevedo/lazykube/internal/weburl"
 )
 
 type Region struct {
@@ -15,6 +16,7 @@ type Style struct {
 	Fg   theme.RGB
 	Bg   *theme.RGB
 	Bold bool
+	Link weburl.URL
 }
 
 func Fg(c theme.RGB) Style {
@@ -28,6 +30,13 @@ func (s Style) WithBg(bg theme.RGB) Style {
 
 func (s Style) WithBold() Style {
 	s.Bold = true
+	return s
+}
+
+func (s Style) WithLink(u weburl.URL) Style {
+	if u.Linkable() {
+		s.Link = u
+	}
 	return s
 }
 
@@ -105,17 +114,18 @@ func (r Region) putCell(x, y int, ch rune, extra string, cont bool, s Style) {
 	}
 	if cl.Cont && !cont {
 		if head := r.cell(x-1, y); head != nil {
-			head.Rune, head.Extra = ' ', ""
+			head.Rune, head.Extra, head.Link = ' ', "", weburl.URL{}
 		}
 	} else if next := r.cell(x+1, y); next != nil && next.Cont && !cont {
 		next.Cont = false
-		next.Rune, next.Extra = ' ', ""
+		next.Rune, next.Extra, next.Link = ' ', "", weburl.URL{}
 	}
 	cl.Rune = ch
 	cl.Extra = extra
 	cl.Cont = cont
 	cl.Fg = s.Fg
 	cl.Bold = s.Bold
+	cl.Link = s.Link
 	if s.Bg != nil {
 		cl.Bg = *s.Bg
 	}

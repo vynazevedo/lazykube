@@ -59,6 +59,12 @@ const (
 	DestCronJobs       DestinationID = "workloads.cronjobs"
 	DestConfiguration  DestinationID = "configuration"
 	DestNetwork        DestinationID = "network"
+	DestServices       DestinationID = "network.services"
+	DestEndpointSlices DestinationID = "network.endpointslices"
+	DestIngresses      DestinationID = "network.ingresses"
+	DestIngressClasses DestinationID = "network.ingressclasses"
+	DestNetPolicies    DestinationID = "network.networkpolicies"
+	DestHTTPRoutes     DestinationID = "network.httproutes"
 	DestStorage        DestinationID = "storage"
 	DestNamespaces     DestinationID = "namespaces"
 	DestEvents         DestinationID = "events"
@@ -130,7 +136,15 @@ func buildDestinations() []Destination {
 		radar,
 	}
 	out = append(out, plannedChildren(DestConfiguration, "ConfigMaps", "Secrets", "ResourceQuotas", "LimitRanges", "HPA", "PodDisruptionBudgets")...)
-	out = append(out, plannedChildren(DestNetwork, "Services", "Endpoints", "EndpointSlices", "Ingresses", "IngressClasses", "NetworkPolicies")...)
+	out = append(out,
+		leaf(DestServices, DestNetwork, "Services", 0, ScreenResources, FocusPods),
+		planned("network.endpoints", DestNetwork, "Endpoints", 1),
+		leaf(DestEndpointSlices, DestNetwork, "EndpointSlices", 2, ScreenResources, FocusPods),
+		leaf(DestIngresses, DestNetwork, "Ingresses", 3, ScreenResources, FocusPods),
+		leaf(DestIngressClasses, DestNetwork, "IngressClasses", 4, ScreenResources, FocusPods),
+		leaf(DestNetPolicies, DestNetwork, "NetworkPolicies", 5, ScreenResources, FocusPods),
+		leaf(DestHTTPRoutes, DestNetwork, "HTTPRoutes", 6, ScreenResources, FocusPods),
+	)
 	out = append(out, plannedChildren(DestStorage, "PersistentVolumeClaims", "PersistentVolumes", "StorageClasses")...)
 	out = append(out, plannedChildren(DestAccessControl, "ServiceAccounts", "Roles", "RoleBindings", "ClusterRoles", "ClusterRoleBindings")...)
 	out = append(out, plannedChildren(DestCustomResource, "Definitions")...)

@@ -23,22 +23,33 @@ type workloadLeaf struct {
 	gvr   schema.GroupVersionResource
 	kind  data.WorkloadKind
 	label string
+	net   data.NetworkKind
+	scope leafScope
+	field string
+}
+
+type leafScope struct {
+	cluster   bool
+	fixed     bool
+	namespace string
 }
 
 var workloadLeaves = []workloadLeaf{
-	{DestPods, schema.GroupVersionResource{Version: "v1", Resource: "pods"}, data.WorkloadPod, "Pods"},
-	{DestDeployments, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}, data.WorkloadDeployment, "Deployments"},
-	{DestStatefulSets, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "statefulsets"}, data.WorkloadStatefulSet, "StatefulSets"},
-	{DestDaemonSets, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "daemonsets"}, data.WorkloadDaemonSet, "DaemonSets"},
-	{DestJobs, schema.GroupVersionResource{Group: "batch", Version: "v1", Resource: "jobs"}, data.WorkloadJob, "Jobs"},
-	{DestCronJobs, schema.GroupVersionResource{Group: "batch", Version: "v1", Resource: "cronjobs"}, data.WorkloadCronJob, "CronJobs"},
-	{DestReplicaSets, schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "replicasets"}, data.WorkloadReplicaSet, "ReplicaSets"},
+	{dest: DestPods, gvr: schema.GroupVersionResource{Version: "v1", Resource: "pods"}, kind: data.WorkloadPod, label: "Pods"},
+	{dest: DestDeployments, gvr: schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "deployments"}, kind: data.WorkloadDeployment, label: "Deployments"},
+	{dest: DestStatefulSets, gvr: schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "statefulsets"}, kind: data.WorkloadStatefulSet, label: "StatefulSets"},
+	{dest: DestDaemonSets, gvr: schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "daemonsets"}, kind: data.WorkloadDaemonSet, label: "DaemonSets"},
+	{dest: DestJobs, gvr: schema.GroupVersionResource{Group: "batch", Version: "v1", Resource: "jobs"}, kind: data.WorkloadJob, label: "Jobs"},
+	{dest: DestCronJobs, gvr: schema.GroupVersionResource{Group: "batch", Version: "v1", Resource: "cronjobs"}, kind: data.WorkloadCronJob, label: "CronJobs"},
+	{dest: DestReplicaSets, gvr: schema.GroupVersionResource{Group: "apps", Version: "v1", Resource: "replicasets"}, kind: data.WorkloadReplicaSet, label: "ReplicaSets"},
 }
 
 func workloadLeafFor(id DestinationID) (workloadLeaf, bool) {
-	for _, w := range workloadLeaves {
-		if w.dest == id {
-			return w, true
+	for _, leaves := range [][]workloadLeaf{workloadLeaves, networkLeaves} {
+		for _, w := range leaves {
+			if w.dest == id {
+				return w, true
+			}
 		}
 	}
 	return workloadLeaf{}, false
@@ -53,6 +64,7 @@ type resourceSub struct {
 	done      <-chan struct{}
 	page      data.ResourcePage
 	offset    int
+	query     string
 	restarted bool
 	err       string
 	loading   bool
@@ -67,6 +79,17 @@ type resourceState struct {
 	seq            uint64
 	cursor         int
 	card           int
+	opened         data.ResourceRow
+	searching      bool
+	searchDirty    bool
+	searchSeq      uint64
+}
+
+type tableSearchMsg struct {
+	tag   resourceTag
+	seq   uint64
+	query string
+	page  data.ResourcePage
 }
 
 type resourceCatalogMsg struct {
@@ -104,6 +127,10 @@ func (m Model) wantedResources() []workloadLeaf {
 		}
 	case m.onScreen(ScreenOverview):
 		return workloadLeaves
+	case m.onScreen(ScreenResourceDetail):
+		if w, ok := workloadLeafFor(m.nav.Active().Dest); ok && w.net != "" {
+			return []workloadLeaf{w}
+		}
 	}
 	return nil
 }
@@ -117,7 +144,20 @@ func (m Model) resourceNamespace() string {
 
 func (m Model) resourceKey(w workloadLeaf) data.ResourceSubscriptionKey {
 	c := m.res.catalog
-	return data.ResourceSubscriptionKey{Session: c.Session, Generation: c.Generation, GVR: w.gvr, Namespace: m.resourceNamespace(), ProjectionVersion: data.ResourceProjectionVersion}
+	key := data.ResourceSubscriptionKey{Session: c.Session, Generation: c.Generation, GVR: w.gvr, Namespace: m.resourceNamespace(), ProjectionVersion: data.ResourceProjectionVersion}
+	if w.net != "" || w.scope.fixed {
+		key.ProjectionVersion = data.ResourceNetworkProjection
+	}
+	if w.scope.fixed {
+		key.Namespace = w.scope.namespace
+	}
+	if w.scope.cluster {
+		key.Namespace = ""
+	}
+	if w.field != "" {
+		key.FieldSelector = "metadata.name=" + w.field
+	}
+	return key
 }
 
 func (s *resourceSub) release() {
@@ -130,10 +170,13 @@ func (s *resourceSub) release() {
 }
 
 func (m *Model) releaseResources() {
-	for _, s := range m.res.subs {
-		s.release()
+	for _, subs := range []map[schema.GroupVersionResource]*resourceSub{m.res.subs, m.acc.subs} {
+		for _, s := range subs {
+			s.release()
+		}
 	}
 	m.res.subs = nil
+	m.acc = m.acc.closed()
 	if m.res.catalogLoading {
 		m.cancelCatalog()
 	}
@@ -160,8 +203,9 @@ func (m *Model) loadCatalog(b data.ResourceBrowser, refresh bool) tea.Cmd {
 func (m *Model) syncResources() tea.Cmd {
 	b, ok := m.browser()
 	want := m.wantedResources()
-	if !ok || len(want) == 0 {
-		if len(m.res.subs) > 0 || m.res.catalogLoading {
+	graph := m.followAccess()
+	if !ok || len(want)+len(graph) == 0 {
+		if len(m.res.subs)+len(m.acc.subs) > 0 || m.res.catalogLoading {
 			m.releaseResources()
 		}
 		return nil
@@ -172,23 +216,38 @@ func (m *Model) syncResources() tea.Cmd {
 		}
 		return m.loadCatalog(b, false)
 	}
-	subs := maps.Clone(m.res.subs)
+	var lists, graphs []tea.Cmd
+	var changed bool
+	m.res.subs, lists, _ = m.syncSubs(b, m.res.subs, want)
+	m.acc.subs, graphs, changed = m.syncSubs(b, m.acc.subs, graph)
+	if changed {
+		m.acc.dirty = true
+	}
+	m.seekTable(m.res.cursor)
+	return tea.Batch(append(append(lists, graphs...), m.computeAccess(), m.searchTable())...)
+}
+
+func (m *Model) syncSubs(b data.ResourceBrowser, current map[schema.GroupVersionResource]*resourceSub, want []workloadLeaf) (map[schema.GroupVersionResource]*resourceSub, []tea.Cmd, bool) {
+	subs := maps.Clone(current)
 	if subs == nil {
 		subs = map[schema.GroupVersionResource]*resourceSub{}
 	}
 	var cmds []tea.Cmd
+	changed := false
 	for gvr, s := range subs {
 		served := m.res.catalog.Lookup(gvr).Availability == data.ResourceServed
 		keep := s.served == served && slices.ContainsFunc(want, func(w workloadLeaf) bool { return w.gvr == gvr && m.resourceKey(w) == s.key })
 		if !keep {
 			s.release()
 			delete(subs, gvr)
+			changed = true
 		}
 	}
 	for _, w := range want {
 		if _, ok := subs[w.gvr]; ok {
 			continue
 		}
+		changed = true
 		m.res.seq++
 		key := m.resourceKey(w)
 		tag := resourceTag{session: m.session.Generation, seq: m.res.seq, key: key}
@@ -203,9 +262,7 @@ func (m *Model) syncResources() tea.Cmd {
 			return resourceSubMsg{tag: tag, handle: h, err: err}
 		})
 	}
-	m.res.subs = subs
-	m.seekTable(m.res.cursor)
-	return tea.Batch(cmds...)
+	return subs, cmds, changed
 }
 
 func waitResource(h data.ResourceSubscription, done <-chan struct{}, tag resourceTag) tea.Cmd {
@@ -224,8 +281,12 @@ func waitResource(h data.ResourceSubscription, done <-chan struct{}, tag resourc
 }
 
 func (m *Model) currentSub(tag resourceTag) *resourceSub {
-	s, ok := m.res.subs[tag.key.GVR]
-	if !ok || tag.session != m.session.Generation || s.seq != tag.seq || s.key != tag.key {
+	return matchSub(m.res.subs, tag, m.session.Generation)
+}
+
+func matchSub(subs map[schema.GroupVersionResource]*resourceSub, tag resourceTag, session uint64) *resourceSub {
+	s, ok := subs[tag.key.GVR]
+	if !ok || tag.session != session || s.seq != tag.seq || s.key != tag.key {
 		return nil
 	}
 	return s
@@ -254,10 +315,101 @@ func seekPage(h data.ResourceSubscription, abs int) (data.ResourcePage, int, boo
 }
 
 func (m Model) tableLeaf() (workloadLeaf, bool) {
-	if !m.onScreen(ScreenResources) {
+	if !m.onScreen(ScreenResources) && !m.onScreen(ScreenResourceDetail) {
 		return workloadLeaf{}, false
 	}
 	return workloadLeafFor(m.nav.Active().Dest)
+}
+
+func searchRows(h data.ResourceSubscription, query string) data.ResourcePage {
+	if s, ok := h.(data.ResourceSearcher); ok {
+		return s.Search(query, resourcePageLimit)
+	}
+	page := h.Page("", resourcePageLimit)
+	items := page.Items
+	page.Items, page.Filtered = nil, true
+	for _, row := range items {
+		if row.Matches(query) {
+			page.Items = append(page.Items, row)
+		}
+	}
+	page.Matched = len(page.Items)
+	page.Truncated = page.Truncated || page.Continue != ""
+	page.Continue = ""
+	return page
+}
+
+func (m *Model) searchTable() tea.Cmd {
+	q := m.filter.Value()
+	if q == "" {
+		m.res.searchDirty = false
+		return nil
+	}
+	w, ok := m.tableLeaf()
+	if !ok || m.res.searching {
+		return nil
+	}
+	s, ok := m.res.subs[w.gvr]
+	if !ok || s.handle == nil || !m.res.searchDirty && s.query == q {
+		return nil
+	}
+	m.res.searching, m.res.searchDirty = true, false
+	m.res.searchSeq++
+	msg := tableSearchMsg{tag: resourceTag{session: m.session.Generation, seq: s.seq, key: s.key}, seq: m.res.searchSeq, query: q}
+	handle := s.handle
+	return func() tea.Msg {
+		msg.page = searchRows(handle, msg.query)
+		return msg
+	}
+}
+
+func (m *Model) storeSearch(msg tableSearchMsg) {
+	if msg.tag.session != m.session.Generation || msg.seq != m.res.searchSeq {
+		return
+	}
+	m.res.searching = false
+	s := m.currentSub(msg.tag)
+	if s == nil {
+		return
+	}
+	if msg.query != m.filter.Value() {
+		m.res.searchDirty = true
+		return
+	}
+	next := *s
+	next.loading, next.page, next.offset, next.restarted, next.query = false, msg.page, 0, false, msg.query
+	m.storeSub(msg.tag.key.GVR, next)
+	m.res.cursor = clampToPage(m.res.cursor, next)
+}
+
+func (m Model) searchPending() bool {
+	q := m.filter.Value()
+	w, ok := m.tableLeaf()
+	if q == "" || !ok {
+		return false
+	}
+	s, ok := m.res.subs[w.gvr]
+	return ok && s.handle != nil && s.query != q
+}
+
+func (m *Model) reloadTable() {
+	m.res.cursor = 0
+	w, ok := m.tableLeaf()
+	if !ok {
+		return
+	}
+	s, ok := m.res.subs[w.gvr]
+	if !ok || s.handle == nil {
+		return
+	}
+	if m.filter.Value() != "" {
+		m.res.searchDirty = true
+		return
+	}
+	next := *s
+	next.query, next.loading = "", false
+	next.page, next.offset, next.restarted = seekPage(s.handle, 0)
+	m.storeSub(w.gvr, next)
 }
 
 func (m *Model) storeSub(gvr schema.GroupVersionResource, s resourceSub) {
@@ -284,6 +436,10 @@ func (m *Model) seekTable(abs int) {
 		m.res.cursor = abs
 		return
 	}
+	if m.filter.Value() != "" {
+		m.res.cursor = clampToPage(abs, *s)
+		return
+	}
 	next := *s
 	next.page, next.offset, next.restarted = seekPage(s.handle, abs)
 	m.storeSub(w.gvr, next)
@@ -295,6 +451,12 @@ func (m *Model) seekTable(abs int) {
 
 func (m Model) handleResourceMsg(msg tea.Msg) (Model, tea.Cmd, bool) {
 	switch msg := msg.(type) {
+	case tableSearchMsg:
+		m.storeSearch(msg)
+		return m, nil, true
+	case accessMsg:
+		m.storeAccess(msg)
+		return m, nil, true
 	case resourceCatalogMsg:
 		if msg.session != m.session.Generation || msg.seq != m.res.catalogSeq {
 			return m, nil, true
@@ -304,16 +466,14 @@ func (m Model) handleResourceMsg(msg tea.Msg) (Model, tea.Cmd, bool) {
 		}
 		snap := msg.snap
 		m.res.catalog, m.res.catalogLoading, m.res.catalogCancel = &snap, false, nil
-		subs := maps.Clone(m.res.subs)
-		for gvr, s := range subs {
-			if s.err != "" {
-				s.release()
-				delete(subs, gvr)
-			}
-		}
-		m.res.subs = subs
+		m.tree.gateway = snap.Lookup(httpRouteGVR).Availability == data.ResourceServed
+		m.res.subs, m.acc.subs = dropFailed(m.res.subs), dropFailed(m.acc.subs)
+		m.acc.dirty = true
 		return m, nil, true
 	case resourceSubMsg:
+		if next, cmd, ok := m.openedAccess(msg); ok {
+			return next, cmd, true
+		}
 		s := m.currentSub(msg.tag)
 		if s == nil {
 			if msg.handle != nil {
@@ -329,10 +489,19 @@ func (m Model) handleResourceMsg(msg tea.Msg) (Model, tea.Cmd, bool) {
 			m.storeSub(gvr, next)
 			return m, nil, true
 		}
-		next.handle, next.page, next.offset = msg.handle, msg.handle.Page("", resourcePageLimit), 0
+		next.handle = msg.handle
+		if _, table := m.tableLeaf(); table && m.filter.Value() != "" {
+			next.loading, m.res.searchDirty = true, true
+		} else {
+			next.page, next.offset = msg.handle.Page("", resourcePageLimit), 0
+		}
 		m.storeSub(gvr, next)
 		return m, waitResource(msg.handle, next.done, msg.tag), true
 	case resourceChangeMsg:
+		if s := matchSub(m.acc.subs, msg.tag, m.session.Generation); s != nil && s.handle != nil {
+			m.acc.dirty = true
+			return m, waitResource(s.handle, s.done, msg.tag), true
+		}
 		s := m.currentSub(msg.tag)
 		if s == nil || s.handle == nil {
 			return m, nil, true
@@ -343,6 +512,10 @@ func (m Model) handleResourceMsg(msg tea.Msg) (Model, tea.Cmd, bool) {
 		abs := 0
 		if active {
 			abs = m.res.cursor
+		}
+		if active && m.filter.Value() != "" {
+			m.res.searchDirty = true
+			return m, waitResource(s.handle, s.done, msg.tag), true
 		}
 		next := *s
 		next.page, next.offset, next.restarted = seekPage(s.handle, abs)
@@ -361,8 +534,13 @@ func (m Model) handleResourceMsg(msg tea.Msg) (Model, tea.Cmd, bool) {
 func (m *Model) refreshResources() tea.Cmd {
 	b, ok := m.browser()
 	want := m.wantedResources()
-	if !ok || len(want) == 0 {
+	if !ok || len(want)+len(m.acc.subs) == 0 {
 		return nil
+	}
+	for _, s := range m.acc.subs {
+		if s.handle != nil {
+			s.handle.Refresh()
+		}
 	}
 	for _, w := range want {
 		if s, ok := m.res.subs[w.gvr]; ok && s.handle != nil {
@@ -373,4 +551,15 @@ func (m *Model) refreshResources() tea.Cmd {
 		return nil
 	}
 	return m.loadCatalog(b, true)
+}
+
+func dropFailed(in map[schema.GroupVersionResource]*resourceSub) map[schema.GroupVersionResource]*resourceSub {
+	subs := maps.Clone(in)
+	for gvr, s := range subs {
+		if s.err != "" {
+			s.release()
+			delete(subs, gvr)
+		}
+	}
+	return subs
 }

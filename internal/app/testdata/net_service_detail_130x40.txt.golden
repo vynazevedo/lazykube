@@ -1,0 +1,40 @@
+ lazykube [DEMO] [RO]  v2.0   ◎ context demo namespace Todos   k8s demo  nodes 1  ns 8  pods 13        ⠙ metrics every 5s ● live  
+  2 Dashboard  |  3 Workloads  |  4 Nodes  |  5 Security  |  6 Events  |  7 Radar                                         m menu  
+ Network · Services > lgo                                                                                                         
+ ╭─ Services · lgo/lgo · [DEMO] ────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ │ Nome              lgo                                                                                                        │ 
+ │ Namespace         lgo                                                                                                        │ 
+ │ Idade             3d                                                                                                         │ 
+ │ Cobertura         cobertura completa no escopo                                                                               │ 
+ │ Tipo              NodePort                                                                                                   │ 
+ │ ClusterIP         10.43.20.5                                                                                                 │ 
+ │ Externo           -                                                                                                          │ 
+ │ Selector          app.kubernetes.io/name=lgo                                                                                 │ 
+ │ Porta             http 80:30080 para 8080                                                                                    │ 
+ │                                                                                                                              │ 
+ │ Acesso  3 endereços · estado pelos endpoints lidos; nenhuma requisição foi feita                                             │ 
+ │ ● Ingress      http://lgo.example.com                                                                                        │ 
+ │           estado    pronta · Ingress lgo/lgo · sem TLS declarado                                                             │ 
+ │           alcance   provável rede privada, alcance não verificado                                                            │ 
+ │ ● NodePort     http://192.168.0.12:30080                                                                                     │ 
+ │           estado    pronta · Service lgo/lgo, node demo-node-01 · nome da porta                                              │ 
+ │           alcance   porta alocada no node, alcance não verificado                                                            │ 
+ │ ● ClusterIP    http://10.43.20.5                                                                                             │ 
+ │           estado    pronta · Service lgo/lgo · nome da porta                                                                 │ 
+ │           alcance   endereço interno do cluster                                                                              │ 
+ │           ↳ u escolhe e copia uma URL                                                                                        │ 
+ │                                                                                                                              │ 
+ │ Rota  primeiro elo quebrado pelos objetos lidos                                                                              │ 
+ │ ● Ingress lgo/lgo lgo.example.com/ para lgo:http                                                                             │ 
+ │           ↳ nenhum elo quebrado nos objetos lidos; o tráfego não foi testado                                                 │ 
+ │ ● IngressClass traefik                                                                                                       │ 
+ │ ● TLS          sem TLS declarado para este host                                                                              │ 
+ │ ● Service      lgo/lgo                                                                                                       │ 
+ │ ● Porta        http 80/TCP                                                                                                   │ 
+ │ ● Pods         1 de 1 prontos                                                                                                │ 
+ │ ● Endpoints    http 80/TCP: 1 de 1 prontos                                                                                   │ 
+ │ ● Endereço     endereço publicado no Ingress                                                                                 │ 
+ │ ● Service lgo/lgo                                                                                                            │ 
+ ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  scroll   u  URLs   y  copy name   r  reload   esc  back   b  tree   m  menu   ?  help   q  quit           bubbletea · 0 fps 

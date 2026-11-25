@@ -23,6 +23,11 @@ type ResourceTableState struct {
 	Offset         int
 	Restarted      bool
 	AllNamespaces  bool
+	Net            data.NetworkKind
+	ClusterScoped  bool
+	Filter         string
+	Filtering      bool
+	Searching      bool
 	Scope          string
 }
 
@@ -112,18 +117,28 @@ func resourceColumns(kind data.WorkloadKind, w int) []resourceColumn {
 	return cols
 }
 
-func resourceLayout(kind data.WorkloadKind, w int) (int, int, []resourceColumn) {
-	cols := resourceColumns(kind, w)
-	fixed := 3
-	for _, c := range cols {
-		fixed += c.width + 1
+func (st ResourceTableState) layout(w int) (int, int, []resourceColumn) {
+	cols := resourceColumns(st.Kind, w)
+	if st.Net != "" {
+		cols = networkColumns(st.Net, w)
 	}
 	ns := 0
-	if w >= 100 {
+	if w >= 100 && !st.ClusterScoped {
 		ns = 16
-		fixed += ns + 1
 	}
-	return max(10, w-fixed), ns, cols
+	for {
+		fixed := 3
+		for _, c := range cols {
+			fixed += c.width + 1
+		}
+		if ns > 0 {
+			fixed += ns + 1
+		}
+		if st.Net == "" || w-fixed >= networkNameMin || len(cols) <= 1 {
+			return max(10, w-fixed), ns, cols
+		}
+		cols = cols[:len(cols)-1]
+	}
 }
 
 func stateColor(s data.WorkloadState) theme.RGB {
@@ -175,6 +190,10 @@ func (st ResourceTableState) blocked() (string, theme.RGB, bool) {
 		return "carregando " + label + "…", theme.Muted, true
 	case st.Page.Coverage.State == data.CoverageDenied:
 		return "sem permissão para listar " + label, theme.Err, true
+	case len(st.Page.Items) == 0 && st.Searching:
+		return "filtrando " + label + "…", theme.Muted, true
+	case len(st.Page.Items) == 0 && st.Page.Filtered && st.Page.Total > 0:
+		return "nenhum item lido corresponde ao filtro", theme.Muted, true
 	case len(st.Page.Items) == 0 && st.Page.Coverage.State == data.CoverageComplete:
 		return "nenhum " + label + " neste escopo", theme.Muted, true
 	case len(st.Page.Items) == 0:
@@ -197,6 +216,21 @@ func ResourceTable(r draw.Region, st ResourceTableState, ctx Ctx) {
 	if st.Offset > 0 || page.Continue != "" {
 		status = append(status, text(fmt.Sprintf("%d-%d de %d", st.Offset+1, st.Offset+len(page.Items), page.Total)), faint("  ·  "))
 	}
+	if st.Filtering || st.Filter != "" {
+		status = append(status, muted("filtro "), bold(draw.Sanitize(st.Filter), ctx.Pal.A))
+		if st.Filtering {
+			status = append(status, colored("▏", ctx.Pal.A))
+		}
+		if st.Searching {
+			status = append(status, muted(" filtrando…"))
+		} else if page.Filtered {
+			status = append(status, muted(fmt.Sprintf(" %d de %d", page.Matched, page.Total)))
+			if page.Matched > len(page.Items) {
+				status = append(status, colored(fmt.Sprintf(", mostrando %d", len(page.Items)), theme.Warn))
+			}
+		}
+		status = append(status, faint("  ·  "))
+	}
 	status = append(status, muted("escopo "), text(draw.Sanitize(st.Scope)))
 	if _, _, blocked := st.blocked(); !blocked || page.Coverage.State != "" {
 		cov, color := resourceCoverageText(page.Coverage)
@@ -209,8 +243,8 @@ func ResourceTable(r draw.Region, st ResourceTableState, ctx Ctx) {
 		}
 	}
 	inner.Line(0, 0, status.Truncate(inner.W))
-	nameW, nsW, cols := resourceLayout(st.Kind, inner.W)
-	qualified := nsW == 0 && st.AllNamespaces
+	nameW, nsW, cols := st.layout(inner.W)
+	qualified := nsW == 0 && st.AllNamespaces && !st.ClusterScoped
 	nameTitle := "NAME"
 	if qualified {
 		nameTitle = "NAMESPACE/NAME"
@@ -267,7 +301,7 @@ func ResourceTable(r draw.Region, st ResourceTableState, ctx Ctx) {
 		body.Line(0, i, line.Truncate(inner.W))
 	}
 	if inner.H > rows+ResourceTableTop {
-		foot := "detalhe, YAML e relações: contrato futuro · r recarrega"
+		foot := "enter detalhe · / filtra · r recarrega"
 		sel := st.selected()
 		if sel != nil && sel.Workload.Reason != "" {
 			foot = "motivo: " + draw.Sanitize(sel.Workload.Reason)
@@ -419,7 +453,7 @@ func WorkloadOverview(r draw.Region, st OverviewState, ctx Ctx) {
 }
 
 func ResourceHelp() []KeyHelp {
-	return []KeyHelp{{"↑↓", "move"}, {"r", "reload"}, {"esc", "back"}, {"b", "tree"}, {"m", "menu"}, {"?", "help"}, {"q", "quit"}, {"y", "copy"}}
+	return []KeyHelp{{"↑↓", "move"}, {"enter", "detail"}, {"/", "filter"}, {"r", "reload"}, {"esc", "back"}, {"b", "tree"}, {"m", "menu"}, {"?", "help"}, {"q", "quit"}, {"y", "copy"}}
 }
 
 func FullHelpResources() []KeyHelp {
@@ -427,9 +461,10 @@ func FullHelpResources() []KeyHelp {
 		{"↑/↓ k/j", "move selection"},
 		{"pgup/pgdn", "page"},
 		{"home/end", "first / last"},
+		{"enter", "open detail and access"},
+		{"/", "filter by name or columns"},
 		{"r", "reload list (retry denied or list-only)"},
 		{"y", "copy namespace/name"},
-		{"o", "actions on the row"},
 		{"esc", "back"},
 		{"b", "navigation tree"},
 		{"m", "screens menu ← → enter"},

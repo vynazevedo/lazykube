@@ -1,0 +1,24 @@
+ lazykube [DEMO] [RO]  ◎ context demo namespace Todos   k8s demo      ⠙ ● live  
+  2 Dashboard | 3 Workloads | 4 Nodes | 5 Security | 6 Events | 7 Radar         
+ Network · Services                                                             
+ ╭─ Services · focus ─────────────────────────────────────────────────────────╮ 
+ │ filtro odoo▏ 2 de 8  ·  escopo todos os namespaces  ·  cobertura completa… │ 
+ │   NAMESPACE/NAME                          TYPE         PORTS               │ 
+ │ › ys-odoo/odoo                            LoadBalancer 8069:31069          │ 
+ │   ys-odoo/psql                            ClusterIP    5432                │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │ selecionado ys-odoo/odoo · r recarrega                                     │ 
+ ╰────────────────────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   enter  detail   /  filter   r  reload            bubbletea · 0 fps 

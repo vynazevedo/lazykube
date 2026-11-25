@@ -1,0 +1,24 @@
+ lazykube [DEMO] [RO]  ◎ context demo namespace Todos   k8s demo      ⠙ ● live  
+  2 Dashboard | 3 Workloads | 4 Nodes | 5 Security | 6 Events | 7 Radar         
+ Network · Services > lgo                                                       
+ ╭─ Services · lgo/lgo · [DEMO] ──────────────────────────────────────────────╮ 
+ │ Nome              lgo                                                      │ 
+ │ Namespace         lgo                                                      │ 
+ │ Idade             3d                                                       │ 
+ │ Cobertura         cobertura completa no escopo                             │ 
+ │ Tipo              NodePort                                                 │ 
+ │ ClusterIP         10.43.20.5                                               │ 
+ │ Externo           -                                                        │ 
+ │ Selector          app.kubernetes.io/name=lgo                               │ 
+ │ Porta             http 80:30080 para 8080                                  │ 
+ │                                                                            │ 
+ │ Acesso  3 endereços · estado pelos endpoints lidos; nenhuma requisição fo… │ 
+ │ ● Ingress      http://lgo.example.com                                      │ 
+ │           estado    pronta · Ingress lgo/lgo · sem TLS declarado           │ 
+ │           alcance   provável rede privada, alcance não verificado          │ 
+ │ ● NodePort     http://192.168.0.12:30080                                   │ 
+ │           estado    pronta · Service lgo/lgo, node demo-node-01 · nome da… │ 
+ │           alcance   porta alocada no node, alcance não verificado          │ 
+ ╰────────────────────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────
+  ↑↓  scroll   u  URLs   y  copy name   r  reload   esc  back bubbletea · 0 fps 

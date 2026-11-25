@@ -23,6 +23,7 @@ const (
 	resourcePoolRows          = 30000
 	resourceSubscriptionLimit = 12
 	resourceWatchLimit        = 6
+	resourceFactBytes         = 32 << 20
 )
 
 var errResourceScope = errors.New("resource scope or identity unavailable")
@@ -36,6 +37,8 @@ type resourcePool struct {
 	lists     chan struct{}
 	watches   int
 	rows      int
+	factBytes int
+	factLimit int
 	closed    bool
 	wg        sync.WaitGroup
 	now       func() time.Time
@@ -52,6 +55,7 @@ type resourceEntry struct {
 	cancel     context.CancelFunc
 	handles    map[*resourceHandle]struct{}
 	rows       map[string]data.ResourceRow
+	factBytes  int
 	workloads  data.WorkloadDistribution
 	revision   uint64
 	observedAt time.Time
@@ -69,7 +73,7 @@ type resourceHandle struct {
 }
 
 func newResourcePool(ctx context.Context, client dynamic.Interface, source *Source) *resourcePool {
-	return &resourcePool{ctx: ctx, client: client, source: source, entries: make(map[data.ResourceSubscriptionKey]*resourceEntry), lists: make(chan struct{}, 2), now: source.opts.Now, rowLimit: resourceRowLimit, poolLimit: resourcePoolRows, retry: func(n int) time.Duration {
+	return &resourcePool{ctx: ctx, client: client, source: source, entries: make(map[data.ResourceSubscriptionKey]*resourceEntry), lists: make(chan struct{}, 2), now: source.opts.Now, factLimit: resourceFactBytes, rowLimit: resourceRowLimit, poolLimit: resourcePoolRows, retry: func(n int) time.Duration {
 		return min(30*time.Second, time.Second*time.Duration(1<<min(n, 5))+time.Duration(rand.IntN(250))*time.Millisecond)
 	}}
 }
@@ -78,7 +82,7 @@ func (p *resourcePool) subscribe(ctx context.Context, key data.ResourceSubscript
 	if ctx.Err() != nil {
 		return nil, ctx.Err()
 	}
-	if key.Session != p.source.resourceSession() || key.Generation != p.source.generation || key.ProjectionVersion != data.ResourceProjectionVersion || key.GVR != d.GVR || d.Availability != data.ResourceServed || strings.Contains(key.GVR.Resource, "/") {
+	if key.Session != p.source.resourceSession() || key.Generation != p.source.generation || !resourceProjection(key.ProjectionVersion) || key.GVR != d.GVR || d.Availability != data.ResourceServed || strings.Contains(key.GVR.Resource, "/") {
 		return nil, errResourceScope
 	}
 	if d.Namespaced {
@@ -144,7 +148,7 @@ func (p *resourcePool) close() {
 		e.changedLocked()
 	}
 	p.entries = make(map[data.ResourceSubscriptionKey]*resourceEntry)
-	p.rows = 0
+	p.rows, p.factBytes = 0, 0
 	p.mu.Unlock()
 }
 
@@ -162,7 +166,8 @@ func (h *resourceHandle) Cancel() {
 		if len(e.handles) == 0 {
 			e.cancel()
 			p.rows -= len(e.rows)
-			e.rows = nil
+			p.factBytes -= e.factBytes
+			e.rows, e.factBytes = nil, 0
 			delete(p.entries, e.key)
 		}
 	})
@@ -242,6 +247,8 @@ func (e *resourceEntry) clear(state data.CoverageState, reason string) {
 		return
 	}
 	p.rows -= len(e.rows)
+	p.factBytes -= e.factBytes
+	e.factBytes = 0
 	e.rows = make(map[string]data.ResourceRow)
 	e.workloads = data.WorkloadDistribution{}
 	e.truncated = false
@@ -268,18 +275,23 @@ func (e *resourceEntry) put(row data.ResourceRow, deleted bool) bool {
 		if exists && old.Ref.UID == row.Ref.UID {
 			delete(e.rows, key)
 			e.workloads.Add(old.Workload, -1)
+			e.addFacts(-factBytes(old))
 			p.rows--
 			e.changedLocked()
 		}
 		return true
 	}
-	if !exists && (len(e.rows) >= p.rowLimit || p.rows >= p.poolLimit) {
+	growth := factBytes(row)
+	if exists {
+		growth -= factBytes(old)
+	}
+	if !exists && (len(e.rows) >= p.rowLimit || p.rows >= p.poolLimit) || growth > 0 && p.factBytes+growth > p.factLimit {
 		e.truncated = true
 		e.coverage = data.Coverage{State: data.CoveragePartial, Reason: "resource store budget exhausted"}
 		e.changedLocked()
 		return false
 	}
-	if exists && old == row {
+	if exists && data.SameResourceRow(old, row) {
 		return true
 	}
 	if !exists {
@@ -289,8 +301,53 @@ func (e *resourceEntry) put(row data.ResourceRow, deleted bool) bool {
 		e.workloads.Add(old.Workload, -1)
 	}
 	e.workloads.Add(row.Workload, 1)
+	e.addFacts(growth)
 	e.rows[key] = row
 	e.observedAt = p.now()
 	e.changedLocked()
 	return true
+}
+
+func resourceProjection(v int) bool {
+	return v == data.ResourceProjectionVersion || v == data.ResourceNetworkProjection
+}
+
+func factBytes(row data.ResourceRow) int {
+	if row.Network == nil {
+		return 0
+	}
+	return row.Network.Bytes + rowBytes(row)
+}
+
+func (e *resourceEntry) addFacts(n int) {
+	e.factBytes += n
+	e.pool.factBytes += n
+}
+
+func (h *resourceHandle) Search(query string, limit int) data.ResourcePage {
+	e := h.entry
+	p := e.pool
+	p.mu.Lock()
+	if _, ok := e.handles[h]; !ok {
+		p.mu.Unlock()
+		return data.ResourcePage{Coverage: data.Coverage{State: data.CoverageUnavailable, Reason: "subscription canceled"}}
+	}
+	out := data.ResourcePage{Revision: e.revision, ObservedAt: e.observedAt, Coverage: e.coverage, Total: len(e.rows), Truncated: e.truncated, Borrowed: e.borrowed, Workloads: e.workloads, Filtered: true}
+	rows := make([]data.ResourceRow, 0, len(e.rows))
+	for _, row := range e.rows {
+		rows = append(rows, row)
+	}
+	p.mu.Unlock()
+	matches := rows[:0]
+	for _, row := range rows {
+		if row.Matches(query) {
+			matches = append(matches, row)
+		}
+	}
+	sort.Slice(matches, func(i, j int) bool {
+		return matches[i].Ref.Namespace+"/"+matches[i].Ref.Name < matches[j].Ref.Namespace+"/"+matches[j].Ref.Name
+	})
+	out.Matched = len(matches)
+	out.Items = append(out.Items, matches[:min(len(matches), min(max(limit, 1), resourcePageSize))]...)
+	return out
 }

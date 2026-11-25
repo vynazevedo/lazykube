@@ -179,9 +179,14 @@ func podTarget(p *data.Pod) (guard.Target, bool) {
 func (m Model) actionTarget() (guard.Target, bool) {
 	switch {
 	case m.inDetail():
+		if m.accessGone() {
+			return guard.Target{}, false
+		}
 		return podTarget(m.selectedPod())
 	case m.onScreen(ScreenResources):
 		return m.tableTarget()
+	case m.onScreen(ScreenResourceDetail):
+		return m.resourceTarget()
 	case m.onScreen(ScreenNodes):
 		return m.nodeTarget()
 	case m.onScreen(ScreenRadar):
@@ -231,8 +236,38 @@ func (m Model) postureTarget() (guard.Target, bool) {
 	return guard.Target{}, false
 }
 
+func (m Model) accessGone() bool {
+	return m.acc.target.active && m.acc.view != nil && m.acc.view.gone
+}
+
+func (m Model) resourceTarget() (guard.Target, bool) {
+	w, ref, ok := m.activeResource()
+	if !ok || ref.UID == "" || m.acc.target.gvr != w.gvr || m.acc.view == nil || m.acc.view.row == nil || m.accessGone() {
+		return guard.Target{}, false
+	}
+	row := m.acc.view.row.Ref
+	if row.Namespace != ref.Namespace || row.Name != ref.Name || row.UID != ref.UID || row.ResourceVersion == "" {
+		return guard.Target{}, false
+	}
+	return guard.Target{Group: w.gvr.Group, Version: w.gvr.Version, Resource: w.gvr.Resource, Namespace: row.Namespace, Name: row.Name, UID: row.UID, ResourceVersion: row.ResourceVersion}, true
+}
+
+func (m Model) offeredActions() (guard.Target, []actionSpec) {
+	t, ok := m.actionTarget()
+	if !ok {
+		return guard.Target{}, nil
+	}
+	var items []actionSpec
+	for _, s := range actionSpecs {
+		if guard.SupportsAction(s.action, t) {
+			items = append(items, s)
+		}
+	}
+	return t, items
+}
+
 func (m Model) actionHelp(help []ui.KeyHelp, desc string) []ui.KeyHelp {
-	if _, ok := m.actionTarget(); !ok {
+	if _, items := m.offeredActions(); len(items) == 0 {
 		return help
 	}
 	return append(slices.Clone(help), ui.KeyHelp{Key: "o", Desc: desc})
@@ -304,15 +339,10 @@ func (m *Model) nextActionTag() actionTag {
 }
 
 func (m Model) openActions() (Model, tea.Cmd) {
-	t, ok := m.actionTarget()
-	var items []actionSpec
-	if ok {
-		for _, s := range actionSpecs {
-			if guard.SupportsAction(s.action, t) {
-				items = append(items, s)
-			}
-		}
+	if m.searchPending() {
+		return m, m.showNotice(textSearchPending)
 	}
+	t, items := m.offeredActions()
 	if len(items) == 0 {
 		if m.onScreen(ScreenRadar) || m.onScreen(ScreenSecurity) {
 			return m, nil

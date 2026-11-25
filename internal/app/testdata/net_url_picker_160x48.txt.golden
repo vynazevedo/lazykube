@@ -1,0 +1,48 @@
+ lazykube [DEMO] [RO]  v2.0   ◎ context demo namespace Todos   k8s demo  nodes 1  ns 8  pods 13  uptime 119d                         ⠙ metrics every 5s ● live  
+ [2 Dashboard] |  3 Workloads  |  4 Nodes  |  5 Security  |  6 Events  |  7 Radar                                                                       m menu  
+ Dashboard > bilibili-live-7f6b8d9c5-mn4tz                                                                                                                      
+ ╭─ Pod bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz ────────────────────────────────────────────────────────────────────────────────────────────────────────╮ 
+ │  Log   Config   Top   Describe   Events   Security                                                                                                         │ 
+ │ ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── │ 
+ │ ● bilibili-live-7f6b8d9c5-mn4tz                                                                                                                  [Running] │ 
+ │   bilibili-raffle · Running · ready 2/2 · node demo-node-01 · 10.42.0.24                                                                                   │ 
+ │                                                                                                                                                            │ 
+ │ ╭────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮ │ 
+ │ │ Containers  2 · ready 2/2                                                                                                                              │ │ 
+ │ │ ● app     app               running 17m · ready ✓ · started ✓ · restarts 2                                                                      ◂ logs │ │ 
+ │ │           last      ╭─ Copiar URL · bilibili-raffle/bilibili-live-7f6b8d9c5-mn4tz ───────────────────────────────────────────────╮                     │ │ 
+ │ │           last msg  │                                                                                                            │                     │ │ 
+ │ │           ↳ P logs a│  › ● Ingress      https://live.example.com                                                                 │                     │ │ 
+ │ │ ● app     log-shippe│    ● ClusterIP    http://10.43.10.11                                                                       │                     │ │ 
+ │ │                     │                                                                                                            │                     │ │ 
+ │ │ Acesso  2 endereços │                                                                                                            │                     │ │ 
+ │ │ ● Ingress      https│                                                                                                            │                     │ │ 
+ │ │           estado    │                                                                                                            │                     │ │ 
+ │ │           alcance   │                                                                                                            │                     │ │ 
+ │ │ ● ClusterIP    http:│                                                                                                            │                     │ │ 
+ │ │           estado    │                                                                                                            │                     │ │ 
+ │ │           alcance   │                                                                                                            │                     │ │ 
+ │ │           ↳ u escolh│                                                                                                            │                     │ │ 
+ │ │                     │                                                                                                            │                     │ │ 
+ │ │ Rota  primeiro elo q│                                                                                                            │                     │ │ 
+ │ │ ● Ingress bilibili-r│                                                                                                            │                     │ │ 
+ │ │           ↳ nenhum e│  ────────────────────────────────────────────────────────────────────────────────────────────────────────  │                     │ │ 
+ │ │ ● IngressClass traef│  URL completa, 1 de 2; host em destaque                                                                    │                     │ │ 
+ │ │ ● TLS          secre│  https://live.example.com                                                                                  │                     │ │ 
+ │ │ ● Service      bilib│  pronta · provável rede privada, alcance não verificado                                                    │                     │ │ 
+ │ │ ● Porta        http │                                                                                                            │                     │ │ 
+ │ │ ● Pods         1 de │  ↑↓ escolhe · enter copia o texto acima · esc fecha                                                        │                     │ │ 
+ │ │ ● Endpoints    http │                                                                                                            │                     │ │ 
+ │ │ ● Endereço     ender╰────────────────────────────────────────────────────────────────────────────────────────────────────────────╯                     │ │ 
+ │ │ ● Service bilibili-raffle/bilibili-live                                                                                                                │ │ 
+ │ │           ↳ nenhum elo quebrado nos objetos lidos; o tráfego não foi testado                                                                           │ │ 
+ │ │ ● Service      bilibili-raffle/bilibili-live                                                                                                           │ │ 
+ │ │ ● Pods         1 de 1 prontos                                                                                                                          │ │ 
+ │ │ ● Endpoints    http 80/TCP: 1 de 1 prontos                                                                                                             │ │ 
+ │ │                                                                                                                                                        │ │ 
+ │ │ NetworkPolicies  o efeito real depende do CNI e não foi avaliado                                                                                       │ │ 
+ │ │           selecionamdefault-deny                                                                                                                       │ │ 
+ │ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ │ 
+ ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  ↑↓  choose   enter  copy   esc  close   q  quit                                                                                             bubbletea · 0 fps 

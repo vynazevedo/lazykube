@@ -35,6 +35,10 @@ func (m Model) Render() *draw.Canvas {
 		ui.DeploymentOverlay(screen, m.deploymentOverlayState(), ctx)
 	}
 
+	if m.urls.open {
+		ui.URLPicker(screen, m.urlPickerState(), ctx)
+	}
+
 	keys := active.Help(m)
 	switch {
 	case m.tree.visible && m.tree.focused:
@@ -45,6 +49,8 @@ func (m Model) Render() *draw.Canvas {
 		keys = ui.ActionHelp()
 	case m.dep.open:
 		keys = ui.OverlayHelp()
+	case m.urls.open:
+		keys = ui.URLPickerHelp()
 	}
 	ui.Footer(screen.Sub(0, m.layout.DividerY, m.w, 1), screen.Sub(0, m.layout.FooterY, m.w, 1), ui.FooterState{FPS: m.displayFPS(), Keys: keys, Notice: m.notice.text})
 
@@ -57,7 +63,9 @@ func (m Model) Render() *draw.Canvas {
 	}
 	if m.act.stage != actionClosed {
 		ui.ActionDialog(screen, m.actionDialog(), ctx)
+		c.DropLinks()
 	}
+	c.SealLinks()
 	return c
 }
 

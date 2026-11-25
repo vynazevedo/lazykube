@@ -1,0 +1,24 @@
+ lazykube [DEMO] [RO]  ◎ context demo namespace Todos   k8s demo      ⠙ ● live  
+  2 Dashboard | 3 Workloads | 4 Nodes | 5 Security | 6 Events | 7 Radar         
+ Network · Services                                                             
+ ╭─ Services · focus ─────────────────────────────────────────────────────────╮ 
+ │ escopo todos os namespaces  ·  cobertura completa no escopo  ·  8 itens  … │ 
+ │   NAMESPACE/NAME                          TYPE         PORTS               │ 
+ │ › bilibili-raffle/bilibili-live           ClusterIP    80                  │ 
+ │   bilibili-raffle/bilibili-raffle         ClusterIP    80                  │ 
+ │   lgo/lgo                                 NodePort     80:30080            │ 
+ │   ys-odoo/odoo                            LoadBalancer 8069:31069          │ 
+ │   ys-odoo/psql                            ClusterIP    5432                │ 
+ │   xcx/qiandao                             ClusterIP    80                  │ 
+ │   kube-system/kube-dns                    ClusterIP    53/UDP              │ 
+ │   kube-system/traefik                     LoadBalancer 80:32080,443:32443  │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │                                                                            │ 
+ │ selecionado bilibili-raffle/bilibili-live · r recarrega                    │ 
+ ╰────────────────────────────────────────────────────────────────────────────╯ 
+────────────────────────────────────────────────────────────────────────────────
+  ↑↓  move   enter  detail   /  filter   r  reload            bubbletea · 0 fps 
