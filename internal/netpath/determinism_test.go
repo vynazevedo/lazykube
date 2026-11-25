@@ -173,6 +173,14 @@ func TestLiteralAddressesOnlyInheritAServedFamily(t *testing.T) {
 		{"IPv4 service, IPv6 ready only", []string{"10.1.0.1"}, down, ready, map[string]State{"4": StateUnknown, "6": StateUnknown, "name": StateUnknown}},
 		{"dual, both ready", []string{"10.1.0.1", "fd00::1"}, ready, ready, map[string]State{"4": StateReady, "6": StateReady, "name": StateReady}},
 		{"dual, IPv6 down", []string{"10.1.0.1", "fd00::1"}, ready, down, map[string]State{"4": StateReady, "6": StateUnknown, "name": StateReady}},
+		{"IPv4 service, IPv6 draining only", []string{"10.1.0.1"}, down, drain, map[string]State{"4": StateUnknown, "6": StateUnknown, "name": StateUnknown}},
+		{"IPv4 service ready, IPv6 draining outside", []string{"10.1.0.1"}, ready, drain, map[string]State{"4": StateReady, "6": StateUnknown, "name": StateReady}},
+		{"IPv4 service draining, IPv6 ready outside", []string{"10.1.0.1"}, drain, ready, map[string]State{"4": StateDraining, "6": StateUnknown, "name": StateDraining}},
+		{"dual, only IPv6 draining", []string{"10.1.0.1", "fd00::1"}, down, drain, map[string]State{"4": StateUnknown, "6": StateDraining, "name": StateDraining}},
+		{"dual, only IPv4 draining", []string{"10.1.0.1", "fd00::1"}, drain, down, map[string]State{"4": StateDraining, "6": StateUnknown, "name": StateDraining}},
+		{"headless, both ready", []string{"None"}, ready, ready, map[string]State{"4": StateReady, "6": StateReady, "name": StateReady}},
+		{"headless, only IPv6 ready", []string{"None"}, down, ready, map[string]State{"4": StateUnknown, "6": StateReady, "name": StateReady}},
+		{"headless, only IPv6 draining", []string{"None"}, down, drain, map[string]State{"4": StateUnknown, "6": StateDraining, "name": StateDraining}},
 		{"dual, IPv6 draining", []string{"10.1.0.1", "fd00::1"}, ready, drain, map[string]State{"4": StateReady, "6": StateUnknown, "name": StateReady}},
 	} {
 		g := healthy()
@@ -187,7 +195,7 @@ func TestLiteralAddressesOnlyInheritAServedFamily(t *testing.T) {
 			switch {
 			case strings.Contains(a.Display, "["):
 				kind = "6"
-			case !strings.Contains(a.Display, "lb.example.com"):
+			case !strings.Contains(a.Display, "lb.example.com") && !strings.Contains(a.Display, "headless"):
 				kind = "4"
 			}
 			if a.State != tc.want[kind] {
