@@ -166,7 +166,7 @@ func TestNetworkFactBudgetAndSearch(t *testing.T) {
 	if got := h.(data.ResourceSearcher).Search("", 10); got.Coverage.State != data.CoverageUnavailable {
 		t.Fatal("a canceled handle finds nothing")
 	}
-	s.resources.factLimit = 3 * (factBase + 64)
+	s.resources.factLimit = 3 * factBytes(page.Items[0])
 	h = resourceSubscribe(t, s, key, true, false)
 	page = resourceWait(t, h, func(p data.ResourcePage) bool { return p.Coverage.State == data.CoveragePartial })
 	if !page.Truncated || len(page.Items) == 20 {

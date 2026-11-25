@@ -316,7 +316,7 @@ func factBytes(row data.ResourceRow) int {
 	if row.Network == nil {
 		return 0
 	}
-	return row.Network.Bytes
+	return row.Network.Bytes + rowBytes(row)
 }
 
 func (e *resourceEntry) addFacts(n int) {

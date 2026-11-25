@@ -1,6 +1,7 @@
 package kube
 
 import (
+	"reflect"
 	"sort"
 	"strconv"
 	"strings"
@@ -19,8 +20,8 @@ import (
 
 const (
 	factRowLimit       = 32 << 10
-	factBase           = 256
 	factTextLimit      = 253
+	factWordLimit      = 64
 	factPathLimit      = 1024
 	factLabels         = 64
 	factPorts          = 64
@@ -45,7 +46,6 @@ func (e *resourceEntry) facts(object any) *data.NetworkFacts {
 }
 
 type factBuilder struct {
-	bytes     int
 	truncated bool
 }
 
@@ -54,12 +54,19 @@ func (b *factBuilder) text(s string, limit int) (string, bool) {
 		b.truncated = true
 		return "", false
 	}
-	b.bytes += len(s) + 16
 	return strings.Clone(s), true
 }
 
+func (b *factBuilder) word(s string) string {
+	v, _ := b.text(s, factWordLimit)
+	return v
+}
+
 func (b *factBuilder) texts(in []string, count, limit int) []string {
-	var out []string
+	if len(in) == 0 {
+		return nil
+	}
+	out := make([]string, 0, min(len(in), count))
 	for _, s := range in {
 		if len(out) == count {
 			b.truncated = true
@@ -78,7 +85,10 @@ func (b *factBuilder) labels(in map[string]string) data.Labels {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
-	var out data.Labels
+	if len(keys) == 0 {
+		return nil
+	}
+	out := make(data.Labels, 0, min(len(keys), factLabels))
 	for _, k := range keys {
 		if len(out) == factLabels {
 			b.truncated = true
@@ -94,7 +104,7 @@ func (b *factBuilder) labels(in map[string]string) data.Labels {
 }
 
 func networkFacts(object any, gvr schema.GroupVersionResource) *data.NetworkFacts {
-	b := &factBuilder{bytes: factBase}
+	b := &factBuilder{}
 	var f data.NetworkFacts
 	ok := false
 	switch obj := object.(type) {
@@ -108,9 +118,11 @@ func networkFacts(object any, gvr schema.GroupVersionResource) *data.NetworkFact
 		ok = b.unstructured(&f, obj, gvr)
 	}
 	f.Truncated = b.truncated
-	f.Bytes = b.bytes
-	if !ok || b.bytes > factRowLimit {
-		return &data.NetworkFacts{Truncated: true, Bytes: factBase}
+	f.Bytes = retainedBytes(reflect.ValueOf(&f))
+	if !ok || f.Bytes > factRowLimit {
+		marker := &data.NetworkFacts{Truncated: true}
+		marker.Bytes = retainedBytes(reflect.ValueOf(marker))
+		return marker
 	}
 	return &f
 }
@@ -174,7 +186,7 @@ func (b *factBuilder) template(f *data.NetworkFacts, obj *unstructured.Unstructu
 }
 
 func (b *factBuilder) service(svc *corev1.Service) *data.ServiceFacts {
-	out := &data.ServiceFacts{Type: string(svc.Spec.Type), PublishNotReady: svc.Spec.PublishNotReadyAddresses}
+	out := &data.ServiceFacts{Type: b.word(string(svc.Spec.Type)), PublishNotReady: svc.Spec.PublishNotReadyAddresses}
 	ips := svc.Spec.ClusterIPs
 	if len(ips) == 0 && svc.Spec.ClusterIP != "" {
 		ips = []string{svc.Spec.ClusterIP}
@@ -183,6 +195,7 @@ func (b *factBuilder) service(svc *corev1.Service) *data.ServiceFacts {
 	out.ExternalIPs = b.texts(svc.Spec.ExternalIPs, factAddresses, factTextLimit)
 	out.ExternalName, _ = b.text(svc.Spec.ExternalName, factTextLimit)
 	out.Selector = b.labels(svc.Spec.Selector)
+	out.Ports = exact[data.ServicePort](len(svc.Spec.Ports), factPorts)
 	for _, p := range svc.Spec.Ports {
 		if len(out.Ports) == factPorts {
 			b.truncated = true
@@ -194,9 +207,9 @@ func (b *factBuilder) service(svc *corev1.Service) *data.ServiceFacts {
 			app, _ = b.text(*p.AppProtocol, factTextLimit)
 		}
 		target, _ := b.text(p.TargetPort.String(), factTextLimit)
-		out.Ports = append(out.Ports, data.ServicePort{Name: name, Port: int(p.Port), Protocol: string(p.Protocol), Target: target, NodePort: int(p.NodePort), AppProtocol: app})
-		b.bytes += 64
+		out.Ports = append(out.Ports, data.ServicePort{Name: name, Port: int(p.Port), Protocol: b.word(string(p.Protocol)), Target: target, NodePort: int(p.NodePort), AppProtocol: app})
 	}
+	out.LoadBalancer = exact[data.LoadBalancerAddress](len(svc.Status.LoadBalancer.Ingress), factAddresses)
 	for _, a := range svc.Status.LoadBalancer.Ingress {
 		out.LoadBalancer = b.address(out.LoadBalancer, a.IP, a.Hostname)
 	}
@@ -216,6 +229,13 @@ func (b *factBuilder) address(list []data.LoadBalancerAddress, ip, hostname stri
 	return append(list, data.LoadBalancerAddress{IP: addr, Hostname: host})
 }
 
+func exact[T any](n, limit int) []T {
+	if n == 0 || limit <= 0 {
+		return nil
+	}
+	return make([]T, 0, min(n, limit))
+}
+
 func tri(v *bool) data.Tri {
 	if v == nil {
 		return data.TriUnknown
@@ -225,7 +245,8 @@ func tri(v *bool) data.Tri {
 
 func (b *factBuilder) slice(s *discoveryv1.EndpointSlice) *data.SliceFacts {
 	service, _ := b.text(s.Labels[sliceServiceLabel], factTextLimit)
-	out := &data.SliceFacts{Service: service, AddressType: string(s.AddressType), Total: len(s.Endpoints)}
+	out := &data.SliceFacts{Service: service, AddressType: b.word(string(s.AddressType)), Total: len(s.Endpoints)}
+	out.Ports = exact[data.SlicePort](len(s.Ports), factPorts)
 	for _, p := range s.Ports {
 		if len(out.Ports) == factPorts {
 			b.truncated = true
@@ -239,11 +260,11 @@ func (b *factBuilder) slice(s *discoveryv1.EndpointSlice) *data.SliceFacts {
 			port.Port = int(*p.Port)
 		}
 		if p.Protocol != nil {
-			port.Protocol = string(*p.Protocol)
+			port.Protocol = b.word(string(*p.Protocol))
 		}
 		out.Ports = append(out.Ports, port)
-		b.bytes += 48
 	}
+	out.Endpoints = exact[data.SliceEndpoint](len(s.Endpoints), factEndpoints)
 	for _, ep := range s.Endpoints {
 		if ep.Conditions.Ready == nil || *ep.Conditions.Ready {
 			out.Ready++
@@ -260,7 +281,6 @@ func (b *factBuilder) slice(s *discoveryv1.EndpointSlice) *data.SliceFacts {
 			node, _ = b.text(*ep.NodeName, factTextLimit)
 		}
 		out.Endpoints = append(out.Endpoints, data.SliceEndpoint{Addresses: b.texts(ep.Addresses, factAddresses, factTextLimit), Ready: tri(ep.Conditions.Ready), Serving: tri(ep.Conditions.Serving), Terminating: tri(ep.Conditions.Terminating), TargetKind: kind, TargetName: name, Node: node})
-		b.bytes += 96
 	}
 	return out
 }
@@ -282,7 +302,6 @@ func (b *factBuilder) backend(in networkingv1.IngressBackend) (data.IngressBacke
 		out.Resource = kind + "/" + name
 		ok = ok && okKind && okName
 	}
-	b.bytes += 64
 	return out, ok
 }
 
@@ -298,6 +317,7 @@ func (b *factBuilder) ingress(ing *networkingv1.Ingress) *data.IngressFacts {
 		}
 	}
 	paths := 0
+	out.Rules = exact[data.IngressRule](len(ing.Spec.Rules), factRules)
 	for _, r := range ing.Spec.Rules {
 		if len(out.Rules) == factRules {
 			b.truncated = true
@@ -309,6 +329,7 @@ func (b *factBuilder) ingress(ing *networkingv1.Ingress) *data.IngressFacts {
 		}
 		rule := data.IngressRule{Host: host}
 		if r.HTTP != nil {
+			rule.Paths = exact[data.IngressPath](len(r.HTTP.Paths), factPaths-paths)
 			for _, p := range r.HTTP.Paths {
 				if paths == factPaths {
 					b.truncated = true
@@ -321,15 +342,15 @@ func (b *factBuilder) ingress(ing *networkingv1.Ingress) *data.IngressFacts {
 				}
 				kind := ""
 				if p.PathType != nil {
-					kind = string(*p.PathType)
+					kind = b.word(string(*p.PathType))
 				}
 				rule.Paths = append(rule.Paths, data.IngressPath{Path: path, Type: kind, Backend: backend})
 				paths++
 			}
 		}
 		out.Rules = append(out.Rules, rule)
-		b.bytes += 64
 	}
+	out.TLS = exact[data.IngressTLS](len(ing.Spec.TLS), factTLS)
 	for _, t := range ing.Spec.TLS {
 		if len(out.TLS) == factTLS {
 			b.truncated = true
@@ -337,8 +358,8 @@ func (b *factBuilder) ingress(ing *networkingv1.Ingress) *data.IngressFacts {
 		}
 		secret, _ := b.text(t.SecretName, factTextLimit)
 		out.TLS = append(out.TLS, data.IngressTLS{Hosts: b.texts(t.Hosts, factTLSHosts, factTextLimit), Secret: secret})
-		b.bytes += 64
 	}
+	out.Addresses = exact[data.LoadBalancerAddress](len(ing.Status.LoadBalancer.Ingress), factAddresses)
 	for _, a := range ing.Status.LoadBalancer.Ingress {
 		out.Addresses = b.address(out.Addresses, a.IP, a.Hostname)
 	}
@@ -347,6 +368,7 @@ func (b *factBuilder) ingress(ing *networkingv1.Ingress) *data.IngressFacts {
 
 func (b *factBuilder) policy(p *networkingv1.NetworkPolicy) *data.NetworkPolicyFacts {
 	out := &data.NetworkPolicyFacts{MatchLabels: b.labels(p.Spec.PodSelector.MatchLabels), IngressRules: len(p.Spec.Ingress), EgressRules: len(p.Spec.Egress)}
+	out.Expressions = exact[data.SelectorRequirement](len(p.Spec.PodSelector.MatchExpressions), factRequirements)
 	for _, r := range p.Spec.PodSelector.MatchExpressions {
 		if len(out.Expressions) == factRequirements {
 			b.truncated = true
@@ -354,6 +376,7 @@ func (b *factBuilder) policy(p *networkingv1.NetworkPolicy) *data.NetworkPolicyF
 		}
 		out.Expressions = append(out.Expressions, b.requirement(r))
 	}
+	out.Types = exact[string](len(p.Spec.PolicyTypes), 4)
 	for _, t := range p.Spec.PolicyTypes {
 		if len(out.Types) < 4 {
 			v, _ := b.text(string(t), factTextLimit)
@@ -435,7 +458,7 @@ func nestedMaps(obj map[string]any, path ...string) []map[string]any {
 }
 
 func (b *factBuilder) pod(p *corev1.Pod) *data.PodFacts {
-	out := &data.PodFacts{Labels: b.labels(p.Labels), Phase: string(p.Status.Phase), Terminating: p.DeletionTimestamp != nil}
+	out := &data.PodFacts{Labels: b.labels(p.Labels), Phase: b.word(string(p.Status.Phase)), Terminating: p.DeletionTimestamp != nil}
 	for _, c := range p.Status.Conditions {
 		if c.Type == corev1.PodReady {
 			switch c.Status {
